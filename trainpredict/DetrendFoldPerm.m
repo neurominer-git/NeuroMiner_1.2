@@ -1,6 +1,6 @@
 function OUT = DetrendFoldPerm(IN, OUT)
 
-global SVM MODEFL
+global SVM MODEFL EVALFUNC
 
 if isfield(SVM,'Post') && isfield(SVM.Post,'Detrend') && SVM.Post.Detrend
     OUT.detrend.flag = true;
@@ -17,9 +17,9 @@ if OUT.detrend.flag
     PermNum = numel(PermVec);
     FoldNum = numel(FoldVec);
     ClassNum = numel(ClassVec);
-
-    P = []; D = []; L = [];
-
+    thresh = zeros(PermNum * FoldNum,ClassNum); aucs=thresh;
+    beta = thresh; p=thresh;
+    ll=1;
     for ii=1:PermNum % Loop through CV1 permutations
 
         for jj=1:FoldNum % Loop through CV1 folds
@@ -32,6 +32,8 @@ if OUT.detrend.flag
                 %CVInd = IN.Y.CVInd{i,j}{curclass};
                 %TrInd = IN.Y.TrInd{i,j}{curclass};
                 zu = size(OUT.Trtargs{i,j,curclass},2);
+                
+                P = []; D = []; L = [];
 
                 for z = 1 : zu
                     
@@ -41,18 +43,28 @@ if OUT.detrend.flag
                     
                 end
 
+                switch MODEFL
+                    case 'regression'
+                        [~, beta(ll), p(ll)] = nk_DetrendPredictions2([], [], P, L);
+                    case 'classification'
+                        L(L==-1)=0; X = [D L]; I=sum(isnan(X),2);
+                        ROCout = roc2(X(~I,:),[],[],0);
+                        aucs(ll,curclass)= ROCout.AUC; thresh(ll,curclass)=ROCout.co;
+                end
+                ll=ll+1;
+
             end
         end
     end
     
     switch MODEFL
         case 'regression'
-            [~, OUT.detrend.beta, OUT.detrend.p] = nk_DetrendPredictions2([], [], P, L);
+            OUT.detrend.beta = median(beta);
+            OUT.detrend.p = median(p);
             
         case 'classification'
-            [ ~,~, T, ~, ~, OUT.detrend.indexthresh] = perfcurve2(L,D,1);
-            OUT.detrend.thresh = T(OUT.detrend.indexthresh);
-            %Pcorr = P - OUT.detrend.thresh;
+            OUT.detrend.thresh = median(thresh);
+
              for ii=1:PermNum % Loop through CV1 permutations
                 for jj=1:FoldNum % Loop through CV1 folds
                     i = PermVec(ii); j= FoldVec(jj);
@@ -60,10 +72,12 @@ if OUT.detrend.flag
                         curclass = ClassVec(ccurclass);
                         zu = size(OUT.Trtargs{i,j,curclass},2);
                         for z = 1 : zu
-                            OUT.Trdecs{i,j,curclass}(:,z) =  OUT.Trdecs{i,j,curclass}(:,z) - OUT.detrend.thresh ;
+                            OUT.Trdecs{i,j,curclass}(:,z) =  OUT.Trdecs{i,j,curclass}(:,z) - OUT.detrend.thresh(curclass) ;
                             OUT.Trtargs{i,j,curclass}(:,z) = sign( OUT.Trdecs{i,j,curclass}(:,z) );
-                            OUT.CVdecs{i,j,curclass}(:,z) =  OUT.CVdecs{i,j,curclass}(:,z) - OUT.detrend.thresh ;
+                            OUT.CVdecs{i,j,curclass}(:,z) =  OUT.CVdecs{i,j,curclass}(:,z) - OUT.detrend.thresh(curclass) ;
                             OUT.CVtargs{i,j,curclass}(:,z) = sign( OUT.CVdecs{i,j,curclass}(:,z) );
+                            OUT.tr{i,j,curclass}(:,z) = EVALFUNC( IN.Y.TrL{i,j}{curclass}, OUT.Trdecs{i,j,curclass}(:,z) );
+                            OUT.ts{i,j,curclass}(:,z) = EVALFUNC( IN.Y.CVL{i,j}{curclass}, OUT.CVdecs{i,j,curclass}(:,z) );
                         end
                     end
                 end

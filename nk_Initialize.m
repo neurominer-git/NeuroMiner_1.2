@@ -10,15 +10,16 @@ global NMinfo NM CALIBAVAIL OOCVAVAIL SPMAVAIL FSAVAIL OCTAVE
 
 NMinfo.info.name    = 'NeuroMiner';
 if OCTAVE
-    NMinfo.info.ver     = sprintf('Version 1.1 (Beta) | BEORN [OCTAVE: %s]', OCTAVE_VERSION);
-  else
-    NMinfo.info.ver     = 'Version 1.1 (Beta) | BEORN [MATLAB]';
+    NMinfo.info.ver     = sprintf('Version 1.1 (Beta) | BEORN [OCTAVE %s]', OCTAVE_VERSION);
+else
+    matver = ver('matlab');
+    NMinfo.info.ver     = sprintf('Version 1.1 (Beta) | BEORN [%s %s]', matver.Name, matver.Release);
 end
 NMinfo.info.author  = 'Nikolaos Koutsouleris';
 NMinfo.info.affil   = 'Section for Precision Psychiatry';
 NMinfo.info.dep     = 'Department of Psychiatry and Psychotherapy';
 NMinfo.info.inst    = 'Ludwig-Maximilian-University';
-NMinfo.info.datever = '11/2021';
+NMinfo.info.datever = '12/2021';
 NMinfo.info.timestamp = date;
 NMinfo.info.email   = 'nm@pronia.eu';
 try

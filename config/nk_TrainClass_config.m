@@ -1,10 +1,11 @@
-% ============================================================================
-% FORMAT res = nk_TrainClass_config(act, varind, parentstr)
-% ============================================================================
-% Interface for defining the parameters of the training and prediction process
-%
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 05/2018
+% =========================================================================
+% FORMAT [act, varind] = nk_TrainClass_config(act, varind, parentstr)
+% =========================================================================
+% Interface for defining the parameters of the training and prediction 
+% process. The function also creates default parameters if a new modality 
+% has been added to the NM workspace
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% (c) Nikolaos Koutsouleris, 12/2021
 
 function [act, varind] = nk_TrainClass_config(act, varind, parentstr)
 global NM
@@ -70,11 +71,11 @@ if NM.TrainParam.STACKING.flag == 1
     end
 end
 
+nan_in_label=false;         if sum(isnan(NM.label(:)))>0, nan_in_label=true; end
 %% Create further default configurations
 if ~isfield(NM.TrainParam,'PREPROC'),
     % Create PREPROC structure
     nan_in_pred=false;          if sum(isnan(NM.Y{varind}(:)))>0, nan_in_pred=true; end
-    nan_in_label=false;         if sum(isnan(NM.label(:)))>0, nan_in_label=true; end
     NM.TrainParam.PREPROC{1}    = DefPREPROC(NM.modeflag,nan_in_pred,nan_in_label);
     NM.TrainParam.VIS{1}        = nk_Vis_config([], NM.TrainParam.PREPROC, 1, 1); 
 else
@@ -99,10 +100,11 @@ else
         otherwise
             nY = numel(NM.Y);
             nP = numel(NM.TrainParam.PREPROC); 
-            for i=1:nY;
+            for i=1:nY
                 if i>nP
-                    NM.TrainParam.PREPROC{i} = DefPREPROC(NM.modeflag);
-                    NM.TrainParam.VIS{i}    = nk_Vis_config([], NM.TrainParam.PREPROC{i}, i, 1); 
+                    nan_in_pred=false;          if sum(isnan(NM.Y{i}(:)))>0, nan_in_pred=true; end
+                    NM.TrainParam.PREPROC{i}    = DefPREPROC(NM.modeflag, nan_in_pred, nan_in_label);
+                    NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC{i}, i, 1); 
                 end
             end
     end

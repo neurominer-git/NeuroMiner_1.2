@@ -28,11 +28,11 @@ end
 
 if flg
     if ischar(ip)
-        str = sprintf('%s|%s', str, ip);
+        str = sprintf('%s/%s', str, ip);
     elseif isnumeric(ip)
-        str = sprintf('%s|%g', str, ip);
+        str = sprintf('%s/%g', str, ip);
     elseif isempty(ip)
-        str = sprintf('%s|%s', str, 'undefined');
+        str = sprintf('%s/%s', str, 'undefined');
     else
         str = 'unknown parameter type';
     end

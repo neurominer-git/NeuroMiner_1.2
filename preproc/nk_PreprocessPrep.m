@@ -166,14 +166,16 @@ switch act
                     fprintf('\nSmoothing weighting map')
                     inp.Yw = nk_PerfSpatFilt2( inp.Yw, PREPROC, inp.X ); 
                 else
-                    I = arrayfun( @(j) isfield(PREPROC.ACTPARAM{j},'RANK'), 1:numel( PREPROC.ACTPARAM ));
-                    if any(I), 
-                        I = find(I);
-                        for z=1:numel(I)
-                            if isfield(PREPROC.ACTPARAM{I(z)}.RANK,'EXTERN')
-                                inp.Yw = PREPROC.ACTPARAM{I(z)}.RANK.EXTERN;
-                                inp.Yw = nk_PerfSpatFilt2( inp.Yw, PREPROC, inp.X ); 
-                                break
+                    if isfield(PREPROC,'ACTPARAM')
+                        I = arrayfun( @(j) isfield(PREPROC.ACTPARAM{j},'RANK'), 1:numel( PREPROC.ACTPARAM ));
+                        if any(I), 
+                            I = find(I);
+                            for z=1:numel(I)
+                                if isfield(PREPROC.ACTPARAM{I(z)}.RANK,'EXTERN')
+                                    inp.Yw = PREPROC.ACTPARAM{I(z)}.RANK.EXTERN;
+                                    inp.Yw = nk_PerfSpatFilt2( inp.Yw, PREPROC, inp.X ); 
+                                    break
+                                end
                             end
                         end
                     end

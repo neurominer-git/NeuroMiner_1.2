@@ -24,10 +24,10 @@ function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P
 % Outputs:
 % --------
 % mW :          (Back-projected) weight map
-% mP :
+% mP :          p
 % mR :
 % mSR :
-% 
+% mC :
 % W :           weight vector in processed feature space
 % mPA :
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -43,7 +43,9 @@ mPA = []; PA = []; warning off
 W       = zeros(size(F,1),1);
 W(F)    = xV;
 W(~Fadd)= 0;
-if ~any(W), fprintf('?'); end
+if ~any(W), 
+    fprintf('?'); 
+end
 
 % Process analytical P values
 if ~isempty(AnalP)
@@ -68,9 +70,9 @@ mW = cell(1,mM);
 if ~isempty(PA), mPA = cell(1,mM); end
 
 if procfl
-    mP = cell(1,mM); mR = cell(1,mM); mSR = cell(1,mM);
+    mP = cell(1,mM); mR = cell(1,mM); mSR = cell(1,mM); mC = cell(1,nM);
 else
-    mP = []; mR = []; mSR = [];
+    mP = []; mR = []; mSR = []; mC=[];
 end
 
 % Loop through modalities
@@ -195,14 +197,18 @@ for n=1:nM
                         if isfield(naPX,'indNonRem') && ~isempty(naPX.indNonRem) && sum(~naPX.indNonRem) > 0
                             tmW = zeros(size(naPX.indNonRem')); tmP = zeros(size(naPX.indNonRem'));
                             tmW(naPX.indNonRem) = nmW; nmW = tmW; tmP(naPX.indNonRem) = nmP; nmP = tmP;  
-                            clear tmW tmP;
+                            % Don't forget to adjust the feature masks and the
+                            % indices to modalities in case of fused feature spaces
+                            tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(pInaPX.indNonRemND) = lFuVI; lFuVI = tlFuVI;
+                            tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = lVI; lVI = tlVI;
+                            clear tmW tmP tlFuVI tl;
                         end
                         reducedimfl = true;
                     end
                         
 
                 case {'elimzero','extfeat','extdim'}
-                    %flg = true;
+                    % Find eliminated feature vector
                     if isfield(naPX,'NonPruneVec')
                         IND = 'NonPruneVec';
                     elseif isfield(naPX,'indNonRem')
@@ -210,17 +216,23 @@ for n=1:nM
                     else
                         IND = 'ind';
                     end
+                    % Retrieve index vector to eliminated features
                     if size(naPX.(IND),2)>1 && size(naPX.(IND),1)>1
                         pIND = naPX.(IND)(:,inp.curlabel);
                     else
                         pIND = naPX.(IND);
                     end
+                    % Eliminated features have to be re-introduced
                     tmW = zeros(length(pIND),1); tmW(pIND) = nmW; nmW = tmW;   
                     tmP = false(length(pIND),1); tmP(pIND) = nmP; nmP = tmP;
                     if ~isempty(PA)
                         tmPA = zeros(length(pIND),1);
                         tmPA(naPX.(IND)) = nmPA; nmPA = tmPA;
-                    end
+                    end 
+                    % Don't forget to adjust the feature masks and the
+                    % indices to modalities in case of fused feature spaces
+                    tlFuVI = false(length(pIND),1); tlFuVI(pIND) = lFuVI; lFuVI = tlFuVI;
+                    tlVI = true(length(pIND),1); tlVI(pIND) = lVI; lVI = tlVI;
             end
 
         end
@@ -232,18 +244,19 @@ for n=1:nM
         % Run univariate correlation analysis if no factorization method
         % had been applied to the data
         if ~decompfl(n)
+            tY = zeros(size(Y,1),numel(nmP)); 
             if nM > 1
-                tY = zeros(size(Y,1),numel(nmP)); 
+                % VI references the respective modality n
                 tY(:,nmP) = Y(:,VI(Fu) == n); 
             else
-                tY = Y;
+                tY(:,nmP) = Y;
             end
             % Rows with Nans will be removed by nk_CorrMat
             IN.zerooutflag=1;
             tY = nk_PerfZeroOut(tY, IN);
             nmR  =   nk_CorrMat(L, tY,'pearson'); 
             nmSR =   nk_CorrMat(L, tY,'spearman');
-            nmC  =   corrcov(cov(tY,tY')); nmC = nmC(:);
+            nmC  =   corrcoef(tY); %nmC = nmC(:);
         else
             nmR  =  nan(size(nmW)); nmSR = nmR; nmC = nmR;
         end
@@ -251,12 +264,13 @@ for n=1:nM
         if nM == 1 && mM>1
             for m=1:numel(varind)
                 if procfl
+                    % Estract indices to modality
                     indX = inp.X.dimvecx(m)+1:inp.X.dimvecx(m+1);
                     mW{m} = nmW(indX);
                     mP{m} = nmP(indX);
                     mR{m} = nmR(indX);
                     mSR{m} = nmSR(indX);
-                    mC{m} = mC(indX);
+                    mC{m} = nmC(indX, indX);
                     if ~isempty(PA), mPA{m} = nmPA(indX); end
                 else
                     mW{m} = nmW;
@@ -275,10 +289,18 @@ for n=1:nM
                 if isempty(mR{n})
                     mR{n} = zeros(size(nmW,1),1);
                     mSR{n} = zeros(size(nmW,1),1);
+                    mC{n} = zeros(size(nmW,1),size(nmW,1));
                 end
-                mR{n}(lFuVI) = nmR;
-                mSR{n}(lFuVI) = nmSR; 
-                mC{n}(lFuVI) = nmC;
+                IX = lFuVI(lVI);
+                if numel(nmR)~=numel(IX)
+                    mR{n}(IX) = nmR;
+                    mSR{n}(IX) = nmSR; 
+                    mC{n}(IX,IX) = nmC;
+                else
+                    mR{n}(IX) = nmR(IX);
+                    mSR{n}(IX) = nmSR(IX); 
+                    mC{n}(IX,IX) = nmC(IX,IX);
+                end
             else
                 mR{n} = nmR;
                 mSR{n} = nmSR; 
@@ -286,12 +308,16 @@ for n=1:nM
             end
         end
     else
-        % Concatenate weight vectors
         nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
-        mW = [mW; nmW]; 
         if ~isempty(PA), 
-             nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI);
-             mPA = [mPA; nmPA];
+             nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI(lVI));
+        end
+        if mM>1 % intermediate / late fusion
+            mW{n} = nmW;
+             if ~isempty(PA), mPA{n} = nmPA; end
+        else % Concatenate weight vectors (early fusion)
+            mW = [mW; nmW]; 
+            if ~isempty(PA), mPA = [mPA; nmPA]; end
         end
     end
 end

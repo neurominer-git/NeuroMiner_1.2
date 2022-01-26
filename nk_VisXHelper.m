@@ -138,7 +138,8 @@ switch act
                 I1.VCV1MEAN{h,n}                = nm_nanmedian(I1.VCV1{h,n},2);
                 I1.VCV1SUM{h,n}                 = nm_nansum(I1.VCV1{h,n},2);
                 I1.VCV1SQ{h,n}                  = nm_nansum(I1.VCV1{h,n}.^2,2);
-                I1.VCV1STD{h,n}                 = (nm_nanstd(I1.VCV1{h,n},2)./sqrt(I1.VCV1NMODEL(h)))*1.96;
+                %I1.VCV1STD{h,n}                 = (nm_nanstd(I1.VCV1{h,n},2)./sqrt(I1.VCV1NMODEL(h)))*1.96;
+                I1.VCV1STD{h,n}                 = nm_nanstd(I1.VCV1{h,n},2);
                 indMEANgrSE                     = abs(I1.VCV1MEAN{h,n}) > I1.VCV1STD{h,n};
                 if isempty(I2.VCV2SUM{h, n})
                     I2.GCV2SUM{h, n}            = nan(D,ix*jx,'double');

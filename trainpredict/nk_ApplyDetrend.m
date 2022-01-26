@@ -1,4 +1,4 @@
-function [ Tcorr, Dcorr ] = nk_ApplyDetrend(XTest, YTrain, XTrain, Mkl, Fkl, detrend)
+function [ Tcorr, Dcorr ] = nk_ApplyDetrend(XTest, YTrain, XTrain, Mkl, Fkl, detrend, curclass)
 
 global MODEFL
 
@@ -10,7 +10,7 @@ for z = 1 : nMkl
         case 'regression'
             Tcorr(:,z) = nk_DetrendPredictions2(detrend.beta, detrend.p, Tcorr(:,z)); Dcorr(:,z) = Tcorr(:,z);
         case 'classification'
-            Dcorr(:,z) = Dcorr(:,z) - detrend.thresh; Tcorr(:,z) = sign(Dcorr(:,z));
+            Dcorr(:,z) = Dcorr(:,z) - detrend.thresh(curclass); Tcorr(:,z) = sign(Dcorr(:,z));
     end
             
 end

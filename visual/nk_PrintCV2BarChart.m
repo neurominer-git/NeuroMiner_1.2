@@ -104,11 +104,10 @@ for p=1:numel(D.ax)
                 std_y = D.ax{p}.std_y(:,i);
             end
             set(D.ax{p}.h_bar(i),'YData',D.ax{p}.val_y(:,i));
-            set(D.ax{p}.err_bar(i),'XData',D.ax{p}.std_y(:,i));
             set(D.ax{p}.err_bar(i),'YData',D.ax{p}.val_y(:,i));
             if ~OCTAVE
-              set(D.ax{p}.err_bar(i),'YNegativeDelta',[]);
-              set(D.ax{p}.err_bar(i),'YPositiveDelta',[]);
+              set(D.ax{p}.err_bar(i),'YNegativeDelta',std_y);
+              set(D.ax{p}.err_bar(i),'YPositiveDelta',std_y);
             end
             if std_y 
                 set(D.ax{p}.err_bar(i),'LData',std_y);

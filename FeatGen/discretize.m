@@ -1,4 +1,4 @@
-function [dY, mY, sY] = PerfDiscretizeObj(Y, astart, astep, aend, mY, sY)
+function [dY, mY, sY] = discretize(Y, astart, astep, aend, mY, sY)
 % =========================================================================
 % FORMAT [dY, IN] = nk_PerfDiscretizeObj(Y, IN)
 % =========================================================================
@@ -6,10 +6,11 @@ function [dY, mY, sY] = PerfDiscretizeObj(Y, astart, astep, aend, mY, sY)
 % Discretizes Y columnwise to mean +/- alpha*std, where alpha is a
 % vector of discrete values. By default alpha is set to 0:0.5:4.
 % _________________________________
-% (c) Nikolaos Koutsouleris 10/2015
+% (c) Nikolaos Koutsouleris 01/2022
     
-
+if ~exist("mY","var")
     mY = mean(Y); sY = std(Y);
+end
 
 [m,n] = size(Y);
 dY=zeros(m,n);
@@ -29,5 +30,3 @@ end
 
 dY( Y > tmY + alphas(end) .* tsY ) = aend;
 dY( Y < tmY - alphas(end) .* tsY ) = -(aend);
-
-return

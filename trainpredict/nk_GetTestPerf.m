@@ -30,18 +30,18 @@ global PREDICTFUNC EVALFUNC SVM MODEFL
 % ******************************* Prepare *********************************
 s=1;
 if ~isempty(Features)
-    if iscell(Features), 
+    if iscell(Features) 
         s=size(Features{1},2); 
     else
         s=size(Features,2); 
     end
 end
 ts = zeros(s,1);
-if iscell(Xtest),
+if iscell(Xtest)
     % Check and remove Nan cases
     [Xtest{1}, Ytest, I] = nk_ManageNanCases(Xtest{1}, Ytest);
     nsubj = size(Xtest{1},1); 
-else, 
+else 
     [Xtest, Ytest, I] = nk_ManageNanCases(Xtest, Ytest);
     nsubj = size(Xtest,1); 
 end

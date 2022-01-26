@@ -359,13 +359,14 @@ switch meas{measind}
          hold on;
          xp = [ vp vp ]; yp = [ 0 maxah ];
          hl=line(xp, yp ,'LineWidth',2,'Color','r');
+         %hl2=line([vp2 vp2], yp ,'LineWidth',2,'Color','r-');
          Pval = sum(ve)/size(ve,2);
          if Pval ~= 0
-            Pvalstr = sprintf('P=%g',Pval);
+            Pvalstr = sprintf('%s=%1.2f\nSignificance: P=%g', xlb, vp, Pval);
          else
-            Pvalstr = sprintf('P<%g',1/perms);
+            Pvalstr = sprintf('%s=%1.2f\nSignificance: P<%g', xlb, vp, 1/perms);
          end
-         legend(hl,Pvalstr);
+         legend({'Binned null distribution', 'Fitted null distribution', Pvalstr});
 
     otherwise 
 

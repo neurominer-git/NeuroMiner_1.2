@@ -1,5 +1,8 @@
 function indperm = nk_VisXPermHelper(act, N, nperms, L)
 
+s = RandStream.create('mt19937ar','seed',sum(100*clock));
+RandStream.setGlobalStream(s);
+
 switch act
     case 'genpermlabel'
         indperm = zeros(N, nperms);

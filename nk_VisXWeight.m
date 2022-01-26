@@ -197,32 +197,42 @@ for n=1:nM
                         if isfield(naPX,'indNonRem') && ~isempty(naPX.indNonRem) && sum(~naPX.indNonRem) > 0
                             tmW = zeros(size(naPX.indNonRem')); tmP = zeros(size(naPX.indNonRem'));
                             tmW(naPX.indNonRem) = nmW; nmW = tmW; tmP(naPX.indNonRem) = nmP; nmP = tmP;  
-                            clear tmW tmP;
+                            % Don't forget to adjust the feature masks and the
+                            % indices to modalities in case of fused feature spaces
+                            tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(pInaPX.indNonRemND) = lFuVI; lFuVI = tlFuVI;
+                            tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = lVI; lVI = tlVI;
+                            clear tmW tmP tlFuVI tlVI;
                         end
                         reducedimfl = true;
                     end
                         
 
                 case {'elimzero','extfeat','extdim'}
-                    %flg = true;
+                    % Find eliminated feature vector
                     if isfield(naPX,'NonPruneVec')
                         IND = 'NonPruneVec';
-                    elseif isfield(naPX,'indNonRem')
+                    elseif isfield(naPX,'indNonRem')    
                         IND = 'indNonRem';
                     else
                         IND = 'ind';
                     end
+                    % Retrieve index vector to eliminated features
                     if size(naPX.(IND),2)>1 && size(naPX.(IND),1)>1
                         pIND = naPX.(IND)(:,inp.curlabel);
                     else
                         pIND = naPX.(IND);
                     end
+                    % Eliminated features have to be re-introduced
                     tmW = zeros(length(pIND),1); tmW(pIND) = nmW; nmW = tmW;   
                     tmP = false(length(pIND),1); tmP(pIND) = nmP; nmP = tmP;
                     if ~isempty(PA)
                         tmPA = zeros(length(pIND),1);
                         tmPA(naPX.(IND)) = nmPA; nmPA = tmPA;
-                    end
+                    end 
+                    % Don't forget to adjust the feature masks and the
+                    % indices to modalities in case of fused feature spaces
+                    tlFuVI = false(length(pIND),1); tlFuVI(pIND) = lFuVI; lFuVI = tlFuVI;
+                    tlVI = true(length(pIND),1); tlVI(pIND) = lVI; lVI = tlVI;
             end
 
         end

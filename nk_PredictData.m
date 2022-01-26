@@ -48,7 +48,7 @@ Predict.binCV1Predictions        = cell(iy,jy);
 Predict.binCV1Performance        = zeros(iy,jy,nclass);
 Predict.binCV1Performance_Mean   = zeros(1,nclass);
 Predict.binCV1Performance_SD     = zeros(1,nclass);
-if MULTI.flag, 
+if MULTI.flag 
     Predict.MultiCV1Predictions  = cell(iy,jy);
     Predict.MultiCV1Probabilities  = cell(iy,jy);
     Predict.MultiCV1Performance  = zeros(iy,jy); 
@@ -89,8 +89,8 @@ for k=1:iy % Loop through CV1 permutations
         for curclass = 1:nclass % Loop through dichotomizers
             
             % Extract Test Data
-            if iscell(TS{k,l}), 
-                if ~isempty(mTSInd),
+            if iscell(TS{k,l}) 
+                if ~isempty(mTSInd)
                     if iscell(mTSInd{k,l})
                         XTest = TS{k,l}{curclass}(mTSInd{k,l}{curclass},:); 
                     else
@@ -112,8 +112,8 @@ for k=1:iy % Loop through CV1 permutations
             end
             
             % Extract Training Data
-            if iscell(TR{k,l}), 
-                if ~isempty(TRInd), 
+            if iscell(TR{k,l}) 
+                if ~isempty(TRInd) 
                     if iscell(TRInd{k,l})
                         XTrain = TR{k,l}{curclass}(TRInd{k,l}{curclass},:); 
                     else
@@ -136,8 +136,8 @@ for k=1:iy % Loop through CV1 permutations
             YTrain = dTRLabel{k,l}{curclass}(:,MULTILABEL.curdim);
             
             %Extract CV1 Test Data
-            if iscell(CVD{k,l}), 
-                if ~isempty(CVDInd), 
+            if iscell(CVD{k,l}) 
+                if ~isempty(CVDInd) 
                     if iscell(CVDInd{k,l})
                         XCV = CVD{k,l}{curclass}(CVDInd{k,l}{curclass},:); 
                     else
@@ -177,7 +177,7 @@ for k=1:iy % Loop through CV1 permutations
             Mkl = MD{k,l,curclass};
             
             %%%%%%%%%%%%%%%%%%% PREDICT TEST DATA %%%%%%%%%%%%%%%%%%%%%
-            if VERBOSE, 
+            if VERBOSE 
                 switch MODEFL
                     case 'classification'
                         if RAND.Decompose ~= 9
@@ -194,7 +194,7 @@ for k=1:iy % Loop through CV1 permutations
             end
             
             if detrendfl
-               [ tsT, tsD ] = nk_ApplyDetrend(XTest, Ydum, XTrain, Mkl, Fkl, detrend);
+               [ tsT, tsD ] = nk_ApplyDetrend(XTest, Ydum, XTrain, Mkl, Fkl, detrend, curclass);
             else
                 [~, tsT, tsD, Mkl] = nk_GetTestPerf(XTest, Ydum, Fkl, Mkl, XTrain, 1);
             end
@@ -218,7 +218,7 @@ for k=1:iy % Loop through CV1 permutations
             n_subj = size(tsD,1);
             
             % Weight decision values
-            if ~isempty(W) && ~isempty(W{k,l,curclass}), 
+            if ~isempty(W) && ~isempty(W{k,l,curclass}) 
                 if nW == 1 , Wkl = W{k,l}';  else Wkl = W{k,l,curclass}'; end
                 wx = repmat(Wkl,n_subj,1); tsD = bsxfun(@times,tsD,wx); tsT = bsxfun(@times,tsT,wx); 
             end
@@ -268,7 +268,7 @@ for curclass = 1 : nclass
     
     % Extract current dichotomization decision from (multi-group) array
     indCurClass = Classes == curclass;
-    if isempty(dTSInd{curclass}), 
+    if isempty(dTSInd{curclass}) 
         Predict.binCV2Performance_Targets(curclass) = NaN;
         Predict.binCV2Performance_DecValues(curclass) = NaN;   
         Predict.binCV2Diversity_Targets(curclass) = NaN;

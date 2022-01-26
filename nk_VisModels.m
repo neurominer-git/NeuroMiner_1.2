@@ -166,11 +166,11 @@ for f=1:ix % Loop through CV2 permutations
     for d=1:jx % Loop through CV2 folds
         
         fprintf('\n---------------------------------------------------------------------------------------------')
-        if ~GridAct(f,d), 
+        if ~GridAct(f,d) 
             ll=ll+1;
             fprintf('\nSkipping CV2 [%g,%g] (user-defined).',f,d)
             continue 
-        end;
+        end
         
         [iy, jy] = size(CV.cvin{f,d}.TrainInd); % No. of Perms / Folds at CV1 level
         CVPOS.CV2p = f;
@@ -193,7 +193,7 @@ for f=1:ix % Loop through CV2 permutations
                     [I, I1, filefound] = nk_VisXHelper('accum', nM, nclass, decompfl, permfl, ix, jx, I, inp, ll, nperms, oVISpath);
                     WriteCV2Data(inp, nM, FUSION, SAV, operm, ofold, I1);
                     if filefound
-                        if isfield(I1,'PCV1SUM'), PCV1SUMflag=true; else PCV1SUMflag = false; end
+                        if isfield(I1,'PCV1SUM'), PCV1SUMflag=true; else, PCV1SUMflag = false; end
                         if any(permfl)
                             for h=1:nclass
                                 switch MODEFL
@@ -259,7 +259,7 @@ for f=1:ix % Loop through CV2 permutations
                 % Prepare containers & initialize matrices for CV1-level
                 % weight vector relevance metrics
                 % =========================================================
-                ol                                = ol+1;
+                ol                             = ol+1;
                 [~, I1] = nk_VisXHelper('initI1', nM, nclass, decompfl, permfl);
                 GDFEAT                         = GD.FEAT; 
                 GDVI                           = GD.VI; 
@@ -285,7 +285,7 @@ for f=1:ix % Loop through CV2 permutations
                 if ~VERBOSE,fprintf('\n\nComputing visualizations for CV2 [ %g, %g ] ',f,d), end
                 
                 %% Initialize containers for analysis
-                if permfl, 
+                if permfl 
                     I1.TS           = cell(nclass,1);
                     I1.DS           = cell(nclass,1);
                     I1.TS_perm      = cell(nclass,1);
@@ -317,7 +317,7 @@ for f=1:ix % Loop through CV2 permutations
                     ill = getModelNumDim(h,iy,jy,nP,Pspos,GDFEAT);
                     fprintf('\nPredictor #%g: Need to evaluate %g models in this CV2 partition', h, ill);
                     
-                    if permfl, 
+                    if permfl 
                         I1.VCV1WPERM{h} = cell(ill,1); 
                         I1.VCV1MPERM{h} = nan(ill,1); 
                     end
@@ -334,7 +334,7 @@ for f=1:ix % Loop through CV2 permutations
                         I1.VCV1STD{h,n}            = I1.VCV1SUM{n};
                         
                         % Prepare for analysis without factorization
-                        if ~decompfl(n), 
+                        if ~decompfl(n) 
                             I1.PCV1SUM{h, n}                    = zeros(D, 1,'single'); 
                             I1.VCV1PEARSON{h, n}                = nan(D, iy*jy*nP,'single'); 
                             I1.VCV1SPEARMAN{h, n}               = nan(D, iy*jy*nP,'single'); 
@@ -368,7 +368,7 @@ for f=1:ix % Loop through CV2 permutations
                     end
                     
                     % Initialize model container 
-                    if ~fndMD , MD{h} = cell(nP,1); for m = 1 : nP, MD{h}{m} = cell(iy,jy); end; end;
+                    if ~fndMD , MD{h} = cell(nP,1); for m = 1 : nP, MD{h}{m} = cell(iy,jy); end; end
                 end
                 
                 il = ones(nclass,1); kil=ones(nclass,1);
@@ -426,10 +426,10 @@ for f=1:ix % Loop through CV2 permutations
                                 if ~islogical(Fkl),F = Fkl ~= 0; else F = Fkl; end
 
                                 if VERBOSE
-                                    fprintf('\n');cprintf('*black',['Constructing predictive pattern(s) in CV2 [ %2g ,%2g ], ' ...
+                                    fprintf('\n');fprintf(['Constructing predictive pattern(s) in CV2 [ %2g ,%2g ], ' ...
                                     'CV1 [ %2g ,%2g, Predictor #%g/%g ]: %g model(s), %s ML params [ %s ]. '], f, d, k, l, h, nclass, ul, algostr, P_str); 
                                 else
-                                    fprintf('\n');cprintf('*black','Visualizing: CV2 [ %2g, %2g ], CV1 [ %2g, %2g, P: #%g/%g ]: %g model(s) ',f, d, k, l, h, nclass, ul) ;
+                                    fprintf('\n');fprintf('Visualizing: CV2 [ %2g, %2g ], CV1 [ %2g, %2g, P: #%g/%g ]: %g model(s) ',f, d, k, l, h, nclass, ul) ;
                                 end
 
                                 CVInd   = mapY.CVInd{k,l}{h};
@@ -478,7 +478,7 @@ for f=1:ix % Loop through CV2 permutations
                                 [modelTrL, modelTr, TrInd] = nk_LabelImputer( modelTrL, modelTr, TrInd, sPs, IMPUTE);
                                 
                                 % Concatenate Training and CV data if needed
-                                if FullPartFlag, 
+                                if FullPartFlag 
                                     modelTr = [modelTr; modelCV ]; 
                                     modelTrL = [modelTrL; modelCVL]; 
                                     TrInd = [TrInd; CVInd]; 
@@ -486,7 +486,7 @@ for f=1:ix % Loop through CV2 permutations
                                 modelTr = modelTr(TrInd,:);
                                 
                                 % Prepare permutation operations
-                                if any(permfl),
+                                if any(permfl)
                                     indperm = []; indpermfeat = [];
                                     switch MODEFL
                                         case 'classification'
@@ -500,7 +500,7 @@ for f=1:ix % Loop through CV2 permutations
                                     if size(pCVInd,2)>1,pCVInd=pCVInd'; end
                                     if FullPartFlag, pTrInd = [pTrInd; pCVInd];end
                                     if pmode(1), indperm = indpermA(pTrInd,:); end
-                                    if inp.multiflag ==1,
+                                    if inp.multiflag ==1
                                         modelTsm = modelTs;
                                         modelTsmL = inp.labels(TsIndM);
                                     end
@@ -611,7 +611,7 @@ for f=1:ix % Loop through CV2 permutations
                                         Tx_perm = cell(1,nM); Px_perm = zeros(1,nperms(1));
                                         for n=1:nM, Tx_perm{n} = zeros(size(Tx{n},1),nperms(n)); end
                                         for perms = 1:nperms(1)
-                                            if ~sigfl, 
+                                            if ~sigfl 
                                                 % Train permuted model
                                                 [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms);
                                                   if isfield(mapY,'VI')
@@ -629,7 +629,7 @@ for f=1:ix % Loop through CV2 permutations
                                                 [~, I1.mTS_perm{h}(:,il(h),perms), I1.mDS_perm{h}(:,il(h),perms)] = nk_GetTestPerf(modelTsm, modelTsmL, Find, MDs, modelTr); 
                                             end
                                             % Compare against original model performance
-                                            if feval(compfun, perf_perm, perf_orig),
+                                            if feval(compfun, perf_perm, perf_orig)
                                                 fprintf('.'); 
                                                 Px_perm(perms) = Px_perm(perms) + 1;
                                             end
@@ -642,7 +642,7 @@ for f=1:ix % Loop through CV2 permutations
                                         I1.VCV1MPERM{h}(il(h)) = (sum(Px_perm) / nperms(1));
                                         
                                         % Print significance to screen
-                                        cprintf('black*', ' P=%1.3f ', I1.VCV1MPERM{h}(il(h)));
+                                        fprintf(' P=%1.3f ', I1.VCV1MPERM{h}(il(h)));
                                         
                                         % Loop through modalities
                                         for n=1:nM
@@ -651,14 +651,11 @@ for f=1:ix % Loop through CV2 permutations
                                             Fpind = any(Tx_perm{n},2)'; 
                                             
                                             % Now compute the P value vector:
-                                            TxV = zeros(size(Tx{n}));
-                                            ipTx = Tx{n} >= 0; inTx = Tx{n} < 0;
-                                            TxV(ipTx) = sum(bsxfun(@ge,Tx_perm{n}(ipTx,:),Tx{n}(ipTx)),2)/nperms(1);
-                                            TxV(inTx) = sum(bsxfun(@le,Tx_perm{n}(inTx,:),Tx{n}(inTx)),2)/nperms(1);
-                                            Pvals = TxV(Fpind);
-                                            
+                                            Pvals = sum( abs(Tx_perm{n}) > abs(Tx{n}),2 ) / nperms(1);
+                                            Pvals = Pvals(Fpind);
+
                                             % ... and the Z score vector:
-                                            Zvals = bsxfun(@rdivide, Tx{n} - nm_nanmean(Tx_perm{n},2), nm_nanstd(Tx_perm{n},2));
+                                            Zvals = (Tx{n} - nm_nanmean(Tx_perm{n},2)) ./ nm_nanstd(Tx_perm{n},2);
                                             Zvals = Zvals(Fpind);
                                             
                                             % with stacking there is a
@@ -698,7 +695,7 @@ for f=1:ix % Loop through CV2 permutations
                                             for mj = 1:inp.nD
                                                 Imj = vec_mj == mj & Fpind;
                                                 I1.VCV1{h,n}(mj,il(h)) = mean(Tx{n}(Imj));
-                                                if ~decompfl(n) && u==1,  
+                                                if ~decompfl(n) && u==1  
                                                     I1.VCV1PEARSON{h, n}(mj,kil(h)) = nm_nanmean(Rx{n}(Imj));
                                                     I1.VCV1SPEARMAN{h, n}(mj,kil(h)) = nm_nanmean(SRx{n}(Imj));
                                                     I1.VCV1PEARSON_UNCORR_PVAL{h, n}(mj,kil(h)) = nm_nanmean(nk_PTfromR(Rx{n}(Imj), size(Ymodel,1), 2));
@@ -724,7 +721,7 @@ for f=1:ix % Loop through CV2 permutations
                                             I1.VCV1{h,n}(badcoords,il(h)) = Tx{n};
 
                                             if ~decompfl(n) 
-                                                if u==1,  
+                                                if u==1  
                                                     %% Compute univariate correlation coefficient for each feature
                                                     I1.VCV1PEARSON{h, n}(badcoords,kil(h)) = Rx{n};
                                                     I1.VCV1SPEARMAN{h, n}(badcoords,kil(h)) = SRx{n};
@@ -864,7 +861,7 @@ for f=1:ix % Loop through CV2 permutations
                      [ mCV2perf_perm, mCV2pred_perm ] = nk_MultiEnsPerf(mDTs_perm, mTTs_perm, inp.labels(TsIndM, inp.curlabel), Classes_perm, ngroups);
                      I.VCV2MPERM_S_MULTI(TsIndM,f,perms) = mCV2pred_perm;
                      % Compare against original model performance
-                     if feval(compfun, mCV2perf_perm, mCV2perf_obs),
+                     if feval(compfun, mCV2perf_perm, mCV2perf_obs)
                         fprintf('.'); 
                         mPx_perm(perms) = mPx_perm(perms) + 1;
                      end
@@ -880,7 +877,6 @@ for f=1:ix % Loop through CV2 permutations
         clear I1 
     end
 end
-
 
 %% PERFORM POST-PROCESSING VISUALIZATION PROCEDURES ON THE ENTIRE DATA 
 if ~batchflag
@@ -1038,7 +1034,7 @@ if ~batchflag
             end
             % Compute empirical multivariate p values (corrected and
             % uncorrected as well as Z scores
-            if any(permfl),
+            if any(permfl)
                 I.VCV2ZSCORE{h,n}   = nm_nansum(I.VCV2ZSCORE{h,n},2);% ./ I.VCV2SEL{h,n};
                 % Uncorrected p values
                 Pvals = nm_nansum(I.VCV2PERM{h,n},2)./ol ;
@@ -1056,7 +1052,8 @@ if ~batchflag
             SUM = nm_nansum(I.VCV2SUM{h,n},2) ;
             SEL = I.VCV2SEL{h,n};
             SQ = sqrt(SUM2 ./ SEL - (SUM ./ SEL).^2);
-            I.VCV2SE{h,n} = SQ./sqrt(SEL)*1.96;
+            %I.VCV2SE{h,n} = (SQ./sqrt(SEL))*1.96;
+            I.VCV2SE{h,n} = SQ;
 
             if size(I.VCV2SQ{h, n},2)>1
                 I.VCV2MEAN_CV1{h,n} = nm_nanmean(I.VCV2MEAN{h,n},2);
@@ -1076,7 +1073,7 @@ if ~batchflag
             [I.VCV2signconst_p{h,n}, I.VCV2signconst_pfdr{h,n}, I.VCV2signconst_z{h,n}, I.VCV2signconst{h,n}] = nk_SignBasedConsistencySignificance(I.VCV2VCV1{h,n});  
             
              % Compute GrandMean metrics
-            I.VCV2rat_CV1{h,n}  = I.VCV2MEAN_CV1{h,n}./(I.VCV2SE_CV1{h,n});
+            I.VCV2rat_CV1{h,n}  = I.VCV2MEAN_CV1{h,n}./I.VCV2SE_CV1{h,n};
             I.VCV2MEANthreshSE_CV1{h,n} = zeros(size(I.VCV2MEAN_CV1{h,n}),'single');
             indMEANgrSE = abs(I.VCV2MEAN_CV1{h,n}) > I.VCV2SE_CV1{h,n};
             I.VCV2MEANthreshSE_CV1{h,n}(indMEANgrSE) = I.VCV2MEAN_CV1{h,n}(indMEANgrSE);
@@ -1231,7 +1228,7 @@ if ~batchflag
         visdata{n}.params.I.numCV2part = ll-1;
         visdata{n}.params.NumPred      = I.VCV2NMODEL(h);
         
-        if ~isempty(featnames) && ~isempty(featnames{n});
+        if ~isempty(featnames) && ~isempty(featnames{n})
             visdata{n}.params.features = featnames{n};
         else
             visdata{n}.params.features = cellstr(num2str((1:D)'));
@@ -1240,7 +1237,7 @@ if ~batchflag
         visdata{n}.MEAN                = I.VCV2(:,n);
         visdata{n}.SE                  = I.VCV2SE(:,n);
         visdata{n}.CVRatio             = I.VCV2rat(:,n);
-        if isfield(I,'PCV2'), 
+        if isfield(I,'PCV2') 
             visdata{n}.FeatProb        = {I.PCV2}; end
         visdata{n}.MEAN_CV2            = I.VCV2MEAN_CV1(:,n);
         visdata{n}.SE_CV2              = I.VCV2SE_CV1(:,n);

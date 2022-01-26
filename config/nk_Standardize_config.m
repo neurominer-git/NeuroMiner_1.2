@@ -35,7 +35,7 @@ if ~defaultsfl
         dINDSTR = 'no'; dINDDEF = 2;
     end
     if ~isempty(WINSOPT) 
-        WINSOPTSTR = sprintf('yes, threshold: +/- %g SD',WINSOPT); WINSOPTDEF = 1;
+        WINSOPTSTR = sprintf('yes, threshold: +/- %s SD',nk_ConcatParamstr(WINSOPT, true)); WINSOPTDEF = 1;
     else
         WINSOPTSTR = 'no'; WINSOPTDEF = 2;
     end
