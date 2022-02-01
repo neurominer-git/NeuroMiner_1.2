@@ -232,7 +232,7 @@ end
 % =========================================================================
 function OOCVres = OOCVPrep(dat, inp1, analysis)
 global SAV MODEFL CV OOCV FUSION MULTILABEL
-
+tOOCV = OOCV;
 if inp1.saveparam   == 2, inp1.saveparam    = 0; end
 if inp1.loadparam   == 2, inp1.loadparam    = 0; end
 if inp1.ovrwrt      == 2, inp1.ovrwrt       = 0; end
@@ -291,6 +291,7 @@ for i = 1:inp1.nF
     
     % **************************** ANALYSIS SETUP *****************************
     inp2 = nk_SetFusionMode2(dat, analysis, F, nF, i, inp1.oocvind);
+    OOCV = tOOCV;
     inp = catstruct(inp1,inp2);
     inp.loadGD = true;
     
