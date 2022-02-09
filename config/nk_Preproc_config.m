@@ -77,7 +77,7 @@ end
  
 % Check for target scaling / exponential transformation option
 if strcmp(NM.modeflag,'regression')
-    if isfield(PREPROC,'LABELMOD') && ( PREPROC.LABELMOD.TARGETSCALE || isfield(PREPROC.LABELMOD,'POLYNOM') )
+    if isfield(PREPROC,'LABELMOD') && isfield(PREPROC.LABELMOD,'TARGETSCALE') && ( PREPROC.LABELMOD.TARGETSCALE || isfield(PREPROC.LABELMOD,'POLYNOM') )
         cmdstr = 'Modify / Disable';
         if ~strcmp(d.PREPROC.targetscaling,'NA'), 
             prestr = sprintf('\n* %s', d.PREPROC.targetscaling); 
