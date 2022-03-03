@@ -5,51 +5,40 @@ function [ Res, IN ] = nk_SimulateML(IN)
 % This function is part of the NeuroMiner machine learning library. 
 % It allows the user to determine the expected prognostic performance of a
 % binary classification algorithm under different learning scenarios, as 
-% determined by the "IN" parameter structure:
-%
-% 1) IN.Nfeats : the dimensionality of the variable/feature space 
-%
-% 2) IN.Nmarkers : the percentage (0-1) of predictive markers within that 
-%    feature space
-%
-% 3) IN.Ncases : the number of observations/cases/samples to learn from
-%
-% 4) IN.eventprob : the percentage (0-1) of cases with the (desired) event 
-%    in relation to the total number of cases 
-%
-% 5) IN.AUCmax and IN.AUCmin : the maximum / minimum separability in the 
-%    feature matrix. The helper function is nk_ExpVec.m is used to create 
-%    features following an exponntial decline in separability. Feature 
-%    creation is based on randomly picking Gaussians within a certain 
-%    distance of each other and a certain span.
-%
-% 6) IN.Nbatches : the absolute number of batched to corrupt the data 
-%
-% 7) IN.BatchPerc : the maximum percentage (0-1) of the feature value range 
+% determined by:
+% 1) Nfeats : the dimensionality of the variable/feature space 
+% 2) Nmarkers : the percentage of predictive markers within that feature space
+% 3) Ncases : the number of observations/cases/samples to learn from
+% 4) eventprob : the percentage of cases with the (desired) event in 
+%    relation to the total number of cases 
+% 5) AUCmax and AUCmin : the maximum / minimum separability in the feature 
+%    matrix. The helper function is nk_ExpVec.m is used to create features 
+%    following an exponntial decline in separability. Feature creation is 
+%    based on randomly picking Gaussians within a certain distance of each 
+%    other and a certain span.
+% 6) Nbatches : the number of batched to corrupt the data 
+% 7) BatchPerc : the maximum percentage of the feature value range to be 
 %    allowed for site effects
-%
-% 8) IN.NcasesMiss : The percentage (0-1) of cases with missing data 
-%
-% 9) IN.NfeatsMiss : The percentage (0-1) of missing values per case
+% 8) NcasesMiss : The number of cases with missing data 
+% 9) NfeatsMissThe percentage of missing values per case
 %
 % Parameters can come in ranges and thus are hyperparameters that the 
 % function will loop through in a brute-force approach. Based on these 
 % hyperparameters the function will generate a synthetic data matrix and 
 % forward it to a simple machine learning pipeline. The user currently can 
 % choose among four different classifiers:
-% IN.algorithm :
-%       a) "LINKERNSVM" : LIBSVM with linear kernel (C=1)
-%       b) "LINSVM": LINBLINEAR, L2-regularized, L1-Loss SVC
-%       c) "L2LR" : L2-regularized logistic regression
-%       d) "L1LR" : L1-regularized logistic regression
-%       [not implemented yet:  "RF" : Random Forests]
+% a) "LINKERNSVM" : LIBSVM with linear kernel (C=1)
+% b) "LINSVM": LINBLINEAR, L2-regularized, L1-Loss SVC
+% c) "L2LR" : L2-regularized logistic regression
+% d) "L1LR" : L1-regularized logistic regression
+% [not implemented:  "RF" : Random Forests]
 % 
 % Furthermore, the setup of the cross-validation cycle can be tweaked, e.g.:
-% IN.RAND.OuterPerm = 1; ==> Outer cross-validation permutations
-% IN.RAND.InnerPerm = 1; ==> Inner cross-validation permutations
-% IN.RAND.OuterFold = 5; ==> Outer cross-validation folds
-% IN.RAND.InnerFold = 5; ==> Inner cross-validation folds
-% IN.RAND.Decompose = 1;
+% RAND.OuterPerm = 1; ==> Outer cross-validation permutations
+% RAND.InnerPerm = 1; ==> Inner cross-validation permutations
+% RAND.OuterFold = 5; ==> Outer cross-validation folds
+% RAND.InnerFold = 5; ==> Inner cross-validation folds
+% RAND.Decompose = 1;
 %
 % Please note that currently the function does not run any nested 
 % cross-validation as we will use standard machine learning parameters. 
@@ -59,7 +48,7 @@ function [ Res, IN ] = nk_SimulateML(IN)
 % This function will only work with NeuroMiner installed and initialized in
 % an active MATLAB session Use preferably MATLAB 2018b or higher.
 % _________________________________________________________________________
-% (c) Nikolaos Koutsouleris, 10/02/2022
+% (c) Nikolaos Koutsouleris, 12/03/2021
 
 % Create hyperparameter array
 % Default algorithm
