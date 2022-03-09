@@ -82,7 +82,7 @@ for i=1:nMD
     Mi = find(IN.MS == MD(i));
     
     if Mi % yes, precomputed means exist for destination group
-        if VERBOSE, fprintf('\Adjusting destination group %g using saved means of group %g.',MD(i), MD(i)); end
+        if VERBOSE, fprintf('\nAdjusting destination group %g using saved means of group %g.',MD(i), MD(i)); end
         meanGi = IN.meanG(Mi,:);
        
     elseif any(MS == MD(i))
