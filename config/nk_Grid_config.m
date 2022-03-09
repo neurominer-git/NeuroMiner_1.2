@@ -224,7 +224,42 @@ switch OptimFlag
                                     Pcparstr = 'Sigmoid coefficients'; [Pcstr, n_pars(end+1)] = nk_ConcatParamstr(PolyCoefdefs);
                                     PX = nk_AddParam(PolyCoefdefs, ['ML-' Pcparstr], 2, PX);
                                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Pcparstr, Pcstr);                 menuact = [ menuact 5 ];
-                            end    
+                            end
+                         case ' -t 4' % precomputed kernels
+                             if NM.TrainParam.SVM.kernel.kerndef <8
+                                WLparstr = 'WL iterations'; [WLstr, n_pars(end+1)] = nk_ConcatParamstr(WLiters);
+                                PX = nk_AddParam(WLiters, ['ML-' WLparstr], 2, PX);
+                                menustr = sprintf('%s|Define %s [ %s ]', menustr, WLparstr, WLstr);                        menuact = [ menuact 100];
+                             elseif NM.TrainParam.SVM.kernel.kerndef == 8
+                                 if NM.TrainParam.SVM.kernel.customfunc_nargin > 0
+                                    for n = 1:NM.TrainParam.SVM.kernel.customfunc_nargin
+                                        argParstr = sprintf('CFuncparstr_%d', n); 
+                                        argStr = sprintf('CFuncstr_%d', n);
+                                        arg = sprintf('customkernel_arg%d', n);
+                                        
+                                        eval(sprintf("%s = 'Custom kernel argument %d'", argParstr, n));
+                                        eval(sprintf('[%s, n_pars(end+1)] = nk_ConcatParamstr(%s)', argStr, arg));
+                                        eval(sprintf("PX = nk_AddParam(%s, ['ML-' %s], 2, PX)", arg, argParstr)); 
+                                        eval(sprintf('X = %s; Y = %s', argParstr, argStr)); 
+                                        eval(sprintf("menustr = '%s|Define %s [ %s ]'", menustr, X, Y));
+                                        
+%                                       
+                                        menuact = [ menuact 101];
+                                    end
+                                  
+                                 end
+                                                                        
+                           
+                             end
+%                              switch SVM.kernel.kerndef
+%                                  case 8 % custom kernel function
+%                                      CKFnamestr = 'Custom kernel function (input: 2 matrices, output: kernel matrix)'; [CKFstr, n_pars(end+1)] = nk_ConcatParamstr(CustomKernel);
+%                                      PX = nk_AddParam(CustomKernel, ['ML-' CKFnamestr], 2, PX);
+%                                      menustr = sprintf('%s|Define %s [ %s ]', menustr, CKFnamestr, CKFstr);                        menuact = [ menuact 101];
+%                              
+%                              end
+                            
+                      
                      end             
             end
             
