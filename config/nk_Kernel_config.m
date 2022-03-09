@@ -149,6 +149,11 @@ if numel(kernnum) > 1
         kerndef = nk_input(['Select kernel type for ' progstr ], 0, 'mq', kernmenu, kernnum, kerndef);
     end
     if kerndef
+        if kerndef == 8
+            param.kernel.customfunc = nk_input(['Enter name of custom kernel function (input: 2 matrices, output: kernel matrix'], 0, 's');
+            param.kernel.customfunc_nargin = str2num(nk_input(['Number of arguments of custom kernel function'], 0, 's'));
+            
+        end
         param.kernel.kerndef = kerndef;
         param.kernel.kernstr = kernstr{param.kernel.kerndef};
         %param = nk_PolyKernel_config(param);

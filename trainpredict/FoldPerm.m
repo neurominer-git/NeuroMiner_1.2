@@ -28,7 +28,7 @@
 
 function [IN, OUT] = FoldPerm(IN, OUT, strout, fRFE, fFull, RetrainImmediate, fKX, LoopParam)
 
-global VERBOSE CV MODEFL RAND MULTILABEL MULTI RFE CVPOS
+global VERBOSE CV MODEFL RAND MULTILABEL MULTI RFE CVPOS Ytrain
 
 RF = []; fMULTI = false; VI = []; 
 if MULTI.flag ==1 && ... 
