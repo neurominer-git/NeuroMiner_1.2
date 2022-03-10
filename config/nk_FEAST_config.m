@@ -4,7 +4,7 @@ NumFeat = 10;
 Method= 4;
 na_str='?';
 
-if ~exist('askFeatNum','var') || isempty(askFeatNum), askFeatNum = false; end
+if ~exist('askFeatNum','var') || isempty(askFeatNum), askFeatNum = true; end
 
 if isfield(params,'FEAST'), 
     if isfield(params.FEAST,'Method'),  Method = params.FEAST.Method; end
@@ -33,12 +33,12 @@ params.FEAST.MethodStr = Methods{Method};
 menustr = [ menustr sprintf('Select FEAST algorithm [ %s ]|', params.FEAST.MethodStr)]; menuact = [menuact 2]; 
 
 if askFeatNum
-   FEAST_FeatNum = sprintf('Define number of feature to extract using MRMR [ %g ]|', NumFeat); 
+   FEAST_FeatNum = sprintf('Define number of feature to extract [ %s ]|', nk_ConcatParamstr(NumFeat)); 
    menustr = [ menustr FEAST_FeatNum ]; menuact = [menuact 3];
 end
 
 nk_PrintLogo
-mestr = 'FEAST algorithm selection and configuration'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+mestr = 'FEAST algorithm selection and configuration'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('\nYou are here: %s >>> ',parentstr); 
 act = nk_input(mestr,0,'mq', menustr, menuact);
 
 switch act

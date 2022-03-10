@@ -193,7 +193,7 @@ if ~defaultsfl
              
     end
     nk_PrintLogo
-    mestr = 'LIBSVM: Parameter setup' ; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>>',parentstr);
+    mestr = 'LIBSVM: Parameter setup' ; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
     act = nk_input( mestr,0,'mq', menuact, menusel);
     switch act
         case 1

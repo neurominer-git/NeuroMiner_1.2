@@ -36,7 +36,7 @@ if ~defaultsfl
     end
     
     nk_PrintLogo
-    mestr = 'Extract features from rank / weight vector'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Extract features from rank / weight vector'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
 
     act = nk_input(mestr,0,'mq', menustr , menuact);
     

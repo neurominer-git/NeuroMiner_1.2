@@ -145,7 +145,7 @@ if ~defaultsfl
         end
     end
     
-    mestr = 'Greedy feature selection setup'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>>',parentstr);
+    mestr = 'Greedy feature selection setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
     
     nk_PrintLogo
     act = nk_input('Define Greedy Search parameters',0,'mq', ...

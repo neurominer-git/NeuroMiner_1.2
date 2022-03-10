@@ -270,7 +270,7 @@ if ~exist('act','var') || isempty(act)
     
     nk_PrintLogo
     mestr = 'Define parameter template'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('\nYou are here: %s >>> ',parentstr);
-    if fusemode > 1, fprintf('\n'); cprintf('*blue','==> CONFIGURATION OF MODALITY #%g: %s', varind, descstr ); end
+    if fusemode > 1, fprintf('\n==> CONFIGURATION OF MODALITY #%g: %s', varind, descstr ); end
     act = nk_input(mestr, 0, 'mq', menustr, menuact);
 end
 
@@ -359,12 +359,12 @@ switch act
     % ML OPTIMIZATION STRATEGIES =====================================================================================================================================      
     case 7
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-            if ~isfield(NM.TrainParam.STRAT{varind},'GRD'), NM.TrainParam.STRAT{varind} = nk_Grid_config(NM.TrainParam.STRAT{varind}, NM.TrainParam.STRAT{varind}.SVM, true); end
+            if ~isfield(NM.TrainParam.STRAT{varind},'GRD'), NM.TrainParam.STRAT{varind} = nk_Grid_config(NM.TrainParam.STRAT{varind}, NM.TrainParam.STRAT{varind}.SVM, [], true); end
             act = 1; while act>0, ...
-                    [ NM.TrainParam.STRAT{varind}, act ] = nk_Grid_config(NM.TrainParam.STRAT{varind}, NM.TrainParam.STRAT{varind}.SVM, [], navistr); end
+                    [ NM.TrainParam.STRAT{varind}, act ] = nk_Grid_config(NM.TrainParam.STRAT{varind}, NM.TrainParam.STRAT{varind}.SVM, [], [], navistr); end
         else
-            if ~isfield(NM.TrainParam,'GRD'), NM.TrainParam = nk_Grid_config([], NM.TrainParam.SVM, true); end
-            act = 1; while act>0, [ NM.TrainParam, act ] = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, [], navistr); end
+            if ~isfield(NM.TrainParam,'GRD'), NM.TrainParam = nk_Grid_config([], NM.TrainParam.SVM, varind, true); end
+            act = 1; while act>0, [ NM.TrainParam, act ] = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, [], navistr); end
         end
     % FEATURE SELECTION ==============================================================================================x=================================================  
     case 8

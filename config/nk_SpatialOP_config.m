@@ -69,7 +69,7 @@ else
     titlestr = sprintf('Preprocessing pipeline generator: no steps defined.');
 end
 
-mestr = titlestr; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\n\nYou are here: %s >>> ',parentstr); 
+mestr = titlestr; navistr = [parentstr ' >>> ' mestr]; fprintf('\n\nYou are here: %s >>> ',parentstr); 
 act = nk_input(titlestr, 0,'mq', actstr, actmnu);
 
 switch act

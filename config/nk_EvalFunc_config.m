@@ -55,7 +55,7 @@ if exist('param','var') && ~isempty(param)
 end
 mn_def = find(mn_act==deffunc);
 nk_PrintLogo
-mestr = 'ML model performance criterion'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>>',parentstr);
+mestr = 'ML model performance criterion'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
 GridParam = nk_input(mestr,0,'mq', mn_str, mn_act, mn_def);
 
 if ~GridParam, GridParam = param.GridParam; end

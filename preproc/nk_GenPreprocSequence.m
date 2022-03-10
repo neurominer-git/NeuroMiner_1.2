@@ -84,15 +84,7 @@ if isfield(TemplParam,'ACTPARAM')
                         if VERBOSE, fprintf('\n\t- Method: Combat'); end
                         InputParam.P{ac}.METHOD = 2; InputParam.P{ac}.TsMod = [];
                         if TemplParam.ACTPARAM{ac}.MCOVARLABEL
-                            switch NM.modeflag
-                                case 'classification'
-                                    uL = unique(NM.label); uL(isnan(uL))=[]; nuL = numel(uL);
-                                    dummy_labels = nk_MakeDummyVariables(NM.label); 
-                                    if nuL==2, dummy_labels(:,2)=[]; end
-                                case 'regression'
-                                    dummy_labels = NM.label;
-                            end
-                            covars = [ SrcParam.covars(:, TemplParam.ACTPARAM{ac}.MCOVAR) dummy_labels ];
+                            covars = [ SrcParam.covars(:, TemplParam.ACTPARAM{ac}.MCOVAR) NM.label ];
                             if ~isempty(SrcParam.covars_oocv) 
                                 covars_oocv = [ SrcParam.covars_oocv(:,TemplParam.ACTPARAM{ac}.MCOVAR) zeros(size(SrcParam.covars_oocv,1), size(dummy_labels,2)) ];
                             end

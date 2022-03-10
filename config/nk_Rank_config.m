@@ -20,7 +20,7 @@ if ~defaultsfl
     
     nk_PrintLogo
     
-    mestr = 'Rank / Weight features'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Rank / Weight features'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     if strcmp(RANK.algostr,'extern')
         act = nk_input(mestr,0,'mq', ...
             [sprintf('Choose algorithm and specify its parameters [ %s ]|', RANK.algostr) ...
@@ -191,9 +191,10 @@ if ~defaultsfl
                         PX = nk_AddParam(RANK.RGS.extra_param.beta, 'Beta', 1, PX); 
                     end
                 case 'feast'
-                    act=1; while act > 0, [act, RANK ] = nk_FEAST_config(RANK, 0, navistr); end
+                    act=1; while act > 0, [act, RANK ] = nk_FEAST_config(RANK, 1, navistr); end
+                    PX = nk_AddParam(RANK.FEAST.NumFeat, 'NumFeat', 1, PX); 
                 case 'relief'
-                    RANK.Relief.k = nk_input('Define number(s) of nearest neigbours for RELIEF',0,'i',10,1);PX = nk_AddParam(RANK.Relief.k, 'K', 1, PX); 
+                    RANK.Relief.k = nk_input('Define number(s) of nearest neigbours for RELIEF',0,'i',10,1); PX = nk_AddParam(RANK.Relief.k, 'K', 1, PX); 
                 case 'pls'
                     if ~isfield(RANK,'PLS'), [~, RANK.PLS ] = nk_PLS_config(NM, [], [], true); end
                 case 'extern' 

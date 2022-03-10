@@ -133,13 +133,13 @@ for curlabel=1:MULTILABEL.dim
         
         end
 
-        if  ndims(GD.BinaryGridSelection{curclass}{curlabel}.bestfeats{1}) > 2
+        if  ~ismatrix(GD.BinaryGridSelection{curclass}{curlabel}.bestfeats{1})
             for nodes=1:GD.BinaryGridSelection{curclass}{curlabel}.Nodes
                 GD.BinaryGridSelection{curclass}{curlabel}.bestfeats{nodes} = ...
                     GD.BinaryGridSelection{curclass}{curlabel}.bestfeats{nodes}(:,:,curclass);
             end
         end
-        if ndims(GD.BinaryGridSelection{curclass}{curlabel}.bestweights{1}) > 2
+        if ~ismatrix(GD.BinaryGridSelection{curclass}{curlabel}.bestweights{1})
             for nodes=1:GD.BinaryGridSelection{curclass}{curlabel}.Nodes
                 if ~isempty(GD.BinaryGridSelection{curclass}{curlabel}.bestweights)
                     GD.BinaryGridSelection{curclass}{curlabel}.bestweights{nodes} = ...
@@ -147,14 +147,14 @@ for curlabel=1:MULTILABEL.dim
                 end
             end
         end
-        if ndims(GD.BinaryGridSelection{curclass}{curlabel}.bestpred{1}) > 2
+        if ~ismatrix(GD.BinaryGridSelection{curclass}{curlabel}.bestpred{1})
             for nodes=1:GD.BinaryGridSelection{curclass}{curlabel}.Nodes
                 GD.BinaryGridSelection{curclass}{curlabel}.bestpred{nodes} = ...
                     GD.BinaryGridSelection{curclass}{curlabel}.bestpred{nodes}(:,:,curclass);
             end
         end
 
-        if SAV.savemodel && ndims(GD.BinaryGridSelection{curclass}{curlabel}.bestmodel{1}) > 2
+        if SAV.savemodel && ~ismatrix(GD.BinaryGridSelection{curclass}{curlabel}.bestmodel{1})
             for nodes=1:GD.BinaryGridSelection{curclass}{curlabel}.Nodes
                 GD.BinaryGridSelection{curclass}{curlabel}.bestmodel{nodes} = ...
                     GD.BinaryGridSelection{curclass}{curlabel}.bestmodel{nodes}(:,:,curclass);
