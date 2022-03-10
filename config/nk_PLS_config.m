@@ -40,7 +40,7 @@ if ~defaultsfl
     end
 
     nk_PrintLogo
-    mestr = 'Partial least squares configuration'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Partial least squares configuration'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     act = nk_input(mestr,0,'mq', mn_str, mn_act);
     switch act
         case 1

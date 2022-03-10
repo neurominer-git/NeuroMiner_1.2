@@ -73,6 +73,7 @@ for h=1:n
 end
 
 xlim([min(subjvec) max(subjvec)]);
+ylim([0 1]);
 %handles.MultiClass.be = plot(errx,erry,'kx','MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);
 legend([handles.MultiClass.b handles.MultiClass.be], [handles.NM.groupnames(:)', groupnames_err(:)'], 'Location','Best', 'FontSize',handles.LegendFontSize)
 

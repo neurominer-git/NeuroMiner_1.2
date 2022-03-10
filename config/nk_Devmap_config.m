@@ -48,7 +48,7 @@ if ~defaultsfl
     else
         sparsepls=[];
     end
-    mestr = 'Deviation-based feature weighting'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Deviation-based feature weighting'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     
     act = nk_input(mestr,0,'mq', ...
         [sprintf('Choose algorithm and specify its parameters [ %s ]|', algostr), ...

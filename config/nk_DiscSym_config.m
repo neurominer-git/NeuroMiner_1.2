@@ -52,7 +52,7 @@ param.cmd = cmd;
 if ~exist('parentstr','var') || isempty(parentstr), return; end
 
 nk_PrintLogo
-mestr = 'Binning algorithm configuration'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+mestr = 'Binning algorithm configuration'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('\nYou are here: %s >>> ',parentstr); 
 act = nk_input(mestr,0,'mq', menustr, menuact);
 
 switch act

@@ -51,7 +51,7 @@ act = 1; while act, [act, NM, inp] = DefineOOCVData(inp, NM, Y, parentstr); end
 function [act, NM, inp ] = DefineOOCVData(inp, NM, Y, parentstr)
 
 nk_PrintLogo
-navistr = sprintf('%s\t>>> %s',parentstr, 'OOCV data input'); cprintf('*blue','\nYou are here: %s >>>',navistr); 
+navistr = sprintf('%s\t>>> %s',parentstr, 'OOCV data input'); fprintf('\nYou are here: %s >>>',navistr); 
 
 fprintf('\n\n\t============================')
 fprintf('\n\t    AVAILABLE MODALITIES  ') 

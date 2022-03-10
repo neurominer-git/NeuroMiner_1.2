@@ -39,7 +39,7 @@ end
 if ~exist('parentstr','var') || isempty(parentstr), return; end
 
 nk_PrintLogo
-mestr = 'Maximum Relevance Minimum Redundancy (MRMR) algorithm configuration'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+mestr = 'Maximum Relevance Minimum Redundancy (MRMR) algorithm configuration'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('\nYou are here: %s >>> ',parentstr); 
 act = nk_input(mestr,0,'mq', menustr, menuact);
 
 switch act 

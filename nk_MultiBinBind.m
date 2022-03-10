@@ -26,7 +26,9 @@ Classes                 = zeros(1,sum(Ydims));
 MultiBinBind.TrPerf     = zeros(CV1perms,CV1folds);
 MultiBinBind.CVPerf     = zeros(CV1perms,CV1folds);
 MultiBinBind.Ts1Perf    = zeros(CV1perms,CV1folds);
+MultiBinBind.Ts1Prob    = cell(CV1perms,CV1folds);
 mcolend                 = 0;
+
 %%%% CV1 loop
 for k=1:CV1perms
 
@@ -35,8 +37,6 @@ for k=1:CV1perms
         mTrLabel = label(CV.TrainInd{f,d}(CV.cvin{f,d}.TrainInd{k,l}));
         mCVLabel = label(CV.TrainInd{f,d}(CV.cvin{f,d}.TestInd{k,l}));
         mTsLabel = label(CV.TestInd{f,d});
-        %TrXdims     = size(CV.cvin{f,d}.TrainInd{k,l},1);
-        %CVXdims     = size(CV.cvin{f,d}.TestInd{k,l},1);
         mTr         = [];
         mCV         = [];
 
@@ -82,11 +82,11 @@ for k=1:CV1perms
                         
         % Compute multi-group performance on CV2 test data for CV1
         % partition [k,l]                        
-        [MultiBinBind.Ts1Perf(k,l), MultiBinBind.Ts1Pred{k,l}] = ...
+        [MultiBinBind.Ts1Perf(k,l), MultiBinBind.Ts1Pred{k,l}, MultiBinBind.Ts1Prob{k,l}] = ...
             nk_MultiEnsPerf(mTs(:,mcolX:mcolend), ...
                             sign(mTs(:,mcolX:mcolend)), ...
                             mTsLabel, ...
-                            Classes(:,mcolX:mcolend), Groups);
+                            Classes(:,mcolX:mcolend), ngroups);
     end
 end
 
@@ -99,7 +99,7 @@ MultiBinBind.SD_Ts1Perf     = std(MultiBinBind.Ts1Perf(:));
 
 % Compute multi-group performance on CV2 test data by using entire CV1
 % prediction data on CV2 instances (ensemble of ensembles decision)
-[MultiBinBind.Ts2Perf, MultiBinBind.Ts2Pred] = nk_MultiEnsPerf(mTs, sign(mTs), mTsLabel, Classes, ngroups);
+[MultiBinBind.Ts2Perf, MultiBinBind.Ts2Pred, MultiBinBind.Ts2Prob] = nk_MultiEnsPerf(mTs, sign(mTs), mTsLabel, Classes, ngroups);
 
 MultiGroupSelection.bestacc = MultiBinBind.Mean_CVPerf;
 switch RFE.CV2Class.type
@@ -113,6 +113,8 @@ MultiGroupSelection.bestcomplexity    = mean(MultiGroupSelection.bestcomplexity)
 MultiGroupSelection.binbind           = true;
 MultiGroupSelection.bestpred          = MultiBinBind.Ts2Pred;
 MultiGroupSelection.bestCV2pred       = MultiBinBind.Ts1Pred;
+MultiGroupSelection.bestprob          = MultiBinBind.Ts2Prob; 
+MultiGroupSelection.bestCV2prob       = MultiBinBind.Ts1Prob;
 
 % Print some info
 fprintf('\nMulti-group performance at dichotomizers'' optima:\nCV1 = %1.2f, CV2 = %1.2f, Complexity = %1.2f', ...

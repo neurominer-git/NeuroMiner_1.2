@@ -1,4 +1,4 @@
-function [f, ca, o] = spider(data,tle,rng,lbl,leg,f, colors, axfontsize, labelfontsize, linewidth, markersize)
+function [f, ca, o] = spider(data, tle, rng, lbl, leg, f, colors, axfontsize, labelfontsize, linewidth, markersize)
 % create a spider plot for ranking the data
 % function [f, ca, o] = spider(data,tle,rng,lbl,leg,f)
 %
@@ -9,10 +9,15 @@ function [f, ca, o] = spider(data,tle,rng,lbl,leg,f, colors, axfontsize, labelfo
 % lbl     cell vector axes names (Mxq) in [name unit] pairs   class cell
 % leg     data set legend identification (1xN)                class cell
 % f       figure handle or plot handle                        class real
+% colors 
+% axfontsize
+% labelfontsize
+% linewidth
+% markersize
 %
 % outptus 3 - 3 optional
 % f       figure handle                                       class integer
-% x       axes handle                                         class real
+% ca      axes handle                                         class real
 % o       series object handles                               class real
 %
 % michael arant - jan 30, 2008
@@ -148,7 +153,6 @@ elseif numel(leg) ~= c
 	error(sprintf('%g data sets labeled, %g exist',numel(leg),c))
 end
 
-
 % check for figure or axes
 if ~exist('f','var') || isempty(f)
 	% no figure or axes requested - generate new ones
@@ -165,12 +169,13 @@ end
 axes(ca)
 % set to add plot
 set(ca,'nextplot','add');
+ca.Position(2) = 0.46;
 
 % clear figure and set limits
 set(ca,'visible','off'); set(f,'color','w')
 set(ca,'xlim',[-1.25 1.25],'ylim',[-1.25 1.25]); axis(ca,'equal','manual')
 % title
-text(0,1.5,tle,'horizontalalignment','center','fontweight','bold', 'fontsize',14);
+text(0,1.5,tle,'horizontalalignment','center','fontweight','bold', 'fontsize',14,'Position',[0 1.6]);
 
 % scale by range
 angw = linspace(0,2*pi,r+1)';
@@ -186,7 +191,7 @@ start = [zeros(1,r); cos(ang')]; stop = [zeros(1,r); sin(ang')];
 % plot the axes
 plot(ca,start,stop,'color','k','linestyle','-'); axis equal
 % plot axes markers
-inc = 0.25:.25:1; mk = .025 * ones(1,4); tx = 4 * mk; tl = 0:.25:1;
+inc = 0.25:.25:1; mk = .015 * ones(1,4); tx = 4 * mk; tl = 0:.25:1;
 % loop each axis ang plot the line markers and labels
 % add axes
 for ii = 1:r
@@ -211,15 +216,19 @@ for ii = 1:r
 		end
 	end
 	% label each axis
-	temp = text([cos(ang(ii)) * 1.1 + sin(ang(ii)) * 0], ...
-			[sin(ang(ii)) * 1.1 - cos(ang(ii)) * 0], ...
-			char(lbl(ii,:)),'FontSize',labelfontsize);
+    if ang(ii) <= 2*pi/2 
+        offs = 1.12;
+    else
+        offs = 1.2;
+    end
+	temp = text([cos(ang(ii)) * offs + sin(ang(ii)) * 0], ...
+			[sin(ang(ii)) * offs - cos(ang(ii)) * 0], ...
+			char(lbl(ii,:)),'FontSize',labelfontsize,'FontWeight','bold');
 	% flip the text alignment for right side axes
 	if ang(ii) > pi/2 && ang(ii) < 3*pi/2
 		set(temp,'HorizontalAlignment','right')
 	end
 end
-
 
 % plot the data
 o = polar(ca,angw*ones(1,c),magw);
@@ -234,7 +243,7 @@ for ii = 1:c
 end
 
 % apply the legend
-temp = legend(o,leg,'location','best');
+%temp = legend(o,leg,'location','best');
 
 return
 

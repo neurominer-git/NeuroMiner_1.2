@@ -28,7 +28,7 @@ if ~isempty(act) || ~defaultsfl
     end
     
     nk_PrintLogo
-    mestr = 'Wrapper-based model selection setup'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>>',parentstr);
+    mestr = 'Wrapper-based model selection setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
     
     if ~Wrapper.flag
         
@@ -40,11 +40,11 @@ if ~isempty(act) || ~defaultsfl
         
         if isfield(param,'Filter') && param.Filter.flag && isfield(param.Filter,'SubSpaceFlag') && param.Filter.SubSpaceFlag
             e = nk_GetParamDescription2([],param.Wrapper,'EnsType');
-            cprintf('red','\n================================================================')
-            cprintf('red','\n* Pre-Wrapper filtering/subspace optimization method detected. *')
-            cprintf('red','\n* Wrapper will be applied to pre-defined feature subspaces.    *')
-            cprintf('red','\n* Further subspace optimization methods enabled.               *')
-            cprintf('red','\n================================================================')
+            fprintf('\n================================================================')
+            fprintf('\n* Pre-Wrapper filtering/subspace optimization method detected. *')
+            fprintf('\n* Wrapper will be applied to pre-defined feature subspaces.    *')
+            fprintf('\n* Further subspace optimization methods enabled.               *')
+            fprintf('\n================================================================')
 
             SubStr = ['Evaluate features within subspaces [ ' e.EnsStrat ' ]|'];
             actind = [1 2];    

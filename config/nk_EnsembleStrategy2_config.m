@@ -73,7 +73,7 @@ if ~defaultsfl
     end
     
     nk_PrintLogo
-    mestr = 'Subspace-based ensemble optimization setup'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>>',parentstr); 
+    mestr = 'Subspace-based ensemble optimization setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr); 
     act = nk_input(mestr, 0,'mq', menustr, menuact);
     
     switch act
