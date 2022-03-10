@@ -470,6 +470,19 @@ if isfield(TemplParam,'ACTPARAM')
                     InputParam.P{ac}.DEVMAP.Params = PX.Params;
                     InputParam.P{ac}.DEVMAP.Params_desc = PX.Params_desc;
                 end
+            case 'graphSparsity'
+                if VERBOSE, fprintf('\n* APPLY SPARSITY THRESHOLD TO CONNECTIVITY MATRICES'); end
+                InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+                if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
+                    InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
+                end
+             case 'graphMetrics'
+                if VERBOSE, fprintf('\n* COMPUTE GRAPH METRICS FROM CONNECTIVITY MATRICES'); end
+                InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+                if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
+                    InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
+                end
+                
         end
     end
     if VERBOSE, fprintf('\nPreprocessing sequence setup completed. Executing ...'); end

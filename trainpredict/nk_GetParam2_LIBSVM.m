@@ -10,10 +10,28 @@
 
 function [param, model] = nk_GetParam2_LIBSVM(Y, label, ModelOnly, cmd)
                                             
-global SVM EVALFUNC LIBSVMTRAIN MODEFL CMDSTR                         
+                        
 
-param = [];flw = 0;
+global SVM EVALFUNC LIBSVMTRAIN MODEFL CMDSTR GK 
+
+param = [];flw = 0; GK = struct('gkernelBool',0);
 if strcmp(LIBSVMTRAIN,'svmtrain312'), flw = 1; end
+if SVM.kernel.kerndef == 5, GK.gkernelBool = 1; GK.gkernelFunction = 'WL'; GK.iter = CMDSTR.WLiter; end
+if SVM.kernel.kerndef == 6, GK.gkernelBool = 1; GK.gkernelFunction = 'WLspdelta'; GK.iter = CMDSTR.WLiter; end
+if SVM.kernel.kerndef == 7, GK.gkernelBool = 1; GK.gkernelFunction = 'WLedge'; GK.iter = CMDSTR.WLiter; end
+if SVM.kernel.kerndef == 8 
+    GK.evalStr = strings; 
+    if SVM.kernel.customfunc_nargin > 0
+        for n = 1:SVM.kernel.customfunc_nargin
+            argName = sprintf('customkernel_arg%d', n); 
+            arg_i = CMDSTR.(argName);
+            if CMDSTR.(argName)
+                GK.evalStr = sprintf('%s, %d' , GK.evalStr, arg_i);
+            end
+        end
+    end
+    %GK.iter = CMDSTR.WLiter; 
+end % function has to be on Matlab path!
 
 % Check if weighting is necessary
 cmd = nk_SetWeightStr(SVM, MODEFL, CMDSTR, label, cmd);
@@ -31,7 +49,16 @@ if iscell(Y)
     % MKL-based learning not implemented yet
    
 else % Univariate case
-    
+    if GK.gkernelBool == 1
+        Y = GraphKernel_matrixInput(Y,Y, GK.gkernelFunction, GK.iter);
+        numTrain = size(Y,1);
+        Y = [(1:numTrain)' , Y];
+    end
+    if SVM.kernel.kerndef == 8
+ 
+        Y = eval(sprintf('feval(SVM.kernel.customfunc, Y, Y %s)', GK.evalStr));
+        Y = [(1:numTrain)' , Y];
+    end
     if size(label,1) ~= size(Y,1), label = label'; end
     if SVM.RVMflag, label(label==-1)=2; end
     if ~SVM.LIBSVM.Weighting && (isfield(SVM,'AdaBoost') && SVM.AdaBoost.flag)        

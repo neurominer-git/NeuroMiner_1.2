@@ -1,5 +1,16 @@
 function [rs, ds] = nk_GetTestPerf_LIBSVM(~, tXtest, Ytest, md, ~, ~)
-global SVM LIBSVMPREDICT
+ global SVM LIBSVMPREDICT GK Ytrain
+
+if GK.gkernelBool
+    if SVM.kernel.kerndef == 8
+        tXtest = eval(sprintf('feval(SVM.kernel.customfunc, tXtest, Ytrain{1,1}{1,1} %s)', GK.evalStr));
+    else
+        tXtest = GraphKernel_matrixInput(tXtest,Ytrain{1,1}{1,1}, GK.gkernelFunction, GK.iter); 
+        numTest = size(tXtest,1);
+        tXtest = [(1:numTest)', tXtest];
+    %[lbl, acc, dec] = svmpredict(Ytest, tXtest, md, []);
+    end
+end
 
 % Check whether a posthoc calibration model needs to be applied to test estimates
 if isfield(md,'BBQ') && ~SVM.LIBSVM.Optimization.b

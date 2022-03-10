@@ -1,6 +1,6 @@
 function analysis = nk_MLOptimizer_main(inp, datid, PreML)
 
-global SVM GRD MODEFL W2AVAIL VERBOSE BATCH
+global SVM GRD MODEFL W2AVAIL VERBOSE BATCH inparams
 
 % Write some info to command line
 clc
@@ -108,6 +108,16 @@ for i=1:inparams.nclass
             if VERBOSE, fprintf('\n%s #%g: no slack parameters needed.',strout,i); end
     end
 
+    %% Add precomputed kernel 
+%     switch inparams.stranalysis
+%         case 'precomputed'
+%             SVM.kernel.kernstr = '-t 4';
+%             global WL; 
+%             WL = '-t 4';
+%             fprintf('Precomputed kernel');
+%         otherwise
+%             fprintf('No precomputed kernel');
+%     end
     %% Define kernel parameter settings
     switch SVM.kernel.kernstr
         case {' -t 0', 'lin','linear','lin_kernel','none','lin_elm'}
@@ -127,6 +137,23 @@ for i=1:inparams.nclass
             inparams.Params_desc{i}{end+1} = 'Kernel';
             inparams.Params{i}{end+1} = GRD.PolyCoefparams;
             inparams.Params_desc{i}{end+1} = 'Sigmoid coef';   
+        case ' -t 4'
+            if SVM.kernel.kerndef < 8
+                inparams.Params{i}{end+1} = GRD.WLiters;
+                inparams.Params_desc{i}{end+1} = 'Kernel';
+            else
+                if isfield(SVM.kernel,'customfunc_nargin')
+                    if SVM.kernel.customfunc_nargin >= 1
+                        for n = 1:SVM.kernel.customfunc_nargin
+                            argName = sprintf('customkernel_arg%d', n); 
+                            %GRD.(argName) = 0;
+                            inparams.Params{i}{end+1} = GRD.(argName);
+                            inparams.Params_desc{i}{end+1} = sprintf('Kernel function argument %d', n);
+                        end
+                    end
+                end
+            end
+            %fprintf('\n%s #%g: no kernel parameters for now.',strout,i) 
         otherwise
             switch SVM.prog
                 case 'LIBSVM'

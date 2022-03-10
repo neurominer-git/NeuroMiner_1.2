@@ -55,7 +55,10 @@ if ~isstruct(enind)
                     'remmeandiff',  fl, ...
                     'rankfeat',     fl, ...
                     'remvarcomp',   fl, ...
-                    'devmap',       fl);
+                    'devmap',       fl, ...
+                    'graphSparsity', fl, ...
+                    'graphMetrics', fl);
+                    % CHANGE SPARSITY 
 else
     EF = enind;
 end
@@ -440,6 +443,10 @@ if modflag && ~replflag
             cmd = 15;
         case 'devmap'
             cmd = 16;
+        case 'graphSparsity'
+            cmd = 17;
+        case 'graphMetrics'
+            cmd = 18;
     end
    
 else    
@@ -513,6 +520,10 @@ else
                     end
                 case 'devmap'
                     cmdstr = 'Measure deviation from normative data';                               cmdmnu = 16;
+                case 'graphSparsity'
+                    cmdstr = 'Apply sparsity threshold to connectivity matrix';                     cmdmnu = 17;
+                case 'graphMetrics'
+                    cmdstr = 'Compute network metrics from connectivity matrices';                  cmdmnu = 18;
             end
             [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu);
             cmdstr =[]; cmdmnu=[];
@@ -558,6 +569,10 @@ switch cmd
         CURACT = config_extdim( CURACT, PREPROC.ACTPARAM{stepind-1}.DR , navistr );
     case 16
         CURACT = config_devmap( NM, CURACT, navistr );
+    case 17
+        CURACT = config_graphSparsity(CURACT, navistr);
+    case 18
+        CURACT = config_graphMetrics(CURACT, navistr);
 end
 
 switch replflag
@@ -810,6 +825,25 @@ if isfield(CURACT,'PX'), PX = CURACT.PX ; else PX = []; end
 CURACT.cmd = 'devmap';
 
 end
+
+function CURACT = config_graphSparsity(CURACT, navistr)
+
+if ~isfield(CURACT,'GRAPHSPARSITY'), CURACT.GRAPHSPARSITY=[]; end
+if ~isfield(CURACT,'PX'), CURACT.PX = []; end
+act = 1; while act >0, [ CURACT.GRAPHSPARSITY, CURACT.PX, act ] = graphSparsity_config(CURACT.GRAPHSPARSITY, CURACT.PX, navistr); end
+CURACT.cmd = 'graphSparsity';
+
+end
+
+function CURACT = config_graphMetrics(CURACT, navistr)
+
+if ~isfield(CURACT,'GRAPHMETRICS'), CURACT.GRAPHMETRICS=[]; end
+if ~isfield(CURACT,'PX'), CURACT.PX = []; end
+act = 1; while act >0, [ CURACT.GRAPHMETRICS, CURACT.PX, act ] = graphMetrics_config(CURACT.GRAPHMETRICS, CURACT.PX, navistr); end
+CURACT.cmd = 'graphMetrics';
+
+end
+
 
 % -------------------------------------------------------------------------
 function [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu)

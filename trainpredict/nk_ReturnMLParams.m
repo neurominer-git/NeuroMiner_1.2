@@ -36,7 +36,7 @@ for i=1:nclass
     
     switch SVM.kernel.kernstr
         
-        case {' -t 0',' -t 4',' -t 5', 'lin','linear','lin_kernel','none','lin_elm'}
+        case {' -t 0',' -t 5', 'lin','linear','lin_kernel','none','lin_elm'}
 
             if VERBOSE, fprintf('\n%s #%g: Kernel parameters will be omitted.',strout,i); end
 
@@ -48,6 +48,8 @@ for i=1:nclass
         case ' -t 3'
             [Params{i}{end+1}, Params_desc{i}{end+1} ] = nk_ReturnParam('ML-Kernel parameter(s)',PX.Params_desc, PX.Params);
             [Params{i}{end+1}, Params_desc{i}{end+1} ] = nk_ReturnParam('ML-Sigmoid coefficients',PX.Params_desc, PX.Params);
+        case ' -t 4'
+            [Params{i}{end+1}, Params_desc{i}{end+1} ] = nk_ReturnParam('ML-Kernel parameter(s)',PX.Params_desc, PX.Params);
 
         otherwise
             % This is the gamma exponent parameter of the RBF kernel
