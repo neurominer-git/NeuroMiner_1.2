@@ -18,6 +18,8 @@ switch options.kernelFunc
         cmd = sprintf('%s -r %g -d %g', options.coef0, options.degree);
     case '-t 2'
         cmd = sprintf('%s -g %g', options.gamma);
+    case '-t 4'
+        cmd = sprintf('%s -k %s', options.kernel);
 end
 
 cmd = sprintf('%s -m %g -e %g -h %g -b %g', cmd, ...

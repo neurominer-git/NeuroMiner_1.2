@@ -20,7 +20,7 @@ end
 % =========================================================================
 function [Y, IN] = PerfElimZeroObj(Y, IN)
 
-global VERBOSE
+global VERBOSE SVM
 % Defaults
 if isempty(IN),eIN=true; else eIN=false; end
 
@@ -51,4 +51,10 @@ if eIN || ~isfield(IN,'NonPruneVec') || isempty(IN.NonPruneVec)
     end
     
 end
-Y = Y(:,IN.NonPruneVec);
+    % prune zero-variance graph edges 
+if SVM.kernel.kerndef >=5
+    %if IN.zero == 1,   indGraphNullVar = var(Y)==0;    else, indGraphNullVar = false(1,size(Y,2));end
+    Y(:,~(IN.NonPruneVec)) = 0;
+else
+    Y = Y(:,IN.NonPruneVec);
+end

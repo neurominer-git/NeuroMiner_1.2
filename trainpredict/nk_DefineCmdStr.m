@@ -55,6 +55,8 @@ switch SVM.prog
                         vargout.ParamStr = [vargout.ParamStr 'g'];
                     case ' -t 3'
                          vargout.ParamStr = [vargout.ParamStr 'g', 'r'];
+                    case ' -t 4'
+                        vargout.ParamStr = vargout.ParamStr; 
                     otherwise
                         switch SVM.LIBSVM.LIBSVMver
                             case {0,1,2} 

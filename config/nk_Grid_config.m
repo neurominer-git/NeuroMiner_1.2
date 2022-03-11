@@ -30,6 +30,7 @@ switch OptimFlag
         Tdefs                           = [.2 .5 .7];
         PolyCoefdefs                    = 0;
         PolyDegrdefs                    = 3;
+        WLiters                         = [2 4 6 8 10];
         Neurondefs                      = [25 50 75 100];
         Leafdefs                        = logspace(1,2,10);
         Treedefs                        = [25 50 75 100 150 200];
@@ -48,6 +49,22 @@ switch OptimFlag
         OptRegul.RegulTypeComplexity    = nk_RegulFunc_config(1);
         OptRegul.RegulTypeDiversity     = nk_RegulFunc_config(1);
         NodeSelect.mode                 = 1;
+        if isfield(NM.TrainParam.SVM.kernel, 'customfunc_nargin')
+            if NM.TrainParam.SVM.kernel.customfunc_nargin >0
+                for n = 1:NM.TrainParam.SVM.kernel.customfunc_nargin
+                    argName = sprintf('customkernel_arg%d', n); 
+                    eval(sprintf("%s = 0;", argName)); 
+                end
+            end
+        end
+        
+%         if NM.SVM.kernel.customkernel_nargin >= 1
+%             for n = 1:SVM.kernel.customkernel_nargin
+%                 argName = sprintf('customkernel_arg%d', n); 
+%                 (argName) = 0;
+%             end
+%         end
+        
         switch CompStr
             case 'above'
                  NodeSelect.perc        = 95;
@@ -85,6 +102,18 @@ switch OptimFlag
             if isfield(GRD,'CoxCutoffparams')           CoxCutoffsdefs = GRD.CoxCutoffparams; end
             if isfield(GRD,'OptRegul'),                 OptRegul = GRD.OptRegul; end
             if isfield(GRD,'NodeSelect'),               NodeSelect = GRD.NodeSelect; end
+            if isfield(GRD,'WLiters'),                  WLiters = GRD.WLiters; end
+            if isfield(NM.TrainParam.SVM.kernel,'customfunc_nargin')
+                if NM.TrainParam.SVM.kernel.customfunc_nargin >0
+                    for n = 1:NM.TrainParam.SVM.kernel.customfunc_nargin
+                        argName = sprintf('customkernel_arg%d', n); 
+                        if isfield(GRD, argName) 
+                            eval(sprintf("%s = GRD.%s", argName, argName)); 
+                        end
+                    end
+                end
+            end
+            %if isfield(GRD, 'CustomKernel'),            CustomKernel = GRD.CustomKernel; end
             
             %============================================================== 
             menustr = []; menuact = []; n_pars = [];
@@ -202,7 +231,42 @@ switch OptimFlag
                                     Pcparstr = 'Sigmoid coefficients'; [Pcstr, n_pars(end+1)] = nk_ConcatParamstr(PolyCoefdefs);
                                     PX = nk_AddParam(PolyCoefdefs, ['ML-' Pcparstr], 2, PX);
                                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Pcparstr, Pcstr);                 menuact = [ menuact 5 ];
-                            end    
+                            end
+                         case ' -t 4' % precomputed kernels
+                             if NM.TrainParam.SVM.kernel.kerndef <8
+                                WLparstr = 'WL iterations'; [WLstr, n_pars(end+1)] = nk_ConcatParamstr(WLiters);
+                                PX = nk_AddParam(WLiters, ['ML-' WLparstr], 2, PX);
+                                menustr = sprintf('%s|Define %s [ %s ]', menustr, WLparstr, WLstr);                        menuact = [ menuact 100];
+                             elseif NM.TrainParam.SVM.kernel.kerndef == 8
+                                 if NM.TrainParam.SVM.kernel.customfunc_nargin > 0
+                                    for n = 1:NM.TrainParam.SVM.kernel.customfunc_nargin
+                                        argParstr = sprintf('CFuncparstr_%d', n); 
+                                        argStr = sprintf('CFuncstr_%d', n);
+                                        arg = sprintf('customkernel_arg%d', n);
+                                        
+                                        eval(sprintf("%s = 'Custom kernel argument %d'", argParstr, n));
+                                        eval(sprintf('[%s, n_pars(end+1)] = nk_ConcatParamstr(%s)', argStr, arg));
+                                        eval(sprintf("PX = nk_AddParam(%s, ['ML-' %s], 2, PX)", arg, argParstr)); 
+                                        eval(sprintf('X = %s; Y = %s', argParstr, argStr)); 
+                                        eval(sprintf("menustr = '%s|Define %s [ %s ]'", menustr, X, Y));
+                                        
+%                                       
+                                        menuact = [ menuact 101];
+                                    end
+                                  
+                                 end
+                                                                        
+                           
+                             end
+%                              switch SVM.kernel.kerndef
+%                                  case 8 % custom kernel function
+%                                      CKFnamestr = 'Custom kernel function (input: 2 matrices, output: kernel matrix)'; [CKFstr, n_pars(end+1)] = nk_ConcatParamstr(CustomKernel);
+%                                      PX = nk_AddParam(CustomKernel, ['ML-' CKFnamestr], 2, PX);
+%                                      menustr = sprintf('%s|Define %s [ %s ]', menustr, CKFnamestr, CKFstr);                        menuact = [ menuact 101];
+%                              
+%                              end
+                            
+                      
                      end             
             end
             
@@ -401,6 +465,17 @@ switch OptimFlag
                     SEQOPTlimsUdefs =  nk_input([LimsLparstr ' range'],0,'e',SEQOPTlimsUdefs);          PX = nk_AddParam(SEQOPTlimsUdefs, ['ML-' LimsUparstr], 2, PX);
                 case 25
                     CoxCutoffsdefs =  nk_input([CoxCutOffparstr ' range'],0,'e',CoxCutoffsdefs);        PX = nk_AddParam(CoxCutoffsdefs, ['ML-' CoxCutOffparstr], 2, PX);
+            
+                case 100
+                    WLiters         = nk_input([WLparstr ' range'],0,'e',WLiters);                      PX = nk_AddParam(WLiters, ['ML-' WLparstr], 2, PX);
+                case 101
+                    for n = 1:NM.TrainParam.SVM.kernel.customfunc_nargin
+                        argParstr = sprintf('CFuncparstr_%d', n); 
+                        arg = sprintf('customkernel_arg%d', n);
+                        eval(sprintf("%s = nk_input([%s ' range'], 0, 'e', %s)", arg, argParstr, arg)); 
+                        eval(sprintf("PX = nk_AddParam(%s, ['ML-' %s], 2, PX)", arg, argParstr));
+                    end
+                          
             end
             if ~isempty(PX) && ~isempty(PX.opt), n_pars = size(PX.opt,1); else, n_pars = 0; end
         else
@@ -426,6 +501,15 @@ switch OptimFlag
         GRD.OptRegul            = OptRegul;
         GRD.NodeSelect          = NodeSelect;
         GRD.n_params            = n_pars;
+        GRD.WLiters             = WLiters;
+        if isfield(TrainParam.SVM.kernel, 'customfunc_nargin')
+            if NM.TrainParam.SVM.kernel.customfunc_nargin > 0
+                for n = 1:NM.TrainParam.SVM.kernel.customfunc_nargin
+                    argName = sprintf('customkernel_arg%d', n); 
+                    eval(sprintf("GRD.%s = %s;", argName, argName)); 
+                end
+            end
+        end
     case 2
         
         % ***************** Setup for simulated annealing *****************
