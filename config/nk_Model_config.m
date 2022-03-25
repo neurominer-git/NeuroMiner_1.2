@@ -250,12 +250,13 @@ mestr = 'ML algorithm parameters'; navistr = [parentstr ' >>> ' mestr]; fprintf(
 if ~exist('act','var') || isempty(act)
     act = nk_input(mestr, 0,'mq', mnuact, mnusel,1);
 end
+
 switch act
  
     case 1
+
         nk_PrintLogo
-        
-        mestr = ['Define model algorithm for ' NM.modeflag]; cprintf('*blue','\nYou are here: %s >>>',navistr);
+        mestr = ['Define model algorithm for ' NM.modeflag]; fprintf('\nYou are here: %s >>>',navistr);
         selProg = nk_input(mestr,0,'mq', sftmenu, 1:size(sftval,1), 1);
         if selProg, SVM.prog = sftval(selProg,:); end
         

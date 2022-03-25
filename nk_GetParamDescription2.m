@@ -820,6 +820,18 @@ switch action
                 case 2
                     vargout.WrapperMode = 'Simulated annealing';
                     vargout.WrapperStr = sprintf('%s',vargout.WrapperMode);
+                case 3
+                    vargout.WrapperMode = 'Genetic algorithm';
+                    vargout.WrapperStr = sprintf('%s',vargout.WrapperMode);
+                case 4
+                    vargout.WrapperMode = 'Particle swarm optimization';
+                    vargout.WrapperStr = sprintf('%s',vargout.WrapperMode);
+                case 5
+                    vargout.WrapperMode = 'Pathfinder algorithm';
+                    vargout.WrapperStr = sprintf('%s',vargout.WrapperMode);
+                case 6
+                    vargout.WrapperMode = 'Tree seed algorithm';
+                    vargout.WrapperStr = sprintf('%s',vargout.WrapperMode);
             end
             
             if params.Wrapper.SubSpaceStrategy > 1

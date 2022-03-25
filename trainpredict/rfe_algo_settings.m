@@ -2,7 +2,7 @@ function r = rfe_algo_settings(Y, label, Ynew, labelnew, Ps, FullFeat, FullParam
 
 global RFE VERBOSE SVM TRAINFUNC
 
-r.FullInd = find(any(Y) & std(Y)~=0 & sum(isfinite(Y))~=0 & FullFeat==1); r.Y = Y(:,r.FullInd); r.Ynew = Ynew(:,r.FullInd);
+r.FullInd = find(any(Y) & std(Y)~=0 & sum(isfinite(Y))~=0 & FullFeat==1); r.Y = Y(:,r.FullInd); r.Ynew = Ynew(:,r.FullInd); r.YL = label; r.YnewL = labelnew;
 r.kFea = numel(r.FullInd); 
 r.FeatRandPerc = 0;
 r.FeatStepPerc = true;
@@ -45,7 +45,7 @@ switch RFE.Wrapper.type
 end
 
 % Optimization criterion setup
-[r.evaldir, ~, r.optfunc, r.optparam] = nk_ReturnEvalOperator(SVM.GridParam);
+[r.evaldir, ~, r.optfunc, r.optparam, r.minmaxstr, ~, r.evaldir2] = nk_ReturnEvalOperator(SVM.GridParam);
 
 %% Obtain full feature space performance, if not already done so
 if ~exist('FullParam','var') || isempty(FullParam)

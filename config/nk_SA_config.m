@@ -1,4 +1,4 @@
-function param = nk_SA_config(param, defaultsfl)
+function [act, param] = nk_SA_config(param, defaultsfl, parentstr)
 
 SA.c                = 0.01; % Sparsity constant
 SA.T                = 1;    % Starting temperature
@@ -23,6 +23,8 @@ if ~defaultsfl
         if isfield(param.SA,'kc') && ~isempty( param.SA.kc ), SA.kc = param.SA.kc; end
     end
     nk_PrintLogo
+    mestr = 'Simulated annealing selection setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
+
     act = nk_input('Define Simulated annealing parameters',0,'mq', ...
                     [sprintf('Sparsity constant [ %g ]|', SA.c) ...
                      sprintf('Starting temperature [ %g ]|', SA.T) ...
@@ -54,4 +56,3 @@ else
     act = 0;
 end
 param.SA = SA; 
-if act, param = nk_SA_config(param, defaultsfl); end
