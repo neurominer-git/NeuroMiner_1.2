@@ -15,7 +15,7 @@ else
     matver = ver('matlab');
     NMinfo.info.ver     = sprintf('Version 1.1 (Beta) | BEORN [%s %s]', matver.Name, matver.Release);
 end
-NMinfo.info.author  = 'Nikolaos Koutsouleris, Clara Vetter';
+NMinfo.info.author  = 'Nikolaos Koutsouleris, Clara Vetter, Ariane Wiegand';
 NMinfo.info.affil   = 'Section for Precision Psychiatry';
 NMinfo.info.dep     = 'Department of Psychiatry and Psychotherapy';
 NMinfo.info.inst    = 'Ludwig-Maximilian-University';

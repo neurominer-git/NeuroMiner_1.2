@@ -25,9 +25,8 @@ function [sY, IN] = nk_PerfImputeObj(Y, IN)
 %                                   the MATLAB statistics toolbox  
 % sY                :               The imputed data matrix
 % Changes:
-% 25/03/2022        : Improved the selection of training subjects for
-%                     imputation by sorting the training matrix and
-%                     identifying observation without NaNs. 
+% 03/2022           : Improved the selection of training subjects for
+% imputation
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 03/2022
 
@@ -103,15 +102,8 @@ switch IN.method
                     fprintf('\n');warning('I did not find observations with non-missing values for feature %g. Check your settings!', j)
                 end
                 indi_Yi = 1:size(tX,2); indi_Yi(ind_Yi(j))=[];
+                [Xj, indnan_Xi, indi_Yi] = nk_PerfImputeObjTrimMat(tX, indnan_Xi, indi_Yi);
 
-                indnan_Xj = isnan(tX(indnan_Xi, indi_Yi));
-                [c_indnan_Xj, ind_c]  = sort(sum(indnan_Xj),'ascend');
-                [r_indnan_Xj, ind_r]  = sort(sum(indnan_Xj,2),'ascend');
-
-                idx_c = c_indnan_Xj==0; indi_Yi = indi_Yi(ind_c(idx_c));
-                idx_r = r_indnan_Xj==0; indnan_Xi = indnan_Xi(ind_r(idx_r));
-                Xj = tX(indnan_Xi, indi_Yi);
-    
                 % Compute distance metric
                 switch IN.method
                     case 'seuclidean'

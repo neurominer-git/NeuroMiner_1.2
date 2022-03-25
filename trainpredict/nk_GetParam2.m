@@ -31,7 +31,10 @@ end
 % Check if NaNs are in matrix and throw an error to avoid non-sense results!
 sNaN = sum(~isfinite(Y(:)));
 if sNaN
-    error('\nFound %g non-finite values in training matrix!\nCheck your preprocessing settings!',sNan)
+    if size(Y,2)<500
+        writetable(table(Y), sprintf('TrainingData_Error_CV2-%g-%g_CV1-%g-%g.xlsx', CVPOS.CV2p, CVPOS.CV2f, CVPOS.CV1p, CVPOS.CV1f ))
+    end
+    error('\nFound %g non-finite values in training matrix!\nCheck your preprocessing settings!', sNaN)
 end
 
 % Pass training matrix, labels, (and time vector) to used-defined training module
