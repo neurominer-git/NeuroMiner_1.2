@@ -349,7 +349,7 @@ switch act
     case 6
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
             if ~isfield(NM.TrainParam.STRAT{varind},'SVM'), NM.TrainParam.STRAT{varind}.SVM = []; end
-             act = 1; while act>0, ...
+            act = 1; while act>0, ...
                      [NM.TrainParam.STRAT{varind}.SVM, act] = nk_Model_config(NM.TrainParam.STRAT{varind}.SVM, NM.TrainParam.STRAT{varind}, navistr, varind); end
         else
             if ~isfield(NM.TrainParam,'SVM'), NM.TrainParam.SVM = []; end
@@ -377,9 +377,10 @@ switch act
                         NM.TrainParam.STRAT{varind}.MULTI, ...
                         NM.TrainParam.STRAT{varind}.GRD, 1); 
             end
-            acti = 1; while acti>0
-                [ acti, NM.TrainParam.STRAT{varind}.RFE ] = ...
-                    nk_RFE_config(acti, NM.TrainParam.STRAT{varind}, ...
+            act = 1; 
+            while act>0
+                [ act, NM.TrainParam.STRAT{varind}.RFE ] = ...
+                    nk_RFE_config(act, NM.TrainParam.STRAT{varind}, ...
                         NM.TrainParam.STRAT{varind}.SVM, ...
                         NM.modeflag, ...
                         NM.TrainParam.STRAT{varind}.MULTI, ...
@@ -387,7 +388,7 @@ switch act
             end
         else
             if ~isfield(NM.TrainParam,'RFE'), [~, NM.TrainParam.STRAT{varind}.RFE ] = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1); end
-            acti = 1; while acti>0, [ acti, NM.TrainParam.RFE ] = nk_RFE_config(acti, NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, [], navistr); end
+            act = 1; while act>0, [ act, NM.TrainParam.RFE ] = nk_RFE_config(act, NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, [], navistr); end
         end
         
     % MULTI-GROUP SETTINGS =============================================================================================================================================   
@@ -416,12 +417,13 @@ switch act
         
     % SAVING OPTIONS ====================================================================================================================================================     
     case 12
-        NM.TrainParam.SAV.savemodel = nk_input('Save models?',0,'yes|no',[1,0],2);
-        NM.TrainParam.SAV.matname = nk_input('Define prefix of output MAT-files',0,'s'); 
+        act = 1; while act>0, [ NM, act ] = nk_SavingOptions_config(NM, 0, navistr); end
     
+    % OOCV OPTIONS ======================================================================================================================================================     
     case 13
         NM.TrainParam = nk_OOCV_config(NM.TrainParam);
     
+    % EXPORT TRAINING PARAM =============================================================================================================================================     
     case 14
         matname = nk_input('Filename (prefix is TRAIN)',0,'s');
         matname = ['TRAIN_' matname];
@@ -433,9 +435,9 @@ switch act
             cv = NM.cv;
             save(matname,'cv','-append');
         end        
-        
+
+    % IMPORT TRAINING PARAM =============================================================================================================================================    
     case 15
-        
         fl = nk_input('Overwrite current settings?',0,'yes|no',[1,0],1);
         if fl
             menuvec = []; menustr =[];
@@ -491,23 +493,22 @@ switch act
             end
             if ~isempty(mess)>0, h = msgbox(mess,'Loaded parameters:','none'); end
         end
-        
+    
+    % DEFINE VERBOSITY LEVEL ============================================================================================================================================
     case 16
         NM.TrainParam.verbosity = ~NM.TrainParam.verbosity;
     
     case 17
         act = 1; stepind = 1; while act>0, [NM.TrainParam.META, act, stepind] = nk_Ensemble_config(NM.TrainParam.STRAT{varind}.PREPROC, varind, navistr, stepind); end
     
-         % META-LEARNING (STACKING) =================================================================================================================================================     
+    % META-LEARNING (STACKING) =======================================================================================================================================     
     case 18
         if ~isfield(NM.TrainParam,'STACKING'), NM.TrainParam.STACKING.flag = 2; end
         mess=[];act = 1; while act>0, [NM.TrainParam.STACKING, act, mess] = nk_Stacking_config(NM.TrainParam.STACKING, s, mess, navistr); end
         
     case 19
         nk_PrintWs(NM, NM.TrainParam)
-       
 end
-
 act = 1;
 
 function PREPROC = DefPREPROC(modeflag, nan_in_pred, nan_in_label)

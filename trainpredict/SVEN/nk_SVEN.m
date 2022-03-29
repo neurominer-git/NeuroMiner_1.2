@@ -1,5 +1,6 @@
 function m = nk_SVEN(SVM, X, Y, Params)
 global TRAINFUNC
+
 [~,p] = size(X);
 m.t = Params(1); m.lambda = Params(2);
 Xnew = [bsxfun(@minus,X,Y./m.t) bsxfun(@plus,X,Y./m.t)]';
@@ -16,7 +17,7 @@ else
     for i = 1:numel(CMDSTR.ParamStr)
         cmdstr = [ ' -' CMDSTR.ParamStr{i} ' ' strtrim(cParams(i,:)) cmdstr ];
     end
-	model = train_liblin22(Ynew, sparse(Xnew), cmdstr);
+	model = train_liblin244(Ynew, sparse(Xnew), cmdstr);
     m.w = model.w; m.w = m.w';
 end
 m.alpha = m.C * max(1- Ynew.*(Xnew * m.w),0);

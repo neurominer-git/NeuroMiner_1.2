@@ -138,7 +138,7 @@ if action.all
             addpath(fullfile(defs.path,'trainpredict')); fprintf('.');
             addpath(fullfile(defs.path,'trainpredict/libsvm-weights-3.12/matlab')); fprintf('.');
             addpath(fullfile(defs.path,'trainpredict/libsvm-mat-2.9-1')); fprintf('.');
-            addpath(fullfile(defs.path,'trainpredict/liblinear-2.20/')); fprintf('.');
+            addpath(fullfile(defs.path,'trainpredict/liblinear-2.44/')); fprintf('.');
             addpath(fullfile(defs.path,'trainpredict/LIBSVM-Plus-2.89')); fprintf('.');
             addpath(fullfile(defs.path,'trainpredict/mRVMs')); fprintf('.');
             addpath(fullfile(defs.path,'trainpredict/MRVR'));fprintf('.');

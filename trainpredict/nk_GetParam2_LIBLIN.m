@@ -1,12 +1,11 @@
 % ==========================================================================
-% FORMAT [param, model] = nk_GetParam_MEXELM(Y, label, SlackParam, ~, ...
-%                                           ModelOnly)
+% FORMAT [param, model] = nk_GetParam2_LIBLIN(Y, label, ModelOnly, cmd)
 % ==========================================================================
 % Train LIBLINEAR models and evaluate their performance using Y & label, 
 % SlackParam,
 % if ModelOnly = 1, return only model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 11/2020
+% (c) Nikolaos Koutsouleris, 04/2022
 
 function [param, model] = nk_GetParam2_LIBLIN(Y, label, ModelOnly, cmd)
 global SVM EVALFUNC CMDSTR MODEFL                          
@@ -21,14 +20,14 @@ if iscell(Y)
    
 else % Univariate case
     
-    model = train_liblin22(label, sparse(Y), cmd);
+    model = train_liblin244(label, sparse(Y), cmd);
 	model = nk_BuildCalibrationModel(SVM, MODEFL, model, Y, label);
 	
     %fprintf('\n%s',cmdstr)
     if ~ModelOnly
         [param.target, ...
             param.val, ...
-            param.dec_values] = predict_liblin22(label, sparse(Y), model, SVM.LIBLIN.b);
+            param.dec_values] = predict_liblin244(label, sparse(Y), model, SVM.LIBLIN.b);
         if SVM.RVMflag, param.dec_values = nk_CalibrateProbabilities(param.dec_values); end
         param.val = EVALFUNC(label, param.dec_values);
     end

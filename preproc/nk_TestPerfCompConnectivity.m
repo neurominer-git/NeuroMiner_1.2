@@ -31,8 +31,8 @@ for i = 1:m
     Ctest = nk_PerfCompConnectivity(Ytest,params);
     params = rmfield(params,'seeds');
     
-    model = train_liblin(L(trainind),sparse(Ctrain),'-c 2 -s 2');
+    model = train_liblin244(L(trainind),sparse(Ctrain),'-c 2 -s 2');
     
-    P(i) = predict_liblin(L(testind),sparse(Ctest),model);
+    P(i) = predict_liblin244(L(testind),sparse(Ctest),model);
     
 end  

@@ -1150,16 +1150,15 @@ case {'m','mq'}                                             %-Process menu type
                 Prmpt=[Prmpt,' (Default: ',num2str(DefItem),')'];
             end
         case 'mq'
-            for i = 1:nLabels, 
-                fprintf('\t%2d | ', i);
-                fprintf('%s\n',Labels(i,:)), 
+            for i = 1:nLabels
+                fprintf('\t%2d | %s\n', i, Labels(i,:));
             end
-            fprintf('\t<==| Back/Quit [Q]\n');
-            Prmpt = ['Menu choice (1-',int2str(nLabels),'/Q)'];
+            fprintf('\t<==| Back/Quit [Q|%g]\n',nLabels+1);
+            Prmpt = ['Menu choice (1-',int2str(nLabels),'/Q|',num2str(nLabels+1),')'];
             if DefItem
                 Prmpt=[Prmpt,' (Default: ',num2str(DefItem),')'];
             else
-                Prmpt=[Prmpt,' (Default: Q)'];
+                Prmpt=[Prmpt,' (Default: Q|',num2str(nLabels+1),')'];
             end
             nLabels = nLabels+1;
             DefItem = nLabels;
@@ -1188,11 +1187,11 @@ case {'m','mq'}                                             %-Process menu type
                    k = str2double(k);
                end
         end
-        if DefItem & isempty(k), k=DefItem; end
-        while isempty(k) || ~any([1:nLabels]==k)
+        if DefItem && isempty(k), k=DefItem; end
+        while isempty(k) || ~any((1:nLabels)==k)
             if ~isempty(k),fprintf('\n!Selected menu item does not exist \n'),end
             k = input([fprintf('%s',Prmpt) ' ? ']);
-            if DefItem & isempty(k), k=DefItem; end
+            if DefItem && isempty(k), k=DefItem; end
         end
     end
     fprintf('\n')

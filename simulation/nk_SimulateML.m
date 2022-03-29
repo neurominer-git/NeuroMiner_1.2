@@ -353,9 +353,9 @@ parfor k=1:reps
                     % set weighting!
                     cmd = nk_SetWeightStr(xSVM, MODEFL, CMDSTR, Lr, cmd);
                     % Train model
-                    model = train_liblin22(Lr, sparse(Tr_Ystar), cmd);
+                    model = train_liblin244(Lr, sparse(Tr_Ystar), cmd);
                     % Test model
-                    [ ~, ~, ds ] = predict_liblin22(Ls, sparse(Ts_Ystar), model, sprintf(' -b %g -q',xSVM.LIBLIN.b)); 
+                    [ ~, ~, ds ] = predict_liblin244(Ls, sparse(Ts_Ystar), model, sprintf(' -b %g -q',xSVM.LIBLIN.b)); 
                     ds = ds(:,1);
                 case 'RF'
             end
