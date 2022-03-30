@@ -12,7 +12,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
     if ~isempty(Yocv), sYocv = cell(kbin,1); end
     if ~isempty(Cocv), sCocv = cell(kbin,1); end
     optfl = true; ukbin = kbin; 
-    uBINMOD = 0; 
+    %uBINMOD = 0; 
     if smoothfl
         if inp.multiflag
             uPREPROC = nk_SetParamChain(paramfl, 1, PREPROC);
@@ -71,17 +71,18 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
             end
         end
     else
-        uBINMOD = BINMOD;
+       
         sY = Y;
         if ~isempty(Yocv), sYocv = Yocv; end
         if ~isempty(Cocv), sCocv = Cocv; end
         if isfield(inp,'X') && isfield(inp.X,'Yw') && ~isfield(inp,'Yw'), inp.Yw = inp.X.Yw; end
     end
 else
-    uBINMOD = BINMOD;
+    %uBINMOD = BINMOD;
     optfl = false;
     sY = Y;
     if ~isempty(Yocv), sYocv = Yocv; end
     if ~isempty(Cocv), sCocv = Cocv; end
     if isfield(inp,'X') && isfield(inp.X,'Yw') && ~isfield(inp,'Yw'), inp.Yw = inp.X.Yw; end
 end
+uBINMOD = BINMOD;

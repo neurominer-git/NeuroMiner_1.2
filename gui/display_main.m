@@ -26,6 +26,9 @@ switch h_list{h_val}
             load_selCase(handles,handles.MultiClass.cases)
         else
             %set(get(handles.pnBinRegrPerfCmd, 'Children'), 'Enable', 'on');
+            if isfield(handles,'MultiClass') && isfield(handles.MultiClass,'spideraxes') 
+                handles.MultiClass.spideraxes.Title.Visible='off';
+            end
             handles.selOneVsAll_Info.Enable = 'off';
             handles.cmdExportCobWeb.Visible = 'off';
             handles.cmdMetricExport.Visible = 'on';

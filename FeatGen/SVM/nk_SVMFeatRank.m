@@ -125,7 +125,7 @@ for i = 1:nP
             end
             cmdstr = [  SlackParam EpsParam CMDSTR.simplemodel ];
             fprintf('\nTraining LIBLINEAR model with command string:%s', cmdstr);
-            model = train_liblin22(label,Y,cmdstr);
+            model = train_liblin244(label,Y,cmdstr);
             R(:,i) = model.w; 
             nonzerofeat = sum(model.w ~= 0); 
             fprintf(' ==> %g (%1.2f%%) Non-zero features.', nonzerofeat, nonzerofeat*100/model.nr_feature);

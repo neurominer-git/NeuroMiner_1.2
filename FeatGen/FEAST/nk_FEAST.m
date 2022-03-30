@@ -50,7 +50,7 @@ tic;
 switch params.Method
 
     case {1,2,3,4,5,6,7,8,9}
-        ind = feast(params.MethodStr, k ,Y,label);
+        ind = feast(params.MethodStr, k ,Y, label);
     case 10
         if ~iscell(params.MethodParams)
             MethodParams{1} = params.MethodParams;

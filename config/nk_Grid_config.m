@@ -1,10 +1,17 @@
-function [TrainParam, act] = nk_Grid_config(TrainParam, SVM, defaultsfl, parentstr)
+function [TrainParam, act] = nk_Grid_config(TrainParam, SVM, varind, defaultsfl, parentstr)
 global NM
 
 OptimFlag = 1;
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 [~, CompStr] = nk_ReturnEvalOperator(SVM.GridParam);
-
+if isfield(TrainParam,'PREPROC')
+    if ~isempty(varind)
+        PX_preML = nk_ReturnParamChain(TrainParam.PREPROC(varind), true);
+    else
+        PX_preML = nk_ReturnParamChain(TrainParam.PREPROC, true); 
+    end
+    nP = prod(PX_preML.steps);
+end
 switch OptimFlag
     
     case 1
@@ -315,7 +322,7 @@ switch OptimFlag
             end
             
             GRD.GridMaxType = GridMaxType;
-            if prod(n_pars) > 1 
+            if prod(n_pars)*nP > 1 
                 if OptRegul.flag, regstr = 'Yes'; else regstr = 'No'; end
                 menustr = sprintf('%s|Enable regularization of model selection [ %s ]', menustr, regstr);               menuact = [ menuact 7 ];
                 if OptRegul.flag

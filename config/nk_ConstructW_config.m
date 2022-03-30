@@ -86,7 +86,7 @@ if ~defaultsfl
     PX = nk_AddParam(Param.k, 'LPP-K', 1, PX);
     
     nk_PrintLogo
-    mestr = 'Graph construction (Affinity matrix) parameters'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Graph construction (Affinity matrix) parameters'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     act = nk_input(mestr,0,'mq', menustr, menuact);
     
     switch act

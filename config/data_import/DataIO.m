@@ -588,7 +588,7 @@ switch datasource
 
                             if ~oocvflag || IO.labels_known
                                 [check_str, mess, IO] = CheckTabFile(IO, 'check_label', na_str, mess);
-                                if isfield(IO,'t_Y') && ~isempty(IO.t_Y),cprintf('black*','Successfully opened %g x %g table file.',size(IO.t_Y,1),size(IO.t_Y,2)); end
+                                if isfield(IO,'t_Y') && ~isempty(IO.t_Y),fprintf('Successfully opened %g x %g table file.',size(IO.t_Y,1),size(IO.t_Y,2)); end
                                 mn_label_edit = sprintf('Specify column header containing the label data [ %s ]|', check_str); 
                                 mn_act = [ mn_act 'def_labels' ]; mn_str = [mn_str mn_label_edit];
                             end
@@ -674,7 +674,7 @@ end
 nk_PrintLogo; 
 
 if ~isempty(matObj)
-    fprintf('\n');cprintf('blue*','The %s contains the following variables: \n\n',groupmode_str); 
+    fprintf('\n');fprintf('The %s contains the following variables: \n\n',groupmode_str); 
     whos(matObj)
 end
 
@@ -693,7 +693,7 @@ if ~disallow
     mn_IO = sprintf('IMPORT %s',datasource ); mn_act = [ mn_act 'load_data' ] ; mn_str = [mn_str mn_IO];
 end
 
-fprintf('\n'); mestr = 'Input data into NM';  navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); cprintf('*blue','You are here: %s >>> ',parentstr); 
+fprintf('\n'); mestr = 'Input data into NM';  navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('You are here: %s >>> ',parentstr); 
 act = char(nk_input(mestr,0,'mq', mn_str, mn_act));
 
 switch act
@@ -1060,7 +1060,7 @@ switch act
  case 'disp_img'
         nk_PrintLogo
         if iscell(IO.PP), PP = char(IO.PP); F = char(IO.F); else, PP= IO.PP; F=IO.F; end
-        fprintf('\n\n'); cprintf('black*','Found %g image files in setup:',size(PP,1));
+        fprintf('\n\n'); fprintf('Found %g image files in setup:',size(PP,1));
         L = size(F,2); fnd = false(L,1);
         for i=1:size(F,1)
             mp = IO.Vinfo(i,:); mp_str = []; 

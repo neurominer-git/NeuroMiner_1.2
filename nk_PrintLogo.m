@@ -31,7 +31,8 @@ if EXPERT
     fprintf('\n')
     fprintf('\t>>> EXPERT MODE <<< ')
 end
-fprintf('\n\t%s \n', NMinfo.info.ver); fprintf('\n')
-fprintf('(c) %s, %s ', NMinfo.info.author, NMinfo.info.datever)
-%disp(['<a href="matlab: sendmail(''' NMinfo.info.email ''',''NeuroMiner'')">' NMinfo.info.email '</a>'])
-fprintf('\n    nm@pronia.eu \n')
+fprintf('\n\t%s', NMinfo.info.ver); fprintf('\n')
+if exist('maindlg','var') && maindlg
+    fprintf('\n(c) %s | %s ', NMinfo.info.author, NMinfo.info.datever)
+    fprintf('\n    nm@pronia.eu \n')
+end

@@ -76,7 +76,7 @@ if ~isempty(act) || ~defaultsfl
         end
     end
     nk_PrintLogo
-    mestr = 'Filter-based model selection setup'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); cprintf('*blue','\nYou are here: %s >>> ',parentstr);
+    mestr = 'Filter-based model selection setup'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('\nYou are here: %s >>> ',parentstr);
     
     act = nk_input(mestr, 0,'mq', menustr, menuact);
     

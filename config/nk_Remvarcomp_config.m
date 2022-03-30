@@ -63,7 +63,7 @@ menuact = 1:7;
 
 %% Print menu
 nk_PrintLogo
-mestr = 'Extract variance components from matrix'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+mestr = 'Extract variance components from matrix'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
 act = nk_input(mestr,0,'mq', menustr , menuact);
 
 % Get user data

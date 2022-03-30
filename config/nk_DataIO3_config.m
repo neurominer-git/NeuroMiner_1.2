@@ -26,7 +26,7 @@ if ~exist('act','var') || isempty(act)
             mn_act = [mn_act 6 7];
         end
         mn_str = [mn_str '|Finish data import for discovery & cross-validation analysis|' ]; mn_act = [mn_act 8];
-        fprintf('\n\n'); cprintf('*blue','You are here: %s >>> ',parentstr); 
+        fprintf('\n\n'); fprintf('You are here: %s >>> ',parentstr); 
         act = nk_input(mestr,0,'mq', mn_str, mn_act);
     end
 end

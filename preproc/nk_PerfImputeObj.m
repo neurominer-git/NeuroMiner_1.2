@@ -24,8 +24,12 @@ function [sY, IN] = nk_PerfImputeObj(Y, IN)
 %                                   pdist2 which is available through 
 %                                   the MATLAB statistics toolbox  
 % sY                :               The imputed data matrix
+% Changes:
+% 25/03/2022        : Improved the selection of training subjects for
+%                     imputation by sorting the training matrix and
+%                     identifying observation without NaNs. 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2017
+% (c) Nikolaos Koutsouleris, 03/2022
 
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) 
@@ -38,8 +42,7 @@ else
 end
 % =========================================================================
 function [sY, IN] = PerfImputeObj(Y, IN)
-
-global VERBOSE
+global VERBOSE 
 
 % Check for cases that are completely NaN and remove them temporarily
 [Y, ~, IxNaN] = nk_ManageNanCases(Y, []);
@@ -88,14 +91,27 @@ switch IN.method
         for i = 1:m
             if snan(i), %if VERBOSE,fprintf('.'); end; 
                 continue; end
-            % Find which values are NaN in the given case i
-            ind_Yi = find(indnan(i,:)); indi_Yi = ~indnan(i,:);
+            % Find which features are NaN in the given case i
+            ind_Yi = find(indnan(i,:)); 
             n_ind_Yi = numel(ind_Yi);
+
             for j=1:n_ind_Yi
                 % Get training cases which do not have NaNs in the given
-                % column and in the submatrix
-                indnan_Xi = sum(~isnan(tX(:,ind_Yi)),2) == n_ind_Yi;
+                % column 
+                indnan_Xi = find(~isnan(tX(:,ind_Yi(j))));
+                if ~sum(indnan_Xi)
+                    fprintf('\n');warning('I did not find observations with non-missing values for feature %g. Check your settings!', j)
+                end
+                indi_Yi = 1:size(tX,2); indi_Yi(ind_Yi(j))=[];
+
+                indnan_Xj = isnan(tX(indnan_Xi, indi_Yi));
+                [c_indnan_Xj, ind_c]  = sort(sum(indnan_Xj),'ascend');
+                [r_indnan_Xj, ind_r]  = sort(sum(indnan_Xj,2),'ascend');
+
+                idx_c = c_indnan_Xj==0; indi_Yi = indi_Yi(ind_c(idx_c));
+                idx_r = r_indnan_Xj==0; indnan_Xi = indnan_Xi(ind_r(idx_r));
                 Xj = tX(indnan_Xi, indi_Yi);
+    
                 % Compute distance metric
                 switch IN.method
                     case 'seuclidean'
@@ -103,7 +119,7 @@ switch IN.method
                         D = pdist2(Xj, tY(i,indi_Yi), 'seuclidean',S)';
                     case 'mahalanobis'
                         %C = nancov(Xj(:,indi_Yi)); C(C==0) = min(C(C~=0));
-                        D = pdist2(Xj, tY(i,ind_Yi), 'mahalanobis')';
+                        D = pdist2(Xj, tY(i,indi_Yi), 'mahalanobis')';
                     case 'hybrid'
                         % Identify nominal features using predefined cutoff
                         % Compute distances in nominal features
@@ -119,13 +135,12 @@ switch IN.method
                 % Sort training cases according to their proximity to the
                 % test case whose value will be imputed.
                 [Ds, ind] = sort(D,'ascend');
-                if numel(Ds) < IN.k, kx = numel(Ds); else kx = IN.k; end
+                if numel(Ds) < IN.k, kx = numel(Ds); else, kx = IN.k; end
                 % Here we take the unweighted median of the kx imputation
                 % training cases
-                fXX = find(indnan_Xi);
-                mn = median( tX(fXX(ind(1:kx)), ind_Yi(j)) );
+                mn = median( tX(indnan_Xi(ind(1:kx)), ind_Yi(j)) );
                 if isnan(mn)
-                    fprintf('problem')
+                    fprintf('\n');warning('NaNs remain in the the current observation. Check your settings!')
                 end
                 stY(i,ind_Yi(j)) = mn;
                 %if VERBOSE,fprintf('+'), end

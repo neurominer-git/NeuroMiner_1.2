@@ -1,12 +1,11 @@
 % ==========================================================================
-% FORMAT [param, model] = nk_GetParam_DECTRE(Y, label, SlackParam, ModelOnly, ...
-%                                           Param)
+% FORMAT [param, model] = nk_GetParam2_DECTRE(Y, label, ModelOnly, Param)
 % ==========================================================================
 % Train Decision Tree models (and optionally evaluate their performance on
 % the training data)
 % if ModelOnly = 1, return only model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 08/2012
+% (c) Nikolaos Koutsouleris, 03/2022
 
 function [param, model] = nk_GetParam2_DECTRE(Y, label, ModelOnly, Param)
 global EVALFUNC                          
@@ -25,10 +24,8 @@ if iscell(Y)
 else % Univariate case
     
     model = fitctree(Y, label,'MinLeaf',Param(1), 'MaxNumSplits', Param(2), 'PredictorSelection', 'curvature');
-    %model = fitctree(Y, label,'OptimizeHyperparameters','auto', 'HyperparameterOptimizationOptions', opt);
-    %fprintf('\n%s',cmdstr)
     if ~ModelOnly
-        [param.target] = predict_liblin(label, Y, model);
+        [param.target] = md.predict(tXtest);
         param.dec_values = param.target; 
         param.val = EVALFUNC(label, param.dec_values);
     end

@@ -21,7 +21,7 @@ if ~defaultsfl
     mn_str = [mn_str sprintf('Define extraction range [ %s ]',nk_ConcatParamstr(dims))]; mn_act = [mn_act 2];
     if numel(mn_act)>1
         nk_PrintLogo
-        mestr = 'Extraction of components from reduced data projections'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+        mestr = 'Extraction of components from reduced data projections'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
         act = nk_input(mestr,0,'mq',mn_str,mn_act);
     else
         act = 2;

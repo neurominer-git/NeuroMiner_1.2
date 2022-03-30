@@ -71,7 +71,7 @@ if ~exist('IN','var') || isempty(IN)
     if ~exist('PredGroups','var')   || isempty(PredGroups), PredGroups = 1:size(D,2); else, PredGroups = PredGroups'; end
     if ~exist('nCutOff','var')      || isempty(nCutOff),    nCutOff = 5; end
     if ~exist('OPTCRIT','var')         || isempty(OPTCRIT),  OPTCRIT = @BAC; end
-    if ~exist('Ddesc','var')        || isempty(Ddesc),      
+    if ~exist('Ddesc','var')        || isempty(Ddesc)      
         Ddesc = cellstr([repmat('Model ',size(D,2),1) num2str((1:size(D,2))')]); 
     elseif numel(Ddesc) ~= size(D,2)
         error('Model descriptor entries should correspond to the number of models in the model matrix');
@@ -292,7 +292,7 @@ for j=1:numel(R.vecneg{I})
         rOPT        = ijOPT;
         optD        = jD;
         allOPT      = OPTCRIT(L,jD);
-        if VERBOSE, 
+        if VERBOSE
             try
                 fprintf('\nNext Node %g: %1.2f [%4g cases; Lower thresh: %1.2f, Upper thresh: %1.2f]', I+1, rOPT.(char(OPTCRIT)), numel(fI(ind)), lthr, uthr); 
             catch

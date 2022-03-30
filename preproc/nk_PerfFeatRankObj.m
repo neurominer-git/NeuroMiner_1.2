@@ -19,7 +19,7 @@ function IN  = nk_PerfFeatRankObj(oY, IN)
 % IN.weightmethod     :     Upweight (=1) or downweight (=2) features
 % IN.W                :     The ranking vector/matrix over the features
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 08/2020
+% (c) Nikolaos Koutsouleris, 04/2022
 
 global VERBOSE
 
@@ -97,8 +97,9 @@ switch IN.algostr
 
     case 'feast'
         if VERBOSE, fprintf(' feast'); end
+        IN.FEAST.NumFeat = nk_ReturnParam('NumFeat', Params_desc, opt); 
         [~, IN.W] = nk_FEAST(Y, L, [], IN.FEAST);
-        IN.W = IN.W';
+        %IN.W = IN.W';
         
     case 'auc'
         % Area-under-the-Curve ooperator
@@ -165,7 +166,7 @@ switch IN.algostr
 end
 
 %Transpose weights if needed
-if size(IN.W,2) == size(Y,2); IN.W = IN.W'; end
+if size(IN.W,1) < size(IN.W,2); IN.W = IN.W'; end
 
 % Scale from 0 to 1
 IN.W = nk_PerfScaleObj(IN.W);

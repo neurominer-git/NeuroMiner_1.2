@@ -15,7 +15,7 @@ if ~defaultfl
     
     if ~param.CostFun, param.CostFun = 2; end
     d = nk_GetParamDescription2([],param,'EnsType');
-    mestr = 'Subspace selection setup'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>>',parentstr); 
+    mestr = 'Subspace selection setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr); 
     
     nk_PrintLogo
     switch SVM.GridParam

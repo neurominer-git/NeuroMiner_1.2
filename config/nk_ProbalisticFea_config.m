@@ -4,7 +4,7 @@ if ~exist('defaultsfl','var') || isempty(defaultsfl),  defaultsfl = 0; end
 
 tPFE.flag            = 0;   % Perform PFE
 tPFE.Mode            = 1;    % Perform PFE
-tPFE.Perc            = 10;   % Absolute number/Percentage of CV1 feature mask agreement
+tPFE.Perc            = 90;   % Absolute number/Percentage of CV1 feature mask agreement
 tPFE.TolWin          = 25;   % Percentage of CV1 feature mask agreement
 tPFE.MinNum          = 1;    % Minimum # features required across CV1
 tPFE.PruneFlag        = 1;    % Flag for different operations using the Cross-C1 agreement vector
@@ -46,7 +46,7 @@ if ~defaultsfl && ~isempty(PFE)
     end
     
     nk_PrintLogo
-    mestr = 'Probabilistic feature extraction setup'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Probabilistic feature extraction setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     act = nk_input(mestr,0,'mq', menustr, menuact);
     
     switch act

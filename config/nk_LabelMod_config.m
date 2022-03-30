@@ -29,7 +29,7 @@ if ~defaultsfl
     
     nk_PrintLogo
     mestr = 'Process-level label modification'; 
-    navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     act = nk_input(mestr,0,'mq', menustr, menuact);
     
     switch act

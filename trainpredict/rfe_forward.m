@@ -90,7 +90,7 @@ switch r.WeightSort
             % then previous space
             % Finally trained model will have only a performance == optparam
             % if the feature stepping is 1
-            if feval(r.evaldir, param, optparam) 
+            if feval(r.evaldir2, param, optparam) 
                 % If user activated random feature selection then we have
                 % to randomly choose x% of the features in the block
                 if r.FeatRandPerc
@@ -138,7 +138,7 @@ switch r.WeightSort
             
             % Add feature to feature space only if current performance is better
             % then previous space
-            if feval(r.evaldir, param, optparam) 
+            if feval(r.evaldir2, param, optparam) 
                 S = [S kSind]; optparam = param;
                 Opt.S{end+1} = S; Opt.Param = [Opt.Param optparam];
                 if VERBOSE, fprintf('=> NEW optimum: # Features: %4.0f ==> %s = %g', numel(S), ActStr, optparam); end

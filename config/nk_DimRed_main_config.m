@@ -51,7 +51,7 @@ if ~defaultsfl
     [menustr, menuact] = nk_CheckCalibAvailMenu_config(menustr, menuact, CALIBUSE);
     
     nk_PrintLogo
-    mestr = 'Dimensionality reduction'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Dimensionality reduction'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     act = nk_input(mestr,0,'mq', menustr, menuact);
     switch act
         case 1

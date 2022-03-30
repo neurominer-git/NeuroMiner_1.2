@@ -101,6 +101,7 @@ function count = cprintf(style,format,varargin) %#ok<*JAPIMATHWORKS>
 %    6. Bold style is only supported on R2011b+, and cannot also be underlined.
 %
 % Change log:
+%    2021-01-04: Fixed cases of invalid colors (especially bad on R2021b onward)
 %    2021-04-07: Enabled specifying color as #RGB (hexa codes), [.1,.7,.3], [26,178,76]
 %    2020-01-20: Fix by T. Hosman for embedded hyperlinks
 %    2015-06-24: Fixed a few discoloration issues (some other issues still remain)
@@ -120,7 +121,7 @@ function count = cprintf(style,format,varargin) %#ok<*JAPIMATHWORKS>
 % License to use and modify this code is granted freely to all interested, as long as the original author is
 % referenced and attributed as such. The original author maintains the right to be solely associated with this work.
 % Programmed and Copyright by Yair M. Altman: altmany(at)gmail.com
-% $Revision: 1.12 $  $Date: 2021/04/07 01:02:53 $
+% $Revision: 1.13 $  $Date: 2022/01/04 16:15:21 $
   persistent majorVersion minorVersion
   if isempty(majorVersion)
       %v = version; if str2double(v(1:3)) <= 7.1
@@ -132,7 +133,7 @@ function count = cprintf(style,format,varargin) %#ok<*JAPIMATHWORKS>
       minorVersion = v(2); %str2double(versionIdStrs{1}{2});
   end
   % The following is for debug use only:
-  %global docElement txt el
+  %global docElement el debugData
   if ~exist('el','var') || isempty(el),  el=handle([]);  end  %#ok mlint short-circuit error ("used before defined")
   if nargin<1, showDemo(majorVersion,minorVersion); return;  end
   if isempty(style),  return;  end
@@ -219,14 +220,20 @@ function count = cprintf(style,format,varargin) %#ok<*JAPIMATHWORKS>
       % Note: fprintf(2,...) is required in order to add formatting tokens, which
       % ^^^^  can then be updated below (no such tokens when outputting to stdout)
       %format(end+1) = ' ';  % Jacob D's FEX comment 14/6/2016 (sometimes makes things worse!) https://mail.google.com/mail/u/0/#inbox/15551268609f9fef
-      count1 = fprintf(2,format,varargin{:});
-      % Repaint the command window
-      %awtinvoke(cmdWinDoc,'remove',lastPos,1);   % TODO: find out how to remove the extra '_'
-      drawnow;  % this is necessary for the following to work properly (refer to Evgeny Pr in FEX comment 16/1/2011)
-      xCmdWndView.repaint;
-      %pause(0.01);
-      %hListeners = cmdWinDoc.getDocumentListeners; for idx=1:numel(hListeners), try hListeners(idx).repaint; catch, end, end
       cmdWinLen = cmdWinDoc.getLength;
+      cmdWinLenPrev = cmdWinLen;
+      count1 = fprintf(2,format,varargin{:});
+      % Repaint the command window (wait a bit for the async update to complete)
+      iter = 0;
+      while count1 > 0 && cmdWinLen <= cmdWinLenPrev && iter < 100
+          %awtinvoke(cmdWinDoc,'remove',lastPos,1);   % TODO: find out how to remove the extra '_'
+          drawnow;  % this is necessary for the following to work properly (refer to Evgeny Pr in FEX comment 16/1/2011)
+          pause(0.01);
+          xCmdWndView.repaint;
+          %hListeners = cmdWinDoc.getDocumentListeners; for idx=1:numel(hListeners), try hListeners(idx).repaint; catch, end, end
+          cmdWinLen = cmdWinDoc.getLength;
+          iter = iter + 1;
+      end
       docElement = cmdWinDoc.getParagraphElement(lastPos+1);
       if majorVersion<7 || (majorVersion==7 && minorVersion<13)
           if bolFlag && ~underlineFlag
@@ -242,7 +249,8 @@ function count = cprintf(style,format,varargin) %#ok<*JAPIMATHWORKS>
           %dumpElement(docElement);
       end
       % Get the Document Element(s) corresponding to the latest fprintf operation
-      while docElement.getStartOffset < cmdWinLen
+      %debugData = [iter, count1, lastPos, docElement.getStartOffset, cmdWinLen];
+      while docElement.getStartOffset <= cmdWinLen
           % Set the element style according to the current style
           if debugFlag, dumpElement(docElement); end
           specialFlag = underlineFlag | boldFlag;

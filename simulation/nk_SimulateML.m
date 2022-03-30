@@ -1,54 +1,65 @@
 function [ Res, IN ] = nk_SimulateML(IN)
-% ===========================================================================================================
+% =========================================================================
 % FORMAT function [ R, P ] = nk_SimulateML(IN)
-% ===========================================================================================================
+% =========================================================================
 % This function is part of the NeuroMiner machine learning library. 
-% It allows the user to determine the expected prognostic performance of an
-% algorithm under different learning scenarios, as determined by:
-% 1) the dimensionality of the variable/feature space (Nfeats)
-% 2) the percentage of predictive markers within that feature space (Nmarkers)
-% 3) the number of observations/cases/samples to learn from (Ncases)
-% 4) the number of cases with the (desired) event in relation to the total 
-%    number of cases (eventprob)
-% 5) the maximum / minimum separability in the feature matrix, defined as
-%    AUCmax and AUCmin. The helper function is nk_ExpVec.m is used to
-%    create features following an exponntial decline in separability.
-%    Feature creation is based on randomly picking Gaussians within a
-%    certain distance of each other and a certain span.
-% 6) the number of batched to corrupt the data with (Nbatches)
-% 7) the maximum percentage of the feature value range to be allowed for
-%    site effects (BatchPerc)
-% 8) The number of cases with missing data (NcasesMiss)
-% 9) The percentage of missing values per case (NfeatsMiss)
+% It allows the user to determine the expected prognostic performance of a
+% binary classification algorithm under different learning scenarios, as 
+% determined by the "IN" parameter structure:
 %
-% Parameters can come in ranges and thus are hyperparameters that the function will loop through 
-% in a brute-force approach. Based on these hyperparameters the function will generate a synthetic 
-% data matrix and forward it to a simple machine learning pipeline. The user currently can choose 
-% among four different classifiers:
-% a) "LINKERNSVM" : LIBSVM with linear kernel (C=1)
-% b) "LINSVM": LINBLINEAR, L2-regularized, L1-Loss SVC
-% c) "L2LR" : L2-regularized logistic regression
-% d) "L1LR" : L1-regularized logistic regression
-% [not implemented:  "RF" : Random Forests]
+% 1) IN.Nfeats : the dimensionality of the variable/feature space 
+%
+% 2) IN.Nmarkers : the percentage (0-1) of predictive markers within that 
+%    feature space
+%
+% 3) IN.Ncases : the number of observations/cases/samples to learn from
+%
+% 4) IN.eventprob : the percentage (0-1) of cases with the (desired) event 
+%    in relation to the total number of cases 
+%
+% 5) IN.AUCmax and IN.AUCmin : the maximum / minimum separability in the 
+%    feature matrix. The helper function is nk_ExpVec.m is used to create 
+%    features following an exponntial decline in separability. Feature 
+%    creation is based on randomly picking Gaussians within a certain 
+%    distance of each other and a certain span.
+%
+% 6) IN.Nbatches : the absolute number of batched to corrupt the data 
+%
+% 7) IN.BatchPerc : the maximum percentage (0-1) of the feature value range 
+%    allowed for site effects
+%
+% 8) IN.NcasesMiss : The percentage (0-1) of cases with missing data 
+%
+% 9) IN.NfeatsMiss : The percentage (0-1) of missing values per case
+%
+% Parameters can come in ranges and thus are hyperparameters that the 
+% function will loop through in a brute-force approach. Based on these 
+% hyperparameters the function will generate a synthetic data matrix and 
+% forward it to a simple machine learning pipeline. The user currently can 
+% choose among four different classifiers:
+% IN.algorithm :
+%       a) "LINKERNSVM" : LIBSVM with linear kernel (C=1)
+%       b) "LINSVM": LINBLINEAR, L2-regularized, L1-Loss SVC
+%       c) "L2LR" : L2-regularized logistic regression
+%       d) "L1LR" : L1-regularized logistic regression
+%       [not implemented yet:  "RF" : Random Forests]
 % 
 % Furthermore, the setup of the cross-validation cycle can be tweaked, e.g.:
-% RAND.OuterPerm = 1; ==> Outer cross-validation permutations
-% RAND.InnerPerm = 1; ==> Inner cross-validation permutations
-% RAND.OuterFold = 5; ==> Outer cross-validation folds
-% RAND.InnerFold = 5; ==> Inner cross-validation folds
-% RAND.Decompose = 1;
+% IN.RAND.OuterPerm = 1; ==> Outer cross-validation permutations
+% IN.RAND.InnerPerm = 1; ==> Inner cross-validation permutations
+% IN.RAND.OuterFold = 5; ==> Outer cross-validation folds
+% IN.RAND.InnerFold = 5; ==> Inner cross-validation folds
+% IN.RAND.Decompose = 1;
 %
-% Please note that currently the function does not run any nested cross-validation as we will use standard 
-% machine learning parameters. This could be changed in the future but it will increase computational
+% Please note that currently the function does not run any nested 
+% cross-validation as we will use standard machine learning parameters. 
+% This could be changed in the future but it will increase computational
 % costs of the simulation enormously.
 % 
-% This function will only work with NeuroMiner installed and initialized in active MATLAB session
-% Use preferably MATLAB 2018b or higher.
-% 
-% Usage examples:
-% 
-% _____________________________________________________________________________________________________________
-% (c) Nikolaos Koutsouleris, 12/03/2021
+% This function will only work with NeuroMiner installed and initialized in
+% an active MATLAB session Use preferably MATLAB 2018b or higher.
+% _________________________________________________________________________
+% (c) Nikolaos Koutsouleris, 10/02/2022
 
 % Create hyperparameter array
 % Default algorithm
@@ -342,9 +353,9 @@ parfor k=1:reps
                     % set weighting!
                     cmd = nk_SetWeightStr(xSVM, MODEFL, CMDSTR, Lr, cmd);
                     % Train model
-                    model = train_liblin22(Lr, sparse(Tr_Ystar), cmd);
+                    model = train_liblin244(Lr, sparse(Tr_Ystar), cmd);
                     % Test model
-                    [ ~, ~, ds ] = predict_liblin22(Ls, sparse(Ts_Ystar), model, sprintf(' -b %g -q',xSVM.LIBLIN.b)); 
+                    [ ~, ~, ds ] = predict_liblin244(Ls, sparse(Ts_Ystar), model, sprintf(' -b %g -q',xSVM.LIBLIN.b)); 
                     ds = ds(:,1);
                 case 'RF'
             end

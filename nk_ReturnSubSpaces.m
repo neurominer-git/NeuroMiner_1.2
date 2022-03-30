@@ -87,9 +87,9 @@ for sl=1:Vm.dim(3)
                     fprintf('.')
                     try
                         if iscell(V)
-                            d = spm_slice_vol( V{j}(i), M1,Vm.dim(1:2), 1 );
+                            d = spm_slice_vol( V{j}(i), M1, Vm.dim(1:2), 1 );
                         else
-                            d = spm_slice_vol( V(i), M1,Vm.dim(1:2), 1 );
+                            d = spm_slice_vol( V(i), M1, Vm.dim(1:2), 1 );
                         end
                     catch
                         error('\nFile problem: %s,',V{j}(i).fname)
