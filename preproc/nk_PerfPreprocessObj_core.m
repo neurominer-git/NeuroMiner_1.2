@@ -893,6 +893,56 @@ if tsproc, InputParam.Ts = nk_PerfDevMapObj(InputParam.Ts, TrParami ); end
 end
 
 % =========================================================================
+function [SrcParam, InputParam, TrParami, actparam ] = act_graphSparsity(SrcParam, InputParam, ~, TrParami, actparam)
+global VERBOSE
+trfl    = actparam.trfl;
+tsfl    = actparam.tsfl;
+paramfl = actparam.paramfl;
+i       = actparam.i;
+tsproc  = false;  
+
+if isfield(actparam,'opt')
+    InputParam.P{i}.GRAPHSPARSITY.p = actparam.opt;
+end
+
+if paramfl && tsfl 
+     tsproc = true;
+elseif trfl
+    if VERBOSE;fprintf('\tGraph sparsity thresholding ...'); end
+    [InputParam.Tr, TrParami] = graph_PerfSparsityThres(InputParam.Tr, InputParam.P{i}.GRAPHSPARSITY);
+
+    if tsfl, tsproc = true; end
+end
+
+if tsproc, InputParam.Ts = graph_PerfSparsityThres(InputParam.Ts, TrParami); end
+end
+
+function [SrcParam, InputParam, TrParami, actparam ] = act_graphMetrics(SrcParam, InputParam, ~, TrParami, actparam)
+global VERBOSE
+trfl    = actparam.trfl;
+tsfl    = actparam.tsfl;
+paramfl = actparam.paramfl;
+i       = actparam.i;
+tsproc  = false;  
+
+if isfield(actparam,'opt')
+    InputParam.P{i}.GRAPHMETRICS.p = actparam.opt;
+end
+
+if paramfl && tsfl 
+     tsproc = true;
+elseif trfl
+    if VERBOSE;fprintf('\tGraph metrics computation ...'); end
+    [InputParam.Tr, TrParami] = graph_PerfGraphMetrics(InputParam.Tr, InputParam.P{i}.GRAPHMETRICS);
+    % All 
+    if tsfl, tsproc = true; end
+end
+
+if tsproc, InputParam.Ts = graph_PerfGraphMetrics(InputParam.Ts, TrParami); end
+end
+
+
+% =========================================================================
 function [InputParam, SrcParam] = perform_adasyn(InputParam, SrcParam)
 global SVM MODEFL
 

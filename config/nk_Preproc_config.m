@@ -58,7 +58,7 @@ if ~isstruct(enind)
                     'devmap',       fl, ...
                     'graphSparsity', fl, ...
                     'graphMetrics', fl);
-                    % CHANGE SPARSITY 
+                    
 else
     EF = enind;
 end
