@@ -58,7 +58,9 @@ if ~isstruct(enind)
                     'remvarcomp',    fl, ...
                     'devmap',        fl, ...
                     'graphSparsity', fl, ...
-                    'graphMetrics',  fl); 
+                    'graphMetrics', fl, ...
+                    'graphComputation', fl);
+                    
 else
     EF = enind;
 end
@@ -447,6 +449,8 @@ if modflag && ~replflag
             cmd = 17;
         case 'graphMetrics'
             cmd = 18;
+        case 'graphComputation'
+            cmd = 19;
     end
    
 else    
@@ -524,6 +528,8 @@ else
                     cmdstr = 'Apply sparsity threshold to connectivity matrix';                     cmdmnu = 17;
                 case 'graphMetrics'
                     cmdstr = 'Compute network metrics from connectivity matrices';                  cmdmnu = 18;
+                case 'graphComputation'
+                    cmdstr = 'Compute individual networks from input data';                         cmdmnu = 19;
             end
             [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu);
             cmdstr =[]; cmdmnu=[];
@@ -573,6 +579,8 @@ switch cmd
         CURACT = config_graphSparsity(CURACT, navistr);
     case 18
         CURACT = config_graphMetrics(CURACT, navistr);
+    case 19
+        CURACT = config_graphConstruction(CURACT, navistr);
 end
 
 switch replflag
@@ -841,6 +849,15 @@ if ~isfield(CURACT,'GRAPHMETRICS'), CURACT.GRAPHMETRICS=[]; end
 if ~isfield(CURACT,'PX'), CURACT.PX = []; end
 act = 1; while act >0, [ CURACT.GRAPHMETRICS, CURACT.PX, act ] = graphMetrics_config(CURACT.GRAPHMETRICS, CURACT.PX, navistr); end
 CURACT.cmd = 'graphMetrics';
+
+end
+
+function CURACT = config_graphConstruction(CURACT, navistr)
+
+if ~isfield(CURACT,'GRAPHCONSTRUCTION'), CURACT.GRAPHCONSTRUCTION=[]; end
+if ~isfield(CURACT,'PX'), CURACT.PX = []; end
+act = 1; while act >0, [ CURACT.GRAPHCONSTRUCTION, CURACT.PX, act ] = graphConstruction_config(CURACT.GRAPHCONSTRUCTION, CURACT.PX, navistr); end
+CURACT.cmd = 'graphConstruction';
 
 end
 

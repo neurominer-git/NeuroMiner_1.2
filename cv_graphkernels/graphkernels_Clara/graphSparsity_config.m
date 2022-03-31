@@ -6,7 +6,6 @@ if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
    
-
     if isfield(GRAPHSPARSITY,'perc') && ~isempty(GRAPHSPARSITY.perc), SparsityPerc = GRAPHSPARSITY.perc; end
 
     if ~isempty(SparsityPerc)

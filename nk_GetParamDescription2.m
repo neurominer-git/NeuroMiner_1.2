@@ -506,8 +506,25 @@ switch action
                                 covsizeextr = sprintf('1 covariate');
                             end
                             preprocact{i} = sprintf('Deviation-based weighting [ %s: %s%s ]', params.ACTPARAM{i}.DEVMAP.algostr, covsizeextr, grpstr);
-                                
+                        case 'graphSparsity' % CHANGE SPARSITY
+                
+                            preprocact{i} = 'Apply sparsity threshold to conenctivity matrices [';
+                       
+                            if isfield(params.ACTPARAM{i}.GRAPHSPARSITY,'perc') && ~isempty(params.ACTPARAM{i}.GRAPHSPARSITY.perc)
+                                preprocact{i} = sprintf('%s, %s ]', preprocact{i}, nk_ConcatParamstr(params.ACTPARAM{i}.GRAPHSPARSITY.perc));
+                            end
+                            %preprocact{i} = sprintf('%s ]', preprocact{i});
+                        case 'graphMetrics'
+                            preprocact{i} = 'Compute graph metrics from connectivity matrices';
+                            
+                        case 'graphConstruction'
+                            preprocact{i} = 'Construct individual networks';
+%                             if isfield(params.ACTPARAM{i}.GRAPHCONSTRUCTION,'method') && ~isempty(params.ACTPARAM{i}.GRAPHCONSTRUCTION.method)
+%                                 preprocact{i} = sprintf('%s, Method: %s', preprocact{i}, nk_ConcatParamstr(params.ACTPARAM{i}.GRAPHCONSTRUCTION.method));
+%                             end
+%                             preprocact{i} = sprintf('%s ]', preprocact{i});
                     end
+                    
                 else
                     preprocact{i} = 'undefined';
                 end
