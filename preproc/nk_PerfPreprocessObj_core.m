@@ -942,6 +942,32 @@ if tsproc, InputParam.Ts = graph_PerfGraphMetrics(InputParam.Ts, TrParami); end
 end
 
 
+
+function [SrcParam, InputParam, TrParami, actparam ] = act_graphConstruction(SrcParam, InputParam, ~, TrParami, actparam)
+global VERBOSE
+trfl    = actparam.trfl;
+tsfl    = actparam.tsfl;
+paramfl = actparam.paramfl;
+i       = actparam.i;
+tsproc  = false;  
+
+if isfield(actparam,'opt')
+    InputParam.P{i}.GRAPHCONSTRUCTION.p = actparam.opt;
+end
+
+if paramfl && tsfl 
+     tsproc = true;
+elseif trfl
+    if VERBOSE;fprintf('\tGraph computation ...'); end
+    [InputParam.Tr, TrParami] = graph_PerfGraphComputation(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
+    % All 
+    if tsfl, tsproc = true; end
+end
+
+if tsproc, InputParam.Ts = graph_PerfGraphConstruction(InputParam.Ts, TrParami); end
+end
+
+
 % =========================================================================
 function [InputParam, SrcParam] = perform_adasyn(InputParam, SrcParam)
 global SVM MODEFL
