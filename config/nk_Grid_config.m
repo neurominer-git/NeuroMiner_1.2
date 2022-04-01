@@ -4,6 +4,7 @@ global NM
 OptimFlag = 1;
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 [~, CompStr] = nk_ReturnEvalOperator(SVM.GridParam);
+nP = 1;
 if isfield(TrainParam,'PREPROC')
     if ~isempty(varind)
         PX_preML = nk_ReturnParamChain(TrainParam.PREPROC(varind), true);
@@ -99,7 +100,7 @@ switch OptimFlag
             if isfield(GRD,'CutOffparams'),             SEQOPTstepsdefs = GRD.CutOffparams; end
             if isfield(GRD,'LimsLparams'),              SEQOPTlimsLdefs = GRD.LimsLparams; end
             if isfield(GRD,'LimsUparams'),              SEQOPTlimsUdefs = GRD.LimsUparams; end
-            if isfield(GRD,'CoxCutoffparams')           CoxCutoffsdefs = GRD.CoxCutoffparams; end
+            if isfield(GRD,'CoxCutoffparams'),          CoxCutoffsdefs = GRD.CoxCutoffparams; end
             if isfield(GRD,'OptRegul'),                 OptRegul = GRD.OptRegul; end
             if isfield(GRD,'NodeSelect'),               NodeSelect = GRD.NodeSelect; end
             if isfield(GRD,'WLiters'),                  WLiters = GRD.WLiters; end
@@ -322,8 +323,8 @@ switch OptimFlag
             end
             
             GRD.GridMaxType = GridMaxType;
-            if prod(n_pars)*nP > 1 
-                if OptRegul.flag, regstr = 'Yes'; else regstr = 'No'; end
+            if prod(n_pars) * nP > 1 
+                if OptRegul.flag, regstr = 'Yes'; else, regstr = 'No'; end
                 menustr = sprintf('%s|Enable regularization of model selection [ %s ]', menustr, regstr);               menuact = [ menuact 7 ];
                 if OptRegul.flag
                     if isfield(TrainParam,'RFE') && ...

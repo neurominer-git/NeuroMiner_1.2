@@ -63,7 +63,7 @@ clc
 
 inp.id = id;
 CVPOS.fFull = FullPartFlag;
-
+%savemodel=true;
 for i = 1 : nM
     
     % Dimensionality of current modality
@@ -539,6 +539,11 @@ for f=1:ix % Loop through CV2 permutations
                                         if ~fndMD, [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(Ymodel, modelTrL, sPs, 1); end
                                     end
                                     
+%                                     if savemodel
+%                                         xMD = MD{h}{m}{k,l}{u};
+%                                         save(sprintf('VisModels_%s_CV2%g-%g_CV%g-%g.mat', multlabelstr, CVPOS.CV2p, CVPOS.CV2f, CVPOS.CV1p, CVPOS.CV1f ),"xMD");
+%                                     end
+
                                     if inp.stacking
                                         vec_mj = [];
                                         for mj = 1:inp.nD
@@ -588,13 +593,8 @@ for f=1:ix % Loop through CV2 permutations
                                             VxV(inVx) = (sum(bsxfun(@le,Vx_perm(inVx,:),Vx(inVx)),2)/nperms(1))/ul;
                                             I1.VCV1WPERM{il(h),h} = VxV; 
                                             clear VxV
-                                            if sigflFDR
-                                                Fadd   = fdr_bh(I1.VCV1WPERM{il(h),h},0.5,'dep');
-                                                FDRstr = '(FDR) ';
-                                            else
-                                                Fadd   = (I1.VCV1WPERM{il(h),h} <= 0.5);
-                                                FDRstr = '(uncorr) ';
-                                            end
+                                            Fadd   = (I1.VCV1WPERM{il(h),h} <= 0.5);
+                                            FDRstr = '(uncorr) ';
                                             if ~sum(Fadd)
                                                 [minP, Fadd] = min(I1.VCV1WPERM{il(h),h});
                                                 fprintf('\tNo component significant at alpha %s = 0.5 => relaxing to max P = %g\n\t\t\t\t\t\t\t\t',FDRstr, minP );
@@ -607,6 +607,8 @@ for f=1:ix % Loop through CV2 permutations
                                         
                                         % Compute original weight map in input space
                                         [Tx, Psel, Rx, SRx, Cx, ~, PAx ] = nk_VisXWeight(inp, MD{h}{m}{k,l}{u}, Ymodel, modelTrL, varind, ParamX, Find, Vind, decompfl, [], Fadd);
+
+                                        % Compute permuted weight maps
                                         fprintf(' | Permuting:\t');
                                         Tx_perm = cell(1,nM); Px_perm = zeros(1,nperms(1));
                                         for n=1:nM, Tx_perm{n} = zeros(size(Tx{n},1),nperms(n)); end

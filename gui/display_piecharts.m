@@ -42,9 +42,9 @@ switch handles.modeflag
         end
     case 'regression'
         set(handles.txtPretestProb,'visible','on');
-        thresh = get(handles.txtBinarize,'String');
-        groupnames{1} = sprintf('Group 1 (>=%s)',thresh);
-        groupnames{2} = sprintf('Group 2 (< %s)',thresh);
+        thresh = str2double(get(handles.txtBinarize,'String'));
+        groupnames{1} = sprintf('Group 1 (>=%1.2f)',thresh);
+        groupnames{2} = sprintf('Group 2 (< %1.2f)',thresh);
         if ~exist('contigmat','var') || isempty(contigmat)
             contigmat = handles.Regr.contigmat;
             labelh = handles.Regr.b_label;
