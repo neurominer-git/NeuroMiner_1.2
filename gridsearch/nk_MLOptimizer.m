@@ -529,6 +529,7 @@ for f=1:ix % Loop through CV2 permutations
         else
             fprintf('\nUpdate of %s skipped!',oCVnam)
         end
+
         if ~batchflag, GDanalysis.GDfilenames{f,d} = [ oCVnam '.mat' ]; end
         
         if GDfl || ~batchflag

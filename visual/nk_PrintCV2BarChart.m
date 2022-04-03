@@ -99,13 +99,17 @@ for p=1:numel(D.ax)
         for i = 1:D.nclass
             if sum(any(isnan(D.ax{p}.val_y(:,i)))),continue; end
             if D.nclass==1, 
-                std_y = D.ax{p}.std_y';
+                std_y = D.ax{p}.std_y;
+                val_y = D.ax{p}.val_y;
             else
                 std_y = D.ax{p}.std_y(:,i);
+                val_y = D.ax{p}.val_y(:,i);
             end
-            set(D.ax{p}.h_bar(i),'YData',D.ax{p}.val_y(:,i));
-            set(D.ax{p}.err_bar(i),'YData',D.ax{p}.val_y(:,i));
+            set(D.ax{p}.h_bar(i),'YData', val_y);
+            set(D.ax{p}.err_bar(i),'YData',val_y);
             if ~OCTAVE
+              %set(D.ax{p}.err_bar(i),'XNegativeDelta',val_y);
+              %set(D.ax{p}.err_bar(i),'XPositiveDelta',val_y);
               set(D.ax{p}.err_bar(i),'YNegativeDelta',std_y);
               set(D.ax{p}.err_bar(i),'YPositiveDelta',std_y);
             end

@@ -160,7 +160,7 @@ for curlabel=1:nl
         % Transfer results from CV1perf and CV2perf to GD
         % structure using nk_GridSearchHelper2 function
         [GD, MD, DISP] = nk_GridSearchHelper(GD, MD, DISP, i, nclass, ngroups, CV1perf, CV2perf, models);
-
+       
         if isfield(CV1perf,'detrend'), GD.Detrend{i} = CV1perf.detrend; end
 
         % Create variate mask according to selected features

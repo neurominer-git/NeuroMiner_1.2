@@ -84,7 +84,7 @@ if VERBOSE
         h_ax3 = h_temp.Children(3);
     end
     imagesc(h_ax1, ~logical(F)); colormap(h_ax1,'gray'); title(h_ax1,'Original Feature matrix'); 
-    barh(h_ax2, AgreePerc); set(h_ax2, 'Ydir', 'reverse'); ylim(h_ax2,[0.5 nF-0.5]); title(h_ax2,'Cross CV1 Feature Agreement');
+    barh(h_ax2, AgreePerc); set(h_ax2, 'Ydir', 'reverse'); ylim(h_ax2,[0.5 nF+0.5]); title(h_ax2,'Cross CV1 Feature Agreement');
     imagesc(h_ax3,~AgreeFeat); colormap(h_ax3,'gray'); title(h_ax3,'Selected Features'); 
     drawnow
 end
