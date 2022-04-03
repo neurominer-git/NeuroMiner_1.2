@@ -4,14 +4,7 @@ global NM
 OptimFlag = 1;
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 [~, CompStr] = nk_ReturnEvalOperator(SVM.GridParam);
-if isfield(TrainParam,'PREPROC')
-    if ~isempty(varind)
-        PX_preML = nk_ReturnParamChain(TrainParam.PREPROC(varind), true);
-    else
-        PX_preML = nk_ReturnParamChain(TrainParam.PREPROC, true); 
-    end
-    nP = prod(PX_preML.steps);
-end
+
 switch OptimFlag
     
     case 1
@@ -58,12 +51,7 @@ switch OptimFlag
             end
         end
         
-%         if NM.SVM.kernel.customkernel_nargin >= 1
-%             for n = 1:SVM.kernel.customkernel_nargin
-%                 argName = sprintf('customkernel_arg%d', n); 
-%                 (argName) = 0;
-%             end
-%         end
+
         
         switch CompStr
             case 'above'
