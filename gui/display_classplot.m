@@ -105,14 +105,15 @@ end
 % Define X axis scaling
 if ~AltAx
     r = 1;
-    xLimitsVec = 1:numel(predh);
-    xLimitsVecInfo = xLimitsVec';
+    minX = 1; maxX = numel(predh);
+    xLimitsVecInfo = (minX:maxX)';
 else
     r = (nk_Range(handles.BinClass{h}.Xaxis)/100)*5;
-    xLimitsVec = min(handles.BinClass{h}.Xaxis):max(handles.BinClass{h}.Xaxis);
     xLimitsVecInfo = handles.BinClass{h}.Xaxis;
+    minX = min(handles.BinClass{h}.Xaxis);
+    maxX = max(handles.BinClass{h}.Xaxis);
 end
-XLIMS = [xLimitsVec(1)-r xLimitsVec(end)+r];
+XLIMS = [minX-r maxX+r];
 yr = range(predh)*0.05;
 YLIMS = [min(predh)-yr max(predh)+yr]; 
 xlim(handles.axes1, XLIMS);
@@ -245,7 +246,7 @@ else
     probfx = 0;
     handles.BinClass{h}.predh = predh;
 end
-xLimits = get(handles.axes1,'XLim'); xLimitsVec = xLimits(1):xLimits(2);
+xLimits = get(handles.axes1,'XLim'); xLimitsVec = linspace(xLimits(1),xLimits(2), numel(handles.axes1.XAxis.TickValues)-1);
 zeroline = ones(1,numel(xLimitsVec))*probfx;
 if handles.BinClass{h}.CoxMode
     zeroline = handles.BinClass{h}.mean_cutoff_probabilities;
@@ -271,15 +272,15 @@ if AltAx,
     % Display regression lines for alternative X Axis
     xl      = get(gca,'Xlim');
     p       = polyfit(lxL(id1),predh(id1),1);     % p returns 2 coefficients fitting r = a_1 * x + a_2
-    rho(1)  = corr(lxL(id1),predh(id1));
+    [ rho(1), pval(1) ]  = corr(lxL(id1),predh(id1));
     r       = p(1) .* xl + p(2);                   % compute a new vector r that has matching datapoints in x
-    hl(1)   = plot(xl,r, handles.colpt, 'LineWidth', 3, 'Color', handles.colptin(handles.BinClass{h}.groupind(1),:));
+    hl(1)   = plot(xl,r, '-', 'LineWidth', 2, 'Color', [ handles.colptin(handles.BinClass{h}.groupind(1),:) .5]);
     p       = polyfit(lxL(id2),predh(id2),1);     % p returns 2 coefficients fitting r = a_1 * x + a_2
-    rho(2)  = corr(lxL(id2),predh(id2));
+    [ rho(2), pval(2) ]  = corr(lxL(id2),predh(id2));
     r       = p(1) .* xl + p(2);                   % compute a new vector r that has matching datapoints in x
-    hl(2)   = plot(xl,r, handles.colpt, 'LineWidth', 3, 'Color', handles.colptin(handles.BinClass{h}.groupind(2),:));
+    hl(2)   = plot(xl,r, '-', 'LineWidth', 2, 'Color', [ handles.colptin(handles.BinClass{h}.groupind(2),:) .5]);
     handlevec = [handlevec hl];
-    legendvec = [legendvec, {['r = ' num2str(rho(1),'%1.2f')]}, {['r = ' num2str(rho(2),'%1.2f')]} ];
+    legendvec = [legendvec, {sprintf('r=%1.2f | p=%.3f', rho(1), pval(1))}, {sprintf('r=%1.2f | p=%.3f', rho(2), pval(2))} ];
     % Display misclassification histogram analysis 
     % Group 1 misclassification histogram
     [err_hist1, Bins1] = hist3([lxL(id1) err(id1)],[10 2]); 

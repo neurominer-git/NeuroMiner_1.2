@@ -35,8 +35,10 @@ if ~isfield(NM,'TrainParam')
     NM.TrainParam.SVM.GridParam = 1;
     if strcmp(NM.modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
     NM.TrainParam.MULTI.flag    = 0;
-    NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, true);
+    NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
     [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1); 
+    NM.TrainParam.verbosity     = 1;
+elseif ~isfield(NM.TrainParam,'verbosity')
     NM.TrainParam.verbosity     = 1;
 end
 
@@ -75,7 +77,7 @@ nan_in_label=false;         if sum(isnan(NM.label(:)))>0, nan_in_label=true; end
 %% Create further default configurations
 if ~isfield(NM.TrainParam,'PREPROC'),
     % Create PREPROC structure
-    nan_in_pred=false;          if sum(isnan(NM.Y{varind}(:)))>0, nan_in_pred=true; end
+    nan_in_pred = false;        if sum(isnan(NM.Y{varind}(:)))>0, nan_in_pred=true; end
     NM.TrainParam.PREPROC{1}    = DefPREPROC(NM.modeflag,nan_in_pred,nan_in_label);
     NM.TrainParam.VIS{1}        = nk_Vis_config([], NM.TrainParam.PREPROC, 1, 1); 
 else
@@ -527,6 +529,7 @@ if ~exist('nan_in_label','var') || isempty(nan_in_label), nan_in_label = false; 
     if nan_in_pred % Adjust defaults to NaN in the predictor data
         PREPROC.ACTPARAM{1}.SCALE.zerooutflag   = 1;
         PREPROC.ACTPARAM{2}.PRUNE.nan           = 2;
+        PREPROC.ACTPARAM{2}.PRUNE.inf           = 2;
         PREPROC.ACTPARAM{3}.IMPUTE              = nk_Impute_config([],[],[],[],1);
         PREPROC.ACTPARAM{3}.cmd                 = 'impute';
     end

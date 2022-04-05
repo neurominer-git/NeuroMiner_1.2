@@ -367,7 +367,7 @@ switch OptimFlag
             % =============================================================
             nk_PrintLogo
             if prod(n_pars)>3, fprintf('\n');fprintf('-> No. of ML parameter combinations: %g ', prod(n_pars)); end
-            fprintf('\n\n'); mestr = 'Model optimization parameters'; navistr = [parentstr ' >>> ' mestr]; fprintf('You are here: %s >>> ',parentstr); 
+            fprintf('\n\n'); mestr = 'Model optimization parameters'; navistr = [parentstr ' >>> ' mestr]; fprintf('You are here: %s >>> ', parentstr); 
             act = nk_input(mestr, 0,'mq', menustr, menuact );
             
             switch act
