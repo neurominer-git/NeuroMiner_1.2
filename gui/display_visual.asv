@@ -524,7 +524,7 @@ switch meas{measind}
                     %pgy.EdgeAlpha(pgy.EdgeCData < 0.05) = 0.5;
                     pgy.EdgeColor = 'flat';
                     colormap parula;
-                    gy.Edges.LWidths = 0.1*(max(gy.Edges.Weight)+1 -(abs(gy.Edges.Weight)));
+                    gy.Edges.LWidths = 0.5*abs(gy.Edges.Weight);
                     pgy.LineWidth = gy.Edges.LWidths;
                     pgy.NodeColor = 'k';
                  case NetworkCorrMatStr{3}
@@ -542,7 +542,7 @@ switch meas{measind}
                     %pgy.EdgeAlpha(pgy.EdgeCData < 0.05) = 0.5;
                     pgy.EdgeColor = 'flat';
                     colormap parula;
-                    gy.Edges.LWidths = 0.1*(max(gy.Edges.Weight)+1 -(abs(gy.Edges.Weight)));
+                    gy.Edges.LWidths = 0.25*(max(gy.Edges.Weight)+1 -(abs(gy.Edges.Weight)));
                     pgy.LineWidth = gy.Edges.LWidths;
                     pgy.NodeColor = 'k';
              end

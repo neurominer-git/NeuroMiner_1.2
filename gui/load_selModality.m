@@ -39,7 +39,11 @@ if ~multiflag
     if isfield(v,'PermModel_Eval_Global'),     popuplist{end+1} = 'Model P value histogram';                                   end
     if isfield(v,'CorrMat_CV2'),               popuplist{end+1} = 'Correlation matrix';                                        end
     if isfield(v,'CorrMat_CV2_p_uncorr'),      popuplist{end+1} = 'Correlation matrix (P value)';                              end
-    if isfield(v,'CorrMat_CV2_p_fdr'),         popuplist{end+1} = 'Correlation matrix (P value, FDR)';                         end
+    if isfield(v,'CorrMat_CV2_p_fdr'),         popuplist{end+1} = 'Correlation matrix (P value, FDR)';                       end
+    if isfield(v,'CorrMat_CV2'),               popuplist{end+1} = 'Network plot correlation matrix';                           end
+    if isfield(v,'CorrMat_CV2_p_uncorr'),      popuplist{end+1} = 'Network plot correlation matrix (P value)';                 end
+    if isfield(v,'CorrMat_CV2_p_fdr'),         popuplist{end+1} = 'Network plot correlation matrix (P value, FDR)';            end
+
     handles.selVisMeas.String = popuplist; 
     VisOnFl = 'on';
     VisElFl = 'on';

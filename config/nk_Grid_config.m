@@ -14,7 +14,7 @@ if isfield(TrainParam,'PREPROC')
     end
     nP = prod(PX_preML.steps);
 end
->>>>>>> a9e9dcb0db4c772fb53ea8859dd75b9363d237cf
+
 switch OptimFlag
     
     case 1
