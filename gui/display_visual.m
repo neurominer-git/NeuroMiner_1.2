@@ -14,6 +14,7 @@ pagemanual      = handles.txtPager.String;
 sortfl          = handles.tglSortFeat.Value;
 filterfl        = handles.tglVisMeas2.Value;
 filterthr       = handles.txtThrVisMeas2.String;
+
 axes(handles.axes33); cla; hold on
 set(handles.axes33,'TickLabelInterpreter','none')
 
@@ -63,7 +64,12 @@ switch meas{measind}
             fl2 = 'on';
             load_selVisMeas2(handles)
         else
-            fl2 = 'off';
+            if any(strcmp(meas{measind}, NetworkCorrMatStr))
+                fl2 = 'on';
+                load_selVisMeas2(handles)
+            else
+                fl2 = 'off';
+            end
         end
 end
 
