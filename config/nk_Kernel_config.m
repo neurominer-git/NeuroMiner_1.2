@@ -154,7 +154,7 @@ if numel(kernnum) > 1
          kerndef = 1; kerndesc{1} = 'linear';
     else
         % Ask user which kernel to use
-        kerndef = nk_input(fprintf('Select kernel type for %s', progstr), 0, 'mq', kernmenu, kernnum, kerndef);
+        kerndef = nk_input(sprintf('Select kernel type for %s', progstr), 0, 'mq', kernmenu, kernnum, kerndef);
     end
     if kerndef
         if kerndef == 8
