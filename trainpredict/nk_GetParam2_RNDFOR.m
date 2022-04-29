@@ -18,12 +18,14 @@ if iscell(Y)
    
 else % Univariate case
     
-    model = CMDSTR.RFtrain(Y, label, Param(1), Param(2) );
-
+    % model = CMDSTR.RFtrain(Y, label, Param(1), Param(2) );
+    model = pyrunfile('py_classRF_train.py', 'model_file', ...
+        feat = Y, lab = label, n_est = int64(Param(1)), ...
+        n_maxfeat = int64(Param(2)), rootdir = '/Users/claravetter/Documents/Documents_Clara_MacBookAir/LMU');
     %fprintf('\n%s',cmdstr)
-    if ~ModelOnly
-        [param.target] = predict_liblin(label, Y, model);
-        param.dec_values = param.target; 
-        param.val = EVALFUNC(label, param.dec_values);
-    end
+%     if ~ModelOnly
+%         [param.target] = predict_liblin(label, Y, model);
+%         param.dec_values = param.target; 
+%         param.val = EVALFUNC(label, param.dec_values);
+%     end
 end

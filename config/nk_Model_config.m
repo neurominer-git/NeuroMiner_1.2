@@ -2,7 +2,7 @@ function [SVM, act] = nk_Model_config(SVM, TrainParam, parentstr, varind, act)
 global NM EXPERT
 
 d = nk_GetParamDescription2(NM,TrainParam,'GridParam');
-if (isfield(NM,'TrainParam') && isfield(NM.TrƒainParam,'RAND') && NM.TrainParam.RAND.InnerFold == -1 )
+if (isfield(NM,'TrainParam') && isfield(NM.TrainParam,'RAND') && NM.TrainParam.RAND.InnerFold == -1 )
     SVM.GridParam = 1; optimstr = ''; menusel = [];
 else
     optimstr = d.GridParam; optimstr = ['Define ML model performance criterion [ ' optimstr ' ]|']; menusel = 3;

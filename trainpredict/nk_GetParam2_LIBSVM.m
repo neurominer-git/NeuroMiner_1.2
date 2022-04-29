@@ -9,9 +9,7 @@
 % (c) Nikolaos Koutsouleris, 11/2020
 
 function [param, model] = nk_GetParam2_LIBSVM(Y, label, ModelOnly, cmd)
-                                            
-                        
-
+         
 global SVM EVALFUNC LIBSVMTRAIN MODEFL CMDSTR GK 
 
 param = [];flw = 0; GK = struct('gkernelBool',0);
