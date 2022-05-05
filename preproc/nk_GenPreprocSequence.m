@@ -482,12 +482,19 @@ if isfield(TemplParam,'ACTPARAM')
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
                 end
-             case 'graphMetrics'
+            case 'graphConstruction'
                 if VERBOSE, fprintf('\n* COMPUTE CONNECTIVITY MATRICES OF INDIVIDUAL NETWORKS'); end
                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
                 end
+%             case 'graphConstructionDAS'
+%                 % ******************* Das et al. 2018 *********************
+%                 if VERBOSE, fprintf('\n* CONSTRUCT NETWORKS (DAS ET AL 2018)'); end
+%                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+%                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
+%                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
+%                 end
                 
         end
     end

@@ -959,7 +959,7 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tGraph computation ...'); end
-    [InputParam.Tr, TrParami] = graph_PerfGraphComputation(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
+    [InputParam.Tr, TrParami] = graph_PerfGraphConstruction(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
     % All 
     if tsfl, tsproc = true; end
 end

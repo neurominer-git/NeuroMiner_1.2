@@ -1,12 +1,5 @@
 function [sY, IN] = graph_PerfGraphConstruction(Y, IN)
 % =========================================================================
-% FORMAT function [sY, IN] = nk_PerfElimZeroObj(Y, IN)
-% =========================================================================
-% Remove features with zero-variance, and ANY Infs and NaNs.
-% Furthermore, remove features with highly skewed distributions
-% I/O arguments:
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 05/2018
 
 % =========================== WRAPPER FUNCTION ============================ 
     if ~exist('IN','var'), IN = []; end
@@ -27,8 +20,17 @@ function [Y, IN] = PerfGraphConstruction(Y, IN)
 
 %if eIN  
 
-    if ~isempty(IN.method) && (IN.method == "KL divergence") && ~isempty(IN.parcellation) && (IN.parcellation == "Hammers.nii") 
-        R = graph_construction(Y, IN.method, IN.parcellation); 
+    if ~isempty(IN.method) 
+        switch IN.method 
+            case "KL divergence" 
+                 if ~isempty(IN.parcellation) %&& (IN.parcellation == "Hammers.nii") 
+                    R = graph_constructionKLS(Y, IN.method, IN.parcellation); % KLS = symmetric KL divergence method
+                 end
+            case "Group deviation"
+                if ~isempty(IN.refGroup)
+                    R = graph_constructionJBE(Y, IN.method, IN.refGroup, IN.variableTypes) %JBE = jackknife bias estimation method
+                end
+        end
     else
         R = Y;
     end

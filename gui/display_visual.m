@@ -14,10 +14,12 @@ pagemanual      = handles.txtPager.String;
 sortfl          = handles.tglSortFeat.Value;
 filterfl        = handles.tglVisMeas2.Value;
 filterthr       = handles.txtThrVisMeas2.String;
+
 axes(handles.axes33); cla; hold on
 set(handles.axes33,'TickLabelInterpreter','none')
 
 CorrMatStr = {'Correlation matrix', 'Correlation matrix (P value)','Correlation matrix (P value, FDR)'};
+NetworkCorrMatStr = {'Network plot correlation matrix', 'Network plot correlation matrix (P value)', 'Network plot correlation matrix (P value, FDR)'};
 
 v = handles.visdata{handles.curlabel}{varind};
 if v.params.visflag == 1
@@ -62,7 +64,12 @@ switch meas{measind}
             fl2 = 'on';
             load_selVisMeas2(handles)
         else
-            fl2 = 'off';
+            if any(strcmp(meas{measind}, NetworkCorrMatStr))
+                fl2 = 'on';
+                load_selVisMeas2(handles)
+            else
+                fl2 = 'off';
+            end
         end
 end
 
@@ -160,6 +167,21 @@ switch meas{measind}
         y = v.CorrMat_CV2_p_fdr{curclass};
         miny = min(y); maxy = max(y);
 
+    case 'Network plot correlation matrix'
+        y = v.CorrMat_CV2{curclass};
+        miny = min(y); maxy = max(y);
+        %y = graph(y);
+
+    case 'Network plot correlation matrix (P value)'
+        y = v.CorrMat_CV2_p_uncorr{curclass};
+        miny = min(y); maxy = max(y);
+        %y = graph(y);
+
+    case 'Network plot correlation matrix (P value, FDR)'
+        y = v.CorrMat_CV2_p_fdr{curclass};
+        miny = min(y); maxy = max(y);
+        %y = graph(y);
+
     case 'Model P value histogram'
         if multiflag
             y = nm_nanmean(v.PermModel_Crit_Global); 
@@ -187,7 +209,9 @@ if multiflag && isfield(v,'PermModel_Crit_Global_Multi')
     meas{measind} = 'Model P value histogram';
 end
 
+%if ~(measind == 23 | measind == 24 | measind == 25)
 y(~isfinite(y))=0;
+%end
 
 switch meas{measind}
 
@@ -367,7 +391,178 @@ switch meas{measind}
             Pvalstr = sprintf('%s=%1.2f\nSignificance: P<%g', xlb, vp, 1/perms);
          end
          legend({'Binned null distribution', 'Fitted null distribution', Pvalstr});
+    
+    case NetworkCorrMatStr
+         
+         set(handles.pn3DView,'Visible','off'); set(handles.axes33,'Visible','on'); cla; hold on
+         feats = v.params.features; nF = numel(feats);
+         if ~isempty(handles.txtAlterFeats.String)
+            altfeatsvar = handles.txtAlterFeats.String;
+            feats = evalin('base',altfeatsvar);
+         end
+       
+         sI = 1:nF;
+         if filterfl
+             FltMetr = handles.selVisMeas2.String{handles.selVisMeas2.Value};
+             switch FltMetr
+                 case 'CV-ratio of feature weights [Overall Mean]'
+                     [ythr,~,~,vlineval] = CVRatio(v,curclass,multiflag);
+                     if isempty(filterthr)
+                         handles.txtThrVisMeas2.String='-2 2'; 
+                         filterthr = vlineval;
+                     else
+                         filterthr = str2double(filterthr);
+                     end
+                 case 'CV-ratio of feature weights [Grand Mean]'
+                     [ythr,~,~,vlineval] = CVRatio_CV2(v,curclass,multiflag);
+                     if isempty(filterthr)
+                         handles.txtThrVisMeas2.String='-2 2'; 
+                         filterthr = vlineval;
+                     else
+                         filterthr = str2double(filterthr);
+                     end
+                 case 'Feature selection probability [Overall Mean]'
+                     [ythr,~,~,vlineval] = FeatProb(v,curclass,multiflag);
+                     if isempty(filterthr)
+                         handles.txtThrVisMeas2.String='0.5'; 
+                         filterthr = vlineval;
+                     else
+                         filterthr = str2double(filterthr);
+                     end
+                 case 'Probability of feature reliability (95%-CI) [Grand Mean]'
+                     [ythr,~,~,vlineval] = Prob_CV2(v,curclass,multiflag);
+                     if isempty(filterthr)
+                         handles.txtThrVisMeas2.String='-0.5 0.5'; 
+                         filterthr = vlineval;
+                     else
+                         filterthr = str2double(filterthr);
+                     end
+                 case 'Sign-based consistency -log10(P value)'
+                     [ythr,~,~,vlineval] = SignBased_CV2_p_uncorr(v,curclass,multiflag);
+                     if isempty(filterthr)
+                         handles.txtThrVisMeas2.String=num2str(-log10(0.05),'%1.2f'); 
+                         filterthr = vlineval;
+                     else
+                         filterthr = str2double(filterthr);
+                     end
+                 case 'Sign-based consistency -log10(P value, FDR)'
+                     [ythr,~,~,vlineval] = SignBased_CV2_p_fdr(v,curclass,multiflag);
+                     if isempty(filterthr)
+                         handles.txtThrVisMeas2.String=num2str(-log10(0.05),'%1.2f'); 
+                         filterthr = vlineval;
+                     else
+                         filterthr = str2double(filterthr);
+                     end
+                 case 'Analytical -log10(P Value) for Linear SVM [Grand Mean]'
+                     [ythr,~,~,vlineval] = Analytical_p(v,curclass,multiflag);
+                     if isempty(filterthr)
+                         handles.txtThrVisMeas2.String=num2str(-log10(0.05),'%1.2f'); 
+                         filterthr = vlineval;
+                     else
+                         filterthr = str2double(filterthr);
+                     end
+                 case 'Analytical -log10(P Value, FDR) for Linear SVM [Grand Mean]'
+                     [ythr,~,~,vlineval] = Analyitcal_p_fdr(v,curclass,multiflag);
+                     if isempty(filterthr)
+                         handles.txtThrVisMeas2.String=num2str(-log10(0.05),'%1.2f'); 
+                         filterthr = vlineval;
+                     else
+                         filterthr = str2double(filterthr);
+                     end
+             end
+             if sortfl, [~,sI] = sort(abs(ythr),'descend'); end
+             y = y(sI,sI);
+             feats = feats(sI);
+             y = y(featind,featind);
+             feats = feats(featind);
+             y.diag
+             if numel(filterthr)>1
+                Ix2 = (ythr >= min(filterthr) | ythr <= max(filterthr))';
+             else 
+                Ix2 = (abs(ythr)>= filterthr)'; 
+             end
+             Ix2 = Ix2(sI); Ix2 = Ix2(featind);
+             Ix = any(y) & Ix2;
+         else
+             if sortfl, [~,sI] = sort(mean(y),'descend'); end
+             y = y(sI,sI);
+             feats = feats(sI);
+             y = y(featind,featind);
+             feats = feats(featind);
+             Ix = any(y);
+         end
+         y = y(Ix,Ix);
+         feats = feats(Ix);
+         nF = numel(feats);
+         if nF<50, FS = 10; elseif nF<100, FS = 7; elseif nF < 150, FS = 5; else, FS = 0; end
+         yy = y; 
+                      
+         
+%            
+         try
+             cla reset;
+             switch meas{measind}
+                case NetworkCorrMatStr{1}
+                 
+                    gy = graph(yy);
+                    gy = rmedge(gy, 1:numnodes(gy), 1:numnodes(gy));
+                    pgy = plot(gy);
+                    pgy.NodeLabel = feats;
+                    pgy.EdgeCData = gy.Edges.Weight;
+                    pgy.EdgeCData(pgy.EdgeCData > 0) = 0.5;
+                    pgy.EdgeCData(pgy.EdgeCData < 0) = -0.5;
+                    pgy.EdgeColor = 'flat';
+                    colormap parula;
+                    gy.Edges.LWidths = 7*abs(gy.Edges.Weight);
+                    pgy.LineWidth = gy.Edges.LWidths;
+                    pgy.NodeColor = 'k';
+                 case NetworkCorrMatStr{2}
+                    gy = graph(yy);
+                    gy = rmedge(gy, 1:numnodes(gy), 1:numnodes(gy));
+                    %nonsigIdx = find(gy.Edges.Weight >= 0.05);
+                    %gy = rmedge(gy, nonsigIdx);
+                    pgy = plot(gy);
+                    pgy.NodeLabel = feats;
+                    pgy.EdgeCData = gy.Edges.Weight;
+                    pgy.EdgeCData(pgy.EdgeCData >= 0.05) = 0.5;
+                    pgy.EdgeCData(pgy.EdgeCData < 0.05) = -0.5;
+                    pgy.EdgeAlpha = 0.1;
+                    %pgy.EdgeAlpha(pgy.EdgeCData < 0.05) = 0.5;
+                    pgy.EdgeColor = 'flat';
+                    colormap parula;
+                    gy.Edges.LWidths = 0.1*(max(gy.Edges.Weight)+1 -(abs(gy.Edges.Weight)));
+                    pgy.LineWidth = gy.Edges.LWidths;
+                    pgy.NodeColor = 'k';
+                 case NetworkCorrMatStr{3}
+                    yy = triu(yy)+triu(yy,1)';
+                    gy = graph(upper(yy));
+                    gy = rmedge(gy, 1:numnodes(gy), 1:numnodes(gy));
+                    %nonsigIdx = find(gy.Edges.Weight >= 0.05);
+                    %gy = rmedge(gy, nonsigIdx);
+                    pgy = plot(gy);
+                    pgy.NodeLabel = feats;
+                    pgy.EdgeCData = gy.Edges.Weight;
+                    pgy.EdgeCData(pgy.EdgeCData >= 0.05) = 0.5;
+                    pgy.EdgeCData(pgy.EdgeCData < 0.05) = -0.5;
+                    %pgy.EdgeAlpha = 0.1;
+                    %pgy.EdgeAlpha(pgy.EdgeCData < 0.05) = 0.5;
+                    pgy.EdgeColor = 'flat';
+                    colormap parula;
+                    gy.Edges.LWidths = 0.1*(max(gy.Edges.Weight)+1 -(abs(gy.Edges.Weight)));
+                    pgy.LineWidth = gy.Edges.LWidths;
+                    pgy.NodeColor = 'k';
+             end
+             %cbar.Label.String=clabel; cbar.Label.FontWeight='bold';
 
+
+         catch ERR
+             errordlg(sprintf('Network plot cannot be displayed!\n%s', ERR.message));
+         end
+         %handles.axes33.Colormap =  colormap(redgreencmap); 
+         
+         %handles.axes33.XLim = [min(pgy.XData)-1 max(pgy.XData)+1]; 
+         %handles.axes33.YLim = [min(pgy.YData)-1 max(pgy.YData)+1];
+        
     otherwise 
 
         if sortfl, 

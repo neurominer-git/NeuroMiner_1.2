@@ -519,9 +519,9 @@ switch action
                             
                         case 'graphConstruction'
                             preprocact{i} = 'Construct individual networks';
-%                             if isfield(params.ACTPARAM{i}.GRAPHCONSTRUCTION,'method') && ~isempty(params.ACTPARAM{i}.GRAPHCONSTRUCTION.method)
-%                                 preprocact{i} = sprintf('%s, Method: %s', preprocact{i}, nk_ConcatParamstr(params.ACTPARAM{i}.GRAPHCONSTRUCTION.method));
-%                             end
+                            if isfield(params.ACTPARAM{i}.GRAPHCONSTRUCTION,'method') && ~isempty(params.ACTPARAM{i}.GRAPHCONSTRUCTION.method)
+                                preprocact{i} = sprintf('%s, Method: %s', preprocact{i}, params.ACTPARAM{i}.GRAPHCONSTRUCTION.method);
+                            end
 %                             preprocact{i} = sprintf('%s ]', preprocact{i});
                     end
                     
