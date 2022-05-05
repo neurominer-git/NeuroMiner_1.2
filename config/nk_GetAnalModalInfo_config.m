@@ -1,5 +1,5 @@
 function inp = nk_GetAnalModalInfo_config(NM, inp)
-global FUSION STACKING
+global FUSION STACKING MODELDIR
 
 if ~isfield(NM,'analysis'), inp=[]; return; end
 if ~isfield(inp,'analind') || isempty(inp.analind)
@@ -16,6 +16,7 @@ else
     inp.rootdir = analysis.GDdims{1}.RootPath;
 end
 
+MODELDIR = inp.rootdir;
 if ~isempty(FUSION)        
     inp.F = analysis.params.TrainParam.FUSION.M; inp.nF = numel(inp.F); if FUSION.flag < 3, inp.nF = 1; end
 else
