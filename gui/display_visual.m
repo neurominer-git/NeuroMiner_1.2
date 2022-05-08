@@ -475,7 +475,7 @@ switch meas{measind}
              feats = feats(sI);
              y = y(featind,featind);
              feats = feats(featind);
-             y.diag
+             %y.diag
              if numel(filterthr)>1
                 Ix2 = (ythr >= min(filterthr) | ythr <= max(filterthr))';
              else 
