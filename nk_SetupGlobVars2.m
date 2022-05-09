@@ -104,9 +104,15 @@ switch act
         if size(dat.label,2)>1
             MULTILABEL.flag = true;
             MULTILABEL.dim  = size(dat.label,2);
+            if isfield(dat,'labelnames')
+                MULTILABEL.desc = dat.labelnames;
+            else
+                MULTILABEL.desc = cellstr([repmat('L',MULTILABEL.dim,1) num2str((1:MULTILABEL.dim)')]);
+            end
         else
             MULTILABEL.flag = false;
             MULTILABEL.dim = 1;
+            MULTILABEL.desc = [];
         end
         
         VERBOSE = dat.TrainParam.verbosity;

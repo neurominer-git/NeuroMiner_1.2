@@ -167,16 +167,18 @@ for h=1:nperms % Loop through perms
     %% Do balancing / histogram equalization in each fold
     if ~isempty(Eq)
         for i=1:K
-            [ removed, retained ] = nk_EqualizeHisto(Eq, Eq.Covar(trainidx{i}), trainidx{i}, NM.modeflag);
-            trainidx{i} = retained;
-            if Eq.AddRemoved2Test, testidx{i} = [testidx{i}; removed]; end
+            [ removed, retained ] = nk_EqualizeHisto(Eq, Eq.Covar(rInd(trainidx{i})), rInd(trainidx{i}), NM.modeflag);
+            trainidxs{i} = uint16(retained);
+            if Eq.AddRemoved2Test, testidxs{i} = uint16([rInd(testidx{i}); removed]); end
+        end
+    else
+         % Convert to integer to save space
+        for i=1:K
+            testidxs{h,i} = uint16(rInd(testidx{i}));
+            trainidxs{h,i} = uint16(rInd(trainidx{i}));
         end
     end           
-    % Convert to integer to save space
-    for i=1:K
-        testidxs{h,i} = uint16(rInd(testidx{i}));
-        trainidxs{h,i} = uint16(rInd(trainidx{i}));
-    end
+   
 end
 
 cv.TrainInd = trainidxs;

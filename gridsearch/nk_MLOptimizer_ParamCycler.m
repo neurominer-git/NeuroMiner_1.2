@@ -64,7 +64,7 @@ if nPs>1, fprintf('\n === Performing hyperparameter optimization === \n'); else,
 for curlabel=1:nl
     
     if nl>1
-        labelstr = sprintf('Label #%g: ',curlabel);
+        labelstr = sprintf('Label #%g: %s | ',curlabel, MULTILABEL.desc{curlabel});
     end
     MULTILABEL.curdim = curlabel;
     
@@ -97,10 +97,10 @@ for curlabel=1:nl
         tElapsed = toc; tElapsedSum = tElapsedSum+tElapsed; 
         elaps = sprintf('\t%1.2f sec.',tElapsed);
         if nPs > 1 
-            DISP.s = sprintf('%s | %s%s: CV2 [ %g, %g ] => %4g/%4g parameter combinations => %1.1f%% ', ...
+            DISP.s = sprintf('%s | %s%s\nCV2 [ %g, %g ] => %4g/%4g parameter combinations => %1.1f%% ', ...
                 elaps, labelstr, algostr, f, d , pltcnt, pltmax, pltperc);
         else
-            DISP.s = sprintf('%s | %s%s: CV2 [ %g, %g ] => No-parameter optimization', ...
+            DISP.s = sprintf('%s | %s%s\nCV2 [ %g, %g ] => No-parameter optimization', ...
                 elaps, labelstr, algostr, f, d  );
         end
         fprintf('%s',DISP.s); 

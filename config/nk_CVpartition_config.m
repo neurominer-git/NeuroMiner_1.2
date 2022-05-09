@@ -314,11 +314,11 @@ if ~defaultsfl
                          NM.TrainParam.RAND.Eq.Covar = NM.covars(:,covind);
                          varstr = NM.covnames{covind};
                     else
-                         NM.TrainParam.RAND.Eq.Covar = NM.label;
+                         NM.TrainParam.RAND.Eq.Covar = nm_nanmean(NM.label,2);
                          varstr = 'target label';
                     end
                  else
-                     NM.TrainParam.RAND.Eq.Covar = NM.label;
+                     NM.TrainParam.RAND.Eq.Covar = nm_nanmean(NM.label,2);
                      varstr = 'target label';
                  end
                  switch NM.modeflag
