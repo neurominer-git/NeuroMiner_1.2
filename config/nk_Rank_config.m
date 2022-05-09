@@ -91,7 +91,7 @@ if ~defaultsfl
                     menuact = rstr_reg; menusel = rsel_reg;
             end
 
-            RANK.algostr = char(nk_input('Select ranking algorithm',0,'m', menuact, menusel));
+            RANK.algostr = char(nk_input('Select ranking algorithm',0,'mq', menuact, menusel));
            
             switch RANK.algostr
                 

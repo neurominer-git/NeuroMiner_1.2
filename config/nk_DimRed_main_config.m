@@ -184,7 +184,9 @@ if ~defaultsfl
                                         'Non-negative Matrix Factorization via Nesterov''s Optimal Gradient Method' };
             if ~isfield(DR,'NMFmethod'), DR.NMFmethod = NMFmethod{1}; end
             if ~isfield(DR,'tmax'), DR.tmax= 60; end
-            DR.NMFmethod            = NMFmethod{nk_input('Choose NMF method',0,'m',strjoin(NMFmethoddesc,'|'),1:numel(NMFmethoddesc), find(strcmp(NMFmethod,DR.NMFmethod)))};
+            defitem = find(strcmp(NMFmethod,DR.NMFmethod));
+            if isempty(defitem), defitem = NMFmethoddesc{1}; end
+            DR.NMFmethod            = NMFmethod{nk_input('Choose NMF method',0,'mq',strjoin(NMFmethoddesc,'|'),1:numel(NMFmethoddesc), defitem)};
             DR.tmax                 = nk_input('Maximum run-time in seconds',0,'i',DR.tmax);
         case 'ProbPCA'
             if isfield(DR,'ProbPCA'), iter= DR.ProbPCA.iter; else iter = 200; end

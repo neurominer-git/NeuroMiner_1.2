@@ -141,6 +141,9 @@ switch appendfl
             cv = nk_INDEPpartition(CV2LCO.ind, Label, cv2frame, OutPerms);
         else
             switch CV2LOO
+                case true
+                    % This is LOO cross-validation
+                    cv = nk_LOOpartition(Label);
                 case false
                     % This is stratified k-fold cross-validation
                     cv = nk_CVpartition2(OutPerms, OutFold, Label, Constraint);
@@ -148,9 +151,6 @@ switch appendfl
                         OutFold = cv; cv = nk_CVpartition2(OutPerms, OutFold, Label, Constraint);
                         InFold = OutFold - 1;
                     end
-                case true
-                    % This is LOO cross-validation
-                    cv = nk_LOOpartition(Label);
             end
         end
         if isempty(cv), return, end
@@ -397,7 +397,6 @@ for i=1:length(class)
         tclass{i}.TestInd{nperms,nfolds}    = [];
         tclass{i}.TrainLabel{nperms,nfolds} = [];
         tclass{i}.TestLabel{nperms,nfolds}  = [];
-        %tclass{i}.TestFoldInd{nperms}=[];
     else
         if iscell(tclass)
             tclass{i}.TrainInd                  = cell(nperms,nfolds);
@@ -414,8 +413,6 @@ for i=1:length(class)
     
     for j=1:nperms
 
-        %tclass{i}.TestFoldInd{j}=zeros(size(class{i}.ind));
-
         for k=1:nfolds
  
                 switch decomposeflag
@@ -424,8 +421,6 @@ for i=1:length(class)
                         
                         for l=1:length(groupind)
                         
-                            %tclass{i}.TestFoldInd{j}(cv.TestInd{j,k}(label(cv.TestInd{j,k})
-                            %== class{i}.groups(l)))=k;
                             belongstrain = find(label(cv.TrainInd{j,k}) == class{i}.groups(l));
                             belongstest = find(label(cv.TestInd{j,k}) == class{i}.groups(l));
 
@@ -454,7 +449,6 @@ for i=1:length(class)
                         
                     case 2 % One-Vs-All
                         
-                        %tclass{i}.TestFoldInd{j}(cv.TestInd{j,k}(label(cv.TestInd{j,k}) == class{i}.groups))=k;
                         tclass{i}.TrainInd{j,k}  = cv.TrainInd{j,k};
                         lb = zeros(size(cv.TrainInd{j,k}));
                         indpos = label(cv.TrainInd{j,k}) == class{i}.groups; 
@@ -480,7 +474,6 @@ for i=1:length(class)
                 end
         end
         
-        %tclass{i}.TestFoldInd{j} =  uint8(tclass{i}.TestFoldInd{j}(tclass{i}.TestFoldInd{j}~=0));
     end
     if iscell(tclass)
         switch appendfl
@@ -491,7 +484,6 @@ for i=1:length(class)
                 class{i}.TestInd = [ class{i}.TestInd; tclass{i}.TestInd ];
                 class{i}.TrainLabel = [ class{i}.TrainLabel; tclass{i}.TrainLabel ];
                 class{i}.TestLabel = [ class{i}.TestLabel; tclass{i}.TestLabel ];
-                %class{i}.TestFoldInd = [ class{i}.TestFoldInd tclass{i}.TestFoldInd ];
         end
     else
         switch appendfl
@@ -502,7 +494,6 @@ for i=1:length(class)
                 class.TestInd = [ class.TestInd; tclass.TestInd ];
                 class.TrainLabel = [ class.TrainLabel; tclass.TrainLabel ];
                 class.TestLabel = [ class.TestLabel; tclass.TestLabel ];
-                %class.TestFoldInd = [ class.TestFoldInd tclass.TestFoldInd ];
         end
     end
 end

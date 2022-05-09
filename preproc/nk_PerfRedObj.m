@@ -63,7 +63,7 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
     
     if VERBOSE, fprintf('==>'); end
     
-    if ~isempty(Params_desc); IN.DR.dims = nk_ReturnParam('dimensions',Params_desc, opt); end
+    if ~isempty(Params_desc); IN.DR.dims = nk_ReturnParam('dimensions', Params_desc, opt); end
 
     % Dimensionality check
     if ~isempty(IN.DR.dims)

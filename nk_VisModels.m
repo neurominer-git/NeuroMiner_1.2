@@ -39,6 +39,7 @@ permfl          = false(1,nM);                      % flag for permutation mode
 sigfl           = false(1,nM);                      % flag for significance estimation mode
 nperms          = ones(1,nM);                       % number of permuations per modality
 pmode           = ones(1,nM);                       % Permutation mode
+CVRnorm         = 1;
 if strcmp(MODEFL,'classification') && nclass > 1
     ngroups     = numel(unique(inp.labels(~isnan(inp.labels)))); % Number of classes in the label
 else
@@ -1054,9 +1055,18 @@ if ~batchflag
             SUM = nm_nansum(I.VCV2SUM{h,n},2) ;
             SEL = I.VCV2SEL{h,n};
             SQ = sqrt(SUM2 ./ SEL - (SUM ./ SEL).^2);
-            %I.VCV2SE{h,n} = (SQ./sqrt(SEL))*1.96;
-            I.VCV2SE{h,n} = SQ;
-
+            switch CVRnorm 
+                case 1
+                    % we use the standard deviation, which is not
+                    % sensitive to the number of partitions
+                    I.VCV2SE{h,n} = SQ;
+                case 2
+                    % whereas here we use the SEM which is closer to the
+                    % bootstrap ratio but produces overly lenient results
+                    % in cross-validation settings with a high number of
+                    % partitions
+                    I.VCV2SE{h,n} = (SQ./sqrt(SEL))*1.96;
+            end
             if size(I.VCV2SQ{h, n},2)>1
                 I.VCV2MEAN_CV1{h,n} = nm_nanmean(I.VCV2MEAN{h,n},2);
                 I.VCV2SE_CV1{h,n}   = nm_nanmean(I.VCV2STD{h,n},2);
@@ -1069,7 +1079,8 @@ if ~batchflag
             I.VCV2{h,n} = nm_nansum(SUM, 2) ./ SEL;
             
             % Compute CV-ratio 
-            I.VCV2rat{h,n} = I.VCV2{h,n}./I.VCV2SE{h,n};%nm_nanmean(I.VCV2VCV1{h,n},2) ./ nm_nansem(I.VCV2VCV1{h,n},2);
+            I.VCV2rat{h,n} = I.VCV2{h,n}./I.VCV2SE{h,n};
+            %I.VCV2rat{h,n} = nm_nanmean(I.VCV2VCV1{h,n},2) ./ nm_nansem(I.VCV2VCV1{h,n},2);
             
             % Compute Sign-based consistency, Z scores and P values
             [I.VCV2signconst_p{h,n}, I.VCV2signconst_pfdr{h,n}, I.VCV2signconst_z{h,n}, I.VCV2signconst{h,n}] = nk_SignBasedConsistencySignificance(I.VCV2VCV1{h,n});  

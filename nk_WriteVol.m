@@ -1,4 +1,4 @@
-function [V, indvol, vox] = nk_WriteVol(Vdat, fname, dim, spacimg, badcoords, label, labelop, indvol)
+function [V, indvol, vox] = nk_WriteVol(Vdat, fname, dim, spacimg, badcoords, label, labelop, indvol, roundfl)
 % ================================================================================
 % FORMAT nk_WriteVol(Vdat, fname, dim, spacimg, badcoords, label, labelop, indvol)
 % ================================================================================
@@ -17,20 +17,13 @@ else
 end
 
 if isempty(spacimg) || ~exist(spacimg,'file')
-    
-    spm5ver = nk_CheckSPMver;
-
-    if spm5ver
-        Vm = spm_vol(spm_select(1,'image','Space-defining image'));
-    else
-        Vm = spm_vol(spm_get(1,'IMAGE','Space-defining image'));
-    end
+    Vm = spm_vol(spm_select(1,'image','Space-defining image'));
 else
     Vm = spm_vol(spacimg);
 end
 if ~exist('label','var') || isempty(label), label = 0.5; end
 if ~exist('labelop','var') || isempty(labelop), labelop = 'gt'; end
-
+if ~exist('roundfl','var') || isempty(roundfl), roundfl = false; end
 if ~exist('indvol','var') || isempty(indvol)
     
     indvol=[];
@@ -41,7 +34,11 @@ if ~exist('indvol','var') || isempty(indvol)
         M = spm_matrix([0 0 sl 0 0 0 1 1 1]);
         %M1  = Vm.mat\V.mat\M;
         mask_slice = spm_slice_vol(Vm,M,Vm.dim(1:2),1);
-        ind0 = find(feval(labelop,mask_slice,label));
+        if roundfl
+            ind0 = find(feval(labelop,round(mask_slice),label));
+        else
+            ind0 = find(feval(labelop,mask_slice,label));
+        end
         ind = ind0 + (sl - 1)*prod(Vm.dim(1:2));
         indvol = [indvol; ind];
         clear mask_slice

@@ -59,11 +59,11 @@ if OUT.detrend.flag
     
     switch MODEFL
         case 'regression'
-            OUT.detrend.beta = median(beta);
-            OUT.detrend.p = median(p);
+            OUT.detrend.beta = mean(beta);
+            OUT.detrend.p = mean(p);
             
         case 'classification'
-            OUT.detrend.thresh = median(thresh);
+            OUT.detrend.thresh = mean(thresh);
 
              for ii=1:PermNum % Loop through CV1 permutations
                 for jj=1:FoldNum % Loop through CV1 folds

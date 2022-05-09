@@ -172,7 +172,11 @@ switch act
                             I = find(I);
                             for z=1:numel(I)
                                 if isfield(PREPROC.ACTPARAM{I(z)}.RANK,'EXTERN')
-                                    inp.Yw = PREPROC.ACTPARAM{I(z)}.RANK.EXTERN;
+                                    if iscell(PREPROC.ACTPARAM{I(z)}.RANK.EXTERN)
+                                        inp.Yw = PREPROC.ACTPARAM{I(z)}.RANK.EXTERN{j};
+                                    else
+                                        inp.Yw = PREPROC.ACTPARAM{I(z)}.RANK.EXTERN;
+                                    end
                                     inp.Yw = nk_PerfSpatFilt2( inp.Yw, PREPROC, inp.X ); 
                                     break
                                 end

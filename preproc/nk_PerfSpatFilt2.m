@@ -35,7 +35,11 @@ if isfield(CURACT,'SPATIAL') && CURACT.SPATIAL.cubetype>1
         end
         dimst               = dimvecx( zu ) + 1; 
         dimend              = dimvecx( zu + 1 );
-        tY                  = Y(:,dimst:dimend);     
+        try
+            tY                  = Y(:,dimst:dimend);     
+        catch
+            disp('problem')
+        end
         if datatype ~= 1
             for zv = 1:nP
                 fY{zv, zu} = tY; 

@@ -1,4 +1,4 @@
-function [pth, fil] = nk_GenerateNMFilePath(RootDir,AnalDesc,DatType, OptDesc, StrOut, DatID, CV2Perm , CV2Fold, CV1Perm, CV1Fold, ext)
+function [pth, fil] = nk_GenerateNMFilePath(RootDir, AnalDesc, DatType, OptDesc, StrOut, DatID, CV2Perm , CV2Fold, CV1Perm, CV1Fold, ext)
 if ~exist('ext','var') || isempty(ext)
     ext = '.mat';
 end

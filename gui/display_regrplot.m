@@ -84,7 +84,7 @@ switch GraphType
         handles.he = errorbar(lxL(ind),pred(ind),errbar(ind),'ko','LineWidth',0.5,'MarkerSize',9);
 end
 
-handles.regrplot = plot(lxL(ind),pred(ind),'o','MarkerFaceColor','b','MarkerSize',9);
+handles.regrplot = scatter(lxL(ind),pred(ind),'Marker','o','MarkerFaceColor','b','MarkerEdgeColor',rgb('LightBlue'),'MarkerFaceAlpha',0.7, 'MarkerEdgeAlpha',0.2,'SizeData',80);
 
 % Mark points according to "grouping"
 handles.hg = [];

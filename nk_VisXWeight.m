@@ -144,7 +144,6 @@ for n=1:nM
                     if isfield(naPX,'recon') && naPX.recon==1
                         fprintf('-');
                     else
-
                         if isfield(naPX.mpp,'vec')
                            redvec = naPX.mpp.vec;
                         elseif isfield(naPX.mpp,'factors')
@@ -153,6 +152,8 @@ for n=1:nM
                            redvec = naPX.mpp.u;
                         elseif isfield(naPX.mpp,'M')
                            redvec = naPX.mpp.M;
+                        elseif isfield(naPX.mpp,'W')
+                            redvec = naPX.mpp.W;
                         elseif isfield(naPX.mpp,'network')
                            error('Autoencoder reconstructions not supported!')
                         end
@@ -199,9 +200,9 @@ for n=1:nM
                             tmW(naPX.indNonRem) = nmW; nmW = tmW; tmP(naPX.indNonRem) = nmP; nmP = tmP;  
                             % Don't forget to adjust the feature masks and the
                             % indices to modalities in case of fused feature spaces
-                            tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(pInaPX.indNonRemND) = lFuVI; lFuVI = tlFuVI;
-                            tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = lVI; lVI = tlVI;
-                            clear tmW tmP tlFuVI tlVI;
+                            %tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(naPX.indNonRem) = lFuVI; lFuVI = tlFuVI;
+                            %tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = lVI; lVI = tlVI;
+                            clear tmW tmP %tlFuVI tlVI;
                         end
                         reducedimfl = true;
                     end

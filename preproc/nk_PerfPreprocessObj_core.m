@@ -59,13 +59,13 @@ switch MODEFL
     case 'regression'
         nTrL = size(SrcParam.TrainLabel,2);
 end
-if nTrL> 1 && nk_Check4LabelInteraction(InputParam.P) 
-    nL = nTrL; 
-    if VERBOSE, fprintf('\nMulti-label mode detected: Processing %g labels', nL); end
-else
-    nL = 1;
-end
-
+% if nTrL> 1 && nk_Check4LabelInteraction(InputParam.P) 
+%     nL = nTrL; 
+%     if VERBOSE, fprintf('\nMulti-label mode detected: Processing %g labels', nL); end
+% else
+%     nL = 1;
+% end
+nL=1;
 % Do we have to manage synthetic data?
 adasynfl = false; 
 if isfield(SVM,'ADASYN') && SVM.ADASYN.flag == 1 && ...
@@ -959,7 +959,7 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tGraph computation ...'); end
-    [InputParam.Tr, TrParami] = graph_PerfGraphConstruction(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
+    [InputParam.Tr, TrParami] = graph_PerfGraphComputation(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
     % All 
     if tsfl, tsproc = true; end
 end

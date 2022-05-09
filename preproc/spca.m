@@ -109,7 +109,7 @@ while ~converged && iter < maxiter
             b = sign(AXX).*max(0, abs(AXX) - jstop);
         else
             % Find beta by elastic net regression
-            b = larsen(X, X*A(:,j), lambda, jstop, 0);
+            b = larsen(X, X*A(:,j), lambda, jstop, 0, 0, 0);
         end
         B(:,j) = b(end,:)';
     end
