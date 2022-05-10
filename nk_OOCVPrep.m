@@ -287,6 +287,7 @@ else
 end
 
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
+nl = nk_GetLabelDim(MULTILABEL);
 
 % Loop through modalities
 for i = 1:inp1.nF
@@ -296,8 +297,8 @@ for i = 1:inp1.nF
     OOCV = tOOCV;
     inp = catstruct(inp1,inp2);
     inp.loadGD = true;
-    
-    for j = 1:MULTILABEL.dim
+
+    for j = 1:nl
 	
         strOOCVfile = fullfile(inp.rootdir,[stranalysis inp.varstr '_t' num2str(j) '_OOCVresults-' num2str(inp.oocvind) '_ID' dat.id '.mat']);
         inp.multlabelstr = '';  if MULTILABEL.flag, inp.multlabelstr = sprintf('_t%g',j); end

@@ -159,8 +159,6 @@ handles.curranal = analind;
 
 if size(handles.NM.label,2) > 1,
     handles.multilabel = true;
-    handles.curlabel= get(handles.selLabel,'Value');
-    handles.selLabel.String = handles.NM.labelnames;
 else
     handles.multilabel = false;
     handles.curlabel = 1;

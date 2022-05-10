@@ -541,14 +541,9 @@ switch act
         end
         NM.TrainParam.MULTILABEL.sel = nk_input('Select labels for processing',0,'i',NM.TrainParam.MULTILABEL.sel);
         NM.TrainParam.MULTILABEL.dim = numel(NM.TrainParam.MULTILABEL.sel);
-        if isfield(NM.TrainParam.RAND,'Eq') && NM.TrainParam.RAND.Eq.enabled && strcmp(NM.TrainParam.RAND.Eq.CovarName,'NM.label')
+        if isfield(NM.TrainParam.RAND,'Eq') && NM.Trainaram.Eq.enabled && strcmp(NM.Trainaram.Eq.CovarName,'NM.label')
             NM.TrainParam.RAND.Eq.Covar = nm_nanmean(NM.label(:,NM.TrainParam.MULTILABEL.sel),2);
-            nk_PrintLogo
-            fprintf('\nFound active histogram equalization based on NM.label!')
-            reinitcv = nk_input('Shall I reinitialize the CV structure ?', 0, 'yes|no', [1,0], 1);
-            if reinitcv
-                nk_CVpartition_config(0,6);
-            end
+            fprintf('Found active histogram equalization based on NM.label!')
         end
 end
 act = 1;

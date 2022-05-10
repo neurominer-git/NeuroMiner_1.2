@@ -3,8 +3,8 @@ function [GD, MultiBinBind] = nk_ModelNodeSelector(GD, MD, label, f, d, nclass, 
 global CV MULTI GRD SAV MODEFL RFE RAND MULTILABEL SVM
 
 MultiBinBind = [];
-
-for curlabel=1:MULTILABEL.dim
+nl = nk_GetLabelDim(MULTILABEL);
+for curlabel=1:nl
 
     %%%%%%%%%%%%%%%% SELECT PARAMS AT OPTIMUM %%%%%%%%%%%%%%%%%
     %% BINARY CLASSIFIERS / REGRESSORS

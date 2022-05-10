@@ -90,7 +90,7 @@ if ~defaultsfl
         Eq = NM.TrainParam.RAND.Eq;
     end
     buildstr = ''; savestr = ''; loadstr = ''; MenuRem = []; CV2prx = '' ; CV1prx = ''; 
-    EQstr = ''; EQcovstr = ''; EQminstr = ''; EQmaxstr = ''; EQbinstr = ''; EQshufflestr = ''; EQposnegstr=''; EQorigstr = ''; EQeqstr = '';
+    EQstr = ''; EQcovstr = ''; EQminstr = ''; EQmaxstr = ''; EQbinstr = ''; EQshufflestr = ''; EQposnegstr='';
 
     %% Define menu options for cross-validation setup
     if isfield(NM,'TrainParam')
@@ -209,9 +209,7 @@ if ~defaultsfl
                             EQmaxstr = sprintf('Define minimum # of observations at the upper end of label histogram [ %g ]|', Eq.maxcount);
                             EQbinstr = sprintf('Define # of bins in label histogram [ %g ]|', Eq.bincount);
                             EQshufflestr = sprintf('Shuffle removed observations to CV1 test data [ %s ]|', shufflestr{addremoved2test});
-                            EQorigstr = 'Show original histogram of the entire data|';
-                            EQeqstr = 'Show (equalized) histogram of CV1 training partition [1,1] (build CV structure first)|';
-                            MenuVec = [MenuVec 14:20];
+                            MenuVec = [MenuVec 14:18];
                         end
                     case 'classification'
                         EQstr = ['Equalize class sizes at the CV1 cycle by undersampling [ ' enabledstr addremoved2teststr ' ]|']; 
@@ -260,8 +258,6 @@ if ~defaultsfl
                      EQbinstr ...
                      EQposnegstr ...
                      EQshufflestr ...
-                     EQorigstr ...
-                     EQeqstr ...
                      buildstr loadstr savestr], MenuVec,1);
     end
     switch act
@@ -429,12 +425,12 @@ if ~defaultsfl
         case 18
              NM.TrainParam.RAND.Eq.addremoved2test = ~NM.TrainParam.RAND.Eq.addremoved2test;
         case 19
-            figure;histogram(NM.TrainParam.RAND.Eq.Covar, NM.TrainParam.RAND.Eq.bincount); 
+            figure;histogram(NM.TrainParam.RAND.Eq.Covar); 
             ylabel('# of observations in bins'); 
             xlabel(NM.TrainParam.RAND.Eq.CovarName); 
             title(['Histogram analysis of ' Eq.CovarName]);
         case 20 
-            figure; histogram(NM.TrainParam.RAND.Eq.Covar(NM.cv.TrainInd{1,1}(NM.cv.cvin{1,1}.TrainInd{1,1})), NM.TrainParam.RAND.Eq.bincount);
+            figure; histogram(NM.TrainParam.RAND.Eq.Covar(NM.cv.TrainInd{1,1}(NM.cv.cvin{1,1}.TrainInd{1,1})));
             ylabel('# of observations in bins'); 
             xlabel(NM.TrainParam.RAND.Eq.CovarName); 
             title(['Analysis of equalized histogram of ' Eq.CovarName]);

@@ -377,7 +377,7 @@ if appendfl ~=3
         LOOflag = false; if nfolds == -1; LOOflag = true; end
         if ~LOOflag
             cv = nk_CVpartition2(nperms, nfolds, label, constraint, eq, auto_adjust);
-            if ~isstruct(cv);
+            if ~isstruct(cv)
                 nfolds = cv; cv = nk_CVpartition2(nperms, nfolds, label, constraint, eq, auto_adjust);
             end
         else

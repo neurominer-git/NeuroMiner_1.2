@@ -154,7 +154,15 @@ switch act
             if isempty(GRD),        paramstr{end+1} = 'Grid optimization settings'; end
             if isempty(MULTI),      paramstr{end+1} = 'Multi-group parameters'; end
             if isempty(VIS),        paramstr{end+1} = 'Visualization parameters'; end
-            
+            if isfield(dat.TrainParam,'MULTILABEL')
+                MULTILABEL.sel = dat.TrainParam.MULTILABEL.sel;
+            else
+                if MULTILABEL.dim > 1
+                    MULTILABEL.sel = true(1,MULTILABEL.dim);
+                else
+                    MULTILABEL.sel = 1;
+                end
+            end
             if iscell(PREPROC)
                 tPREPROC = PREPROC{1};
             else

@@ -28,7 +28,7 @@ switch modeflag
         % for i=1:numel(N)-1
         %     fprintf('\n%1.1f<->%1.1f =>\t%g', Edges(i), Edges(i+1), N(i));
         % end
-        minN = min(N); tI = []; tV = []
+        minN = min(N); tI = []; tV = [];
         for i = 1:nE-1
             if i == nE
                 ind = find(V >= Edges(i) & V <= Edges(i+1));

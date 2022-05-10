@@ -4,7 +4,16 @@ global CV RFE MULTI MODEFL MULTILABEL VERBOSE PREPROC
 if VERBOSE && RFE.Filter.flag, fprintf('\n\nCreate feature subsets'); end
 
 [nperms, nfolds, nvar] = size(Y.Tr);
-nl = MULTILABEL.dim;
+% Do we have a multi-label situation?
+if MULTILABEL.flag
+    if isfield(MULTILABEL,'sel')
+        nl = numel(MULTILABEL.sel);
+    else
+        nl = MULTILABEL.dim;
+    end
+else
+    nl = 1;
+end
 
 SubSets = cell(nl,1);
 W = cell(nl,1);

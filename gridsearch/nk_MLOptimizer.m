@@ -19,7 +19,7 @@ lx              = inp.l;            % # of subjects
 probflag        = inp.probflag;     % translate decision values to probabilities
 Params          = inp.Params;
 Params_desc     = inp.Params_desc;
-hx              = size(label,2);    % Multi-label mode?
+nl              = nk_GetLabelDim(MULTILABEL); % Multi-label mode?
 n_preml         = inp.nPreMLparams(1) - 1 ;
 modalvec        = inp.ModalityVec;
 [ix, jx]        = size(CV(1).TrainInd);
@@ -56,20 +56,20 @@ switch MODEFL
     case 'classification'
         if RAND.Decompose == 9, binmode = 0; else binmode = 1; end    
         ngroups = numel(unique(label(~isnan(label))));
-         GDanalysis.predictions = cell(lx,nclass,hx);
+         GDanalysis.predictions = cell(lx,nclass,nl);
         if ix>1
-            GDanalysis.CV2grid.predictions      = nan(lx, ix, nclass, hx);
+            GDanalysis.CV2grid.predictions      = nan(lx, ix, nclass, nl);
             GDanalysis.CV2grid.CI_predictions   = nan(lx, 2, nclass);
-            GDanalysis.CV2grid.mean_predictions = nan(lx, nclass, hx);
-            GDanalysis.CV2grid.std_predictions  = nan(lx, nclass, hx);
-            GDanalysis.CV2grid.BAC              = nan(ix, nclass, hx);
-            GDanalysis.CV2grid.sens             = nan(ix, nclass, hx);
-            GDanalysis.CV2grid.spec             = nan(ix, nclass, hx);
-            GDanalysis.CV2grid.accuracy         = nan(ix, nclass, hx);
-            GDanalysis.CV2grid.PPV              = nan(ix, nclass, hx);
-            GDanalysis.CV2grid.NPV              = nan(ix, nclass, hx);
-            GDanalysis.CV2grid.AUC              = nan(ix, nclass, hx);
-            GDanalysis.CV2grid.DOR              = nan(ix, nclass, hx);
+            GDanalysis.CV2grid.mean_predictions = nan(lx, nclass, nl);
+            GDanalysis.CV2grid.std_predictions  = nan(lx, nclass, nl);
+            GDanalysis.CV2grid.BAC              = nan(ix, nclass, nl);
+            GDanalysis.CV2grid.sens             = nan(ix, nclass, nl);
+            GDanalysis.CV2grid.spec             = nan(ix, nclass, nl);
+            GDanalysis.CV2grid.accuracy         = nan(ix, nclass, nl);
+            GDanalysis.CV2grid.PPV              = nan(ix, nclass, nl);
+            GDanalysis.CV2grid.NPV              = nan(ix, nclass, nl);
+            GDanalysis.CV2grid.AUC              = nan(ix, nclass, nl);
+            GDanalysis.CV2grid.DOR              = nan(ix, nclass, nl);
         end
     case 'regression'
         ngroups = 1;
@@ -77,8 +77,8 @@ switch MODEFL
         if isfield(SVM,'Post') && isfield(SVM.Post,'Detrend') && SVM.Post.Detrend
             detrendfl = true;
         end
-        GDanalysis.predictions = cell(lx,1,hx);
-        GDanalysis.CV2grid.predictions = nan(lx, ix , 1, hx);
+        GDanalysis.predictions = cell(lx,1,nl);
+        GDanalysis.CV2grid.predictions = nan(lx, ix , 1, nl);
         binmode = 0;
 end
     
@@ -130,66 +130,66 @@ GDanalysis.GridAct                          = GridAct;
 GDanalysis.RootPath                         = tdir;
 GDanalysis.GDfilenames                      = cell(ix,jx);
 GDanalysis.nclass                           = nclass;
-GDanalysis.grid.mean_CVPerf                 = nan(nPs(1),nclass,ix*jx,hx);
-GDanalysis.grid.mean_TSPerf                 = nan(nPs(1),nclass,ix*jx,hx);
-GDanalysis.grid.mean_Err_CVTSPerf           = nan(nPs(1),nclass,ix*jx,hx);
-GDanalysis.grid.mean_Complexity             = nan(nPs(1),nclass,ix*jx,hx);
-GDanalysis.grid.mean_CVDiversity            = nan(nPs(1),nclass,ix*jx,hx);
-GDanalysis.grid.mean_TsDiversity            = nan(nPs(1),nclass,ix*jx,hx);
-GDanalysis.grid.SelNodeFreq                 = nan(nPs(1),nclass,ix*jx,hx);
+GDanalysis.grid.mean_CVPerf                 = nan(nPs(1),nclass,ix*jx,nl);
+GDanalysis.grid.mean_TSPerf                 = nan(nPs(1),nclass,ix*jx,nl);
+GDanalysis.grid.mean_Err_CVTSPerf           = nan(nPs(1),nclass,ix*jx,nl);
+GDanalysis.grid.mean_Complexity             = nan(nPs(1),nclass,ix*jx,nl);
+GDanalysis.grid.mean_CVDiversity            = nan(nPs(1),nclass,ix*jx,nl);
+GDanalysis.grid.mean_TsDiversity            = nan(nPs(1),nclass,ix*jx,nl);
+GDanalysis.grid.SelNodeFreq                 = nan(nPs(1),nclass,ix*jx,nl);
 
 % Some algorithms require specific variables
 switch SVM.prog
     case 'SEQOPT'
         nE = size(SVM.SEQOPT.C,2);
-        GDanalysis.grid.mean_mSEQI              = nan(nPs(1),nE-1,nclass,ix*jx,hx);
-        GDanalysis.grid.sd_mSEQI                = nan(nPs(1),nE-1,nclass,ix*jx,hx);
-        GDanalysis.grid.mean_mSEQE              = nan(nPs(1),nE,nclass,ix*jx,hx);
-        GDanalysis.grid.sd_mSEQE                = nan(nPs(1),nE,nclass,ix*jx,hx);
-        GDanalysis.grid.mean_mSEAPU             = nan(nPs(1),nE-1,nclass,ix*jx,hx);
-        GDanalysis.grid.sd_mSEQAU               = nan(nPs(1),nE-1,nclass,ix*jx,hx);
-        GDanalysis.grid.mean_mSEQAL             = nan(nPs(1),nE-1,nclass,ix*jx,hx);
-        GDanalysis.grid.sd_mSEQAL               = nan(nPs(1),nE-1,nclass,ix*jx,hx); 
-        GDanalysis.grid.mean_mSEQPU             = nan(nPs(1),nE-1,nclass,ix*jx,hx);
-        GDanalysis.grid.sd_mSEQPU               = nan(nPs(1),nE-1,nclass,ix*jx,hx);
-        GDanalysis.grid.mean_mSEQPL             = nan(nPs(1),nE-1,nclass,ix*jx,hx);
-        GDanalysis.grid.sd_mSEQPL               = nan(nPs(1),nE-1,nclass,ix*jx,hx); 
-        GDanalysis.grid.mean_SeqPerfGains       = nan(nPs(1),nE,nclass,ix*jx,hx);
-        GDanalysis.caseprops                    = cell(lx,nclass,hx);
-        GDanalysis.decvaltraj                   = cell(lx,nclass,ix,hx);
+        GDanalysis.grid.mean_mSEQI              = nan(nPs(1),nE-1,nclass,ix*jx,nl);
+        GDanalysis.grid.sd_mSEQI                = nan(nPs(1),nE-1,nclass,ix*jx,nl);
+        GDanalysis.grid.mean_mSEQE              = nan(nPs(1),nE,nclass,ix*jx,nl);
+        GDanalysis.grid.sd_mSEQE                = nan(nPs(1),nE,nclass,ix*jx,nl);
+        GDanalysis.grid.mean_mSEAPU             = nan(nPs(1),nE-1,nclass,ix*jx,nl);
+        GDanalysis.grid.sd_mSEQAU               = nan(nPs(1),nE-1,nclass,ix*jx,nl);
+        GDanalysis.grid.mean_mSEQAL             = nan(nPs(1),nE-1,nclass,ix*jx,nl);
+        GDanalysis.grid.sd_mSEQAL               = nan(nPs(1),nE-1,nclass,ix*jx,nl); 
+        GDanalysis.grid.mean_mSEQPU             = nan(nPs(1),nE-1,nclass,ix*jx,nl);
+        GDanalysis.grid.sd_mSEQPU               = nan(nPs(1),nE-1,nclass,ix*jx,nl);
+        GDanalysis.grid.mean_mSEQPL             = nan(nPs(1),nE-1,nclass,ix*jx,nl);
+        GDanalysis.grid.sd_mSEQPL               = nan(nPs(1),nE-1,nclass,ix*jx,nl); 
+        GDanalysis.grid.mean_SeqPerfGains       = nan(nPs(1),nE,nclass,ix*jx,nl);
+        GDanalysis.caseprops                    = cell(lx,nclass,nl);
+        GDanalysis.decvaltraj                   = cell(lx,nclass,ix,nl);
     case 'WBLCOX'
-        GDanalysis.grid.mean_mCutOffPerc        = zeros(nPs(1),nclass,ix*jx,hx);
-        GDanalysis.grid.mean_sdCutOffPerc       = zeros(nPs(1),nclass,ix*jx,hx);
-        GDanalysis.grid.mean_mCutOffProb        = zeros(nPs(1),nclass,ix*jx,hx);
-        GDanalysis.grid.mean_sdCutOffProb       = zeros(nPs(1),nclass,ix*jx,hx);
-        GDanalysis.predtimes                    = cell(lx,nclass,hx);
-        GDanalysis.optcutoffs                   = cell(lx,nclass,hx);
-        GDanalysis.optcutoffpercs               = cell(lx,nclass,hx);
-        GDanalysis.CV2cutoffs                   = cell(lx,nclass,hx);
+        GDanalysis.grid.mean_mCutOffPerc        = zeros(nPs(1),nclass,ix*jx,nl);
+        GDanalysis.grid.mean_sdCutOffPerc       = zeros(nPs(1),nclass,ix*jx,nl);
+        GDanalysis.grid.mean_mCutOffProb        = zeros(nPs(1),nclass,ix*jx,nl);
+        GDanalysis.grid.mean_sdCutOffProb       = zeros(nPs(1),nclass,ix*jx,nl);
+        GDanalysis.predtimes                    = cell(lx,nclass,nl);
+        GDanalysis.optcutoffs                   = cell(lx,nclass,nl);
+        GDanalysis.optcutoffpercs               = cell(lx,nclass,nl);
+        GDanalysis.CV2cutoffs                   = cell(lx,nclass,nl);
 end
 
 % ... and multi-class must be treated separately
 if MULTI.flag
-    GDanalysis.multi_bestTR             = nan(ix,jx,hx);
-    GDanalysis.multi_bestTS             = nan(ix,jx,hx);
+    GDanalysis.multi_bestTR             = nan(ix,jx,nl);
+    GDanalysis.multi_bestTS             = nan(ix,jx,nl);
     if ~MULTI.BinBind
         if isfield(GRD,'NodeSelect') && ( GRD.NodeSelect.mode == 2 || GRD.NodeSelect.mode == 3 )
-            GDanalysis.multi_bestPpos   = cell(ix*jx,hx);
+            GDanalysis.multi_bestPpos   = cell(ix*jx,nl);
         else
-            GDanalysis.multi_bestPpos   = zeros(ix*jx,hx);
+            GDanalysis.multi_bestPpos   = zeros(ix*jx,nl);
         end
     end
     GDanalysis.multi_bestP              = cell(nclass,1);
-    GDanalysis.multi_predictions        = cell(lx,hx);
-    GDanalysis.multi_CV2predictions     = cell(lx,hx);
-    GDanalysis.multi_probabilities      = cell(lx,ngroups,hx);
-    GDanalysis.multi_CV2probabilities   = cell(lx,ngroups,hx);
-    GDanalysis.grid.MultiCVPerf         = nan(nPs(1),ix*jx,hx);
-    GDanalysis.grid.MultiTSPerf         = nan(nPs(1),ix*jx,hx);
-    GDanalysis.grid.MultiERR_CVTSPerf   = nan(nPs(1),ix*jx,hx);
-    GDanalysis.grid.MultiCVDiversity    = nan(nPs(1),ix*jx,hx);
-    GDanalysis.grid.MultiTsDiversity    = nan(nPs(1),ix*jx,hx);
-    GDanalysis.grid.MultiSelNodeFreq    = nan(nPs(1),ix*jx,hx);
+    GDanalysis.multi_predictions        = cell(lx,nl);
+    GDanalysis.multi_CV2predictions     = cell(lx,nl);
+    GDanalysis.multi_probabilities      = cell(lx,ngroups,nl);
+    GDanalysis.multi_CV2probabilities   = cell(lx,ngroups,nl);
+    GDanalysis.grid.MultiCVPerf         = nan(nPs(1),ix*jx,nl);
+    GDanalysis.grid.MultiTSPerf         = nan(nPs(1),ix*jx,nl);
+    GDanalysis.grid.MultiERR_CVTSPerf   = nan(nPs(1),ix*jx,nl);
+    GDanalysis.grid.MultiCVDiversity    = nan(nPs(1),ix*jx,nl);
+    GDanalysis.grid.MultiTsDiversity    = nan(nPs(1),ix*jx,nl);
+    GDanalysis.grid.MultiSelNodeFreq    = nan(nPs(1),ix*jx,nl);
     DISP.figmulti = [];    
 end
 
@@ -202,19 +202,19 @@ GDanalysis.bestError                        = cell(nclass,1);
 
 for h=1:nclass
     
-    GDanalysis.bestTR{h}                    = zeros(ix,jx,hx);
-    GDanalysis.bestTS{h}                    = zeros(ix,jx,hx);
-    GDanalysis.bestComplexity{h}            = zeros(ix,jx,hx);
-    GDanalysis.bestError{h}                 = zeros(ix,jx,hx);
+    GDanalysis.bestTR{h}                    = zeros(ix,jx,nl);
+    GDanalysis.bestTS{h}                    = zeros(ix,jx,nl);
+    GDanalysis.bestComplexity{h}            = zeros(ix,jx,nl);
+    GDanalysis.bestError{h}                 = zeros(ix,jx,nl);
     
     if (isfield(GRD,'NodeSelect') &&  GRD.NodeSelect.mode ~= 1) || combcell
-        GDanalysis.bestP{h}                 = cell(ix*jx,hx);
-        if MULTI.flag, GDanalysis.multi_bestP{h} = cell(ix*jx,hx); end
-        GDanalysis.bestPpos{h}              = cell(ix*jx,hx);
+        GDanalysis.bestP{h}                 = cell(ix*jx,nl);
+        if MULTI.flag, GDanalysis.multi_bestP{h} = cell(ix*jx,nl); end
+        GDanalysis.bestPpos{h}              = cell(ix*jx,nl);
     else
-        GDanalysis.bestP{h}                 = zeros(ix*jx,nPdims(h),hx);
-        if MULTI.flag, GDanalysis.multi_bestP{h} = zeros(ix*jx,nPdims(h),hx); end
-        GDanalysis.bestPpos{h}              = zeros(ix*jx,hx);
+        GDanalysis.bestP{h}                 = zeros(ix*jx,nPdims(h),nl);
+        if MULTI.flag, GDanalysis.multi_bestP{h} = zeros(ix*jx,nPdims(h),nl); end
+        GDanalysis.bestPpos{h}              = zeros(ix*jx,nl);
     end
 end
 [~, ~, ~, ~, act] = nk_ReturnEvalOperator(SVM.GridParam);
@@ -227,7 +227,7 @@ end
 paramfl         = struct('use_exist',true,'found', false, 'write', true);
 
 % Multi-label mode?
-if hx>1, MULTILABEL.flag = true; end
+if nl>1, MULTILABEL.flag = true; end
 
 ol = 0; ll = 1; GridUsed = false(size(GridAct)); 
 
@@ -357,88 +357,88 @@ for f=1:ix % Loop through CV2 permutations
 
             % %%%%%%%%%%%%%%%%%%%%% PREPARATIONS %%%%%%%%%%%%%%%%%%%%%%
             % CV1 test data performance measures
-            GD.TR       = zeros(nPs(1),nclass,hx);
+            GD.TR       = zeros(nPs(1),nclass,nl);
 
             % CV2 test data performance measures
-            GD.TS       = zeros(nPs(1),nclass,hx); 
-            GD.mTS      = zeros(nPs(1),nclass,hx); % mean ?
-            GD.sTS      = zeros(nPs(1),nclass,hx); % sd ?
+            GD.TS       = zeros(nPs(1),nclass,nl); 
+            GD.mTS      = zeros(nPs(1),nclass,nl); % mean ?
+            GD.sTS      = zeros(nPs(1),nclass,nl); % sd ?
 
             % Generalization error between CV1 and CV2 test data
-            GD.ERR      = zeros(nPs(1),nclass,hx);
+            GD.ERR      = zeros(nPs(1),nclass,nl);
 
             % Final binary classifier / predictor results on CV2 test
             % data
-            GD.BinPred  = cell(nPs(1),hx);
+            GD.BinPred  = cell(nPs(1),nl);
 
             % Multi-group classification measures
             if MULTI.flag
-               GD.MultiTR       =  zeros(nPs(1),hx); % performance on CV1 test data
-               GD.MultiTS       =  zeros(nPs(1),hx); % performance on CV2 test data
-               GD.MultiERR      = zeros(nPs(1),hx); % generalization error
-               GD.MultiCV1TrPred= cell(nPs(1),hx); % CV1 traindata predictions
-               GD.MultiCV1CVPred= cell(nPs(1),hx); % CV1 test data predictions
-               GD.MultiCV1TrProb= cell(nPs(1),ngroups,hx); % CV1 traindata predictions
-               GD.MultiCV1CVProb= cell(nPs(1),ngroups,hx); % CV1 test data predictions
-               GD.MultiPred     = cell(nPs(1),hx); % CV2 test data predictions
-               GD.MultiM_DivT   = zeros(nPs(1),hx);
-               GD.MultiSD_DivT  = zeros(nPs(1),hx);             
-               GD.MultiM_DivV   = zeros(nPs(1),hx);
-               GD.MultiSD_DivV  = zeros(nPs(1),hx);
-               GD.MultiCV2Div   = zeros(nPs(1),hx);
-               GD.MultiCV2DivDec= zeros(nPs(1),hx);
+               GD.MultiTR       =  zeros(nPs(1),nl); % performance on CV1 test data
+               GD.MultiTS       =  zeros(nPs(1),nl); % performance on CV2 test data
+               GD.MultiERR      = zeros(nPs(1),nl); % generalization error
+               GD.MultiCV1TrPred= cell(nPs(1),nl); % CV1 traindata predictions
+               GD.MultiCV1CVPred= cell(nPs(1),nl); % CV1 test data predictions
+               GD.MultiCV1TrProb= cell(nPs(1),ngroups,nl); % CV1 traindata predictions
+               GD.MultiCV1CVProb= cell(nPs(1),ngroups,nl); % CV1 test data predictions
+               GD.MultiPred     = cell(nPs(1),nl); % CV2 test data predictions
+               GD.MultiM_DivT   = zeros(nPs(1),nl);
+               GD.MultiSD_DivT  = zeros(nPs(1),nl);             
+               GD.MultiM_DivV   = zeros(nPs(1),nl);
+               GD.MultiSD_DivV  = zeros(nPs(1),nl);
+               GD.MultiCV2Div   = zeros(nPs(1),nl);
+               GD.MultiCV2DivDec= zeros(nPs(1),nl);
             end
 
             % Mean model complexity across CV1 partitions
-            GD.C        = zeros(nPs(1),nclass,hx);
+            GD.C        = zeros(nPs(1),nclass,nl);
 
             % Diversity measures for CV1 and CV2 test data
-            GD.M_DivT   = zeros(nPs(1),nclass,hx);
-            GD.SD_DivT  = zeros(nPs(1),nclass,hx);             
-            GD.M_DivV   = zeros(nPs(1),nclass,hx);
-            GD.SD_DivV  = zeros(nPs(1),nclass,hx);
-            GD.CV2Div   = zeros(nPs(1),nclass,hx);
-            GD.CV2DivDec= zeros(nPs(1),nclass,hx);
+            GD.M_DivT   = zeros(nPs(1),nclass,nl);
+            GD.SD_DivT  = zeros(nPs(1),nclass,nl);             
+            GD.M_DivV   = zeros(nPs(1),nclass,nl);
+            GD.SD_DivV  = zeros(nPs(1),nclass,nl);
+            GD.CV2Div   = zeros(nPs(1),nclass,nl);
+            GD.CV2DivDec= zeros(nPs(1),nclass,nl);
 
             % Models params
-            MD          = cell(nPs(1),hx);  % models
-            GD.FEAT     = cell(nPs(1),hx);  % selected features for model in MD
-            GD.VI       = cell(nPs(1),hx);
-            GD.Weights  = cell(nPs(1),hx);  % weights for base learners' predictions
+            MD          = cell(nPs(1),nl);  % models
+            GD.FEAT     = cell(nPs(1),nl);  % selected features for model in MD
+            GD.VI       = cell(nPs(1),nl);
+            GD.Weights  = cell(nPs(1),nl);  % weights for base learners' predictions
 
             % Decision values / Probabilities of CV1 training & test data and CV2 test data
-            GD.DT       = cell(nPs(1),hx);  % CV1 training data
-            GD.DV       = cell(nPs(1),hx);  % CV1 test data          
-            GD.DS       = cell(nPs(1),hx);  % CV2 test data
+            GD.DT       = cell(nPs(1),nl);  % CV1 training data
+            GD.DV       = cell(nPs(1),nl);  % CV1 test data          
+            GD.DS       = cell(nPs(1),nl);  % CV2 test data
             
             % For sequence optimizer only
             switch SVM.prog
                case 'SEQOPT'
-                   GD.mSEQI = cell(nPs(1), nclass, hx);
-                   GD.sdSEQI = cell(nPs(1),nclass, hx);
-                   GD.mSEQE = cell(nPs(1), nclass, hx);  
-                   GD.sdSEQE = cell(nPs(1), nclass, hx); 
-                   GD.mSEQAbsThrU = cell(nPs(1), nclass, hx);
-                   GD.sdSEQAbsThrU = cell(nPs(1), nclass, hx);
-                   GD.mSEQAbsThrL = cell(nPs(1), nclass, hx);
-                   GD.sdSEQAbsThrL = cell(nPs(1), nclass, hx);
-                   GD.mSEQPercThrU = cell(nPs(1), nclass, hx);
-                   GD.sdSEQPercThrU = cell(nPs(1), nclass, hx);
-                   GD.mSEQPercThrL = cell(nPs(1), nclass, hx);
-                   GD.sdSEQPercThrL = cell(nPs(1), nclass, hx);
-                   GD.CasePropagations = cell(nPs(1), nclass, hx);
-                   GD.DecValTraj = cell(nPs(1), nclass, hx);
+                   GD.mSEQI = cell(nPs(1), nclass, nl);
+                   GD.sdSEQI = cell(nPs(1),nclass, nl);
+                   GD.mSEQE = cell(nPs(1), nclass, nl);  
+                   GD.sdSEQE = cell(nPs(1), nclass, nl); 
+                   GD.mSEQAbsThrU = cell(nPs(1), nclass, nl);
+                   GD.sdSEQAbsThrU = cell(nPs(1), nclass, nl);
+                   GD.mSEQAbsThrL = cell(nPs(1), nclass, nl);
+                   GD.sdSEQAbsThrL = cell(nPs(1), nclass, nl);
+                   GD.mSEQPercThrU = cell(nPs(1), nclass, nl);
+                   GD.sdSEQPercThrU = cell(nPs(1), nclass, nl);
+                   GD.mSEQPercThrL = cell(nPs(1), nclass, nl);
+                   GD.sdSEQPercThrL = cell(nPs(1), nclass, nl);
+                   GD.CasePropagations = cell(nPs(1), nclass, nl);
+                   GD.DecValTraj = cell(nPs(1), nclass, nl);
                 case 'WBLCOX'
-                   GD.mCutOffPerc = zeros(nPs(1), nclass, hx);
-                   GD.sdCutOffPerc = zeros(nPs(1),nclass, hx);
-                   GD.mCutOffProb = zeros(nPs(1), nclass, hx);  
-                   GD.sdCutOffProb = zeros(nPs(1), nclass, hx);
-                   GD.CV2Cutoffs = cell(nPs(1), nclass, hx);
-                   GD.CV1predictedtimes = cell(nPs(1), nclass, hx);
-                   GD.CV2predictedtimes = cell(nPs(1), nclass, hx);
+                   GD.mCutOffPerc = zeros(nPs(1), nclass, nl);
+                   GD.sdCutOffPerc = zeros(nPs(1),nclass, nl);
+                   GD.mCutOffProb = zeros(nPs(1), nclass, nl);  
+                   GD.sdCutOffProb = zeros(nPs(1), nclass, nl);
+                   GD.CV2Cutoffs = cell(nPs(1), nclass, nl);
+                   GD.CV1predictedtimes = cell(nPs(1), nclass, nl);
+                   GD.CV2predictedtimes = cell(nPs(1), nclass, nl);
             end
 
-            if detrendfl, GD.Detrend = cell(nPs(1),hx); end
+            if detrendfl, GD.Detrend = cell(nPs(1),nl); end
             if isfield(RFE.Wrapper,'optflag') && RFE.Wrapper.optflag == 1, RFE.Wrapper.flag = 0; end
             
             %%%%%%%%%%%%%%%% PARAMETER OPTIMIZATION %%%%%%%%%%%%%%%%
@@ -465,7 +465,7 @@ for f=1:ix % Loop through CV2 permutations
 
             tGD = GD;
 
-            if ~exist('MD','var'), MD = cell(nPs(1),hx); end
+            if ~exist('MD','var'), MD = cell(nPs(1),nl); end
 
             % if no mapY has been transmitted ask user
             if ~exist('mapY','var')
@@ -597,7 +597,17 @@ for f=1:ix % Loop through CV2 permutations
 
             for curclass=1:nclass
                 
-                for curlabel=1:MULTILABEL.dim
+                if MULTILABEL.flag
+                    if isfield(MULTILABEL,'sel')
+                        nl = numel(MULTILABEL.sel);
+                    else
+                        nl = MULTILABEL.dim;
+                    end
+                else
+                    nl = 1;
+                end
+                for curlabel=1:nl
+
                     GDanalysis.grid.SelNodeFreq(:,curclass,ll,curlabel) = GD.BinaryGridSelection{curclass}{curlabel}.SelNodes;
 
                     % Best performance measures
@@ -704,7 +714,7 @@ for f=1:ix % Loop through CV2 permutations
                                     mDecValTraj = nm_nanmedian(DecValTraj,3);
                                 else
                                     mCaseProps = GD.CasePropagations{fSelNodes};
-                                    mDecValTraj = nanmedian(GD.DecValTraj{fSelNodes},3);
+                                    mDecValTraj = nm_nanmedian(GD.DecValTraj{fSelNodes},3);
                                 end
                                 GDanalysis.caseprops(TsI, curclass, curlabel) = cellmat_mergecols(GDanalysis.caseprops(TsI, curclass,curlabel), num2cell(mCaseProps,2));
                                 GDanalysis.decvaltraj(TsI, curclass, f, curlabel) = cellmat_mergecols(GDanalysis.decvaltraj(TsI, curclass, f, curlabel), num2cell(mDecValTraj,2));
@@ -904,8 +914,11 @@ if GDfl || ~batchflag
     % ********************** ANALYSIS ACROSS PERMS ************************
     switch MODEFL
         case 'regression'
-
-            GDanalysis.Regr = nk_ComputeEnsembleProbability(GDanalysis.predictions(:,1,:), inp.label);
+            lb = inp.label;
+            if MULTILABEL.flag && isfield(MULTILABEL,'sel')
+               lb = inp.label(:,MULTILABEL.sel);
+            end
+            GDanalysis.Regr = nk_ComputeEnsembleProbability(GDanalysis.predictions(:,1,:), lb);
 
         case 'classification'
             

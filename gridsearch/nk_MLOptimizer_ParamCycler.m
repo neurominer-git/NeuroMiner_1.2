@@ -49,11 +49,7 @@ if npreml>-1
 end
 
 % Do we have a multi-label situation?
-if MULTILABEL.flag
-    nl = MULTILABEL.dim;
-else
-    nl = 1;
-end
+nl = nk_GetLabelDim(MULTILABEL);
 
 tElapsedSum = 0; ii = [];
 tic
@@ -62,9 +58,13 @@ if nPs>1, fprintf('\n === Performing hyperparameter optimization === \n'); else,
      
 % Loop through all available labels
 for curlabel=1:nl
-    
-    if nl>1
-        labelstr = sprintf('Label #%g: %s | ',curlabel, MULTILABEL.desc{curlabel});
+    cl = MULTILABEL.sel(curlabel);
+    if MULTILABEL.flag
+        if nl>1
+            labelstr = sprintf('Label #%g: %s | ', cl, MULTILABEL.desc{cl});
+        else
+            labelstr = sprintf('Label %s | ', MULTILABEL.desc{cl});
+        end
     end
     MULTILABEL.curdim = curlabel;
     

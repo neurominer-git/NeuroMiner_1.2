@@ -311,6 +311,8 @@ end
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
 
 %%%%%%%%%%%%%%%%%%%%%%% RUN VISUALIZATION ANALYSIS  %%%%%%%%%%%%%%%%%%%%%%%
+nl = nk_GetLabelDim(MULTILABEL);
+
 for i = 1:nF
     inp2            = nk_SetFusionMode2(dat, analysis, F, nF, i);
     inp             = catstruct(inp1,inp2); clear inp2;
@@ -320,7 +322,7 @@ for i = 1:nF
     % (30.12.2018)
     if isfield(VIS,'norm'), inp.norm = VIS.norm; else, inp.norm = 1; end
 
-    for j = 1:MULTILABEL.dim
+    for j = 1:nl
         if MULTILABEL.flag && MULTILABEL.dim>1, 
             fprintf('\n\n');cprintf('*black','====== Working on label #%g ====== ',j); inp.curlabel = j; 
         end

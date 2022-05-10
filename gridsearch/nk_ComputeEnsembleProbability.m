@@ -4,10 +4,9 @@
 % (c) Nikolaos Koutsouleris, 4/2012
 function results = nk_ComputeEnsembleProbability(predictions, label, noscale, optcutoff, optcutoffperc, meanfun)
 
-global SCALE MODEFL RAND EVALFUNC MULTILABEL
+global SCALE MODEFL RAND EVALFUNC 
 
 if isempty(MODEFL), MODEFL = nk_input('Select prediction framework', 0, 'classification|regression'); end
-if isempty(MULTILABEL), MULTILABEL.dim = size(predictions,2); end
 if ~exist('label','var'), label = []; end
 if ~exist('noscale','var'), noscale=[]; end
 if ~exist('optcutoff','var'), optcutoff=[]; end
@@ -41,30 +40,32 @@ if isempty(EVALFUNC)
 end
 
 lx      = length(predictions);
-results.num_predictions = zeros(lx,MULTILABEL.dim);
+nl      = size(label,2);
+
+results.num_predictions = zeros(lx,nl);
 
 % Index to ~nan predictions
-results.index_predictions = false(lx,MULTILABEL.dim);
+results.index_predictions = false(lx,nl);
 
 % Mean prediction
-results.mean_predictions = nan(lx,MULTILABEL.dim);
+results.mean_predictions = nan(lx,nl);
 
 % STD of prediction
-results.std_predictions = zeros(lx,MULTILABEL.dim);
+results.std_predictions = zeros(lx,nl);
 
 % Confidence intervals of predictions
-results.CI1_predictions = zeros(lx,MULTILABEL.dim); 
-results.CI2_predictions = zeros(lx,MULTILABEL.dim);
+results.CI1_predictions = zeros(lx,nl); 
+results.CI2_predictions = zeros(lx,nl);
 
 if ~isempty(label)
     switch MODEFL
         case 'regression'
-            results.R2          = zeros(1,MULTILABEL.dim);
-            results.r           = zeros(1,MULTILABEL.dim);
-            results.p           = zeros(1,MULTILABEL.dim);
-            results.r_95CI_low  = zeros(1,MULTILABEL.dim);
-            results.r_95CI_up   = zeros(1,MULTILABEL.dim);
-            results.t           = zeros(1,MULTILABEL.dim);
+            results.R2          = zeros(1,nl);
+            results.r           = zeros(1,nl);
+            results.p           = zeros(1,nl);
+            results.r_95CI_low  = zeros(1,nl);
+            results.r_95CI_up   = zeros(1,nl);
+            results.t           = zeros(1,nl);
         case 'classification'
     end
 end
@@ -75,7 +76,7 @@ else
 end
 if targscale, IN.revertflag = true; end
 
-for curlabel=1:MULTILABEL.dim
+for curlabel=1:nl
     
     pred    = nan(lx,1); stdpred = pred; ci1 = pred; ci2 = pred;
     numpred = zeros(lx,1);
