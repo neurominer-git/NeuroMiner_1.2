@@ -47,10 +47,6 @@ if ~multiflag
         handles.selVisMeas.String = popuplist; 
         VisOnFl = 'on';
         VisElFl = 'on';
-    else
-        VisOnFl = 'off';
-        VisElFl = 'off';
-        handles.curmodal = size(handles.visdata,1);
     end
     
 else
@@ -72,10 +68,8 @@ end
 handles.selVisMeas.Enable = VisOnFl; 
 switch handles.params.TrainParam.FUSION.flag
     case 3
-        handles.selModality.Enable = 'off';
     otherwise
         handles.selModality.Enable = VisElFl;
-end
 handles.selPager.Enable = VisElFl;
 handles.tglSortFeat.Enable = VisElFl;
 handles.cmdExportFeats.Enable = VisElFl;

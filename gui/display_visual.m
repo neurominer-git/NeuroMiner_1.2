@@ -4,7 +4,7 @@
 function handles = display_visual(handles)
 global st
 st.ParentFig    = handles.figure1;
-varind          = handles.selModality.Value;
+varind          = handles.curmodal;
 measind         = handles.selVisMeas.Value;
 meas            = handles.selVisMeas.String;
 load_selPager(handles)
@@ -21,7 +21,7 @@ set(handles.axes33,'TickLabelInterpreter','none')
 CorrMatStr = {'Correlation matrix', 'Correlation matrix (P value)','Correlation matrix (P value, FDR)'};
 NetworkCorrMatStr = {'Network plot correlation matrix', 'Network plot correlation matrix (P value)', 'Network plot correlation matrix (P value, FDR)'};
 
-v = handles.visdata{handles.curlabel}{varind};
+v = handles.visdata{varind,handles.curlabel};
 if v.params.visflag == 1
     featind = 1:v.params.nfeats;
 else
@@ -645,12 +645,12 @@ switch meas{measind}
                 handles.axes33.YLim = [ x(1)-0.5 x(end)+0.5 ];
                 handles.axes33.XLim = [miny-ylimoff maxy+ylimoff ];
                 handles.axes33.XTickMode='auto';
-                if numel(ind) ~= numel(handles.visdata_table(handles.curlabel, handles.curmodal).tbl.ind)
+                if numel(ind) ~= numel(handles.visdata_table(handles.curmodal,handles.curlabel).tbl.ind)
                     act = 'create';
                 else
                     act = 'reorder';
                 end
-                handles.visdata_table(handles.curlabel, handles.curmodal) = create_visdata_tables(v, handles.visdata_table(handles.curlabel, handles.curmodal), ind, act);
+                handles.visdata_table(handles.curlabel, handles.curmodal) = create_visdata_tables(v, handles.visdata_table(handles.curmodal,handles.curlabel), ind, act);
 
             case 1
                 st.fig = handles.pn3DView; 

@@ -311,8 +311,8 @@ end
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
 
 %%%%%%%%%%%%%%%%%%%%%%% RUN VISUALIZATION ANALYSIS  %%%%%%%%%%%%%%%%%%%%%%%
-nl = nk_GetLabelDim(MULTILABEL);
-
+nL = nk_GetLabelDim(MULTILABEL);
+analysis.visdata = cell(nF,nL);
 for i = 1:nF
     inp2            = nk_SetFusionMode2(dat, analysis, F, nF, i);
     inp             = catstruct(inp1,inp2); clear inp2;
@@ -321,12 +321,21 @@ for i = 1:nF
     % Per default do not activate normalization of the weight vector
     % (30.12.2018)
     if isfield(VIS,'norm'), inp.norm = VIS.norm; else, inp.norm = 1; end
-
-    for j = 1:nl
+    for j = 1:nL
         if MULTILABEL.flag && MULTILABEL.dim>1, 
-            fprintf('\n\n');cprintf('*black','====== Working on label #%g ====== ',j); inp.curlabel = j; 
+            fprintf('\n\n====== Working on label #%g ====== ',j); inp.curlabel = j; 
         end
-        analysis.visdata{i,j} = nk_VisModels(inp, dat.id, inp.GridAct);
+        vis = nk_VisModels(inp, dat.id, inp.GridAct);
+        % we have to map the results to the visdata container in a uniform
+        % way to ease results inspection later.
+        switch FUSION.flag
+            case {0,3}
+                analysis.visdata{i,j} = vis{1};
+            case {1,2}
+                for k=1:numel(F)
+                    analysis.visdata{k,j} = vis{k};
+                end
+        end
     end
 end
 

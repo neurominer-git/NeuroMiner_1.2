@@ -618,6 +618,7 @@ function selModality_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns selModality contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from selModality
 
+handles.curmodal = hObject.Value;
 handles = display_visual(handles);
 guidata(handles.figure1,handles);
 
@@ -1132,6 +1133,7 @@ function selSubParam_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns selSubParam contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from selSubParam
 
+if handles.curmodal <= numel(handles.params.TrainParam.FUSION.M)
 handles = display_SubParam(handles);
 
 % --- Executes during object creation, after setting all properties.

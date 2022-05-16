@@ -32,8 +32,8 @@ end
 na_str = '?'; inp.datatype = 'VISdatamat'; 
 % Resolves bug when running in batch mode
 if ~isfield(inp,'extraL') , inp.extraL=[]; end
-OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; LoadStr = []; SaveStr = [];ExtraLStr = []; CV1OpStr = [];
-OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = [];ExtraLAct = []; CV1OpAct = [];
+OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; LoadStr = []; SaveStr = [];ExtraLStr = []; CV1OpStr = []; WriteCV2str = []; 
+OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = [];ExtraLAct = []; CV1OpAct = []; WriteCV2Act = []; 
 
 %% Configure menu
 if numel(NM.analysis)>1
@@ -90,9 +90,11 @@ if ~isempty(analysis)
     end 
 
     % Configure write out of CV2 partition maps (for imaging analyses only)
-    WRITECV2_opts     = {'yes','no'};       
-    WriteCV2str = sprintf('Write CVR, sign-based consistency maps (FDR) and masked CVR images [ %s ]|', ...
-        WRITECV2_opts{inp.writeCV2}) ;                                                                                       WriteCV2Act = 13; 
+    if nk_CheckContainsImagingData(NM, inp.analind)
+        WRITECV2_opts     = {'yes','no'};       
+        WriteCV2str = sprintf('Write CVR, sign-based consistency maps (FDR) and masked CVR images [ %s ]|', ...
+            WRITECV2_opts{inp.writeCV2}) ;                                                                                       WriteCV2Act = 13;  
+    end
 
     % Configure loading of pre-existing parameters and models
     if inp.saveparam == 2 && inp.lfl == 1 && inp.CV1==2
@@ -168,7 +170,7 @@ if ~disallow, menustr = [menustr '|PROCEED >>>']; menuact = [menuact 99]; end
 
 %% Display menu and act on user selections
 nk_PrintLogo
-mestr = 'Visualization module run-time configuration'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>>',parentstr);
+mestr = 'Visualization module run-time configuration'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
 if inp.batchflag == 2, act = nk_input(mestr, 0, 'mq', menustr, menuact); end
 
 switch act
@@ -309,6 +311,8 @@ end
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
 
 %%%%%%%%%%%%%%%%%%%%%%% RUN VISUALIZATION ANALYSIS  %%%%%%%%%%%%%%%%%%%%%%%
+nL = nk_GetLabelDim(MULTILABEL);
+analysis.visdata = cell(nF,nL);
 for i = 1:nF
     inp2            = nk_SetFusionMode2(dat, analysis, F, nF, i);
     inp             = catstruct(inp1,inp2); clear inp2;
@@ -317,12 +321,21 @@ for i = 1:nF
     % Per default do not activate normalization of the weight vector
     % (30.12.2018)
     if isfield(VIS,'norm'), inp.norm = VIS.norm; else, inp.norm = 1; end
-
-    for j = 1:MULTILABEL.dim
+    for j = 1:nL
         if MULTILABEL.flag && MULTILABEL.dim>1, 
-            fprintf('\n\n');cprintf('*black','====== Working on label #%g ====== ',j); inp.curlabel = j; 
+            fprintf('\n\n====== Working on label #%g ====== ',j); inp.curlabel = j; 
         end
-        analysis.visdata{i,j} = nk_VisModels(inp, dat.id, inp.GridAct);
+        vis = nk_VisModels(inp, dat.id, inp.GridAct);
+        % we have to map the results to the visdata container in a uniform
+        % way t
+        switch FUSION.flag
+            case {0,3}
+                analysis.visdata{i,j} = vis{1};
+            case {1,2}
+                for k=1:numel(F)
+                    analysis.visdata{k,j} = vis{k};
+                end
+        end
     end
 end
 

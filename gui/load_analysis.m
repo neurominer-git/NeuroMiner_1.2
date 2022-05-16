@@ -21,12 +21,11 @@ for i = 1:nVarIn
     elseif strcmpi(varargin{i}, 'Visdata')
     
         vis = varargin{i+1};
-        if ~isempty( vis  )
-            nL = numel(vis);
-            nM = numel(vis{1});
-            for n=1:nL
-                for m=1:nM
-                    handles.visdata_table(n, m) = create_visdata_tables(vis{n}{m}, [], [], 'create');
+        if ~isempty(vis)
+            [nM, nL] = size(vis);
+            for n=1:nM
+                for m=1:nL
+                    handles.visdata_table(n, m) = create_visdata_tables(vis{n,m}, [], [], 'create');
                 end
             end
             handles.visdata = vis;
