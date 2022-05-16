@@ -31,7 +31,7 @@ function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P
 % W :           weight vector in processed feature space
 % mPA :
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2021
+% (c) Nikolaos Koutsouleris, 05/2022
 
 global SVM %TEMPL
 
@@ -99,7 +99,7 @@ for n=1:nM
         lVI = true(size(Fu)); 
     end
     
-    lFuVI = Fu & lVI; fVI = find(lVI); nmP = Fu(fVI);
+    lFuVI = find(Fu & lVI); fVI = find(lVI); nmP = Fu(fVI);
     nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
     if ~isempty(PA)
          nmPA = nan(numel(fVI),1); nmPA(nmP) = PA(lFuVI);
@@ -201,7 +201,7 @@ for n=1:nM
                             % Don't forget to adjust the feature masks and the
                             % indices to modalities in case of fused feature spaces
                             %tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(naPX.indNonRem) = lFuVI; lFuVI = tlFuVI;
-                            %tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = lVI; lVI = tlVI;
+                            %tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = fVI; fVI = tlVI;
                             clear tmW tmP %tlFuVI tlVI;
                         end
                         reducedimfl = true;
@@ -234,7 +234,7 @@ for n=1:nM
                     % indices to modalities in case of fused feature spaces
                     if ~reducedimfl
                         tlFuVI = false(length(pIND),1); tlFuVI(pIND) = lFuVI; lFuVI = tlFuVI;
-                        tlVI = true(length(pIND),1); tlVI(pIND) = lVI; lVI = tlVI;
+                        tlVI = true(length(pIND),1); tlVI(pIND) = fVI; fVI = tlVI;
                     end
             end
 
@@ -294,7 +294,7 @@ for n=1:nM
                     mSR{n} = zeros(size(nmW,1),1);
                     mC{n} = zeros(size(nmW,1),size(nmW,1));
                 end
-                IX = lFuVI(lVI);
+                IX = lFuVI(fVI);
                 if numel(nmR)~=numel(IX)
                     mR{n}(IX) = nmR;
                     mSR{n}(IX) = nmSR; 
@@ -313,7 +313,7 @@ for n=1:nM
     else
         nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
         if ~isempty(PA), 
-             nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI(lVI));
+             nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI(fVI));
         end
         if mM>1 % intermediate / late fusion
             mW{n} = nmW;

@@ -17,4 +17,4 @@ function W = nk_WeigthDataInstanceHisto(L)
 % ind = L == cbin(i+1);
 % W(ind) = nbin(i);
 
-W = nk_ScaleData(abs(L - median(L)),0,1);
+W = nk_ScaleData(abs(L - median(L)),0,1).^3;
