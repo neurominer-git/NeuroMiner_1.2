@@ -215,7 +215,7 @@ if ~defaultsfl
                         end
                     case 'classification'
                         EQstr = ['Equalize class sizes at the CV1 cycle by undersampling [ ' enabledstr addremoved2teststr ' ]|']; 
-                        if NM.TrainParam.RAND.Eq.enabled
+                        if isfield(NM.TrainParam.RAND,'Eq') && NM.TrainParam.RAND.Eq.enabled
                             EQposnegstr  = sprintf('Define positive/negative ratio after equalization (1=>same amount of positive/negative cases) [ %g ]', EQ.posnegrat);
                             EQshufflestr = sprintf('Shuffle removed observations to CV1 test data [ %s ]', shufflestr{addremoved2test});
                             MenuVec = [MenuVec 17 18 ];

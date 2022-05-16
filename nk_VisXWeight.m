@@ -99,7 +99,7 @@ for n=1:nM
         lVI = true(size(Fu)); 
     end
     
-    lFuVI = find(Fu & lVI); fVI = find(lVI); nmP = Fu(fVI);
+    lFuVI = find(Fu(lVI)); fVI = find(lVI); nmP = Fu(fVI);
     nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
     if ~isempty(PA)
          nmPA = nan(numel(fVI),1); nmPA(nmP) = PA(lFuVI);
@@ -294,16 +294,9 @@ for n=1:nM
                     mSR{n} = zeros(size(nmW,1),1);
                     mC{n} = zeros(size(nmW,1),size(nmW,1));
                 end
-                IX = lFuVI(fVI);
-                if numel(nmR)~=numel(IX)
-                    mR{n}(IX) = nmR;
-                    mSR{n}(IX) = nmSR; 
-                    mC{n}(IX,IX) = nmC;
-                else
-                    mR{n}(IX) = nmR(IX);
-                    mSR{n}(IX) = nmSR(IX); 
-                    mC{n}(IX,IX) = nmC(IX,IX);
-                end
+                mR{n}(lFuVI) = nmR(lFuVI);
+                mSR{n}(lFuVI) = nmSR(lFuVI); 
+                mC{n}(lFuVI,lFuVI) = nmC(lFuVI,lFuVI);
             else
                 mR{n} = nmR;
                 mSR{n} = nmSR; 
@@ -313,7 +306,7 @@ for n=1:nM
     else
         nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
         if ~isempty(PA), 
-             nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI(fVI));
+             nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI);
         end
         if mM>1 % intermediate / late fusion
             mW{n} = nmW;

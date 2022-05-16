@@ -645,7 +645,12 @@ switch meas{measind}
                 handles.axes33.YLim = [ x(1)-0.5 x(end)+0.5 ];
                 handles.axes33.XLim = [miny-ylimoff maxy+ylimoff ];
                 handles.axes33.XTickMode='auto';
-                handles.visdata_table(handles.curlabel, handles.curmodal) = create_visdata_tables(v, handles.visdata_table(handles.curlabel, handles.curmodal), ind, 'reorder');
+                if numel(ind) ~= numel(handles.visdata_table(handles.curlabel, handles.curmodal).tbl.ind)
+                    act = 'create';
+                else
+                    act = 'reorder';
+                end
+                handles.visdata_table(handles.curlabel, handles.curmodal) = create_visdata_tables(v, handles.visdata_table(handles.curlabel, handles.curmodal), ind, act);
 
             case 1
                 st.fig = handles.pn3DView; 

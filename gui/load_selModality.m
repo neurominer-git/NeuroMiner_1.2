@@ -13,7 +13,11 @@ if ~multiflag
         popuplist{i} = sprintf('Modality %g: %s', i, handles.NM.datadescriptor{handles.visdata{handles.curlabel}{i}.params.varind}.desc);
     end
     handles.selModality.String = popuplist;
-    v = handles.visdata{handles.curlabel}{handles.curmodal};
+    try
+        v = handles.visdata{handles.curlabel}{handles.curmodal};
+    catch
+        v = handles.visdata{handles.curmodal};
+    end
     popuplist=[];
     if isfield(v,'MEAN'),                      popuplist{1} = 'Feature weights [Overall Mean (StErr)]';                        end
     if isfield(v,'MEAN_CV2'),                  popuplist{end+1} = 'Feature weights [Grand Mean (StErr)]';                      end
