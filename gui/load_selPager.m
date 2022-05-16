@@ -7,7 +7,7 @@ else
     multiflag = false;
 end
 
-if handles.visdata{handles.curmodal, handles.curlabel}.params.visflag ~= 1 && ~multiflag && handles.curmodal<= size(handles.visdata,1)
+if handles.curmodal<= size(handles.visdata,1) && handles.visdata{handles.curmodal, handles.curlabel}.params.visflag ~= 1 && ~multiflag 
     nfeats = handles.visdata{handles.curmodal,handles.curlabel}.params.nfeats;
     if nfeats > perpage
         vec = 1:perpage:nfeats;

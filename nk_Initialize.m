@@ -19,7 +19,7 @@ NMinfo.info.author  = 'Nikolaos Koutsouleris, Clara Vetter, Ariane Wiegand';
 NMinfo.info.affil   = 'Section for Precision Psychiatry';
 NMinfo.info.dep     = 'Department of Psychiatry and Psychotherapy';
 NMinfo.info.inst    = 'Ludwig-Maximilian-University';
-NMinfo.info.datever = '04/2022';
+NMinfo.info.datever = '05/2022';
 NMinfo.info.timestamp = date;
 NMinfo.info.email   = 'nm@pronia.eu';
 try
