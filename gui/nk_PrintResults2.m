@@ -1134,7 +1134,9 @@ function selSubParam_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from selSubParam
 
 if handles.curmodal <= numel(handles.params.TrainParam.FUSION.M)
-handles = display_SubParam(handles);
+    handles = display_SubParam(handles);
+    guidata(handles.figure1,handles);
+end
 
 % --- Executes during object creation, after setting all properties.
 function selSubParam_CreateFcn(hObject, eventdata, handles)
