@@ -1,5 +1,6 @@
 function nkdev_MakeTransparent(Y, L, IN)
 global SVM
+
 if ~isfield(IN, 'RAND') || isempty(IN.RAND)
 	% Setup permutation parameters
 	IN.RAND.OuterPerm = 1;
@@ -17,7 +18,7 @@ end
 LIBSVMTRAIN = @svmtrain312;
 LIBSVMPREDICT = @svmpredict312;
 
-switch algorithm
+switch IN.algorithm
 	case 'LINKERNSVM'
 		SVM.prog = 'LIBSVM';
 		SVM.(SVM.prog).Weighting = 1;
@@ -83,11 +84,11 @@ for j=1:pCV
             % Scale / standardize matrix using NM and do it properly within the cross-validation cycle
 			switch SCALEMODE
 				case 'scale'
-                    if verbose, fprintf('\nScale data mtrix.'); end
+                    if verbose, fprintf('\nScale data matrix.'); end
 					[Tr_Y, INi] = nk_PerfScaleObj(Y(Tr,:)); % Train scaling model
 					Ts_Y = nk_PerfScaleObj(Y(Ts,:), INi); % Apply it to the test data
 				case 'std'
-                    if verbose, fprintf('\nStandardize data mtrix.'); end
+                    if verbose, fprintf('\nStandardize data matrix.'); end
 					[Tr_Y, INi] = nk_PerfStandardizeObj(Y(Tr,:)); % Train standardization model
 					Ts_Y = nk_PerfStandardizeObj(Y(Ts,:), INi); % Apply it to the test data
             end
@@ -98,35 +99,40 @@ for j=1:pCV
                 Ts_Y = nk_PerfImputeObj(Ts_Y, INi); % Apply it to the test data
             end
 
-            % Here we noe create modified version of the test data 
-            for h=1:nperms
-                
+            % Here we need to create modified version of the test data 
+            switch algorithm
+                case 'LINKERNSVM'
+                    % standard LIBSVM params:
+                    cmd = '-s 0 -t 0 -c 1';
+                    % set weighting!
+                    cmd = nk_SetWeightStr(xSVM, MODEFL, CMDSTR, Lr, cmd);
+                    % Train model
+                    model = LIBSVMTRAIN(W, Lr, Tr_Y, cmd);
+                   
+                case {'LINSVM', 'L2LR', 'L1LR', 'L1SVC'}
+                    %Define command string
+                    cmd = nk_DefineCmdStr(xSVM, MODEFL); 
+                    cmd = [ ' -c 1' cmd.simplemodel cmd.quiet ];
+                    % set weighting!
+                    cmd = nk_SetWeightStr(xSVM, MODEFL, CMDSTR, Lr, cmd);
+                    % Train model
+                    model = train_liblin244(Lr, sparse(Tr_Y), cmd);
+            end
+
+            for h=1:size(Ts_Y)
+                h_Ls = Ls(h,:);
+                [h_Ts_Y_pos, h_Ts_Y_neg] = nkdev_CreateData4ModelInterpreter(Tr_Y, Ts_Y(h,:), IN.nperms, IN.frac, model); 
                 switch algorithm
-                    case 'LINKERNSVM'
-                        % standard LIBSVM params:
-                        cmd = '-s 0 -t 0 -c 1';
-                        % set weighting!
-                        cmd = nk_SetWeightStr(xSVM, MODEFL, CMDSTR, Lr, cmd);
-                        % Train model
-                        model = LIBSVMTRAIN(W, Lr, Tr_Y, cmd);
-                        % Test model on modified data
-                        [ ~, ~, ds ] = LIBSVMPREDICT( Ls, Ts_Y, model, sprintf(' -b %g',xSVM.LIBSVM.Optimization.b));
+                    case  'LINKERNSVM'
+                         [ ~, ~, ds_pos ] = LIBSVMPREDICT( h_Ls, h_Ts_Y_pos, model, sprintf(' -b %g',xSVM.LIBSVM.Optimization.b));
+                         [ ~, ~, ds_neg ] = LIBSVMPREDICT( h_Ls, h_Ts_Y_neg, model, sprintf(' -b %g',xSVM.LIBSVM.Optimization.b));
                     case {'LINSVM', 'L2LR', 'L1LR', 'L1SVC'}
-                        %Define command string
-                        cmd = nk_DefineCmdStr(xSVM, MODEFL); 
-                        cmd = [ ' -c 1' cmd.simplemodel cmd.quiet ];
-                        % set weighting!
-                        cmd = nk_SetWeightStr(xSVM, MODEFL, CMDSTR, Lr, cmd);
-                        % Train model
-                        model = train_liblin244(Lr, sparse(Tr_Y), cmd);
-                        % Test model on modified data
-                        [ ~, ~, ds ] = predict_liblin244(Ls, sparse(Ts_Y), model, sprintf(' -b %g -q',xSVM.LIBLIN.b)); 
-                        ds = ds(:,1);
-                    case 'RF'
+                         [ ~, ~, ds_pos ] = predict_liblin244(h_Ls, sparse(h_Ts_Y_pos), model, sprintf(' -b %g -q',xSVM.LIBLIN.b)); 
+                         [ ~, ~, ds_neg ] = predict_liblin244(h_Ls, sparse(h_Ts_Y_neg), model, sprintf(' -b %g -q',xSVM.LIBLIN.b)); 
+                         ds_pos = ds_pos(:,1);
+                         ds_neg = ds_neg(:,1);
                 end
             end
-			% We use Balanced Accuracy for now.
-			Ri(j,i) = BAC(Ls,ds);
 
         end
 end

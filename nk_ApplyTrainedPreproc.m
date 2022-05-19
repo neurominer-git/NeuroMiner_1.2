@@ -69,7 +69,7 @@ else
 
         if nM>1
             if issmoothed
-                Y = inp.X{n}.sY;
+                Y = inp.X(n).sY;
                 if isfield(inp.X(n),'sYw') && ~isempty(inp.X(n).sYw)
                     inp.iYw = inp.X(n).sYw;
                 end

@@ -42,10 +42,11 @@ if ~defaultsfl
         case 4
             if PercDef == 1, PercDef = 2; elseif PercDef == 2, PercDef = 1; end
             if PercDef == 1 
-                PrunePerc = nk_input('Define percentage(s) to determine single-value cutoff',0, 'i', PrunePerc);
+                PrunePerc = nk_input('Define percentage(s) to determine single-value cutoff (e.g. 95 means that 95% of feature values are identical)',0, 'i', PrunePerc);
                 PX = nk_AddParam(PrunePerc, 'PrunePerc', 1, []);
             else
                 PrunePerc = [];
+                PX = nk_AddParam([],'PrunePerc', 2, [], 'replace');
             end
     end
 else
