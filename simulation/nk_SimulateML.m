@@ -1,4 +1,4 @@
-function [ Res, IN ] = nk_SimulateML(IN)
+function [ Res, IN ] = nk_SimulateML(IN, axes)
 % =========================================================================
 % FORMAT function [ R, P ] = nk_SimulateML(IN)
 % =========================================================================
@@ -84,11 +84,11 @@ if ~isfield(IN, 'NfeatsMiss') || isempty(IN.NfeatsMiss)
 end
 
 if ~isfield(IN, 'AUCmax') || isempty(IN.AUCmax)
-    IN.AUCMax = 0.7;
+    IN.AUCmax = 0.7;
 end
 
 if ~isfield(IN, 'AUCmin') || isempty(IN.AUCmin)
-    IN.AUCMax = 0.5;
+    IN.AUCmin = 0.5;
 end
 
 if ~isfield(IN, 'verbose') || isempty(IN.verbose)
@@ -110,7 +110,13 @@ nP = size(P,1);
 R = zeros(nP,1);
 R95CI = zeros(2,nP);
 
-figure; ax = gca;
+
+if nargin == 2
+    ax = axes; 
+else
+    figure; 
+    ax = gca;
+end
 Crit = 'Balanced Accuracy';
 Xl = cell(nP,1);
 
@@ -132,7 +138,7 @@ for i=1:nP % Loop through hyperparameter combinations
     % Do the magic
 	[R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);
 	% Update the simulation plot
-    plot(1:i,R(1:i),'b-');
+    plot(ax,1:i,R(1:i),'b-');
     ax.XTick = 1:i;
     ax.XTickLabel = Xl(1:i);
     ax.XTickLabelRotation = 90;

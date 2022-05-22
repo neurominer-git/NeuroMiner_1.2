@@ -1,19 +1,21 @@
 function [GRAPHCONSTRUCTION, PX, act ] = graphConstruction_config(GRAPHCONSTRUCTION, PX, parentstr, defaultsfl)
-global NM
+global NM 
 % what method should be used for the construction of the networks?
-ConstructionMethod = 'KL divergence';
-ParcellationAtlas = 'Hammers.nii';
-VariableTypesVec = '';
+ConstructionMethod = 'Normative network + 1';
+% ParcellationAtlas = 'Hammers.nii';
+% VariableTypesVec = '';
 ReferenceGroup = '';
+SimilarityMeasure = 'Mutual information';
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
     if isempty(GRAPHCONSTRUCTION), [GRAPHCONSTRUCTION, PX] = graphConstruction_config(GRAPHCONSTRUCTION, PX, parentstr, true); end
     if isfield(GRAPHCONSTRUCTION,'method'), ConstructionMethod = GRAPHCONSTRUCTION.method; end
-    if isfield(GRAPHCONSTRUCTION,'parcellation'), ParcellationAtlas = GRAPHCONSTRUCTION.parcellation; end
-    if isfield(GRAPHCONSTRUCTION, 'variableTypes'), VariableTypesVec = GRAPHCONSTRUCTION.variableTypes; end
-    if isfield(GRAPHCONSTRUCTION, 'refGroup'), VariableTypesVec = GRAPHCONSTRUCTION.refGroup; end
+    % if isfield(GRAPHCONSTRUCTION,'parcellation'), ParcellationAtlas = GRAPHCONSTRUCTION.parcellation; end
+    %if isfield(GRAPHCONSTRUCTION, 'variableTypes'), VariableTypesVec = GRAPHCONSTRUCTION.variableTypes; end
+    if isfield(GRAPHCONSTRUCTION, 'refGroup'), ReferenceGroup = GRAPHCONSTRUCTION.refGroup; end
+    if isfield(GRAPHCONSTRUCTION,'simMeasure'), SimilarityMeasure = GRAPHCONSTRUCTION.simMeasure; end
     % BETTER, as some of the options are only relevant for some
     % construction methods, to open an additional menu after method is
     % selected
@@ -23,40 +25,49 @@ if ~defaultsfl
         GCSTR_METHOD = ConstructionMethod;
     end
 
-    if strcmp(GCSTR_METHOD,'KL divergence')
-        if isempty(ParcellationAtlas)
-            GCSTR_PARC = '(undefined)';
-        else
-            GCSTR_PARC = ParcellationAtlas;
-        end
-        menustr = ['Select graph construction method [ ' GCSTR_METHOD ' ]|', ...
-            'Define parcellation atlas [ ' GCSTR_PARC ' ]'];
-        menuact = 1:2;
-    end
+%     if strcmp(GCSTR_METHOD,'KL divergence')
+%         if isempty(ParcellationAtlas)
+%             GCSTR_PARC = '(undefined)';
+%         else
+%             GCSTR_PARC = ParcellationAtlas;
+%         end
+%         menustr = ['Select graph construction method [ ' GCSTR_METHOD ' ]|', ...
+%             'Define parcellation atlas [ ' GCSTR_PARC ' ]'];
+%         menuact = 1:2;
+%     end
 
-    if strcmp(GCSTR_METHOD, 'Group deviation')
-        if isempty(VariableTypesVec)
-            GCSTR_VARTVEC = '(undefined)';
+    if strcmp(GCSTR_METHOD, 'Normative network + 1')
+        if isempty(SimilarityMeasure)
+            GCSTR_SIMMEASURE = '(undefined)';
         else
-            GCSTR_VARTVEC = sprintf('vector length: %d', length(VariableTypesVec));
+            GCSTR_SIMMEASURE = SimilarityMeasure;
         end
 
         if isempty(ReferenceGroup)
             GCSTR_REFG = '(undefined)';
         else
-            GCSTR_REFG = sprintf('reference group: %s', ReferenceGroup);
+            GCSTR_REFG = ReferenceGroup;
+
         end
+        
+%         if isempty(VariableTypesVec)
+%             GCSTR_VARTVEC = '(undefined)';
+%         else
+%             GCSTR_VARTVEC = sprintf('vector length: %d', length(VariableTypesVec));
+%         end
+
         menustr = ['Select graph construction method [ ' GCSTR_METHOD ' ]|', ...
-            'Define variable types (vector) [ ' GCSTR_VARTVEC ']|', ...
+            'Define similarity measure [' GCSTR_SIMMEASURE ']|', ...
             'Define reference group [' GCSTR_REFG ']'];
+            % 'Define variable types (vector) [ ' GCSTR_VARTVEC ']'] , ...
+             % only important if we want to implement a network estimation similar to mgm 
         menuact = 1:3;
     end
 
     %[menustr, menuact] = nk_CheckCalibAvailMenu_config(menustr, menuact, CALIBUSE);
 
-
     nk_PrintLogo
-    mestr = 'Graph construction'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Graph construction'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr);
     act = nk_input(mestr,0,'mq', menustr, menuact);
 
     switch act
@@ -64,49 +75,67 @@ if ~defaultsfl
             [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, parentstr);
             %ConstructionMethod = 'KL divergence';
         case 2
-            switch GCSTR_METHOD
-                case 'KL divergence'
-                    readParcA = nk_input('Read in parcellation atlas externally', 0, 'mq', ...
-                        ['From MATLAB workspace |' ...
-                        'From file |'], [0,1], 0);
-
-                    switch readParcA
-                        case 0
-                            GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas variable name in Matlab workspace',0,'e');
-                        case 1
-                            GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
-                    end
-                               
-                case 'Group deviation'
-                    readVarT = nk_input('Read in variable types externally', 0, 'mq', ...
-                        ['From MATLAB workspace |' ...
-                        'From file |'], [0,1], 0);
-
-                    switch readVarT
-                        case 0
-                            GRAPHCONSTRUCTION.variableTypes = nk_input('Define variable types vector',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
-                        case 1
-                            GRAPHCONSTRUCTION.variableTypes = nk_FileSelector(1,0,'Select file containing variable types vector','.*\.txt$|.*\.csv');
-                    end
-                   
-                    %GRAPHCONSTRUCTION.refGroup = nk_input('Reference group name (as defined in dataset)', 0, 's');
-        
-            end
+             simMeasureNo = nk_input('Define measure to quantify similarity between variables', 0, 'mq', ...
+                ['Mutual information |', ...
+                'Pearson correlation |', ...
+                'Spearman`s rho |',...
+                'Kendall`s tau'], 1:4, 0);
+             switch simMeasureNo 
+                 case 1
+                     GRAPHCONSTRUCTION.simMeasure = 'Mutual information';
+                 case 2
+                     GRAPHCONSTRUCTION.simMeasure = 'Pearson correlation';
+                 case 3
+                     GRAPHCONSTRUCTION.simMeasure = 'Spearman`s rho';
+                 case 4 
+                     GRAPHCONSTRUCTION.simMeasure = 'Kendall`s tau';
+             end
+  
         case 3
             readRefG = nk_input('Read in reference group data externally', 0, 'mq', ...
                 ['From MATLAB workspace |' ...
-                'From file |'], [0,1], 0);
+                'From file'], [0,1], 0);
 
             switch readRefG
                 case 0
                     GRAPHCONSTRUCTION.refGroup = nk_input('Define reference group dataset (as named in MATLAB workspace)',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
+          
                 case 1
                     GRAPHCONSTRUCTION.refGroup = nk_FileSelector(1,0,'Select file with reference group data (in the same format as main data, incl. group and ID column)','.*\.txt$|.*\.csv');
             end
-
-             
-            %ParcellationAtlas = 'Hammers.nii';
+%         case 4
+%             switch GCSTR_METHOD
+%                 %                 case 'KL divergence'
+%                 %                     readParcA = nk_input('Read in parcellation atlas externally', 0, 'mq', ...
+%                 %                         ['From MATLAB workspace |' ...
+%                 %                         'From file |'], [0,1], 0);
+%                 %
+%                 %                     switch readParcA
+%                 %                         case 0
+%                 %                             GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas variable name in Matlab workspace',0,'e');
+%                 %                         case 1
+%                 %                             GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
+%                 %                     end
+% 
+%                 case 'Normative network + 1'
+% %                     readVarT = nk_input('Read in variable types externally', 0, 'mq', ...
+% %                         ['From MATLAB workspace |' ...
+% %                         'From file |'], [0,1], 0);
+% 
+% %                     switch readVarT
+% %                         case 0
+% %                             GRAPHCONSTRUCTION.variableTypes = nk_input('Define variable types vector',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
+% %                         case 1
+% %                             GRAPHCONSTRUCTION.variableTypes = nk_FileSelector(1,0,'Select file containing variable types vector','.*\.txt$|.*\.csv');
+% %                     end
+% 
+%                     %GRAPHCONSTRUCTION.refGroup = nk_input('Reference group name (as defined in dataset)', 0, 's');
+% 
+%             end
     end
+
+    %ParcellationAtlas = 'Hammers.nii';
+
 else
     [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION,PX, parentstr, true);
     act = 0;
@@ -149,12 +178,9 @@ global NM
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
-    menustr = ['KL divergence (Kong et al., 2014)               (KL divergence)|' ...
-        'Deviation from group (Das et al., 2018)                (Group deviation)|'];
-    menuact = {'KL divergence', ...
-        'Group deviation'};
-
-    
+    menustr = ['Normative network + 1 (e.g., Drenthen et al., 2018)                (Normative network + 1)']; % 'KL divergence (Kong et al., 2014)               (KL divergence)|' ...
+    menuact = {'Normative network + 1'}; %'KL divergence', ...
+        
 if isfield(GRAPHCONSTRUCTION,'method'), def = find(strcmp(menuact,GRAPHCONSTRUCTION.method)); else, def = 1; end %what does this line do?
 
 nk_PrintLogo
@@ -166,19 +192,22 @@ if ~strcmp(act,'BACK'), GRAPHCONSTRUCTION.method = act; end
 if ~exist('PX','var'), PX = []; end
 
 switch act{1}
-    case 'KL divergence'
-        GRAPHCONSTRUCTION.method = 'KL divergence';
-        PX = nk_AddParam([], [], [], PX,'reset');
+%     case 'KL divergence'
+%         GRAPHCONSTRUCTION.method = 'KL divergence';
+%         PX = nk_AddParam([], [], [], PX,'reset');
 %         if isfield(GRAPHCONSTRUCTION,'KL divergence')
 %             ParcellationAtlas = GRAPHCONSTRUCTION.parcellation;
 %             
 %         else
 %             ParcellationAtlas = 'Hammers.nii';
 %         end
-        GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas (incl. path to file)', 0, 's');
-    case 'Group deviation'
-        GRAPHCONSTRUCTION.method = 'Group deviation';
+%         GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas (incl. path to file)', 0, 's');
+    case 'Normative network + 1'
+        GRAPHCONSTRUCTION.method = 'Normative network + 1';
         PX = nk_AddParam([], [], [], PX,'reset');
+        
+        GRAPHCONSTRUCTION.simMeasure = 'Mutual information';
+
         readVarT = nk_input('Read in variable types externally', 0, 'mq', ...
             ['From MATLAB workspace |' ...
             'From file |'], [0,1], 0);
@@ -191,7 +220,10 @@ switch act{1}
         end
 end
 else
-    GRAPHCONSTRUCTION.method = 'Group deviation'; GRAPHCONSTRUCTION.variableTypes = 9999; PX = nk_AddParam([], [], [], PX,'reset');
+    GRAPHCONSTRUCTION.method = 'Normative network + 1'; 
+    GRAPHCONSTRUCTION.refGroup = 'undefined'; 
+    GRAPHCONSTRUCTION.simMeasure = 'Mutual information';
+    PX = nk_AddParam([], [], [], PX,'reset');
 end
 % if ~strcmp(MethodOption,'BACK'), GRAPHCONSTRUCTION.method = MethodOption; end
 % if ~exist('PX','var'), PX = []; end
@@ -199,9 +231,45 @@ end
 % else
 %     GRAPHCONSTRUCTION.method = 'KL divergence';
 % 
-
-
-
 end
+
+% function [GRAPHCONSTRUCTION, PX] = return_graphSimMeasure(GRAPHCONSTRUCTION, PX, parentstr, defaultsfl)
+% global NM
+% 
+% if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
+% 
+% if ~defaultsfl
+%     menustr = ['Mututal information                (Mutual information)|', ...
+%         'Pearson correlation (check assumptions)   (Pearson correlation)|', ...
+%         'Spearson correlation                      (Spearson correlation)']; % 'KL divergence (Kong et al., 2014)               (KL divergence)|' ...
+%     menuact = {'Mutual information', ...
+%         'Pearson correlation', ...
+%         'Spearson correlation'}; %'KL divergence', ...
+% 
+%     if isfield(GRAPHCONSTRUCTION,'simMeasure'), def = find(strcmp(menuact,GRAPHCONSTRUCTION.simMeasure)); else, def = 1; end %what does this line do?
+% 
+%     nk_PrintLogo
+%     mestr = 'Measure to quantify similarity between variables'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr);
+%     if isempty(def), def=1; end
+% 
+%     act = nk_input(mestr,0, 'mq', menustr, menuact, def);
+%     if ~strcmp(act,'BACK'), GRAPHCONSTRUCTION.simMeasure= act; end
+%     if ~exist('PX','var'), PX = []; end
+%     switch act{1}
+%         case 'Mutual information'
+%             GRAPHCONSTRUCTION.simMeasure = 'Mutual information';
+%             PX = nk_AddParam([], [], [], PX,'reset');
+%         
+%         case 'Pearson correlation'
+%             GRAPHCONSTRUCTION.simMeasure = 'Pearson correlation';
+%             PX = nk_AddParam([], [], [], PX,'reset');
+%         case ' Spearman correlation'
+%             GRAPHCONSTRUCTION.simMeasure = 'Spearman correlation';
+%             PX = nk_AddParam([], [], [], PX,'reset');
+%     end
+% else
+%     GRAPHCONSTRUCTION.simMeasure = 'Mutual information'; PX = nk_AddParam([], [], [], PX,'reset');
+% end
+% end
 
 

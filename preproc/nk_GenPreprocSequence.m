@@ -488,6 +488,12 @@ if isfield(TemplParam,'ACTPARAM')
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
                 end
+%                 if isfield(TemplParam.ACTPARAM{ac}.GRAPHCONSTRUCTION,'refGroup') && ~strcmp(TemplParam.ACTPARAM{ac}.GRAPHCONSTRUCTION.refGroup, '(undefined)')
+%                     InputParam.P{ac}.CALIBUSE      = true;
+%                     InputParam.C = TemplParam.ACTPARAM{ac}.GRAPHCONSTRUCTION.refGroup;
+%                 else
+%                     InputParam.P{ac}.CALIBUSE      = false;
+%                end
 %             case 'graphConstructionDAS'
 %                 % ******************* Das et al. 2018 *********************
 %                 if VERBOSE, fprintf('\n* CONSTRUCT NETWORKS (DAS ET AL 2018)'); end
