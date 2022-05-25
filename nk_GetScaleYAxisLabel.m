@@ -1,5 +1,5 @@
 function [yl, ylb, yfun, ylbshort] = nk_GetScaleYAxisLabel(param)
-global PREPROC NM
+global PREPROC NM MULTILABEL
 
 if ~exist('param','var')
     OPTCRIT = NM.TrainParam.SVM.GridParam;
@@ -25,7 +25,7 @@ switch OPTCRIT
     case 7
         yl = [0 1];     ylb = 'Area-Under-the-Curve';                       yfun = @AUC; ylbshort = 'AUC';
     case 9
-        yl = [0 100];   ylb = 'Mean squared error';                         yfun = @MSE; ylbshort = 'MSE';
+        yl = [0 range(NM.label(:,MULTILABEL.curdim)).^2];   ylb = 'Mean squared error';                         yfun = @MSE; ylbshort = 'MSE';
     case 10
         yl = [0 100];   ylb = 'Squared correlation coefficient [% explained variance]'; yfun = @SCC; ylbshort = 'SCC';
     case 11

@@ -370,7 +370,9 @@ if isfield(TemplParam,'ACTPARAM')
                     InputParam.P{ac}.RANK.Params = PX.Params;
                     InputParam.P{ac}.RANK.Params_desc = PX.Params_desc;
                 end
-                if strcmp(TemplParam.ACTPARAM{ac}.RANK.labeldesc,'NM target label')
+                if strcmp(TemplParam.ACTPARAM{ac}.RANK.labeldesc,'NM target label') && ...
+                        ~strcmp(TemplParam.ACTPARAM{ac}.RANK.algostr,'extern') && ...
+                        ~strcmp(TemplParam.ACTPARAM{ac}.RANK.algostr,'extern2') 
                     InputParam.P{ac}.LabelInteraction = true;
                 end
                 

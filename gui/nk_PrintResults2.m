@@ -159,8 +159,6 @@ handles.curranal = analind;
 
 if size(handles.NM.label,2) > 1,
     handles.multilabel = true;
-    handles.curlabel= get(handles.selLabel,'Value');
-    handles.selLabel.String = handles.NM.labelnames;
 else
     handles.multilabel = false;
     handles.curlabel = 1;
@@ -620,6 +618,7 @@ function selModality_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns selModality contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from selModality
 
+handles.curmodal = hObject.Value;
 handles = display_visual(handles);
 guidata(handles.figure1,handles);
 
@@ -1134,7 +1133,10 @@ function selSubParam_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns selSubParam contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from selSubParam
 
-handles = display_SubParam(handles);
+if handles.curmodal <= numel(handles.params.TrainParam.FUSION.M)
+    handles = display_SubParam(handles);
+    guidata(handles.figure1,handles);
+end
 
 % --- Executes during object creation, after setting all properties.
 function selSubParam_CreateFcn(hObject, eventdata, handles)

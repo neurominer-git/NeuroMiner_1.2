@@ -104,9 +104,15 @@ switch act
         if size(dat.label,2)>1
             MULTILABEL.flag = true;
             MULTILABEL.dim  = size(dat.label,2);
+            if isfield(dat,'labelnames')
+                MULTILABEL.desc = dat.labelnames;
+            else
+                MULTILABEL.desc = cellstr([repmat('L',MULTILABEL.dim,1) num2str((1:MULTILABEL.dim)')]);
+            end
         else
             MULTILABEL.flag = false;
             MULTILABEL.dim = 1;
+            MULTILABEL.desc = [];
         end
         
         VERBOSE = dat.TrainParam.verbosity;
@@ -148,7 +154,15 @@ switch act
             if isempty(GRD),        paramstr{end+1} = 'Grid optimization settings'; end
             if isempty(MULTI),      paramstr{end+1} = 'Multi-group parameters'; end
             if isempty(VIS),        paramstr{end+1} = 'Visualization parameters'; end
-            
+            if isfield(dat.TrainParam,'MULTILABEL')
+                MULTILABEL.sel = dat.TrainParam.MULTILABEL.sel;
+            else
+                if MULTILABEL.dim > 1
+                    MULTILABEL.sel = true(1,MULTILABEL.dim);
+                else
+                    MULTILABEL.sel = 1;
+                end
+            end
             if iscell(PREPROC)
                 tPREPROC = PREPROC{1};
             else

@@ -41,15 +41,8 @@ for n=1:nM
     
     [ sY, sYocv, sCocv, inp ] = nk_PerfPreprocessSpatial( Y, Yocv, Cocv, inp, tparamfl, BINMOD, kbin, ukbin);
     
-    if nM>1 
-        inp.X{n}.sY = sY;
-        if ~isempty(sYocv), inp.X{n}.sYocv = sYocv; end
-        if ~isempty(sCocv), inp.X{n}.sCocv = sCocv; end
-    else
-        inp.X(n).sY = sY;
-        if ~isempty(sYocv), inp.X(n).sYocv = sYocv; end
-        if ~isempty(sCocv), inp.X(n).sCocv = sCocv; end
-    end
-    
+    inp.X(n).sY = sY;
+    if ~isempty(sYocv), inp.X(n).sYocv = sYocv; end
+    if ~isempty(sCocv), inp.X(n).sCocv = sCocv; end
 
 end

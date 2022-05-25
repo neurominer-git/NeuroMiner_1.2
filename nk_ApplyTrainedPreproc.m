@@ -69,19 +69,31 @@ else
 
         if nM>1
             if issmoothed
-                Y = inp.X{n}.sY;
+                Y = inp.X(n).sY;
+                if isfield(inp.X(n),'sYw') && ~isempty(inp.X(n).sYw)
+                    inp.iYw = inp.X(n).sYw;
+                end
                 if isfield(inp.X(n),'sYocv') && ~isempty(inp.X(n).sYocv), Yocv = inp.X(n).sYocv; end
             else
                 Y = inp.X(n).Y; 
+                if isfield(inp.X(n),'Yw') && ~isempty(inp.X(n).Yw)
+                    inp.iYw = inp.X(n).Yw;
+                end
                 if isfield(inp.X(n),'Yocv') && ~isempty(inp.X(n).Yocv), Yocv = inp.X(n).Yocv; end
             end
             PREPROC = inp.PREPROC{n};
         else
             if issmoothed
                 Y = inp.X.sY;
+                if isfield(inp.X,'sYw') && ~isempty(inp.X.sYw)
+                    inp.iYw = inp.X.sYw;
+                end
                 if isfield(inp.X(n),'sYocv') && ~isempty(inp.X(n).sYocv), Yocv = inp.X.sYocv; end 
             else
                 Y = inp.X.Y; 
+                if isfield(inp.X,'Yw') && ~isempty(inp.X.Yw)
+                    inp.iYw = inp.X.Yw;
+                end
                 if isfield(inp.X(n),'Yocv') && ~isempty(inp.X(n).Yocv), Yocv = inp.X.Yocv; end 
             end
             PREPROC = inp.PREPROC; 

@@ -35,9 +35,9 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                 paramfl.P{u} = nk_ReturnParamChain(uPREPROC, 1); 
                 fprintf('\nPredictor #%g: Smoothing Training & CV data',u)
                 sY{u} = nk_PerfSpatFilt2( Y, uPREPROC, paramfl.PV ); 
-                if isfield(inp.X,'Yw'), 
+                if isfield(inp,'Yw') && ~isempty(inp.Yw) 
                     fprintf('\nSmoothing weighting map')
-                    inp.Yw{u} = nk_PerfSpatFilt2( inp.X.Yw, uPREPROC, paramfl.PV ); 
+                    inp.Yw{u} = nk_PerfSpatFilt2( inp.iYw, uPREPROC, paramfl.PV ); 
                 else
                     I = arrayfun( @(j) isfield(uPREPROC.ACTPARAM{j},'RANK'), 1:numel( uPREPROC.ACTPARAM ));
 %                     if any(I), 

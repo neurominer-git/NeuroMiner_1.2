@@ -315,7 +315,7 @@ parfor k=1:reps
     
 	for j=1:pCV
 	
-		% Use multi-core setting of my laptop to parallelize the CV cycle
+		% We could use here a multi-core to parallelize the CV cycle
         for i=1:nCV
             
             Tr = cv.TrainInd{j,i};
@@ -337,7 +337,7 @@ parfor k=1:reps
             end
             
             if ncm
-                if verbose, fprintf('\nImpute data mtrix.'); end
+                if verbose, fprintf('\nImpute data matrix.'); end
                 [Tr_Ystar, INi] = nk_PerfImputeObj(Tr_Ystar); % Train imputation model
                 Ts_Ystar = nk_PerfImputeObj(Ts_Ystar, INi); % Apply it to the test data
             end

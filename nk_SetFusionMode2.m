@@ -18,12 +18,7 @@ switch FUSION.flag
                 case 0
                      OUT.analysis = analysis.GDdims{1}; 
                 case 3
-                    if tF>numel(analysis.GDdims)
-                        fprintf('\n'); warning('Requested analysis of modality %g which does not exist',tF)
-                        OUT.analysis = [];
-                    else
-                        OUT.analysis = analysis.GDdims{tF}; 
-                    end
+                     OUT.analysis = analysis.GDdims{curmodal}; 
             end
         end
 

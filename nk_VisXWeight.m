@@ -31,7 +31,7 @@ function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P
 % W :           weight vector in processed feature space
 % mPA :
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2021
+% (c) Nikolaos Koutsouleris, 05/2022
 
 global SVM %TEMPL
 
@@ -99,7 +99,7 @@ for n=1:nM
         lVI = true(size(Fu)); 
     end
     
-    lFuVI = Fu & lVI; fVI = find(lVI); nmP = Fu(fVI);
+    lFuVI = find(Fu(lVI)); fVI = find(lVI); nmP = Fu(fVI);
     nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
     if ~isempty(PA)
          nmPA = nan(numel(fVI),1); nmPA(nmP) = PA(lFuVI);
@@ -144,7 +144,6 @@ for n=1:nM
                     if isfield(naPX,'recon') && naPX.recon==1
                         fprintf('-');
                     else
-
                         if isfield(naPX.mpp,'vec')
                            redvec = naPX.mpp.vec;
                         elseif isfield(naPX.mpp,'factors')
@@ -153,6 +152,8 @@ for n=1:nM
                            redvec = naPX.mpp.u;
                         elseif isfield(naPX.mpp,'M')
                            redvec = naPX.mpp.M;
+                        elseif isfield(naPX.mpp,'W')
+                            redvec = naPX.mpp.W;
                         elseif isfield(naPX.mpp,'network')
                            error('Autoencoder reconstructions not supported!')
                         end
@@ -199,9 +200,9 @@ for n=1:nM
                             tmW(naPX.indNonRem) = nmW; nmW = tmW; tmP(naPX.indNonRem) = nmP; nmP = tmP;  
                             % Don't forget to adjust the feature masks and the
                             % indices to modalities in case of fused feature spaces
-                            tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(pInaPX.indNonRemND) = lFuVI; lFuVI = tlFuVI;
-                            tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = lVI; lVI = tlVI;
-                            clear tmW tmP tlFuVI tlVI;
+                            %tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(naPX.indNonRem) = lFuVI; lFuVI = tlFuVI;
+                            %tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = fVI; fVI = tlVI;
+                            clear tmW tmP %tlFuVI tlVI;
                         end
                         reducedimfl = true;
                     end
@@ -233,7 +234,7 @@ for n=1:nM
                     % indices to modalities in case of fused feature spaces
                     if ~reducedimfl
                         tlFuVI = false(length(pIND),1); tlFuVI(pIND) = lFuVI; lFuVI = tlFuVI;
-                        tlVI = true(length(pIND),1); tlVI(pIND) = lVI; lVI = tlVI;
+                        tlVI = true(length(pIND),1); tlVI(pIND) = fVI; fVI = tlVI;
                     end
             end
 
@@ -293,16 +294,9 @@ for n=1:nM
                     mSR{n} = zeros(size(nmW,1),1);
                     mC{n} = zeros(size(nmW,1),size(nmW,1));
                 end
-                IX = lFuVI(lVI);
-                if numel(nmR)~=numel(IX)
-                    mR{n}(IX) = nmR;
-                    mSR{n}(IX) = nmSR; 
-                    mC{n}(IX,IX) = nmC;
-                else
-                    mR{n}(IX) = nmR(IX);
-                    mSR{n}(IX) = nmSR(IX); 
-                    mC{n}(IX,IX) = nmC(IX,IX);
-                end
+                mR{n}(lFuVI) = nmR(lFuVI);
+                mSR{n}(lFuVI) = nmSR(lFuVI); 
+                mC{n}(lFuVI,lFuVI) = nmC(lFuVI,lFuVI);
             else
                 mR{n} = nmR;
                 mSR{n} = nmSR; 
@@ -312,7 +306,7 @@ for n=1:nM
     else
         nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
         if ~isempty(PA), 
-             nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI(lVI));
+             nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI);
         end
         if mM>1 % intermediate / late fusion
             mW{n} = nmW;

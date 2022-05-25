@@ -322,7 +322,7 @@ try
             if isfield(NM,'analysis')
                 inp = []; act = 1;
                 while act>0, 
-                    [act, inp ] = nk_OOCVPrep(act, inp, 'MAIN INTERFACE >> APPLY MODELS TO NEW DATA'); 
+                    [act, NM, inp ] = nk_OOCVPrep(NM, act, inp, 'MAIN INTERFACE >> APPLY MODELS TO NEW DATA'); 
                 end
             end
             

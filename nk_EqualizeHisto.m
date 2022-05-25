@@ -1,4 +1,4 @@
-function [tI, I] = nk_EqualizeHisto(Eq, V, I, modeflag)
+function [ I, tI ] = nk_EqualizeHisto(Eq, V, I, modeflag)
 
 
 if ~exist('V','var') || isempty(V), error('target label vector missing or undefined'); end
@@ -28,7 +28,7 @@ switch modeflag
         % for i=1:numel(N)-1
         %     fprintf('\n%1.1f<->%1.1f =>\t%g', Edges(i), Edges(i+1), N(i));
         % end
-        minN = min(N); tI = [];
+        minN = min(N); tI = []; tV = [];
         for i = 1:nE-1
             if i == nE
                 ind = find(V >= Edges(i) & V <= Edges(i+1));
@@ -39,13 +39,16 @@ switch modeflag
                rInd = randperm(numel(ind));
                rInd = rInd(1:minN);
                tI = [ tI; I(ind(rInd)) ] ;
+               tV = [ tV; V(ind(rInd)) ] ;
            else
                tI = [ tI; I(ind) ] ;
+               tV = [ tV; V(ind) ];
            end
         end
-        ind = randperm(numel(tI));
-        tI = tI(ind);
+        %ind = randperm(numel(tI));
+        %tI = tI(ind);
         I = setdiff(I, tI);
+
     case 'classification'
         
         uL = unique(V); nuL = numel(uL); suL= zeros(1,nuL); ruL = suL;

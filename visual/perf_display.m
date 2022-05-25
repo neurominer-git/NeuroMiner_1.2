@@ -25,6 +25,19 @@ else
     set(handles.selModal,'Enable','off')  
 end
 
+if handles.multilabel
+    if isfield(handles.NM.analysis{analind}.params.TrainParam,'MULTILABEL')
+        if handles.curlabel > numel(handles.NM.analysis{handles.curranal}.params.TrainParam.MULTILABEL.sel)
+            handles.selLabel.Value = 1;
+        end
+        handles.selLabel.String = handles.NM.labelnames(handles.NM.analysis{handles.curranal}.params.TrainParam.MULTILABEL.sel);
+        handles.curlabel = handles.NM.analysis{handles.curranal}.params.TrainParam.MULTILABEL.sel(get(handles.selLabel,'Value'));
+    else
+        handles.selLabel.String = handles.NM.labelnames;
+        handles.curlabel= get(handles.selLabel,'Value');
+    end
+end
+
 [handles, visdata] = switch_analysis(handles);
 
 handles.lbStartup.String = 'Customize menus ...';

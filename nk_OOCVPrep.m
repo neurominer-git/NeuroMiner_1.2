@@ -1,4 +1,4 @@
- function [ act, inp ] = nk_OOCVPrep(act, inp, parentstr)
+ function [ act, NM, inp ] = nk_OOCVPrep(NM, act, inp, parentstr)
 % =========================================================================
 % FORMAT [act, inp] = nk_OOCVprep(act, inp, parentstr)
 % =========================================================================
@@ -7,7 +7,7 @@
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, last modified 07/2021
 
-global CV NM
+global CV 
 
 % Detect completed analyses
 complvec = []; for z=1:numel(NM.analysis), if NM.analysis{z}.status, complvec = [ complvec z ]; end; end
@@ -210,6 +210,7 @@ switch act
             NM.analysis{inp.analind(i)}.OOCV{inp.oocvind} = OOCVPrep(NM, inp, NM.analysis{inp.analind(i)});
             nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'clear', 0); 
          end
+         
     case 12
         if inp.saveCV1 == 1, inp.saveCV1 = 2; elseif inp.saveCV1 == 2,  inp.saveCV1 = 1; end
 end
@@ -277,14 +278,16 @@ if isfield(inp1.OO,'groups') && numel(inp1.OO.groups)==numel(inp1.OO.cases)
         inp1.groupnames = inp1.OO.groupnames;
     end
 end
-
-if isfield(analysis,'rootdir') && exist(analysis.rootdir,'dir')
-    inp1.rootdir = fullfile(analysis.rootdir,analysis.params.TrainParam.SVM.prog,inp1.oocvname);
+if isfield(inp1,'targdir'), 
+    inp1.rootdir = fullfile(inp1.targdir, inp1.oocvname);
+elseif isfield(analysis,'rootdir') && exist(analysis.rootdir,'dir')
+    inp1.rootdir = fullfile(analysis.rootdir,analysis.params.TrainParam.SVM.prog, inp1.oocvname);
 else
-    inp1.rootdir = fullfile(pwd,analysis.params.TrainParam.SVM.prog,inp1.oocvname);
+    inp1.rootdir = fullfile(pwd,analysis.params.TrainParam.SVM.prog, inp1.oocvname);
 end
 
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
+nl = nk_GetLabelDim(MULTILABEL);
 
 % Loop through modalities
 for i = 1:inp1.nF
@@ -294,11 +297,11 @@ for i = 1:inp1.nF
     OOCV = tOOCV;
     inp = catstruct(inp1,inp2);
     inp.loadGD = true;
-    
-    for j = 1:MULTILABEL.dim
+
+    for j = 1:nl
 	
         strOOCVfile = fullfile(inp.rootdir,[stranalysis inp.varstr '_t' num2str(j) '_OOCVresults-' num2str(inp.oocvind) '_ID' dat.id '.mat']);
-         inp.multlabelstr = '';  if MULTILABEL.flag, inp.multlabelstr = sprintf('_t%g',j); end
+        inp.multlabelstr = '';  if MULTILABEL.flag, inp.multlabelstr = sprintf('_t%g',j); end
 		if exist(strOOCVfile,'file') && inp.ovrwrt==2
 			fprintf('\nLoading:\n%s',strOOCVfile);
 			load(strOOCVfile)

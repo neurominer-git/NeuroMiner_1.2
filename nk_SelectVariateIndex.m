@@ -19,7 +19,7 @@ if iscell(dat.Y),
         
         nk_PrintLogo
         [nanCL, nCL] = nm_nancount(dat.label);
-        fprintf('\n'); cprintf('black*','NM framework: %s ==> ', dat.modeflag);
+        fprintf('\n'); fprintf('NM framework: %s ==> ', dat.modeflag);
         switch dat.modeflag
             case 'regression'
                fprintf('%g cases, median (SD): %g (%g)', nanCL, nm_nanmedian(dat.label), nm_nanstd(dat.label));
@@ -28,9 +28,9 @@ if iscell(dat.Y),
         end
         if nCL>0, fprintf('; %g cases without labels', nCL); end
         fprintf('\n')
-        cprintf('blue','\n*****************************')
-        cprintf('blue','\n*****    MODALITIES     *****')  
-        cprintf('blue','\n*****************************')
+        fprintf('\n*****************************')
+        fprintf('\n*****    MODALITIES     *****')  
+        fprintf('\n*****************************')
         fprintf('\n')
         menuact = []; ll = 1;
         for i=1:nvar
@@ -49,7 +49,7 @@ if iscell(dat.Y),
                 if any(NanStats.Feats50), badfeats = sprintf('%s | %g (%1.1f%%) = [50%%-99%%] NaNs', badfeats, sum(NanStats.Feats50),NanStats.Feats50Perc); end
                 if any(NanStats.Feats25), badfeats = sprintf('%s | %g (%1.1f%%) = [25%%-50%%] NaNs', badfeats, sum(NanStats.Feats25),NanStats.Feats25Perc); end
             end
-            fprintf('\n[ %3g ]',i);cprintf('black*',' %s', dat.datadescriptor{i}.desc);
+            fprintf('\n[ %3g ]',i);fprintf(' %s', dat.datadescriptor{i}.desc);
             if nvar < 10
                 fprintf('\n');
                 switch dat.datadescriptor{i}.input_settings.datasource
@@ -99,8 +99,8 @@ if iscell(dat.Y),
                         fprintf('\t\t* Source: Surface files\n')
                 end
                 fprintf('\t\t* Dimensionality: %g features %s\n', size(dat.Y{i},2))
-                if ~isempty(badcases), fprintf('\n\t\t'); cprintf([1,0.5,0],'* NaNs per cases: %s ', badcases); end
-                if ~isempty(badfeats); fprintf('\n\t\t'); cprintf([1,0.5,0],'* NaNs per features: %s ', badfeats); end
+                if ~isempty(badcases), fprintf('\n\t\t'); fprintf('* NaNs per cases: %s ', badcases); end
+                if ~isempty(badfeats); fprintf('\n\t\t'); fprintf('* NaNs per features: %s ', badfeats); end
             end
             ll=ll+1;
         end

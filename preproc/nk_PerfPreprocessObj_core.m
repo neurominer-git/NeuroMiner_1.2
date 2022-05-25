@@ -11,7 +11,7 @@
 % hyperparameter combination are stored. This results in a tree structure 
 % of preprocessed data and respective parameters.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2021
+% (c) Nikolaos Koutsouleris, 05/2022
 
 function [SrcParam, InputParam, TrParam] = ...
               nk_PerfPreprocessObj_core(SrcParam, InputParam, TrParam, act)
@@ -59,13 +59,17 @@ switch MODEFL
     case 'regression'
         nTrL = size(SrcParam.TrainLabel,2);
 end
+% if we deal with multiple labels, do we need to create one processed data version
+% for each label or can we use a single processed data version for all
+% labels, which saves time and memory. For this, we need to find out if
+% there are label interactions during preprocessing. Label interactions are
+% defined in the parent function nk_GenPreprocSequence.m
 if nTrL> 1 && nk_Check4LabelInteraction(InputParam.P) 
     nL = nTrL; 
     if VERBOSE, fprintf('\nMulti-label mode detected: Processing %g labels', nL); end
 else
     nL = 1;
 end
-
 % Do we have to manage synthetic data?
 adasynfl = false; 
 if isfield(SVM,'ADASYN') && SVM.ADASYN.flag == 1 && ...
@@ -80,7 +84,16 @@ if nact>1, fprintf('\t...Execute preprocessing sequence: '); end
 
 for i=1:nact
     
-    ActParam = struct('trfl', trfl, 'paramfl', paramfl, 'tsfl', tsfl, 'cfl', cfl, 'nTs', nTs', 'nC', nC,'i',i, 'adasynfl', adasynfl, 'curlabel', 1, 'label_interaction', nL>1);
+    ActParam = struct('trfl', trfl, ...
+                      'paramfl', paramfl, ...
+                      'tsfl', tsfl, ...
+                      'cfl', cfl, ...
+                      'nTs', nTs', ...
+                      'nC', nC, ...
+                      'i',i, ...
+                      'adasynfl', adasynfl, ...
+                      'curlabel', 1, ...
+                      'label_interaction', nL>1);
     tStart = tic; 
     
     if iscell(act), acti = act{i}; end
@@ -959,7 +972,7 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tGraph computation ...'); end
-    [InputParam.Tr, TrParami] = graph_PerfGraphConstruction(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
+    [InputParam.Tr, TrParami] = graph_PerfGraphComputation(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
     % All 
     if tsfl, tsproc = true; end
 end

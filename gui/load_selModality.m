@@ -9,44 +9,50 @@ end
 popuplist=[];
 if ~multiflag
 
-    for i=1:numel(handles.visdata{handles.curlabel})
-        popuplist{i} = sprintf('Modality %g: %s', i, handles.NM.datadescriptor{handles.visdata{handles.curlabel}{i}.params.varind}.desc);
+    for i=1:size(handles.visdata,1)
+        popuplist{i} = sprintf('Modality %g: %s', i, handles.NM.datadescriptor{handles.visdata{i,handles.curlabel}.params.varind}.desc);
     end
     handles.selModality.String = popuplist;
-    v = handles.visdata{handles.curlabel}{handles.curmodal};
-    popuplist=[];
-    if isfield(v,'MEAN'),                      popuplist{1} = 'Feature weights [Overall Mean (StErr)]';                        end
-    if isfield(v,'MEAN_CV2'),                  popuplist{end+1} = 'Feature weights [Grand Mean (StErr)]';                      end
-    if isfield(v,'CVRatio'),                   popuplist{end+1} = 'CV-ratio of feature weights [Overall Mean]';                end
-    if isfield(v,'CVRatio_CV2'),               popuplist{end+1} = 'CV-ratio of feature weights [Grand Mean]';                  end
-    if isfield(v,'FeatProb'),                  popuplist{end+1} = 'Feature selection probability [Overall Mean]';              end
-    if isfield(v,'Prob_CV2'),                  popuplist{end+1} = 'Probability of feature reliability (95%-CI) [Grand Mean]';  end
-	if isfield(v,'SignBased_CV2'),             popuplist{end+1} = 'Sign-based consistency';  									end
-	if isfield(v,'SignBased_CV2_z'),           popuplist{end+1} = 'Sign-based consistency (Z score)';  						end
-	if isfield(v,'SignBased_CV2_p_uncorr'),    popuplist{end+1} = 'Sign-based consistency -log10(P value)';  					end
-	if isfield(v,'SignBased_CV2_p_fdr'),       popuplist{end+1} = 'Sign-based consistency -log10(P value, FDR)';  				end
-    if isfield(v,'Spearman_CV2'),              popuplist{end+1} = 'Spearman correlation [Grand Mean]';                         end
-    if isfield(v,'Pearson_CV2'),               popuplist{end+1} = 'Pearson correlation [Grand Mean]';                          end
-    if isfield(v,'Spearman_CV2_p_uncorr'),     popuplist{end+1} = 'Spearman correlation -log10(P value) [Grand Mean]';         end
-    if isfield(v,'Pearson_CV2_p_uncorr'),      popuplist{end+1} = 'Pearson correlation -log10(P value) [Grand Mean]';          end
-    if isfield(v,'Spearman_CV2_p_fdr'),        popuplist{end+1} = 'Spearman correlation -log10(P value, FDR) [Grand Mean]';    end
-    if isfield(v,'Pearson_CV2_p_fdr'),         popuplist{end+1} = 'Pearson correlation -log10(P value, FDR) [Grand Mean]';     end
-    if isfield(v,'PermProb_CV2'),              popuplist{end+1} = 'Permutation-based -log10(P value) [Grand Mean]';            end
-    if isfield(v,'PermProb_CV2_FDR_PVAL'),     popuplist{end+1} = 'Permutation-based -log10(P value, FDR) [Grand Mean]';       end
-    if isfield(v,'PermZ_CV2'),                 popuplist{end+1} = 'Permutation-based Z Score [Grand Mean]';                    end
-	if isfield(v,'Analytical_p'),     		   popuplist{end+1} = 'Analytical -log10(P Value) for Linear SVM [Grand Mean]';    end
-	if isfield(v,'Analyitcal_p_fdr'),     	   popuplist{end+1} = 'Analytical -log10(P Value, FDR) for Linear SVM [Grand Mean]';end
-    if isfield(v,'PermModel_Eval_Global'),     popuplist{end+1} = 'Model P value histogram';                                   end
-    if isfield(v,'CorrMat_CV2'),               popuplist{end+1} = 'Correlation matrix';                                        end
-    if isfield(v,'CorrMat_CV2_p_uncorr'),      popuplist{end+1} = 'Correlation matrix (P value)';                              end
-    if isfield(v,'CorrMat_CV2_p_fdr'),         popuplist{end+1} = 'Correlation matrix (P value, FDR)';                       end
-    if isfield(v,'CorrMat_CV2'),               popuplist{end+1} = 'Network plot correlation matrix';                           end
-    if isfield(v,'CorrMat_CV2_p_uncorr'),      popuplist{end+1} = 'Network plot correlation matrix (P value)';                 end
-    if isfield(v,'CorrMat_CV2_p_fdr'),         popuplist{end+1} = 'Network plot correlation matrix (P value, FDR)';            end
-
-    handles.selVisMeas.String = popuplist; 
-    VisOnFl = 'on';
-    VisElFl = 'on';
+    if handles.curmodal<=size(handles.visdata,1)
+        v = handles.visdata{handles.curmodal,handles.curlabel};
+        popuplist=[];
+        if isfield(v,'MEAN'),                      popuplist{1} = 'Feature weights [Overall Mean (StErr)]';                        end
+        if isfield(v,'MEAN_CV2'),                  popuplist{end+1} = 'Feature weights [Grand Mean (StErr)]';                      end
+        if isfield(v,'CVRatio'),                   popuplist{end+1} = 'CV-ratio of feature weights [Overall Mean]';                end
+        if isfield(v,'CVRatio_CV2'),               popuplist{end+1} = 'CV-ratio of feature weights [Grand Mean]';                  end
+        if isfield(v,'FeatProb'),                  popuplist{end+1} = 'Feature selection probability [Overall Mean]';              end
+        if isfield(v,'Prob_CV2'),                  popuplist{end+1} = 'Probability of feature reliability (95%-CI) [Grand Mean]';  end
+	    if isfield(v,'SignBased_CV2'),             popuplist{end+1} = 'Sign-based consistency';  									end
+	    if isfield(v,'SignBased_CV2_z'),           popuplist{end+1} = 'Sign-based consistency (Z score)';  						end
+	    if isfield(v,'SignBased_CV2_p_uncorr'),    popuplist{end+1} = 'Sign-based consistency -log10(P value)';  					end
+	    if isfield(v,'SignBased_CV2_p_fdr'),       popuplist{end+1} = 'Sign-based consistency -log10(P value, FDR)';  				end
+        if isfield(v,'Spearman_CV2'),              popuplist{end+1} = 'Spearman correlation [Grand Mean]';                         end
+        if isfield(v,'Pearson_CV2'),               popuplist{end+1} = 'Pearson correlation [Grand Mean]';                          end
+        if isfield(v,'Spearman_CV2_p_uncorr'),     popuplist{end+1} = 'Spearman correlation -log10(P value) [Grand Mean]';         end
+        if isfield(v,'Pearson_CV2_p_uncorr'),      popuplist{end+1} = 'Pearson correlation -log10(P value) [Grand Mean]';          end
+        if isfield(v,'Spearman_CV2_p_fdr'),        popuplist{end+1} = 'Spearman correlation -log10(P value, FDR) [Grand Mean]';    end
+        if isfield(v,'Pearson_CV2_p_fdr'),         popuplist{end+1} = 'Pearson correlation -log10(P value, FDR) [Grand Mean]';     end
+        if isfield(v,'PermProb_CV2'),              popuplist{end+1} = 'Permutation-based -log10(P value) [Grand Mean]';            end
+        if isfield(v,'PermProb_CV2_FDR_PVAL'),     popuplist{end+1} = 'Permutation-based -log10(P value, FDR) [Grand Mean]';       end
+        if isfield(v,'PermZ_CV2'),                 popuplist{end+1} = 'Permutation-based Z Score [Grand Mean]';                    end
+	    if isfield(v,'Analytical_p'),     		   popuplist{end+1} = 'Analytical -log10(P Value) for Linear SVM [Grand Mean]';    end
+	    if isfield(v,'Analyitcal_p_fdr'),     	   popuplist{end+1} = 'Analytical -log10(P Value, FDR) for Linear SVM [Grand Mean]';end
+        if isfield(v,'PermModel_Eval_Global'),     popuplist{end+1} = 'Model P value histogram';                                   end
+        if isfield(v,'CorrMat_CV2'),               popuplist{end+1} = 'Correlation matrix';                                        end
+        if isfield(v,'CorrMat_CV2_p_uncorr'),      popuplist{end+1} = 'Correlation matrix (P value)';                              end
+        if isfield(v,'CorrMat_CV2_p_fdr'),         popuplist{end+1} = 'Correlation matrix (P value, FDR)';                       end
+        if isfield(v,'CorrMat_CV2'),               popuplist{end+1} = 'Network plot correlation matrix';                           end
+        if isfield(v,'CorrMat_CV2_p_uncorr'),      popuplist{end+1} = 'Network plot correlation matrix (P value)';                 end
+        if isfield(v,'CorrMat_CV2_p_fdr'),         popuplist{end+1} = 'Network plot correlation matrix (P value, FDR)';            end
+        handles.selVisMeas.String = popuplist; 
+        VisOnFl = 'on';
+        VisElFl = 'on';
+    else
+        VisOnFl = 'off';
+        VisElFl = 'off';
+        handles.curmodal = size(handles.visdata,1);
+    end
+    
 else
     if isfield(v,'ObsModel_Eval_Global_Multi')
         handles.selVisMeas.Enable = 'on'; 
@@ -64,7 +70,12 @@ else
 end
 % Toggle enabled status of visualization controls
 handles.selVisMeas.Enable = VisOnFl; 
-handles.selModality.Enable = VisElFl;
+switch handles.params.TrainParam.FUSION.flag
+    case 3
+        handles.selModality.Enable = 'off';
+    otherwise
+        handles.selModality.Enable = VisElFl;
+end
 handles.selPager.Enable = VisElFl;
 handles.tglSortFeat.Enable = VisElFl;
 handles.cmdExportFeats.Enable = VisElFl;

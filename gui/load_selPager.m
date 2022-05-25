@@ -6,10 +6,9 @@ if strcmp(handles.popupmenu1.String{handles.popupmenu1.Value},'Multi-group class
 else
     multiflag = false;
 end
-varind = get(handles.selModality,'Value');
 
-if handles.visdata{handles.curlabel}{varind}.params.visflag ~= 1 && ~multiflag
-    nfeats = handles.visdata{handles.curlabel}{varind}.params.nfeats;
+if handles.curmodal<= size(handles.visdata,1) && handles.visdata{handles.curmodal, handles.curlabel}.params.visflag ~= 1 && ~multiflag 
+    nfeats = handles.visdata{handles.curmodal,handles.curlabel}.params.nfeats;
     if nfeats > perpage
         vec = 1:perpage:nfeats;
         if vec(end) < nfeats, vec(end+1) = nfeats; end

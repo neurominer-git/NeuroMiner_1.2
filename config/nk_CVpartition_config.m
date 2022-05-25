@@ -6,17 +6,23 @@
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % NeuroMiner 1.0, (c) Nikolaos Koutsouleris 08/2018
 
-function act = nk_CVpartition_config(defaultsfl)
+function act = nk_CVpartition_config(defaultsfl, act)
 
 global NM
 
-if ~exist('defaultsfl','var') || isempty(defaultsfl),  defaultsfl = 0; end;
-
+if ~exist('defaultsfl','var') || isempty(defaultsfl),  defaultsfl = 0; end
+if ~exist('act','var') || isempty(act), act = 0; end
 if ~defaultsfl
 
     CV2frm = 1;
     CV1ps = 'not defined'; CV1fs = CV1ps; CV2ps = CV1fs; CV2fs = CV2ps; 
     CV1pn = 10; CV1fn = 10; CV2pn = 10; CV2fn = 10; 
+    Eq.bincount = 10;
+    Eq.mincount = 10;
+    Eq.maxcount = 10;
+    Eq.addremoved2test = 1;
+    Eq.Covar = NM.label;
+    Eq.posnegrat = 1.5;
     Decomp = '';
     CV2ps = ['Define no. of CV2 permutations [ P2 = ' CV2ps ' ]|'];
     CV1ps = ['Define no. of CV1 permutations [ P1 = ' CV1ps ' ]|'];
@@ -80,8 +86,11 @@ if ~defaultsfl
         NM.TrainParam.RAND.Decompose = 1; Decompn = 1;
         MenuVec = [11,1:4];
     end
-    
-    buildstr = ''; savestr = ''; loadstr = ''; MenuRem = []; CV2prx = '' ; CV1prx = ''; histstr = '';
+    if isfield(NM.TrainParam.RAND,'Eq')
+        Eq = NM.TrainParam.RAND.Eq;
+    end
+    buildstr = ''; savestr = ''; loadstr = ''; MenuRem = []; CV2prx = '' ; CV1prx = ''; 
+    EQstr = ''; EQcovstr = ''; EQminstr = ''; EQmaxstr = ''; EQbinstr = ''; EQshufflestr = ''; EQposnegstr=''; EQorigstr = ''; EQeqstr = '';
 
     %% Define menu options for cross-validation setup
     if isfield(NM,'TrainParam')
@@ -183,20 +192,35 @@ if ~defaultsfl
             end
             if fl
                 enabled = 2; enabledstr = 'no';
-                addremoved2test = 2; addremoved2teststr = ''; 
+                addremoved2test = 2; addremoved2teststr = ''; shufflestr={'yes','no'};
                 if isfield(NM.TrainParam,'RAND') && isfield(NM.TrainParam.RAND,'Eq') 
                     if isfield(NM.TrainParam.RAND.Eq,'enabled') && NM.TrainParam.RAND.Eq.enabled ==1, enabled = 1; enabledstr = 'yes'; end
                     if enabled == 1 && (isfield(NM.TrainParam.RAND.Eq,'addremoved2test') && NM.TrainParam.RAND.Eq.addremoved2test==1), 
-                            addremoved2test = 1; addremoved2teststr = ', shuffle to CV1 data'; 
+                        addremoved2test = 1; addremoved2teststr = ', shuffle to CV1 test data'; 
                     end
                 end
+                MenuVec = [MenuVec 13];
                 switch NM.modeflag
                     case 'regression'
-                        histstr = ['Equalize label histogram at the CV1 cycle by undersampling [ ' enabledstr addremoved2teststr ' ]|']; 
+                        EQstr = ['Equalize label histogram at the CV1 cycle by undersampling [ ' enabledstr addremoved2teststr ' ]|']; 
+                        if NM.TrainParam.RAND.Eq.enabled
+                            EQcovstr = sprintf('Define target label(s) for uniform distribution [ size: %g,%g ]|', size(Eq.Covar));
+                            EQminstr = sprintf('Define minimum # of observations at the lower end of label histogram [ %g ]|', Eq.mincount);
+                            EQmaxstr = sprintf('Define minimum # of observations at the upper end of label histogram [ %g ]|', Eq.maxcount);
+                            EQbinstr = sprintf('Define # of bins in label histogram [ %g ]|', Eq.bincount);
+                            EQshufflestr = sprintf('Shuffle removed observations to CV1 test data [ %s ]|', shufflestr{addremoved2test});
+                            EQorigstr = 'Show original histogram of the entire data|';
+                            EQeqstr = 'Show (equalized) histogram of CV1 training partition [1,1] (build CV structure first)|';
+                            MenuVec = [MenuVec 14:20];
+                        end
                     case 'classification'
-                        histstr = ['Equalize class sizes at the CV1 cycle by undersampling [ ' enabledstr addremoved2teststr ' ]|']; 
+                        EQstr = ['Equalize class sizes at the CV1 cycle by undersampling [ ' enabledstr addremoved2teststr ' ]|']; 
+                        if isfield(NM.TrainParam.RAND,'Eq') && NM.TrainParam.RAND.Eq.enabled
+                            EQposnegstr  = sprintf('Define positive/negative ratio after equalization (1=>same amount of positive/negative cases) [ %g ]', EQ.posnegrat);
+                            EQshufflestr = sprintf('Shuffle removed observations to CV1 test data [ %s ]', shufflestr{addremoved2test});
+                            MenuVec = [MenuVec 17 18 ];
+                        end
                 end
-                MenuVec = [ MenuVec 10];
                 buildstr = 'Build Cross-Validation structure|';
                 loadstr  = 'Load Cross-Validation structure|';
                 MenuVec = [MenuVec 6 7];
@@ -208,19 +232,20 @@ if ~defaultsfl
         end
     end
 
-    if ~isempty(CV2reps), MenuVec = [MenuVec(1:3) MenuVec_extra MenuVec(4:end) ]; end
-    if ~isempty(MenuRem), MenuVec(MenuRem) = []; end
+    if ~act
+        if ~isempty(CV2reps), MenuVec = [MenuVec(1:3) MenuVec_extra MenuVec(4:end) ]; end
+        if ~isempty(MenuRem), MenuVec(MenuRem) = []; end
     
-    nk_PrintLogo
-
-    fprintf('\n****************************************************************************************')
-    fprintf('\nSelect appropriate Kx (x=1/2) of folds for your dataset, where:')
-    fprintf('\n\tKx < # of available subjects defines K-fold repeated, stratified cross-validation')
-    fprintf('\n\tKx = -1 defines LOO cross-validation')
-    fprintf('\nIf you choose Kx = -1 no CV permutations will be available.')
-    fprintf('\n****************************************************************************************\n')
-
-    act = nk_input('MAIN INTERFACE >> DEFINE PARAMETERS >> CROSS-VALIDATION SETTINGS',0,'mq', ...
+        nk_PrintLogo
+    
+        fprintf('\n****************************************************************************************')
+        fprintf('\nSelect appropriate Kx (x=1/2) of folds for your dataset, where:')
+        fprintf('\n\tKx < # of available subjects defines K-fold repeated, stratified cross-validation')
+        fprintf('\n\tKx = -1 defines LOO cross-validation')
+        fprintf('\nIf you choose Kx = -1 no CV permutations will be available.')
+        fprintf('\n****************************************************************************************\n')
+    
+        act = nk_input('MAIN INTERFACE >> DEFINE PARAMETERS >> CROSS-VALIDATION SETTINGS',0,'mq', ...
                     [CV2Frame ...
                      CV2ps ...
                      CV2fs ...
@@ -228,21 +253,20 @@ if ~defaultsfl
                      CV1ps ...
                      CV1fs ...
                      Decomp ...
-                     histstr ...
+                     EQstr ...
+                     EQcovstr ...
+                     EQminstr ...
+                     EQmaxstr ...
+                     EQbinstr ...
+                     EQposnegstr ...
+                     EQshufflestr ...
+                     EQorigstr ...
+                     EQeqstr ...
                      buildstr loadstr savestr], MenuVec,1);
-
+    end
     switch act
-         case 11
-             NM.TrainParam.RAND.CV2Frame = nk_input('Select cross-validation framework',0,'m', ... 
-                 'Pooled|Outer Leave-Group-Out/Inner pooled|Nested Leave-Group-Out|Outer Leave-Group-Out/Inner Leave-Group-In',1:4,CV2frm);
-             switch NM.TrainParam.RAND.CV2Frame
-                 case 1
-                    if isfield(NM.TrainParam.RAND,'CV2LCO'), NM.TrainParam.RAND = rmfield(NM.TrainParam.RAND,'CV2LCO'); end
-                    if isfield(NM.TrainParam.RAND,'CV1LCO'), NM.TrainParam.RAND = rmfield(NM.TrainParam.RAND,'CV1LCO'); end
-                 case 2
-                    if isfield(NM.TrainParam.RAND,'CV1LCO'), NM.TrainParam.RAND = rmfield(NM.TrainParam.RAND,'CV1LCO'); end
-             end
-         case 1
+       
+        case 1
              if isfield(NM.TrainParam.RAND,'CV2Frame') 
                  switch NM.TrainParam.RAND.CV2Frame
                      case 1
@@ -260,14 +284,14 @@ if ~defaultsfl
                  NM.TrainParam.RAND.OuterPerm = ...
                             nk_input('Number of permutations for Outer (CV2) cross-validation ',0,'w1',CV2pn);
              end
-         case 2
+        case 2
              OuterFold = nk_input('Number of folds for Outer (CV2) cross-validation ',0,'i',CV2fn);
-             if OuterFold <= 1 && OuterFold ~= -1,
+             if OuterFold <= 1 && OuterFold ~= -1
                  errordlg('Specify at least two Outer (CV2) folds for k-fold cross-validation!');
              else
                  NM.TrainParam.RAND.OuterFold = OuterFold;
              end
-         case 3
+        case 3
              if isfield(NM.TrainParam.RAND,'CV2Frame') 
                  switch NM.TrainParam.RAND.CV2Frame
                     case {1,2}
@@ -286,70 +310,15 @@ if ~defaultsfl
                             nk_input('Number of permutations for Inner (CV1) cross-validation',0,'w1',CV1pn);
              end
              
-         case 4
+        case 4
              InnerFold = nk_input('Number of folds for Inner cross-validation (CV1)',0,'i',CV1fn);
-             if InnerFold <= 1 && InnerFold ~= -1,
+             if InnerFold <= 1 && InnerFold ~= -1
                  errordlg('Specify at least two CV1 folds for k-fold cross-validation!');
              else
                  NM.TrainParam.RAND.InnerFold = InnerFold;
              end
 
-         case 10
-
-             switch NM.modeflag
-                 case 'regression'
-                     NM.TrainParam.RAND.Eq.enabled = ...
-                         nk_input('Enable histogram equalization at the CV1 level',0,'yes|no',[1,0], enabled);
-                 case 'classification'
-                     NM.TrainParam.RAND.Eq.enabled = ...
-                         nk_input('Enable class size balancing at the CV1 level',0,'yes|no',[1,0], enabled);
-             end
-             if NM.TrainParam.RAND.Eq.enabled
-
-                 if isfield(NM,'covars') && ~isempty(NM.covars)
-                    eqtarget = nk_input('Perform histogram euqalization using the target label or some other covariate', ...
-                                        0,'m','Target label|Covariate',[0,1],1);
-                    if eqtarget
-                         covind = nk_SelectCovariateIndex(NM);
-                         NM.TrainParam.RAND.Eq.Covar = NM.covars(:,covind);
-                         varstr = NM.covnames{covind};
-                    else
-                         NM.TrainParam.RAND.Eq.Covar = NM.label;
-                         varstr = 'target label';
-                    end
-                 else
-                     NM.TrainParam.RAND.Eq.Covar = NM.label;
-                     varstr = 'target label';
-                 end
-                 switch NM.modeflag
-                     case 'classification'
-                         NM.TrainParam.RAND.Eq.posnegrat = nk_input('Target ratio bigger / smaller class (1 => classes have sample size after balancing)',0,'e', 1.5);
-                     case 'regression'
-                         mincount = 1; maxcount = 1; bincount = 10; addremoved2test = 1;
-                         if isfield(NM.TrainParam.RAND.Eq,'maxcount'), ...
-                             maxcount = NM.TrainParam.RAND.Eq.maxcount; end
-                         if isfield(NM.TrainParam.RAND.Eq,'mincount'), ...
-                             mincount = NM.TrainParam.RAND.Eq.mincount; end
-                         if isfield(NM.TrainParam.RAND.Eq,'bincount'), ...
-                             bincount = NM.TrainParam.RAND.Eq.bincount; end
-                         fprintf('\n\n************************************************************')
-                         fprintf('\nSetup for histogram equalization during CV1 cycle generation')
-                         fprintf('\n************************************************************\n')
-                         figure;histogram(NM.TrainParam.RAND.Eq.Covar); 
-                            ylabel('# of observations in bins'); 
-                            xlabel(varstr); 
-                            title(['Histogram analysis of ' varstr]);
-                         NM.TrainParam.RAND.Eq.maxcount = ...
-                             nk_input('Minimum # of observation at the upper end of label histogram',0,'e', maxcount);
-                         NM.TrainParam.RAND.Eq.mincount = ...
-                             nk_input('Minimum # of observation at the lower end of label histogram',0,'e', mincount);
-                         NM.TrainParam.RAND.Eq.bincount = ...
-                             nk_input('# Bins for histogram analysis',0,'e',bincount);
-                 end
-                 NM.TrainParam.RAND.Eq.addremoved2test = ...
-                     nk_input('Add removed training subjects to respective CV1 test folds?',0,'yes|no',[1,0],addremoved2test);
-             end
-         case 5
+        case 5
              if NM.TrainParam.RAND.InnerFold == -1 || NM.TrainParam.RAND.OuterFold == -1
                  NM.TrainParam.RAND.Decompose = ...
                      nk_input('Multi-group decomposition method',0,'m', ...
@@ -359,7 +328,8 @@ if ~defaultsfl
                      nk_input('Multi-group decomposition method',0,'m', ...
                      'One-vs-One|One-vs-All',[1,2],Decompn);
              end
-         case 6
+         
+        case 6
              groups = []; appendfl=false; oldcv=zeros(0,size(NM.label,2));
 
              % Checkwhether to overwrite or append to current CV structure
@@ -404,18 +374,71 @@ if ~defaultsfl
                      end
                  end
              end
-         case 7
+        case 7
              loadcv = nk_FileSelector(1,'matrix','Select cross-validation structure', 'CVstruct_.*\.mat');
              load(loadcv,'cv');
              NM.cv = cv;
-         case 8
+        case 8
              savecv = nk_input('Path & filename for cross-validation structure',0,'s');
              cv =  NM.cv;
              save(['CVstruct_' savecv '.mat'],'cv');
-             
-        case 12
+        case 11
+             NM.TrainParam.RAND.CV2Frame = nk_input('Select cross-validation framework',0,'m', ... 
+                 'Pooled|Outer Leave-Group-Out/Inner pooled|Nested Leave-Group-Out|Outer Leave-Group-Out/Inner Leave-Group-In',1:4,CV2frm);
+             switch NM.TrainParam.RAND.CV2Frame
+                 case 1
+                    if isfield(NM.TrainParam.RAND,'CV2LCO'), NM.TrainParam.RAND = rmfield(NM.TrainParam.RAND,'CV2LCO'); end
+                    if isfield(NM.TrainParam.RAND,'CV1LCO'), NM.TrainParam.RAND = rmfield(NM.TrainParam.RAND,'CV1LCO'); end
+                 case 2
+                    if isfield(NM.TrainParam.RAND,'CV1LCO'), NM.TrainParam.RAND = rmfield(NM.TrainParam.RAND,'CV1LCO'); end
+             end
+         case 12
              NM.TrainParam.RAND.OuterPerm = nk_input('Number of repetitions for Outer (CV2) cross-validation',0,'w1',CV2pn);
-                             
+         case 13
+             NM.TrainParam.RAND.Eq.enabled = ~NM.TrainParam.RAND.Eq.enabled ;
+         case 14
+             if isfield(NM,'covars') && ~isempty(NM.covars)
+                eqtarget = nk_input('Perform histogram euqalization using the target label or some other covariate', ...
+                                    0,'m','Target label|Covariate',[0,1],1);
+                if eqtarget
+                     covind = nk_SelectCovariateIndex(NM);
+                     NM.TrainParam.RAND.Eq.Covar = NM.covars(:,covind);
+                     NM.TrainParam.RAND.Eq.CovarName = NM.covnames{covind};
+                else
+                    if isfield(NM.TrainParam,'MULTILABEL')
+                         NM.TrainParam.RAND.Eq.Covar = nm_nanmean(NM.label(:,NM.TrainParam.MULTILABEL.sel),2);
+                     else
+                         NM.TrainParam.RAND.Eq.Covar = nm_nanmean(NM.label,2);
+                     end
+                     NM.TrainParam.RAND.Eq.CovarName  = 'NM.label';
+                end
+             end
+        case 15
+             NM.TrainParam.RAND.Eq.mincount = ...
+                             nk_input('Minimum # of observation at the lower end of label histogram',0,'e', Eq.mincount);
+        case 16    
+             NM.TrainParam.RAND.Eq.maxcount = ...
+                 nk_input('Minimum # of observation at the upper end of label histogram',0,'e', Eq.maxcount);
+        case 17
+            switch NM.modeflag
+                 case 'classification'
+                     NM.TrainParam.RAND.Eq.posnegrat = nk_input('Target ratio bigger / smaller class (1 => classes have sample size after balancing)',0,'e', Eq.posnegrat);
+                 case 'regression'
+                      NM.TrainParam.RAND.Eq.bincount = nk_input('# Bins for histogram analysis',0,'i',Eq.bincount);
+            end
+        case 18
+             NM.TrainParam.RAND.Eq.addremoved2test = ~NM.TrainParam.RAND.Eq.addremoved2test;
+        case 19
+            figure;histogram(NM.TrainParam.RAND.Eq.Covar, NM.TrainParam.RAND.Eq.bincount); 
+            ylabel('# of observations in bins'); 
+            xlabel(NM.TrainParam.RAND.Eq.CovarName); 
+            title(['Histogram analysis of ' Eq.CovarName]);
+        case 20 
+            figure; histogram(NM.TrainParam.RAND.Eq.Covar(NM.cv.TrainInd{1,1}(NM.cv.cvin{1,1}.TrainInd{1,1})), NM.TrainParam.RAND.Eq.bincount);
+            ylabel('# of observations in bins'); 
+            xlabel(NM.TrainParam.RAND.Eq.CovarName); 
+            title(['Analysis of equalized histogram of ' Eq.CovarName]);
+
     end
 else
     NM.TrainParam.RAND.CV2Frame     = 1;

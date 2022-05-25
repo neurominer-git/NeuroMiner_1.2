@@ -192,9 +192,9 @@ else
     labelh = handles.BinClass{h}.labelh;
 end
 if GraphType > 3, 
-    signpred = sign(predh-0.5);
+    signpred = sign(predh-0.5); offy =0.5;
 else
-    signpred = sign(predh-offs);
+    signpred = sign(predh-offs); offy=0;
 end
 err = signpred ~= labelh;
 idx1 = id1 & ~err; idx2 = id2 & ~err; b(1) = 0; b(2)= 0;
@@ -202,7 +202,7 @@ idx1 = id1 & ~err; idx2 = id2 & ~err; b(1) = 0; b(2)= 0;
 if sum(idx1)
     if ~AltAx
         fIdx1 = find(id1);
-        v = [ [0 0]; [0 YLIMS(2)]; [lxL(fIdx1(end))+r YLIMS(2)]; [lxL(fIdx1(end))+r 0] ];             
+        v = [ [offy offy]; [offy YLIMS(2)]; [lxL(fIdx1(end))+r YLIMS(2)]; [lxL(fIdx1(end))+r offy] ];             
         patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', handles.colptin(handles.BinClass{h}.groupind(1),:), 'EdgeColor', 'none', 'FaceAlpha', 0.15)
     end
     b(1) = plot(lxL(idx1),predh(idx1),handles.colpt,...
@@ -225,7 +225,7 @@ if sum(idx2)
     end
     if ~AltAx
         fIdx2 = find(id2);
-        v = [ [lxL(fIdx2(1)) 0]; [lxL(fIdx2(1)) YLIMS(1)]; [XLIMS(2) YLIMS(1)]; [XLIMS(2) 0] ];             
+        v = [ [lxL(fIdx2(1)) offy]; [lxL(fIdx2(1)) YLIMS(1)]; [XLIMS(2) YLIMS(1)]; [XLIMS(2) offy] ];             
         patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
     end
     b(2) = plot(lxL(idx2),predh(idx2),CLP,...
@@ -336,7 +336,14 @@ switch GraphType
             case {'MikSVM','MKLRVM'}
                 algostr = 'RVM probability';
             case 'LIBSVM'
-                algostr = 'SVM score';
+                if handles.params.TrainParam.SVM.LIBSVM.Optimization.b
+                    algostr = 'SVM probability [Platt''s probabilities]';
+                elseif isfield(handles.params.TrainParam.SVM,'BBQ') && handles.params.TrainParam.SVM.BBQ.flag==1
+                    algostr = 'SVM probability [Bayesian Binning into Quantiles]';
+                else
+                    algostr = 'SVM decision score';
+                end
+                
             case 'MVTRVR'
                 algostr = 'RVR score';
             case 'MEXELM';

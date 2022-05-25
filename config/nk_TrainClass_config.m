@@ -40,6 +40,11 @@ if ~isfield(NM,'TrainParam')
     NM.TrainParam.verbosity     = 1;
 elseif ~isfield(NM.TrainParam,'verbosity')
     NM.TrainParam.verbosity     = 1;
+    if size(NM.label,2)>1
+        NM.TrainParam.MULTILABEL.flag = true;
+        NM.TrainParam.MULTILABEL.sel = 1:size(NM.label,2);
+        NM.TrainParam.MULTILABEL.dim = size(NM.label,2);
+    end
 end
 
 % Check whether the number of modalities specified in FUSION.M matches 
@@ -210,6 +215,19 @@ if ~exist('act','var') || isempty(act)
         oocvstr='';
         oocvflag = false;
     end
+    if size(NM.label,2)>1
+        if isfield(NM,'TrainParam') && isfield(NM.TrainParam,'MULTILABEL')
+            nL = nk_GetLabelDim(NM.TrainParam.MULTILABEL);
+            if nL>1
+                multlabelselstr = sprintf('%g labels selected',nL);
+            else
+                multlabelselstr = sprintf('Label: %s',NM.labelnames{NM.TrainParam.MULTILABEL.sel});
+            end
+        else
+            multlabelselstr = sprintf('%g labels selected',size(NM.label,2));
+        end
+        menustr = [ menustr 'Label selection in multi-label mode [ ' multlabelselstr ' ]|']; menuact = [ menuact 20];
+    end
 
     menustr = [menustr 'Cross-validation settings [ ' STATUS.cv ' ]|']; menuact = [menuact 3];
     
@@ -255,7 +273,8 @@ if ~exist('act','var') || isempty(act)
             menustr = [ menustr multistr];
             menuact = [ menuact 9 ]; 
         end
-    end   
+    end
+    
     menustr = [ menustr ... 
                 'Visualization options [ ' STATUS.VIS ' ]|' ...
                 'Model saving options [ ' STATUS.SAV ' ]|' ...
@@ -269,7 +288,7 @@ if ~exist('act','var') || isempty(act)
     menuact = [ menuact 11 12 ];
     if oocvflag, menuact = [ menuact 13 ]; end
     menuact = [ menuact 16 19 14 15 ];
-    
+
     nk_PrintLogo
     mestr = 'Define parameter template'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('\nYou are here: %s >>> ',parentstr);
     if fusemode > 1, fprintf('\n==> CONFIGURATION OF MODALITY #%g: %s', varind, descstr ); end
@@ -510,6 +529,27 @@ switch act
         
     case 19
         nk_PrintWs(NM, NM.TrainParam)
+
+    case 20
+        nk_PrintLogo
+        fprintf('\n*************************************')
+        fprintf('\n***     MULTI-LABEL SELECTION     ***')
+        fprintf('\n*************************************')
+        fprintf('\n')
+        for i=1:size(NM.label,2)
+            fprintf('\n- %g -  %s',i, NM.labelnames{i})
+        end
+        NM.TrainParam.MULTILABEL.sel = nk_input('Select labels for processing',0,'i',NM.TrainParam.MULTILABEL.sel);
+        NM.TrainParam.MULTILABEL.dim = numel(NM.TrainParam.MULTILABEL.sel);
+        if isfield(NM.TrainParam.RAND,'Eq') && NM.TrainParam.RAND.Eq.enabled && strcmp(NM.TrainParam.RAND.Eq.CovarName,'NM.label')
+            NM.TrainParam.RAND.Eq.Covar = nm_nanmean(NM.label(:,NM.TrainParam.MULTILABEL.sel),2);
+            nk_PrintLogo
+            fprintf('\nFound active histogram equalization based on NM.label!')
+            reinitcv = nk_input('Shall I reinitialize the CV structure ?', 0, 'yes|no', [1,0], 1);
+            if reinitcv
+                nk_CVpartition_config(0,6);
+            end
+        end
 end
 act = 1;
 

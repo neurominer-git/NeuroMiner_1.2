@@ -24,7 +24,7 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, paramfl, 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 03/2021
 
-global PREPROC MODEFL MULTI CV RAND VERBOSE TEMPL SVM
+global PREPROC MODEFL MULTI CV RAND VERBOSE TEMPL SVM MULTILABEL
 
 % Initialize runtime variables
 i       = inp.f; % Curration permutation
@@ -98,17 +98,23 @@ end
 if ~isempty(MULTI) && MULTI.flag, tY.mTsL = labels(TsInd,:); end
 for u=1:ukbin, TsI{u} = TsInd; end
 
+if MULTILABEL.flag && size(labels,2)>1
+    lb = MULTILABEL.sel;
+else
+    lb = 1;
+end
+
 for u=1:kbin
     switch MODEFL
         case 'regression'
-            TsL     = labels(TsInd,:);
+            TsL     = labels(TsInd,lb);
             TsInd   = true(size(TsL,1),1);
         case 'classification'
             if RAND.Decompose == 9
-                TsL     = labels(TsInd,:);
+                TsL     = labels(TsInd,lb);
                 TsInd   = true(size(TsL,1),1);
             else
-                TsL     = CV.classnew{i,j}{u}.label;
+                TsL     = CV.classnew{i,j}{u}.label(:,lb);
                 TsInd   = CV.classnew{i,j}{u}.ind;
             end
     end
@@ -179,8 +185,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
             end
             TrI = TrInd(CV.cvin{i,j}.TrainInd{k,l});
             CVI = TrInd(CV.cvin{i,j}.TestInd{k,l});
-            TrL = labels(TrI,:);
-            CVL = labels(CVI,:);
+            TrL = labels(TrI,lb);
+            CVL = labels(CVI,lb);
             
             if size(TrI,2)>2
                 TrI = TrI';
@@ -313,7 +319,6 @@ for k=sta_iy:stp_iy % Inner permutation loop
             end
 
             %% Generate and execute for given CV1 partition preprocessing sequence
-
             [InputParam, oTrainedParam, SrcParam] = nk_GenPreprocSequence(InputParam, PREPROC, SrcParam, oTrainedParam);
             
             %% Write preprocessed data to mapY structure
@@ -340,11 +345,11 @@ for k=sta_iy:stp_iy % Inner permutation loop
             if isfield(SrcParam,'TrL_imputed'), 
                 TrL = SrcParam.TrL_imputed; 
                 [~,TrL] = nk_ManageNanCases(vTs{1}, TrL, SrcParam.iTr); 
-                tTrL = labels(TrI,:);
+                tTrL = labels(TrI,lb);
                 TrL(~isnan(tTrL)) = tTrL(~isnan(tTrL));
             else
                 % Overwrite labels adjusted to NaN cases
-                TrL = labels(TrI(~SrcParam.iTr),:); CVL = labels(CVI(~SrcParam.iCV),:);
+                TrL = labels(TrI(~SrcParam.iTr),lb); CVL = labels(CVI(~SrcParam.iCV),lb);
             end
             
             clear InputParam
@@ -386,8 +391,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
                             tY.TrL{k,l}{zu} = CV.class{i,j}{zu}.TrainLabel{k,l};
                             tY.CVL{k,l}{zu} = CV.class{i,j}{zu}.TestLabel{k,l};	
                         else
-                            tY.TrL{k,l}{zu} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TrainInd{k,l}));
-                            tY.CVL{k,l}{zu} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TestInd{k,l}));
+                            tY.TrL{k,l}{zu} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TrainInd{k,l}),lb);
+                            tY.CVL{k,l}{zu} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TestInd{k,l}),lb);
                         end
                     end
 
@@ -417,11 +422,11 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         case 'classification'
                             if RAND.Decompose ~=9
                                 % Write labels to CV1 partition
-                                tY.TrL{k,l}{u} = CV.class{i,j}{u}.TrainLabel{k,l};	
-                                tY.CVL{k,l}{u} = CV.class{i,j}{u}.TestLabel{k,l};	
+                                tY.TrL{k,l}{u} = CV.class{i,j}{u}.TrainLabel{k,l}(:,lb);	
+                                tY.CVL{k,l}{u} = CV.class{i,j}{u}.TestLabel{k,l}(:,lb);	
                             else
                                 tY.TrL{k,l}{u} = TrL;
-                                tY.CVL{k,l}{u} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TestInd{k,l}),:);
+                                tY.CVL{k,l}{u} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TestInd{k,l}),lb);
                             end
                     end
 

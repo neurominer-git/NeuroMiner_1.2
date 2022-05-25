@@ -59,19 +59,21 @@ if spm_flip_analyze_images; mat = diag([-1 1 1 1])*mat; end;
 
 % Create output image
 VO            = V;
-VO.fname      = fullfile(pwd,'temp.nii');
+VO.fname      = fullfile(pwd,'rtemp.nii');
 VO.dim(1:3)   = imgdim(1:3);
 VO.mat        = mat;
 VO            = spm_create_vol(VO);
 T = [];
+Tx = zeros(VO.dim);
 for i = 1:imgdim(3)
     M = inv(spm_matrix([0 0 -i])*inv(VO.mat)*V.mat);
     mask_slice = spm_slice_vol(V,M,VO.dim(1:2),1);
     ind0 = find(feval('gt', mask_slice,0));
     img = spm_slice_vol(V, M, imgdim(1:2), 1);
+    Tx(:,:,i) = img; 
     if ~isempty(ind0), 
-        T = [T; img(ind0) ]; 
+        T = [T; img(ind0)];
     end
 end
 T=T';
-
+spm_write_vol(VO,reshape(Tx,VO.dim));
