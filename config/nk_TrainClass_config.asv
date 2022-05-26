@@ -37,7 +37,7 @@ if ~isfield(NM,'TrainParam')
     NM.TrainParam.MULTI.flag    = 0;
     NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
     [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1); 
-    NM.TrainParam               = nk_MLI_config(NM.TrainParam, true);
+    NM.TrainParam               = nk_MLI
     NM.TrainParam.verbosity     = 1;
 elseif ~isfield(NM.TrainParam,'verbosity')
     NM.TrainParam.verbosity     = 1;
@@ -278,7 +278,7 @@ if ~exist('act','var') || isempty(act)
     
     menustr = [ menustr ... 
                 'Visualization options [ ' STATUS.VIS ' ]|' ...
-                'Prediction interpretation options [ ' STATUS.MLI ' ]|' ...
+                'Prediction interpretation options [ ' STATUS.MLI ']|' ...
                 'Model saving options [ ' STATUS.SAV ' ]|' ...
                 oocvstr ...
                 'Define verbosity level [ ' verbostr ' ]|' ...
@@ -436,7 +436,7 @@ switch act
     
     % ML INTEPRETATION STRATEGIES =======================================================================================================================================   
     case 11
-        act = 1; while act>0, [ NM.TrainParam, act ] = nk_MLI_config(NM.TrainParam); end
+        %nk_Ensemble_config;
         
     % SAVING OPTIONS ====================================================================================================================================================     
     case 12

@@ -23,7 +23,7 @@ function [ inp, contfl, analysis, mapY, GD, MD, Param, P, mapYocv ] = nk_ApplyTr
 global VERBOSE PREPROC SAV OCTAVE
 
 contfl = false; 
-mapYocv = []; mapY = []; Param = []; GD = []; MD = []; P = paramfl; 
+mapYocv = []; mapY = []; GD = []; MD = []; P = paramfl; 
 % Load CVdatamat for current CV2 partition
 if ~exist(analysis.RootPath,'dir'), analysis.RootPath = nk_DirSelector('Specify root directory of analysis'); end
 if isempty(analysis.GDfilenames{inp.f,inp.d}), contfl = true; return; end
@@ -45,17 +45,21 @@ if smoothonly
     inp.smoothonly = false;
     inp.issmoothed = true;
 else
-    
     Yocv = []; 
     issmoothed = false; if isfield(inp,'issmoothed') && inp.issmoothed, issmoothed = true; end
     nM = numel(inp.PREPROC);
     if ~isfield(inp,'saveparam'), inp.saveparam = false; end
 
-    P = cell(1, nM); mapY = cell(1, nM); mapYocv = cell(1,nM); Param = cell(1,nM);
+    P = cell(1, nM); mapY = cell(1, nM); mapYocv = cell(1,nM); 
     % Check whether optimized preprocessing params exist
     if exist("Param",'var') && ~isempty(Param)
-        paramfl.found = true;
+        if iscell(paramfl)
+            paramfl{1}.found= true;
+        else
+            paramfl.found = true;
+        end
     else
+        Param = cell(1,nM);
         if isfield(inp,'optpreprocmat') && ~isempty(inp.optpreprocmat) && ~inp.saveparam
             if exist(inp.optpreprocmat{inp.f,inp.d},'file')
                 fprintf('\nLoading optimized pre-processing parameters for CV2 [%g,%g]:\n%s', ...
@@ -84,12 +88,15 @@ else
     
         if iscell(paramfl)
             tparamfl = paramfl{n};
-            PREPROC = inp.PREPROC{n};
         else
             tparamfl = paramfl;
-            PREPROC = inp.PREPROC;
         end
 
+        if iscell(PREPROC)
+             PREPROC = inp.PREPROC{n};
+        else
+            PREPROC = inp.PREPROC;
+        end
         tparamfl.PV = inp.X(n);
 
         if VERBOSE, fprintf('\nGenerate pre-processing parameter array for CV2 partition [%g,%g].\n',inp.f,inp.d); end

@@ -7,7 +7,7 @@ function [Results, FileNames, RootPath] = nk_MLInterpreter(inp)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, last modified 08/2020
 
-global SVM RFE MULTI MODEFL CV EVALFUNC SCALE SAV CVPOS 
+global SVM RFE MULTI MODEFL CV EVALFUNC SCALE SAV CVPOS MLI 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FullPartFlag    = RFE.ClassRetrain;
 switch inp.analmode
@@ -33,6 +33,8 @@ algostr         = GetMLType(SVM);
 interpAll       = cell(nclass,1);
 ll              = 1; 
 totLearn        = 0;
+oocvflag        = inp.oocvflag;
+inp.MLI         = MLI;
 
 if ~exist('GridAct','var') || isempty(GridAct), GridAct = nk_CVGridSelector(ix,jx); end
 if ~exist('batchflag','var') || isempty(batchflag), batchflag = false; end
@@ -83,12 +85,12 @@ for f=1:ix % Loop through CV2 permutations
         else
             tInd = CV.TestInd{f,d};
         end
-        predCV2 = cell(nclass,1);
-        switch inp.method
+        predOrig = cell(nclass,1);
+        switch inp.MLI.method
             case 'posneg'
-                interpCV2 = cell(nclass,2);
+                predInterp = cell(nclass, numel(tInd),2);
             case 'median'
-                interpCV2 = cell(nclass,1);
+                predInterp = cell(nclass, numel(tInd),1);
         end
         inp.f = f; inp.d = d; 
         operm = f; ofold = d;
@@ -219,7 +221,13 @@ for f=1:ix % Loop through CV2 permutations
                                     % training and test data, (c) CV1 training & test
                                     % data as well as CV2 test data              
                                     if BINMOD, hix = h; else, hix = 1; end
-                                    [ TR , CV1, CV2 ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, mapYocv.Ts{k,l}{hix}, Param{1}(k,l,hix), pnt);                                       
+                                    if inp.oocvflag
+                                        [ TR , CV1, CV2, OCV ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, mapYocv.Ts{k,l}{hix}, Param{1}(k,l,hix), pnt);
+                                        uD = zeros(size(OCV,1),ul);
+                                    else 
+                                        [ TR , CV1, CV2 ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, [], Param{1}(k,l,hix), pnt);
+                                        uD = zeros(size(CV2,1),ul);
+                                    end
                                     if FullPartFlag, TR = [ TR; CV1]; end
  
                                    % Get and build label info
@@ -244,21 +252,27 @@ for f=1:ix % Loop through CV2 permutations
                                             f, d, k, l, ul, algostr, totLearn, P_str)
                                     end
 
-                                    uD = zeros(size(TsInd,1),ul);
-
                                     % Loop through feature subspaces
                                     for u=1:ul
                                         % Extract features according to mask
                                         TR_star = nk_ExtractFeatures(TR, F, [], u);
-                                        CV2_star = nk_ExtractFeatures(CV2, F, [], u);
+                                        
                                         if ~fndMD
                                             fprintf('Compute optimal model...');
                                             [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(TR_star, modelTrL, sPs, 1);
                                             fprintf(' done.');
                                         end
+
                                         fprintf(' Predict CV2 test data...')
                                         % Apply model to CV2 test data 
-                                        [~, ~, uD(:,u)] = nk_GetTestPerf(CV2_star, ones(size(CV2_star,1),1), F(:,u), MD{h}{m}{k,l}{u}, Ymodel, 1);
+                                        if inp.oocvflag
+                                            OCV_star = nk_ExtractFeatures(OCV, F, [], u);
+                                            [~, ~, uD(:,u)] = nk_GetTestPerf(OCV_star, ones(size(CV2_star,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
+                                        else
+                                            CV2_star = nk_ExtractFeatures(CV2, F, [], u);
+                                            [~, ~, uD(:,u)] = nk_GetTestPerf(CV2_star, ones(size(CV2_star,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
+
+                                        end
                                         fprintf(' done.')
                                     end
                                     
@@ -268,7 +282,7 @@ for f=1:ix % Loop through CV2 permutations
                                         p = GD.Detrend{Pspos(m)}.p;
                                         uD(:,u) = nk_DetrendPredictions2(beta, p, uD(:,u)); 
                                     end    
-                                    predCV2{h} = [predCV2{h} uD];
+                                    predOrig{h} = [predOrig{h} uD];
                                 end
                             end
                         end
@@ -282,9 +296,6 @@ for f=1:ix % Loop through CV2 permutations
                         % Retrieve optimal parameters from precomputed analysis structure
                         % Differentiate according to binary or multi-group mode
                         [~, ~, nP, ~] = nk_GetModelParams2(analysis, multiflag, ll, h, inp.curlabel);
-                        
-                        if ~fndMD , MD{h} = cell(nP,1); end
-                        predOCV = cell(1,nclass);
 
                         for q=1:numel(tInd) % Loop through CV2/OOCV cases 
                             
@@ -296,10 +307,10 @@ for f=1:ix % Loop through CV2 permutations
                                 % (see there)
                                 inp = nk_CreateData4MLInterpreter(inp, nx, TrInd, tInd(q,:));
                             end
-                            switch inp.method
+                            switch inp.MLI.method
                                 case 'posneg'
-                                    inp.desc_oocv{1} = sprintf('%g%%-percentile modification', inp.upper_thresh);
-                                    inp.desc_oocv{2} = sprintf('%g%%-percentile modification', inp.lower_thresh);
+                                    inp.desc_oocv{1} = sprintf('%g%%-percentile modification', inp.MLI.upper_thresh);
+                                    inp.desc_oocv{2} = sprintf('%g%%-percentile modification', inp.MLI.lower_thresh);
                                     [ inp, ~, ~, ~, ~, ~, ~, ~, mapYocv ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param);
                                 case 'median'
                                     inp.desc_oocv = 'median modification';
@@ -345,8 +356,11 @@ for f=1:ix % Loop through CV2 permutations
                                         % data as well as CV2 test data              
                                         if BINMOD, hix = h; else, hix = 1; end
                                         [ TR , ~, ~, OCV ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, mapYocv.Ts{k,l}{hix}, Param{1}(k,l,hix), pnt);    
-                                        switch inp.method
+
+                                        switch inp.MLI.method
                                             case 'posneg'
+                                                uD_pos = zeros(size(OCV{1},1),ul);
+                                                uD_neg = zeros(size(OCV{1},1),ul);
                                                 % Loop through feature subspaces
                                                 for u=1:ul
             
@@ -370,17 +384,18 @@ for f=1:ix % Loop through CV2 permutations
                                                         uD_neg(:,u) = nk_DetrendPredictions2(beta, p, uD_neg(:,u));
                                                     end    
                                                 end
-                                                predOCV_pos{h} = [predOCV_pos{h} uD_pos];
-                                                predOCV_neg{h} = [predOCV_neg{h} uD_neg];
+                                                predInterp{h,q,1} = [predInterp{h,q,1} uD_pos];
+                                                predInterp{h,q,2} = [predInterp{h,q,2} uD_neg];
 
                                             case 'median'
-
+                                                 uD = size(OCV{1},ul);
                                                 % Loop through feature subspaces
                                                 for u=1:ul
             
                                                     % Extract features according to mask
                                                     TR_star   = nk_ExtractFeatures(TR, F, [], u);
                                                     OCV_star  = nk_ExtractFeatures(OCV, F, [], u);
+
                                                     % Apply trained model to
                                                     % artificial data and generate
                                                     % predictions for later
@@ -395,17 +410,15 @@ for f=1:ix % Loop through CV2 permutations
                                                         uD(:,u) = nk_DetrendPredictions2(beta, p, uD(:,u)); 
                                                     end    
                                                 end
-                                                predOCV{h} = [predOCV{h} uD];
-                                        end
-                                        
+                                                predInterp{h,q} = [predInterp{h,q} uD];
+                                        end  
                                     end
                                 end
                             end
                         end
-
                     end
 
-                    fprintf('\nSaving %s', oMLIpath); save(oMLIpath,'binOOCVDh','operm','ofold');
+                    fprintf('\nSaving %s', oMLIpath); save(oMLIpath,'predOrig', 'predInterp','operm','ofold');
                     if saveparam, fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); end
                 end
                 

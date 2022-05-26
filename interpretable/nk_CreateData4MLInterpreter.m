@@ -5,7 +5,7 @@ Tr = IN.X(nx).Y(TrInd,:);
 if isfield(IN.X(nx),'Yocv')
     Ts = IN.X(nx).Yocv(TsInd,:);
     if isfield(IN,'covars_oocv') && ~isempty(IN.covars_oocv) && nx == 1
-        switch IN.method
+        switch IN.MLI.method
             case 'posneg'
                 IN.covars_rep{1} = repmat(IN.covars_oocv(TsInd,:),IN.nperms,1);
                 IN.covars_rep{2} = repmat(IN.covars_oocv(TsInd,:),IN.nperms,1);
@@ -28,44 +28,44 @@ else
     Yocvstr = 'Yocv';
 end
 % If map is provided determine subspace for modification
-if isfield(IN,'MAP') && ~isempty(IN.MAP)    
-    cutoff = IN.MAP.cutoff;
-    if isfield(IN.MAP,'percentmode') && IN.MAP.percentmode
-        cutoff = percentile(IN.MAP.map, IN.MAP.cutoff);
+if isfield(IN.MLI,'MAP') && IN.MLI.MAP.flag     
+    cutoff = IN.MLI.MAP.cutoff;
+    if isfield(IN.MLI.MAP,'percentile') && IN.MLI.MAP.percentmode
+        cutoff = percentile(IN.MLI.MAP.map, IN.MLI.MAP.cutoff);
     end
-    mapidx = return_imgind(IN.MAP.operator, cutoff, IN.MAP.map);
+    mapidx = return_imgind(IN.MLI.MAP.operator, cutoff, IN.MLI.MAP.map);
 else
     mapidx = 1:n;
 end
 
 % Determine extremes of the distribution
 n = numel(mapidx);
-nfrac = ceil(n*IN.frac);
+nfrac = ceil(n*IN.MLI.frac);
 
-switch IN.method
+switch IN.MLI.method
     case 'posneg'
 
-        upper = prctile(Tr(:,mapidx), IN.upper_thresh);
-        lower = prctile(Tr(:,mapidx), IN.lower_thresh);
+        upper = prctile(Tr(:,mapidx), IN.MLI.upper_thresh);
+        lower = prctile(Tr(:,mapidx), IN.MLI.lower_thresh);
                 
-        if ~isinf(IN.nperms)
+        if ~isinf(IN.MLI.nperms)
         
-            P = repmat(Ts, IN.nperms, 1);
-            N = repmat(Ts, IN.nperms, 1);
-            I = false(IN.nperms, size(Tr,2));
+            P = repmat(Ts, IN.MLI.nperms, 1);
+            N = repmat(Ts, IN.MLI.nperms, 1);
+            I = false(IN.MLI.nperms, size(Tr,2));
             
             % Create modified instances of case
-            for i=1:IN.nperms
+            for i=1:IN.MLI.nperms
                 idx = randperm(n, nfrac);
                 P(i, mapidx(idx)) = upper(idx); 
                 N(i, mapidx(idx)) = lower(idx);
                 I(i, mapidx(idx)) = true;
             end
         else
-            I = false(IN.max_iter, size(Tr,2)); iter = 1; completed = false;
-            while iter <= IN.max_iter
+            I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
+            while iter <= IN.MLI.max_iter
                 I(iter, mapidx(randperm(n, nfrac))) = true;
-                if sum( sum(I(1:iter,:)) >= IN.n_visited ) == n
+                if sum( sum(I(1:iter,:)) >= IN.MLI.n_visited ) == n
                     completed = true;
                     break
                 end
@@ -99,27 +99,27 @@ switch IN.method
         medi = prctile(Tr(:,mapidx), 50);
         if ~isinf(IN.nperms)
         
-            M = repmat(Ts, IN.nperms, 1);
-            I = false(IN.nperms, size(Tr,2));
+            M = repmat(Ts, IN.MLI.nperms, 1);
+            I = false(IN.MLI.nperms, size(Tr,2));
             
             % Create modified instances of case
-            for i=1:IN.nperms
+            for i=1:IN.MLI.nperms
                 idx = randperm(n, nfrac);
                 M(i, mapidx(idx)) = medi(idx); 
                 I(i, mapidx(idx)) = true;
             end
         else
-            I = false(IN.max_iter, size(Tr,2)); iter = 1; completed = false;
-            while iter <= IN.max_iter
+            I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
+            while iter <= IN.MLI.max_iter
                 I(iter, mapidx(randperm(n, nfrac))) = true;
-                if sum( sum(I(1:iter,:)) >= IN.n_visited ) == n
+                if sum( sum(I(1:iter,:)) >= IN.MLI.n_visited ) == n
                     completed = true;
                     break
                 end
                 iter=iter+1;
             end
             if ~completed
-                warning('\n Not all features underwent the predefined amount of %g modifications after %g iterations.', IN.n_visited, IN.max_iter);
+                warning('\n Not all features underwent the predefined amount of %g modifications after %g iterations.', IN.MLI.n_visited, IN.MLI.max_iter);
             else
                 I(iter,:)=[];
                 iter=iter-1;

@@ -14,7 +14,13 @@ if iscell(oTr)
     if ~oocvonly
         CV = oCV{Ix}; Ts = oTs{Ix};   
     end
-    if ~isempty(oOcv), Ocv = oOcv{Ix}; end
+    if ~isempty(oOcv)
+        if size(oOcv,2)>1
+            Ocv = oOcv(Ix,:);
+        else
+            Ocv = oOcv{Ix}; 
+        end
+    end
 else
     Tr = oTr; 
     if ~oocvonly

@@ -411,7 +411,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
             if oocvonly
                 if iscell(Yocv)
                     for n=1:numel(Yocv)
-                        ocv{n} = squeeze(InputParam.Ts(:,n,:));
+                        ocv{n} = squeeze(InputParam.Ts{:,n,:});
                     end
                 else
                     ocv = squeeze(InputParam.Ts(:,1,:));
@@ -425,8 +425,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 tsd = squeeze(InputParam.Ts(:,3,:));
                 if ~isempty(Yocv) 
                     if iscell(Yocv)
-                        for n=1:numel
-                            ocv{n} = squeeze(InputParam.Ts(:,3+n,:)); 
+                        for n=1:numel(Yocv)
+                            ocv{n} = squeeze(InputParam.Ts{:,3+n,:}); 
                         end
                     else
                         ocv = squeeze(InputParam.Ts(:,4,:));
@@ -528,7 +528,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                     if ~isempty(Yocv)
                         if iscell(Yocv)
                             for n=1:numel(Yocv)
-                                tYocv.Ts{k,l}{u}{n} = nk_ManageNanCases(ocv{n}, [], SrcParam.iOCV); 
+                                tYocv.Ts{k,l}{u}{n} = nk_ManageNanCases(ocv{n}, [], SrcParam.iOCV{n}); 
                             end
                         else
                             tYocv.Ts{k,l}{u} = nk_ManageNanCases(ocv, [], SrcParam.iOCV); 
