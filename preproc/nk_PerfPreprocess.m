@@ -327,6 +327,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
             end
             
             %% Generate SrcParam structure
+            SrcParam.oocvonly           = oocvonly;
             SrcParam.TrX                = TrX;
             if ~oocvonly
                 SrcParam.TrI                = TrI;
