@@ -1,4 +1,4 @@
-function [P, N, I] = nkdev_CreateData4ModelInterpreter(Tr, Ts, IN, Px)
+function [P, N, I] = nkdev_CreateData4ModelInterpreterPosNeg(Tr, Ts, IN, Px)
 
 n = size(Tr,2);
 

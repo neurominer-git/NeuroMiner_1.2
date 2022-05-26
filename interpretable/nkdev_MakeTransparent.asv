@@ -1,14 +1,10 @@
 function [Y_interpreted, Y_predictions, Px] = nkdev_MakeTransparent(Y, L, IN, Px)
-% =================================================================================
-% function [Y_interpreted, Y_predictions, Px] = nkdev_MakeTransparent(Y, L, IN, Px)
-% =================================================================================
 % Y :   the data matrix to work with (e.g., NM.Y{1})
 % L :   the label vector (e.g., [1 -1])
 % IN :  the parameters required to rune the script (more or less
 %       self-explaining, see below)
-% Px :  The models generated in a previous run to compare different
-%       parameter settings for the model interpretation
-% =================================================================================
+% Px :  The models generated in a previous run to compare 
+% =========================================================================
 global SVM
 
 if ~isfield(IN, 'RAND') || isempty(IN.RAND)
@@ -306,9 +302,7 @@ for j=1:pCV
                     % Analyze model's predictions for current case
                     Ts_Y_map(h,:) = nkdev_MapModelPredictionsMedian(Ts_Y_predict(h), h_ds_median, h_Idx);
             end
-            if isfield(IN,'brainmask')
-                nk_WriteVol(Ts_Y_map(h,:),sprintf('Subject_%g_interpretedZ',Ts(h)),1,IN.brainmask,IN.badcoords,0,'gt');
-            end
+            nk_WriteVol(Ts_Y_map(h,:),sprintf('Subject_%g_interpretedZ',Ts(h)),1,IN.brainmask,IN.badcoords,0,'gt');
         end
 
         Y_interpreted(Ts,:) = Y_interpreted(Ts,:) + Ts_Y_map;
@@ -324,5 +318,9 @@ for j=1:pCV
     end
 end
 Y_interpreted = Y_interpreted/pCV;
+Y_interpreted = nk_PerfStandardizeObj(Y_interpreted);
+Y_original = nk_PerfStandardizeObj(Y);
 Y_predictions = Y_predictions/pCV;
-
+for h=1:size(Y_interpreted,1)
+    nk_WriteVol(Y_original(h,:),sprintf('subject_origZ_%g',h),1,IN.brainmask,IN.badcoords,0,'gt');
+end

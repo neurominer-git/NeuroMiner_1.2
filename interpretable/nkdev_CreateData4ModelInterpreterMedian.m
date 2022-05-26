@@ -1,4 +1,4 @@
-function [P, N, I] = nkdev_CreateData4ModelInterpreter(Tr, Ts, IN, Px)
+function [M, I] = nkdev_CreateData4ModelInterpreterMedian(Tr, Ts, IN, Px)
 
 n = size(Tr,2);
 
@@ -17,22 +17,20 @@ end
 
 % Determine extremes of the distribution
 n = numel(mapidx);
-upper = prctile(Tr(:,mapidx), IN.upper_thresh);
-lower = prctile(Tr(:,mapidx), IN.lower_thresh);
+medi = prctile(Tr(:,mapidx), 50);
+%medi = zeros(1,numel(mapidx));
 
 nfrac = ceil(n*IN.frac);
 
 if ~isinf(IN.nperms)
 
-    P = repmat(Ts, IN.nperms, 1);
-    N = repmat(Ts, IN.nperms, 1);
+    M = repmat(Ts, IN.nperms, 1);
     I = false(IN.nperms, size(Tr,2));
     
     % Create modified instances of case
     for i=1:IN.nperms
         idx = randperm(n, nfrac);
-        P(i, mapidx(idx)) = upper(idx); 
-        N(i, mapidx(idx)) = lower(idx);
+        M(i, mapidx(idx)) = medi(idx); 
         I(i, mapidx(idx)) = true;
     end
 else
@@ -51,21 +49,17 @@ else
         I(iter,:)=[];
         iter=iter-1;
     end
-    P = repmat(Ts, iter, 1);
-    N = repmat(Ts, iter, 1);
+    M = repmat(Ts, iter, 1);
     for i=1:iter
-        P(i, I(i,:)) = upper(I(i,:)); 
-        N(i, I(i,:)) = lower(I(i,:));
+        M(i, I(i,:)) = medi(I(i,:)); 
     end
 end
 % Remove duplicates
-[~, ix] = unique(P-N,'rows');
-P = P(ix,:);
-N = N(ix,:);
+[~, ix] = unique(M,'rows');
+M = M(ix,:);
 I = I(ix,:);
-ix = isnan(P);
-P(ix) = 0;
-N(ix) = 0;
+ix = isnan(M);
+M(ix) = 0;
 
 function imgind = return_imgind(typthresh, thresh, img)
 

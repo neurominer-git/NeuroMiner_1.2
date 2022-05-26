@@ -5,7 +5,7 @@ function [InputParam, TrainedParam, SrcParam] = nk_GenPreprocSequence(InputParam
 % =========================================================================
 % 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2021
+% (c) Nikolaos Koutsouleris, 05/2022
 global MODEFL NM VERBOSE
 
 if isfield(TemplParam,'ACTPARAM')
@@ -17,7 +17,8 @@ if isfield(TemplParam,'ACTPARAM')
     InputParam.CV1fold      = SrcParam.CV1fold;
     actionseq               = cell(1,lact);
     InputParam.curclass     = SrcParam.u;
-  
+    if SrcParam.oocvonly, tscnt = 0; else, tscnt=3; end
+
     % Loop through ACTPARAM sequence
     for ac = 1:lact
         
@@ -47,81 +48,138 @@ if isfield(TemplParam,'ACTPARAM')
                 if ~isempty(SrcParam.covars)
                     InputParam.P{ac}.IND = TemplParam.ACTPARAM{ac}.IND;
                     InputParam.P{ac}.TsInd = [];
-                    if VERBOSE, 
+                    if VERBOSE
                         fprintf('\n* PER-GROUP NORMALIZATION AND ZERO-VARIANCE REMOVAL ACROSS GROUPS')
                         fprintf('\n\t- Normalize data to mean effects in group: %s', NM.covnames{TemplParam.ACTPARAM{ac}.IND});
                     end
-                    if isfield(SrcParam,'TrX'),         InputParam.P{ac}.TrInd        = SrcParam.covars( SrcParam.TrX, TemplParam.ACTPARAM{ac}.IND );   end
-                    if isfield(SrcParam,'TrI'),         InputParam.P{ac}.TsInd{end+1} = SrcParam.covars( SrcParam.TrI, TemplParam.ACTPARAM{ac}.IND );   end
-                    if isfield(SrcParam,'CVI'),         InputParam.P{ac}.TsInd{end+1} = SrcParam.covars( SrcParam.CVI, TemplParam.ACTPARAM{ac}.IND );   end
-                    if isfield(SrcParam,'TsI'),         InputParam.P{ac}.TsInd{end+1} = SrcParam.covars( SrcParam.TsI, TemplParam.ACTPARAM{ac}.IND );   end
-                    if ~isempty(SrcParam.covars_oocv),  InputParam.P{ac}.TsInd{end+1} = SrcParam.covars_oocv( :, TemplParam.ACTPARAM{ac}.IND );   end
-                    
-                    if ~isempty(SrcParam.iTr), 
-                        InputParam.P{ac}.TrInd(SrcParam.iTr,:)=[]; 
+                    InputParam.P{ac}.TrInd        = SrcParam.covars( SrcParam.TrX, TemplParam.ACTPARAM{ac}.IND );  
+                    InputParam.P{ac}.TrInd(SrcParam.iTrX,:)=[]; 
+                    if isfield(SrcParam,'TrI')         
+                        InputParam.P{ac}.TsInd{end+1} = SrcParam.covars( SrcParam.TrI, TemplParam.ACTPARAM{ac}.IND );
                         InputParam.P{ac}.TsInd{1}(SrcParam.iTr,:)=[];
                     end
-                    if ~isempty(SrcParam.iCV), InputParam.P{ac}.TsInd{2}(SrcParam.iCV,:)=[]; end
-                    if ~isempty(SrcParam.iTs), InputParam.P{ac}.TsInd{3}(SrcParam.iTs,:)=[]; end
-                    if ~isempty(SrcParam.iOCV), InputParam.P{ac}.TsInd{4}(SrcParam.iOCV,:)=[]; end
+                    if isfield(SrcParam,'CVI')         
+                        InputParam.P{ac}.TsInd{2} = SrcParam.covars( SrcParam.CVI, TemplParam.ACTPARAM{ac}.IND );
+                        InputParam.P{ac}.TsInd{2}(SrcParam.iCV,:)=[];
+                    end
+                    if isfield(SrcParam,'TsI')         
+                        InputParam.P{ac}.TsInd{3} = SrcParam.covars( SrcParam.TsI, TemplParam.ACTPARAM{ac}.IND );
+                        InputParam.P{ac}.TsInd{3}(SrcParam.iTs,:)=[];
+                    end
+                    if ~isempty(SrcParam.covars_oocv) 
+                        if iscell(SrcParam.covars_oocv)
+                            for n=1:numel(SrcParam.covars_oocv)
+                                InputParam.P{ac}.TsInd{tscnt+1} = SrcParam.covars_oocv{n}( :, TemplParam.ACTPARAM{ac}.IND );   
+                                InputParam.P{ac}.TsInd{tscnt+n}(SrcParam.iOCV{n},:)=[]; 
+                            end
+                        else
+                            InputParam.P{ac}.TsInd{tscnt+1} = SrcParam.covars_oocv( :, TemplParam.ACTPARAM{ac}.IND ); 
+                            InputParam.P{ac}.TsInd{tscnt+1}(SrcParam.iOCV,:)=[]; 
+                        end
+                    end
                 end
                 
             case 'correctnuis'
                 
                 if ~isempty(SrcParam.covars)
                     InputParam.P{ac}.COVAR = TemplParam.ACTPARAM{ac}.COVAR;
-                    if VERBOSE, 
+                    if VERBOSE 
                         fprintf('\n* ADJUSTING DATA FOR COVARIATE EFFECTS')
                         fprintf('\n\t- Nuisance covariate: %s', NM.covnames{TemplParam.ACTPARAM{ac}.COVAR})
                     end
                     InputParam.P{ac}.TsCovars = [];
-                    if isfield(SrcParam,'TrX'),         InputParam.P{ac}.TrCovars        = SrcParam.covars( SrcParam.TrX, TemplParam.ACTPARAM{ac}.COVAR );   end
-                    if isfield(SrcParam,'TrI'),         InputParam.P{ac}.TsCovars{end+1} = SrcParam.covars( SrcParam.TrI, TemplParam.ACTPARAM{ac}.COVAR );   end
-                    if isfield(SrcParam,'CVI'),         InputParam.P{ac}.TsCovars{end+1} = SrcParam.covars( SrcParam.CVI, TemplParam.ACTPARAM{ac}.COVAR );   end
-                    if isfield(SrcParam,'TsI'),         InputParam.P{ac}.TsCovars{end+1} = SrcParam.covars( SrcParam.TsI, TemplParam.ACTPARAM{ac}.COVAR );   end
-                    if ~isempty(SrcParam.covars_oocv),  InputParam.P{ac}.TsCovars{end+1} = SrcParam.covars_oocv( :, TemplParam.ACTPARAM{ac}.COVAR );   end
-                    if isfield(TemplParam.ACTPARAM{ac},'METHOD') && TemplParam.ACTPARAM{ac}.METHOD==2
-                        if VERBOSE, fprintf('\n\t- Method: Combat'); end
-                        InputParam.P{ac}.METHOD = 2; InputParam.P{ac}.TsMod = [];
-                        if TemplParam.ACTPARAM{ac}.MCOVARLABEL
-                            covars = [ SrcParam.covars(:, TemplParam.ACTPARAM{ac}.MCOVAR) NM.label ];
-                            if ~isempty(SrcParam.covars_oocv) 
-                                covars_oocv = [ SrcParam.covars_oocv(:,TemplParam.ACTPARAM{ac}.MCOVAR) zeros(size(SrcParam.covars_oocv,1), size(dummy_labels,2)) ];
+                    if isfield(SrcParam,'TrX')         
+                        InputParam.P{ac}.TrCovars        = SrcParam.covars( SrcParam.TrX, TemplParam.ACTPARAM{ac}.COVAR );
+                        InputParam.P{ac}.TrCovars(SrcParam.iTrX,:)=[];
+                    end
+                    if isfield(SrcParam,'TrI')         
+                        InputParam.P{ac}.TsCovars{end+1} = SrcParam.covars( SrcParam.TrI, TemplParam.ACTPARAM{ac}.COVAR );
+                        InputParam.P{ac}.TsCovars{1}(SrcParam.iTr,:) = [];
+                    end
+                    if isfield(SrcParam,'CVI')         
+                        InputParam.P{ac}.TsCovars{end+1} = SrcParam.covars( SrcParam.CVI, TemplParam.ACTPARAM{ac}.COVAR );   
+                        InputParam.P{ac}.TsCovars{2}(SrcParam.iCV,:)=[];
+                    end
+                    if isfield(SrcParam,'TsI')         
+                        InputParam.P{ac}.TsCovars{end+1} = SrcParam.covars( SrcParam.TsI, TemplParam.ACTPARAM{ac}.COVAR );
+                        InputParam.P{ac}.TsCovars{3}(SrcParam.iTs,:)=[]; 
+                    end
+                    if ~isempty(SrcParam.covars_oocv)  
+                        if iscell(covars_oocv)
+                            for n=1:numel(covars_oocv)
+                                InputParam.P{ac}.TsCovars{tscnt+n} = SrcParam.covars_oocv{n}( :, TemplParam.ACTPARAM{ac}.COVAR );
+                                InputParam.P{ac}.TsCovars{tscnt+n}(SrcParam.iOCV{n},:)=[]; 
                             end
                         else
-                            covars = SrcParam.covars( : , TemplParam.ACTPARAM{ac}.MCOVAR ); if ~isempty(SrcParam.covars_oocv), covars_oocv = SrcParam.covars_oocv ( : , TemplParam.ACTPARAM{ac}.MCOVAR ); end
+                            InputParam.P{ac}.TsCovars{tscnt+1} = SrcParam.covars_oocv( :, TemplParam.ACTPARAM{ac}.COVAR );
+                            InputParam.P{ac}.TsCovars{tscnt+1}(SrcParam.iOCV,:)=[]; 
                         end
-                        if isfield(SrcParam,'TrX'),         InputParam.P{ac}.TrMod        = covars( SrcParam.TrX, :);   end
-                        if isfield(SrcParam,'TrI'),         InputParam.P{ac}.TsMod{end+1} = covars( SrcParam.TrI, :);   end
-                        if isfield(SrcParam,'CVI'),         InputParam.P{ac}.TsMod{end+1} = covars( SrcParam.CVI, :);   end
-                        if isfield(SrcParam,'TsI'),         InputParam.P{ac}.TsMod{end+1} = covars( SrcParam.TsI, :);   end
-                        if ~isempty(SrcParam.covars_oocv),  InputParam.P{ac}.TsMod{end+1} = covars_oocv;   end
-                    else
-                        if VERBOSE, fprintf('\n\t- Method: Partial correlations analysis'); end
-                        InputParam.P{ac}.METHOD = 1;
                     end
-                    if ~isempty(SrcParam.iTr), 
-                        InputParam.P{ac}.TrCovars(SrcParam.iTrX,:)   = []; 
-                        InputParam.P{ac}.TsCovars{1}(SrcParam.iTr,:) = []; 
-                        if InputParam.P{ac}.METHOD == 2
+                    if isfield(TemplParam.ACTPARAM{ac},'METHOD') && TemplParam.ACTPARAM{ac}.METHOD==2
+                            if VERBOSE, fprintf('\n\t- Method: Combat'); end
+                            InputParam.P{ac}.METHOD = 2; InputParam.P{ac}.TsMod = [];
+                            if TemplParam.ACTPARAM{ac}.MCOVARLABEL
+                                covars = [ SrcParam.covars(:, TemplParam.ACTPARAM{ac}.MCOVAR) NM.label ];
+                                if ~isempty(SrcParam.covars_oocv) 
+                                    if iscell(SrcParam.covars_oocv)
+                                        for n=1:numel(SrcParam.covars_oocv)
+                                            covars_oocv{n} = [ SrcParam.covars_oocv{n}(:,TemplParam.ACTPARAM{ac}.MCOVAR) ...
+                                                zeros(size(SrcParam.covars_oocv{n},1), size(dummy_labels,2)) ];
+                                        end
+                                    else
+                                        covars_oocv = [ SrcParam.covars_oocv(:,TemplParam.ACTPARAM{ac}.MCOVAR) ...
+                                            zeros(size(SrcParam.covars_oocv,1), size(dummy_labels,2)) ];
+                                    end
+                                end
+                            else
+                                covars = SrcParam.covars( : , TemplParam.ACTPARAM{ac}.MCOVAR ); 
+                                if ~isempty(SrcParam.covars_oocv)
+                                    if iscell(SrcParam.covars_oocv)
+                                        for n=1:numel(SrcParam.covars_oocv)
+                                            covars_oocv{n} = SrcParam.covars_oocv{n}( : , TemplParam.ACTPARAM{ac}.MCOVAR );
+                                        end
+                                    else
+                                        covars_oocv = SrcParam.covars_oocv ( : , TemplParam.ACTPARAM{ac}.MCOVAR ); 
+                                    end
+                                end
+                               
+                            end
+                            InputParam.P{ac}.TrMod        = covars( SrcParam.TrX, :);
                             InputParam.P{ac}.TrMod(SrcParam.iTrX,:)   = []; 
-                            InputParam.P{ac}.TsMod{1}(SrcParam.iTr,:) = []; 
-                        end
+                            
+                            if isfield(SrcParam,'TrI')         
+                                InputParam.P{ac}.TsMod{1} = covars( SrcParam.TrI, :);
+                                InputParam.P{ac}.TsMod{1}(SrcParam.iTr,:) = [];
+                            end
+                            if isfield(SrcParam,'CVI')         
+                                InputParam.P{ac}.TsMod{2} = covars( SrcParam.CVI, :);
+                                InputParam.P{ac}.TsMod{2}(SrcParam.iCV,:)=[]; 
+                            end
+                            if isfield(SrcParam,'TsI')         
+                                InputParam.P{ac}.TsMod{3} = covars( SrcParam.TsI, :); 
+                                InputParam.P{ac}.TsMod{3}(SrcParam.iTs,:)=[];   
+                            end
+                            if ~isempty(SrcParam.covars_oocv) 
+                                if iscell(covars_oocv)
+                                    for n=1:numel(SrcParam.covars_oocv)
+                                        InputParam.P{ac}.TsMod{tscnt+n} = covars_oocv{n};
+                                        InputParam.P{ac}.TsMod{tscnt+n}(SrcParam.iOCV{n},:)=[]; 
+                                    end
+                                else
+                                    InputParam.P{ac}.TsMod{tscnt+1} = covars_oocv;
+                                    InputParam.P{ac}.TsMod{tscnt+1}(SrcParam.iOCV,:)=[]; 
+                                end
+                            end
+                        else
+                            if VERBOSE, fprintf('\n\t- Method: Partial correlations analysis'); end
+                            InputParam.P{ac}.METHOD = 1;
                     end
-                    if ~isempty(SrcParam.iCV), InputParam.P{ac}.TsCovars{2}(SrcParam.iCV,:)=[]; end
-                    if ~isempty(SrcParam.iTs), InputParam.P{ac}.TsCovars{3}(SrcParam.iTs,:)=[]; end
-                    if ~isempty(SrcParam.iOCV), InputParam.P{ac}.TsCovars{4}(SrcParam.iOCV,:)=[]; end
                     
-                    if InputParam.P{ac}.METHOD == 2
-                        if ~isempty(SrcParam.iCV), InputParam.P{ac}.TsMod{2}(SrcParam.iCV,:)=[]; end
-                        if ~isempty(SrcParam.iTs), InputParam.P{ac}.TsMod{3}(SrcParam.iTs,:)=[]; end
-                        if ~isempty(SrcParam.iOCV), InputParam.P{ac}.TsMod{4}(SrcParam.iOCV,:)=[]; end
-                    end
                 end
-                if InputParam.P{ac}.METHOD == 1;
+                if InputParam.P{ac}.METHOD == 1
                     if isfield(TemplParam.ACTPARAM{ac},'INTERCEPT')
                         InputParam.P{ac}.INTERCEPT = TemplParam.ACTPARAM{ac}.INTERCEPT-1;
-                        if VERBOSE, 
+                        if VERBOSE
                             switch InputParam.P{ac}.INTERCEPT
                                 case 0
                                     fprintf('\n\t-> Not including intercept.'); 
@@ -132,7 +190,7 @@ if isfield(TemplParam,'ACTPARAM')
                     end
                     if isfield(TemplParam.ACTPARAM{ac},'COVDIR')
                         InputParam.P{ac}.COVDIR = TemplParam.ACTPARAM{ac}.COVDIR-1;
-                        if VERBOSE, 
+                        if VERBOSE 
                             switch InputParam.P{ac}.COVDIR
                                 case 0
                                     fprintf('\n\t-> Covariate effects will be removed from data.'); 
@@ -163,49 +221,49 @@ if isfield(TemplParam,'ACTPARAM')
                 
                 if isfield(NM,'covars') && ~isempty(NM.covars)
                     InputParam.P{ac}.sIND = TemplParam.ACTPARAM{ac}.sIND; InputParam.P{ac}.dIND = TemplParam.ACTPARAM{ac}.dIND;
-                    if VERBOSE,
+                    if VERBOSE
                         fprintf('\n* OFFSET CORRECTION')
                         fprintf('\n\t - Compute group mean offset of : %s', NM.covnames{TemplParam.ACTPARAM{ac}.sIND})
                         fprintf('\n\t - Remove global mean and offsets from : %s', NM.covnames{TemplParam.ACTPARAM{ac}.dIND})
                     end
-                    if isfield(SrcParam,'TrX'),         
+                    if isfield(SrcParam,'TrX')         
                         InputParam.P{ac}.sTrInd        = SrcParam.covars( SrcParam.TrX, TemplParam.ACTPARAM{ac}.sIND );
                         InputParam.P{ac}.dTrInd        = SrcParam.covars( SrcParam.TrX, TemplParam.ACTPARAM{ac}.dIND );
-                        if ~isempty(SrcParam.iTrX), 
-                            InputParam.P{ac}.sTrInd( SrcParam.iTrX,:) = []; 
-                            InputParam.P{ac}.dTrInd( SrcParam.iTrX,:) = []; 
-                        end
+                        InputParam.P{ac}.sTrInd( SrcParam.iTrX,:) = []; 
+                        InputParam.P{ac}.dTrInd( SrcParam.iTrX,:) = []; 
                     end
-                    if isfield(SrcParam,'TrI'),         
+                    if isfield(SrcParam,'TrI')         
                         InputParam.P{ac}.sTsInd{1}     = SrcParam.covars( SrcParam.TrI, TemplParam.ACTPARAM{ac}.sIND );   
                         InputParam.P{ac}.dTsInd{1}     = SrcParam.covars( SrcParam.TrI, TemplParam.ACTPARAM{ac}.dIND );
-                        if ~isempty(SrcParam.iTr), 
-                            InputParam.P{ac}.sTsInd{1}( SrcParam.iTr,:) = []; 
-                            InputParam.P{ac}.dTsInd{1}( SrcParam.iTr,:) = []; 
-                        end
+                        InputParam.P{ac}.sTsInd{1}( SrcParam.iTr,:) = []; 
+                        InputParam.P{ac}.dTsInd{1}( SrcParam.iTr,:) = []; 
                     end
-                    if isfield(SrcParam,'CVI'),         
+                    if isfield(SrcParam,'CVI')         
                         InputParam.P{ac}.sTsInd{end+1} = SrcParam.covars( SrcParam.CVI, TemplParam.ACTPARAM{ac}.sIND );
                         InputParam.P{ac}.dTsInd{end+1} = SrcParam.covars( SrcParam.CVI, TemplParam.ACTPARAM{ac}.dIND );
-                        if ~isempty(SrcParam.iCV), 
-                            InputParam.P{ac}.sTsInd{2}( SrcParam.iCV,:) = []; 
-                            InputParam.P{ac}.dTsInd{2}( SrcParam.iCV,:) = []; 
-                        end
+                        InputParam.P{ac}.sTsInd{2}( SrcParam.iCV,:) = []; 
+                        InputParam.P{ac}.dTsInd{2}( SrcParam.iCV,:) = []; 
                     end
-                    if isfield(SrcParam,'TsI'),         
+                    if isfield(SrcParam,'TsI')         
                         InputParam.P{ac}.sTsInd{end+1} = SrcParam.covars( SrcParam.TsI, TemplParam.ACTPARAM{ac}.sIND );
                         InputParam.P{ac}.dTsInd{end+1} = SrcParam.covars( SrcParam.TsI, TemplParam.ACTPARAM{ac}.dIND );
-                        if ~isempty(SrcParam.iTs), 
-                            InputParam.P{ac}.sTsInd{3}( SrcParam.iTs,:) = []; 
-                            InputParam.P{ac}.dTsInd{3}( SrcParam.iTs,:) = []; 
-                        end
+                        InputParam.P{ac}.sTsInd{3}( SrcParam.iTs,:) = []; 
+                        InputParam.P{ac}.dTsInd{3}( SrcParam.iTs,:) = []; 
+                        
                     end
                     if ~isempty(SrcParam.covars_oocv)
-                        InputParam.P{ac}.sTsInd{end+1} = SrcParam.covars_oocv( : ,    TemplParam.ACTPARAM{ac}.sIND );   
-                        InputParam.P{ac}.dTsInd{end+1} = SrcParam.covars_oocv( : ,    TemplParam.ACTPARAM{ac}.dIND );
-                        if isfield(SrcParam,'iOCV'),
-                            InputParam.P{ac}.sTsInd{end}(SrcParam.iOCV,:) = [];  
-                            InputParam.P{ac}.dTsInd{end}(SrcParam.iOCV,:) = [];
+                        if iscell(SrcParam.covars)
+                            for n=1:numel(SrcParam.covars_oocv)
+                                InputParam.P{ac}.sTsInd{tscnt+n} = SrcParam.covars_oocv{n}( : , TemplParam.ACTPARAM{ac}.sIND );   
+                                InputParam.P{ac}.dTsInd{tscnt+n} = SrcParam.covars_oocv{n}( : , TemplParam.ACTPARAM{ac}.dIND );
+                                InputParam.P{ac}.sTsInd{tscnt+n}(SrcParam.iOCV{n},:) = [];  
+                                InputParam.P{ac}.dTsInd{tscnt+n}(SrcParam.iOCV{n},:) = [];
+                            end
+                        else
+                            InputParam.P{ac}.sTsInd{tscnt+1} = SrcParam.covars_oocv( : , TemplParam.ACTPARAM{ac}.sIND );   
+                            InputParam.P{ac}.dTsInd{tscnt+1} = SrcParam.covars_oocv( : , TemplParam.ACTPARAM{ac}.dIND );
+                            InputParam.P{ac}.sTsInd{tscnt+1}(SrcParam.iOCV,:) = [];  
+                            InputParam.P{ac}.dTsInd{tscnt+1}(SrcParam.iOCV,:) = [];
                         end
                     end
                     
@@ -229,13 +287,13 @@ if isfield(TemplParam,'ACTPARAM')
                     else
                         InputParam.P{ac}.CALIBUSE      = false;
                     end
-                    if isfield(SrcParam,'TrX'),  
+                    if isfield(SrcParam,'TrX')  
                         InputParam.P{ac}.sTrInd        = SrcParam.covars( SrcParam.TrX, TemplParam.ACTPARAM{ac}.sIND );
-                        if ~isempty(SrcParam.iTrX), InputParam.P{ac}.sTrInd(SrcParam.iTrX,:)=[]; end
+                        InputParam.P{ac}.sTrInd(SrcParam.iTrX,:)=[];
                         denom = numel(InputParam.P{ac}.sTrInd);
                     elseif isfield(SrcParam,'TrI')
                         InputParam.P{ac}.sTsInd{1}     = SrcParam.covars( SrcParam.TrI, TemplParam.ACTPARAM{ac}.sIND );
-                        if ~isempty(SrcParam.iTr), InputParam.P{ac}.sTsInd{1}(SrcParam.iTr,:)=[]; end
+                        InputParam.P{ac}.sTsInd{1}(SrcParam.iTr,:)=[]; 
                         denom = numel(InputParam.P{ac}.sTsInd{1});
                     end
                      if VERBOSE,fprintf('\n\tMean & SD computation restricted to N=%g (%1.0f%% of training sample).', ...
@@ -247,25 +305,32 @@ if isfield(TemplParam,'ACTPARAM')
                 %InputParam.P{ac}.dTsInd = cell(4,1);
                 if isfield(TemplParam.ACTPARAM{ac},'dIND') && ~isempty(TemplParam.ACTPARAM{ac}.dIND)  
                     InputParam.P{ac}.dIND = TemplParam.ACTPARAM{ac}.dIND ;
-                    if isfield(SrcParam,'TrX'),         
+                    if isfield(SrcParam,'TrX')         
                         InputParam.P{ac}.dTrInd    = SrcParam.covars( SrcParam.TrX, TemplParam.ACTPARAM{ac}.dIND );
-                        if ~isempty(SrcParam.iTrX), InputParam.P{ac}.dTrInd(SrcParam.iTrX,:)=[]; end
+                        InputParam.P{ac}.dTrInd(SrcParam.iTrX,:)=[];
                     end
-                    if isfield(SrcParam,'TrI'),         
+                    if isfield(SrcParam,'TrI')         
                         InputParam.P{ac}.dTsInd{1} = SrcParam.covars( SrcParam.TrI, TemplParam.ACTPARAM{ac}.dIND );
-                        if ~isempty(SrcParam.iTr), InputParam.P{ac}.dTsInd{1}(SrcParam.iTr,:)=[]; end
+                        InputParam.P{ac}.dTsInd{1}(SrcParam.iTr,:)=[];
                     end
-                    if isfield(SrcParam,'CVI'),         
+                    if isfield(SrcParam,'CVI')         
                         InputParam.P{ac}.dTsInd{2} = SrcParam.covars( SrcParam.CVI, TemplParam.ACTPARAM{ac}.dIND );
-                        if ~isempty(SrcParam.iCV), InputParam.P{ac}.dTsInd{2}(SrcParam.iCV,:)=[]; end
+                        InputParam.P{ac}.dTsInd{2}(SrcParam.iCV,:)=[];
                     end
-                    if isfield(SrcParam,'TsI'),         
+                    if isfield(SrcParam,'TsI')         
                         InputParam.P{ac}.dTsInd{3} = SrcParam.covars( SrcParam.TsI, TemplParam.ACTPARAM{ac}.dIND );
-                        if ~isempty(SrcParam.iTs), InputParam.P{ac}.dTsInd{3}(SrcParam.iTs,:)=[]; end
+                        InputParam.P{ac}.dTsInd{3}(SrcParam.iTs,:)=[]; 
                     end
-                    if ~isempty(SrcParam.covars_oocv)   
-                        InputParam.P{ac}.dTsInd{4} = SrcParam.covars_oocv( : , TemplParam.ACTPARAM{ac}.dIND);
-                        if ~isempty(SrcParam.iOCV), InputParam.P{ac}.dTsInd{4}(SrcParam.iOCV,:)=[]; end
+                    if ~isempty(SrcParam.covars_oocv) 
+                        if iscell(SrcParam.covars_oocv)
+                            for n=1:numel(SrcParam.covars_oocv)
+                                InputParam.P{ac}.dTsInd{tscnt+n} = SrcParam.covars_oocv{n}(:,TemplParam.ACTPARAM{ac}.dIND);
+                                InputParam.P{ac}.dTsInd{tscnt+n}(SrcParam.iOCV{n},:)=[]; 
+                            end
+                        else
+                            InputParam.P{ac}.dTsInd{tscnt+1} = SrcParam.covars_oocv(:, TemplParam.ACTPARAM{ac}.dIND);
+                            InputParam.P{ac}.dTsInd{tscnt+1}(SrcParam.iOCV,:)=[]; 
+                        end
                     end
                 end
                 
@@ -341,7 +406,7 @@ if isfield(TemplParam,'ACTPARAM')
                 
                 % ******************* SCALING *********************
                 if isfield(TemplParam.ACTPARAM{ac}.SCALE,'ZeroOne')
-                    if VERBOSE,
+                    if VERBOSE
                         switch TemplParam.ACTPARAM{ac}.SCALE.ZeroOne
                             case 1
                                 fprintf('\n* SCALING [0 1]')
@@ -358,11 +423,11 @@ if isfield(TemplParam,'ACTPARAM')
                 if VERBOSE, fprintf('\n* FEATURE WEIGHTING'); end
                 InputParam.P{ac}.RANK = TemplParam.ACTPARAM{ac}.RANK;
                 InputParam.P{ac}.RANK.curlabel = TemplParam.ACTPARAM{ac}.RANK.label(SrcParam.TrX,:);
-                if ~isempty(SrcParam.iTrX), InputParam.P{ac}.RANK.curlabel(SrcParam.iTrX,:)=[]; end
+                InputParam.P{ac}.RANK.curlabel(SrcParam.iTrX,:)=[]; 
                 if isfield( TemplParam.ACTPARAM{ac}.RANK,'glabel' )
                     % glabel is a logical vector
                     InputParam.P{ac}.RANK.curglabel = TemplParam.ACTPARAM{ac}.RANK.glabel(SrcParam.TrX);
-                    if ~isempty(SrcParam.iTrX), InputParam.P{ac}.RANK.curglabel(SrcParam.iTrX,:)=[]; end
+                    InputParam.P{ac}.RANK.curglabel(SrcParam.iTrX,:)=[]; 
                 end
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
@@ -411,7 +476,7 @@ if isfield(TemplParam,'ACTPARAM')
                 if VERBOSE, fprintf('\n* EXTRACT VARIANCE COMPONENTS'); end
                 InputParam.P{ac}.REMVARCOMP = TemplParam.ACTPARAM{ac}.REMVARCOMP;
                 InputParam.P{ac}.REMVARCOMP.G = TemplParam.ACTPARAM{ac}.REMVARCOMP.G(SrcParam.TrX,:);
-                if ~isempty(SrcParam.iTrX), 
+                if ~isempty(SrcParam.iTrX) 
                     InputParam.P{ac}.REMVARCOMP.G(SrcParam.iTrX,:)=[]; 
                 end
                 if isfield(TemplParam.ACTPARAM{ac}.REMVARCOMP,'SUBGROUP') 
@@ -433,7 +498,7 @@ if isfield(TemplParam,'ACTPARAM')
                             ind = true(size(InputParam.C,1),1); randind = randperm(numel(ind),n);
                             InputParam.P{ac}.REMVARCOMP.indX = ind(randind);
                     end
-                    if ~isempty(SrcParam.iTrX), InputParam.P{ac}.REMVARCOMP.indX(SrcParam.iTrX)=[]; end
+                    InputParam.P{ac}.REMVARCOMP.indX(SrcParam.iTrX)=[]; 
                 end
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
@@ -446,24 +511,26 @@ if isfield(TemplParam,'ACTPARAM')
                  % ******************* SENSITIZE FEATURES TO DEVIATION FROM NORMATIVE MODEL *********************
                 InputParam.P{ac}.DEVMAP = TemplParam.ACTPARAM{ac}.DEVMAP;
               
-                if isfield(SrcParam,'TrX'),         
+                if isfield(SrcParam,'TrX')         
                     InputParam.P{ac}.TrInd    = SrcParam.TrX;
-                    if ~isempty(SrcParam.iTrX), InputParam.P{ac}.TrInd(SrcParam.iTrX,:)=[]; end
+                    InputParam.P{ac}.TrInd(SrcParam.iTrX,:)=[]; 
                 end
-                if isfield(SrcParam,'TrI'),     
+                if isfield(SrcParam,'TrI')     
                     InputParam.P{ac}.TsInd{1} = SrcParam.TrI ;
-                    if ~isempty(SrcParam.iTr), InputParam.P{ac}.TsInd{1}(SrcParam.iTr,:)=[]; end
+                    InputParam.P{ac}.TsInd{1}(SrcParam.iTr,:)=[]; 
                 end
-                if isfield(SrcParam,'CVI'),         
+                if isfield(SrcParam,'CVI')         
                     InputParam.P{ac}.TsInd{2} = SrcParam.CVI;
-                    if ~isempty(SrcParam.iCV), InputParam.P{ac}.TsInd{2}(SrcParam.iCV,:)=[]; end
+                    InputParam.P{ac}.TsInd{2}(SrcParam.iCV,:)=[]; 
                 end
-                if isfield(SrcParam,'TsI'),         
+                if isfield(SrcParam,'TsI')         
                     InputParam.P{ac}.TsInd{3} = SrcParam.TsI;
-                    if ~isempty(SrcParam.iTs), InputParam.P{ac}.TsInd{3}(SrcParam.iTs,:)=[]; end
+                    InputParam.P{ac}.TsInd{3}(SrcParam.iTs,:)=[]; 
                 end
-                if numel(InputParam.Ts)==4
-                    InputParam.P{ac}.TsInd{4} = true(size(InputParam.Ts{4},1),1);
+                if numel(InputParam.Ts)>3
+                    for n=1:numel(InputParam.Ts)-tscnt
+                        InputParam.P{ac}.TsInd{tscnt+n} = true(size(InputParam.Ts{tscnt+n},1),1);
+                    end
                 end
                 
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX)
@@ -490,14 +557,6 @@ if isfield(TemplParam,'ACTPARAM')
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
                 end
-%             case 'graphConstructionDAS'
-%                 % ******************* Das et al. 2018 *********************
-%                 if VERBOSE, fprintf('\n* CONSTRUCT NETWORKS (DAS ET AL 2018)'); end
-%                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
-%                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
-%                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
-%                 end
-                
         end
     end
     if VERBOSE, fprintf('\nPreprocessing sequence setup completed. Executing ...'); end

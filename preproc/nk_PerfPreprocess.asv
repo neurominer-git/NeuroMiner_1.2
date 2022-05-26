@@ -422,7 +422,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 trd = squeeze(InputParam.Ts(:,1,:)); 
                 cvd = squeeze(InputParam.Ts(:,2,:)); 
                 tsd = squeeze(InputParam.Ts(:,3,:));
-                if ~isempty(Yocv) 
+                if ~isempty(Yocv), 
                     if iscell(Yocv)
                         for n=1:numel
                             ocv{n} = squeeze(InputParam.Ts(:,3+n,:)); 
@@ -476,13 +476,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                             tY.Ts{k,l} = nk_ManageNanCases(tsd, [], SrcParam.iTs);
                         end
                         if ~isempty(Yocv)
-                            if iscell(Yocv)
-                                for n=1:numel(Yocv)
-                                    tYocv.Ts{k,l}{n} = nk_ManageNanCases(ocv{n},[],SrcParam.iOCV); 
-                                end
-                            else
-                                tYocv.Ts{k,l} = nk_ManageNanCases(ocv,[],SrcParam.iOCV); 
-                            end
+                            tYocv.Ts{k,l} = nk_ManageNanCases(ocv,[],SrcParam.iOCV); 
                         end
                     end
                     % Write dichotomization labels to CV1 partition
@@ -524,15 +518,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         [tY.CV{k,l}{u},CVL] = nk_ManageNanCases(cvd, CVL, SrcParam.iCV); 
                         tY.Ts{k,l}{u} = nk_ManageNanCases(tsd, [], SrcParam.iTs);
                     end
-                    if ~isempty(Yocv)
-                        if iscell(Yocv)
-                            for n=1:numel(Yocv)
-                                tYocv.Ts{k,l}{u}{n} = nk_ManageNanCases(ocv{n}, [], SrcParam.iOCV); 
-                            end
-                        else
-                            tYocv.Ts{k,l}{u} = nk_ManageNanCases(ocv, [], SrcParam.iOCV); 
-                        end
-                    end
+                    if ~isempty(Yocv), tYocv.Ts{k,l}{u} = nk_ManageNanCases(ocv, [], SrcParam.iOCV); end
                     
                     if ~strcmp(MODEFL,'regression') && length(CV.class{i,j}{u}.groups) == 2
                         indtr = ( TrL == CV.class{i,j}{u}.groups(1) | TrL == CV.class{i,j}{u}.groups(2) ) | isnan(TrL);    

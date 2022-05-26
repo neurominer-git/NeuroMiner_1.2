@@ -71,17 +71,28 @@ else
 
     for n=1:nM
 
-        if issmoothed, sstr='s'; else, sstr=''; end
-        Y = inp.X(n).([ sstr 'Y']);
-        if isfield(inp.X(n),[ sstr 'Yocv2']) && ~isempty(inp.X(n).([ sstr 'Yocv2']))
-            Yocv = inp.X(n).([ sstr 'Yocv2']);
-        elseif isfield(inp.X(n),[ sstr 'Yocv']) && ~isempty(inp.X(n).([ sstr 'Yocv']))
-            Yocv = inp.X(n).([ sstr 'Yocv']); 
+        if issmoothed
+            Y = inp.X(n).sY;
+            if isfield(inp.X(n),[ sstr 'Yocv2']) && ~isempty(inp.X(n).([ sstr 'Yocv2']))
+                Yocv = inp.X(n).([ sstr 'Yocv2']);
+            elseif isfield(inp.X(n), [ sstr 'Yocv']) && ~isempty(inp.X(n).sYocv)
+                Yocv = inp.X(n).sYocv; 
+            end
+            if isfield(inp.X(n),'sYw') && ~isempty(inp.X(n).sYw)
+                inp.iYw = inp.X(n).sYw;
+            end
+        else
+            Y = inp.X(n).Y; 
+            if isfield(inp.X(n),'Yocv2') && ~isempty(inp.X(n).Yocv2)
+                Yocv = inp.X(n).Yocv2; 
+            elseif isfield(inp.X(n),'Yocv') && ~isempty(inp.X(n).Yocv)
+                Yocv = inp.X(n).Yocv; 
+            end
+            if isfield(inp.X(n),'Yw') && ~isempty(inp.X(n).Yw)
+                inp.iYw = inp.X(n).Yw;
+            end
         end
-        if isfield(inp.X(n), [ sstr 'sYw']) && ~isempty(inp.X(n).([ sstr 'Yw']))
-            inp.iYw = inp.X(n).([ sstr 'Yw']);
-        end
-    
+
         if iscell(paramfl)
             tparamfl = paramfl{n};
             PREPROC = inp.PREPROC{n};
@@ -97,7 +108,7 @@ else
 
         % Param is a structure that contains all relevant info to generate the features 
         % needed by the optimized classifier / predictor system
-        if tparamfl.found 
+        if tparamfl.found, 
             tparamfl.Param = Param{n};
         elseif isfield(tparamfl,'Param')
             tparamfl = rmfield(tparamfl,'Param');

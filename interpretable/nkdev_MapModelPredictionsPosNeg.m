@@ -1,9 +1,8 @@
-function Y_mapped = nkdev_MapModelPredictions(O, R, I)
+function Y_mapped = nkdev_MapModelPredictionsPosNeg(O, R, I)
 
 [m, n] = size(I);
 Y_mapped = zeros(1,n);
-RangeD = R(:,1) - R(:,2);
-RangeD = (RangeD-nm_nanmean(RangeD))*100/abs(O);
+RangeD = abs(R(:,1) - R(:,2));
 for i=1:m
     Y_mapped(I(i,:)) = Y_mapped(I(i,:)) + RangeD(i);
 end

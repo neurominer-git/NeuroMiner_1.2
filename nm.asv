@@ -171,9 +171,8 @@ try
                     if s.analyses_ready
                         mn_str = [mn_str ...
                             'Visualize ' mdltypestr '|' ...
-                            'Interpret predictions of ' mdltypestr ' in the discovery data|' ...
                             'Open NM Results Viewer (cross-validation results)|'];
-                        mn_act = [mn_act 6 18 7];
+                        mn_act = [mn_act 6 7];
                     end
                     
                     if s.analyses_completed 
@@ -188,12 +187,7 @@ try
                     mn_str = [ mn_str '|Load data for model application' ]; mn_act = [mn_act 1 ];
                     if s.oocv_data_ready
                         mn_str = [ mn_str '|Set up parameters for model application' ]; mn_act = [ mn_act 2 ];
-                        if s.oocv_anal_ready
-                            mn_str = [ mn_str ...
-                                '|Apply ' mdltypestr ' to independent data' ...
-                                '|Interpret predictions of ' mdltypestr ' in the independent data']; 
-                            mn_act = [ mn_act 10 18]; 
-                        end
+                        if s.oocv_anal_ready, mn_str = [ mn_str '|Apply ' mdltypestr ' to independent data']; mn_act = [ mn_act 10]; end
                     end
                     if s.oocv_anal_ready
                         mn_str = [mn_str '|Open NM Results Viewer (cross-validation & independent test results)']; 
@@ -203,7 +197,7 @@ try
                     mn_act = [mn_act 7];
                     if ~isfield(NM.defs,'data_scrambled') || ~NM.defs.data_scrambled
                         menutitle = [menutitle ' [ MODEL APPLICATION MODE ]'];
-                        mn_str = [mn_str '|Shred input data in NM structure (external validation)']; mn_act = [ mn_act 16 ];
+                        mn_str = [mn_str '|Shred input data in NM structure (external validation)']; mn_act = [ mn_act 17 ];
                     else
                         menutitle = [menutitle ' [ MODEL EXPORT MODE ]'];
                     end
@@ -260,6 +254,7 @@ try
               'disptrain', ...
               'inspect', ...
               'lock', ...
+              'interpret', ...
               'oocv', ...
               'loadmat', ...
               'savemat', ...
@@ -267,8 +262,7 @@ try
               'help', ...
               'utilities', ...
               'export', ...
-              'update', ...
-              'interpret'};
+              'update'};
     
     switch mn_sel
         case 0
@@ -331,7 +325,7 @@ try
                 else
                     titstr = 'MAIN INTERFACE >> INTERPRET MODELS'' PREDICTIONS [discovery mode]';
                 end
-                inp = []; act = 1; while act>0, [act, NM, inp] = nk_MLInterpreterPrep(NM, act, inp, titstr); end
+                inp = []; act = 1; while act>0, [act, inp] = nk_MLInterpreterPrep(act, inp, titstr); end
             end
             
         case 'oocv'
