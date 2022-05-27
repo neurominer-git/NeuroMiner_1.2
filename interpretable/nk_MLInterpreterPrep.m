@@ -274,14 +274,13 @@ else
 end
 %
 % =========================================================================
-function OOCVres = MLInterpreterPrep(dat, inp1, analysis)
-global SAV MODEFL CV OOCV FUSION MULTILABEL
-tOOCV = OOCV;
+function MLIres = MLInterpreterPrep(dat, inp1, analysis)
+global SAV MODEFL CV FUSION MULTILABEL MLI
 if inp1.saveparam   == 2, inp1.saveparam    = 0; end
 if inp1.loadparam   == 2, inp1.loadparam    = 0; end
 if inp1.ovrwrt      == 2, inp1.ovrwrt       = 0; end
 if inp1.lfl         == 1, inp1.analmode     = 0; else, inp1.analmode = 1; end
-
+inp1.multiflag = 0;
 F = 1; nF = 1;
 if ~isempty(FUSION)        
     F = analysis.params.TrainParam.FUSION.M;
@@ -306,16 +305,6 @@ end
 inp1.id              = dat.id;
 stranalysis          = SAV.matname;
 inp1.ngroups         = numel(unique(dat.label(~isnan(dat.label))));
-
-switch MODEFL
-    case 'classification'
-        OOCVres.predictions = cell(inp1.nclass, MULTILABEL.dim);
-        if OOCV.groupmode > 1
-            OOCVres.multi_predictions = cell(MULTILABEL.dim,1);
-        end
-    case 'regression'
-        OOCVres.predictions = cell(MULTILABEL.dim,1);
-end
 
 if isfield(inp1.OO,'groups') && numel(inp1.OO.groups)==numel(inp1.OO.cases)
     inp1.groupind = inp1.OO.groups;
@@ -344,7 +333,6 @@ for i = 1:inp1.nF
     
     % **************************** ANALYSIS SETUP *****************************
     inp2 = nk_SetFusionMode2(dat, analysis, F, nF, i, inp1.oocvind);
-    OOCV = tOOCV;
     inp = catstruct(inp1,inp2);
     inp.loadGD = true;
 
@@ -367,52 +355,22 @@ for i = 1:inp1.nF
 		        inp.curlabel = 1;
 	        end
 	        if strcmp(MODEFL,'classification')
-		        switch OOCV.groupmode
-			        case 1
-				        inp.multiflag = 0;
-				        [ijMLI.Results, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
-			        case 2
-				        inp.multiflag = 1;
-				        [ijMLI.MultiResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
-			        case 3
-				        inp.multiflag = 0;
-				        [ijMLI.BinResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
-				        inp.multiflag = 1;
-				        [ijMLI.MultiResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
-		        end
-            else
-                inp.multiflag = 0;
-		        [ijOOCV.RegrResults, ijOOCV.FileNames, ijOOCV.RootPath] = nk_MLInterpreter(inp);
+		        [ijMLI.BinResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
+			else
+                [ijMLI.RegrResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
 	        end
 	        fprintf('\nSaving:\n%s',Resultsfile);
-	        save(Resultsfile,'ijMLI', 'MLIParams');	
+	        save(Resultsfile,'ijMLI', 'MLI');	
         end
         
         switch MODEFL
             case 'classification'
-                if isfield(ijOOCV,'BinResults')
-                    for curclass=1:inp.nclass
-                        OOCVres.predictions{curclass, j} = [ OOCVres.predictions{curclass, j} ijOOCV.BinResults.BinCV2Predictions_DecisionValues{curclass} ];
-                    end
-                    OOCVres.BinResults{j} = ijOOCV.BinResults;
-                end
-                if isfield(ijOOCV,'MultiResults') 
-                    for curclass=1:inp.nclass
-                        OOCVres.predictions{curclass, j} = [ OOCVres.predictions{curclass, j} ijOOCV.MultiResults.BinCV2Predictions_DecisionValues{curclass}];
-                    end
-                    OOCVres.multi_predictions{j} = [ OOCVres.multi_predictions{j} ijOOCV.MultiResults.MultiCV2PredictionsLL ];
-                    OOCVres.MultiResults{j} = ijOOCV.MultiResults;
-                end
-                
+                MLIres.Label(j) = ijMLI.BinResults;  
             case 'regression'
-                OOCVres.predictions{j} = [ OOCVres.predictions{j} ijOOCV.RegrResults.CV2PredictedValues ];
-                OOCVres.RegrResults{j} = ijOOCV.RegrResults;
+                MLIres.Label(j) = ijMLI.RegrResults;
         end
-        OOCVres.FileNames{i,j} = ijOOCV.FileNames;
+        MLIres.FileNames{i,j} = ijMLI.FileNames;
     end
-    OOCVres.RootPath{i} = ijOOCV.RootPath;
+    MLIres.RootPath{i} = ijMLI.RootPath;
 end
 clear inp1 inp2
-OOCVres =  nk_OOCVMeta(OOCVres, inp);
-hu = findobj('Tag','OOCV');
-if ~isempty(hu), delete(hu); end

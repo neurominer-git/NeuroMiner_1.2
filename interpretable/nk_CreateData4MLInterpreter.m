@@ -1,31 +1,21 @@
-function IN = nk_CreateData4MLInterpreter(IN, nx, TrInd, TsInd)
+function IN = nk_CreateData4MLInterpreter(Tr, Ts, covars, IN, nx)
 
-n = size(IN.X(nx).Y,2);
-Tr = IN.X(nx).Y(TrInd,:);
-if isfield(IN.X(nx),'Yocv')
-    Ts = IN.X(nx).Yocv(TsInd,:);
-    if isfield(IN,'covars_oocv') && ~isempty(IN.covars_oocv) && nx == 1
-        switch IN.MLI.method
-            case 'posneg'
-                IN.covars_rep{1} = repmat(IN.covars_oocv(TsInd,:),IN.nperms,1);
-                IN.covars_rep{2} = repmat(IN.covars_oocv(TsInd,:),IN.nperms,1);
-            case 'median'
-                IN.covars_rep = repmat(IN.covars_oocv(TsInd,:),IN.nperms,1);
-        end
-    end
+n = size(Tr,2);
+
+if IN.oocvflag
     Yocvstr = 'Yocv2';
 else
-    Ts = IN.X(nx).Y(TsInd,:); 
-    if isfield(IN,'covars') && ~isempty(IN.covars) && nx == 1
-        switch IN.method
-            case 'posneg'
-                IN.covars_rep{1} = repmat(IN.covars(TsInd,:),IN.nperms,1);
-                IN.covars_rep{2} = repmat(IN.covars(TsInd,:),IN.nperms,1);
-            case 'median'
-                IN.covars_rep = repmat(IN.covars(TsInd,:),IN.nperms,1);
-        end
-    end
     Yocvstr = 'Yocv';
+end
+
+if ~isempty(covars) && nx == 1
+    switch IN.MLI.method
+        case 'posneg'
+            IN.covars_rep{1} = repmat(covars,IN.nperms,1);
+            IN.covars_rep{2} = repmat(covars,IN.nperms,1);
+        case 'median'
+            IN.covars_rep = repmat(covars,IN.nperms,1);
+    end
 end
 % If map is provided determine subspace for modification
 if isfield(IN.MLI,'MAP') && IN.MLI.MAP.flag     

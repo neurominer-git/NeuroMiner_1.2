@@ -1,22 +1,37 @@
 function [ act, NM, inp ] = nk_MLInterpreterPrep(NM, act, inp, parentstr)
 % =========================================================================
-% FORMAT [act, inp] = nk_OOCVprep(act, inp, parentstr)
+% FORMAT [act, inp] = nk_MLInterpreterPrep(act, inp, parentstr)
 % =========================================================================
-% Runtime model of independent test data prediction
+% Runtime module of interpretable ML module
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, last modified 05/2022
 
 global CV 
+ 
+OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; LoadStr = []; SaveStr = []; SaveCV1Str = [];
+OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = []; SaveCV1Act = [];
+DATASCRAM = false; if isfield(NM.defs,'data_scrambled') && ~isempty(NM.defs.data_scrambled), DATASCRAM = NM.defs.data_scrambled; end
 
 % Detect completed analyses
 complvec = []; for z=1:numel(NM.analysis), if NM.analysis{z}.status, complvec = [ complvec z ]; end; end
 
 % Initialize runtime parameters 
 if ~exist('inp','var') || isempty(inp)
+    if isfield(NM.defs,'analyses_locked') && NM.defs.analyses_locked && isfield(NM,'OOCV')
+        oocvflag = true;
+        oocvind = 1;
+        OO = NM.OOCV{1};
+    else
+        oocvflag = false;
+        oocvind = [];
+        OO = [];
+    end
+
     inp = struct( 'analind', complvec(1), ...   % Index to analysis
-                    'oocvind', 1, ...           % Index to OOCV data container
-                    'OO', NM.OOCV{1}, ...       % User-defined OOCV data container (start with oocvind = 1)
+                    'oocvflag', oocvflag, ...   % Are we in OOCV mode?
+                    'oocvind', oocvind, ...     % Index to OOCV data container
+                    'OO', OO, ...               % User-defined OOCV data container (start with oocvind = 1)
                     'lfl', 1, ...               % 1 = compute from scratch | 
                     ...                         % 2 = use existing (allowing the user to specify OOCVdatamats)
                     'ovrwrt', 2, ...            % if lfl == 1 ==> 1 = overwrite existing OOCVdatamats 
@@ -30,11 +45,9 @@ if ~exist('inp','var') || isempty(inp)
                     'batchflag', 0);            % 1 = Run in batchmode (without graphics outputs)
                                                 % 0 = run in interactive mode
 end
-na_str = '?'; inp.datatype = 'MLIdatamat'; 
-OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; LoadStr = []; SaveStr = []; SaveCV1Str = [];
-OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = []; SaveCV1Act = [];
-DATASCRAM = false; if isfield(NM.defs,'data_scrambled') && ~isempty(NM.defs.data_scrambled), DATASCRAM = NM.defs.data_scrambled;end
-    
+% Prepare variables for menu creation
+na_str = '?'; inp.datatype = 'MLIdatamat';
+
 %% Configure menu
 % Select analysis
 if numel(NM.analysis)>1
@@ -63,6 +76,7 @@ else
     % Otherwise interpret CV2 validation data
     inp.oocvflag = false;
     OOCVSelectStr = '';
+                                                                                                                          OOCVSelectAct = [];
 end
 
 if ~isempty(analysis)
@@ -242,8 +256,10 @@ function tdir = create_defpath(analysis, oocvind)
  
 rootdir = analysis.rootdir;
 algostr = getAlgoStr(analysis);
-if exist("oocvind","var")
-    if isfield(analysis,'OOCV') && numel(analysis.OOCV) >= oocvind && isfield(analysis.OOCV{oocvind},'RootPath')
+if exist("oocvind","var") 
+    if isfield(analysis,'OOCV') && ...
+        numel(analysis.OOCV) >= oocvind && ...
+        isfield(analysis.OOCV{oocvind},'RootPath')
         if iscell(analysis.OOCV{oocvind}.RootPath)
             tdir = analysis.OOCV{oocvind}.RootPath{1};
         else
@@ -259,8 +275,7 @@ end
 %
 % =========================================================================
 function OOCVres = MLInterpreterPrep(dat, inp1, analysis)
-global SAV MODEFL CV OOCV FUSION MULTILABEL
-tOOCV = OOCV;
+global SAV MODEFL CV FUSION MULTILABEL MLI
 if inp1.saveparam   == 2, inp1.saveparam    = 0; end
 if inp1.loadparam   == 2, inp1.loadparam    = 0; end
 if inp1.ovrwrt      == 2, inp1.ovrwrt       = 0; end
@@ -279,12 +294,14 @@ else
     inp1.nclass = 1;
 end
 
-if isfield(inp1.OO,'label') && ~isempty(inp1.OO.label), 
-    inp1.LabelCV     = dat.label; 
-    inp1.labelOOCV   = inp1.OO.label; 
+if inp1.oocvflag
+    if isfield(inp1.OO,'label') && ~isempty(inp1.OO.label), 
+        inp1.LabelCV     = dat.label; 
+        inp1.labelOOCV   = inp1.OO.label; 
+    end
+    inp1.cases_oocv      = inp1.OO.cases;
+    inp1.nOOCVsubj       = numel(inp1.OO.cases);
 end
-inp1.cases_oocv      = inp1.OO.cases;
-inp1.nOOCVsubj       = numel(inp1.OO.cases);
 inp1.id              = dat.id;
 stranalysis          = SAV.matname;
 inp1.ngroups         = numel(unique(dat.label(~isnan(dat.label))));
@@ -310,7 +327,7 @@ if inp1.oocvflag
     if isfield(inp1,'targdir') 
         inp1.rootdir = fullfile(inp1.targdir, [ inp1.oocvname '_MLI'] );
     elseif isfield(analysis,'rootdir') && exist(analysis.rootdir,'dir')
-        inp1.rootdir = fullfile(analysis.rootdir,analysis.params.TrainParam.SVM.prog, [ inp1.oocvname '_MLI');
+        inp1.rootdir = fullfile(analysis.rootdir,analysis.params.TrainParam.SVM.prog, [ inp1.oocvname '_MLI']);
     else
         inp1.rootdir = fullfile(pwd,analysis.params.TrainParam.SVM.prog, [ inp1.oocvname '_MLI']);
     end
@@ -326,14 +343,16 @@ for i = 1:inp1.nF
     
     % **************************** ANALYSIS SETUP *****************************
     inp2 = nk_SetFusionMode2(dat, analysis, F, nF, i, inp1.oocvind);
-    OOCV = tOOCV;
     inp = catstruct(inp1,inp2);
     inp.loadGD = true;
 
     for j = 1:nl
 	    
         if inp.oocvflag
-        Resultsfile = fullfile(inp.rootdir,[stranalysis inp.varstr '_t' num2str(j) '_MLIresults_ID' dat.id '.mat']);
+            Resultsfile = fullfile(inp.rootdir,[stranalysis inp.varstr '_t' num2str(j) '_OOCV-' num2str(inp.oocvind) '-MLIresults_ID' dat.id '.mat']);
+        else
+            Resultsfile = fullfile(inp.rootdir,[stranalysis inp.varstr '_t' num2str(j) '_MLIresults_ID' dat.id '.mat']);
+        end
         inp.multlabelstr = '';  if MULTILABEL.flag, inp.multlabelstr = sprintf('_t%g',j); end
         if exist(Resultsfile,'file') && inp.ovrwrt==2
 	        fprintf('\nLoading:\n%s',Resultsfile);
@@ -346,43 +365,17 @@ for i = 1:inp1.nF
 		        inp.curlabel = 1;
 	        end
 	        if strcmp(MODEFL,'classification')
-		        switch OOCV.groupmode
-			        case 1
-				        inp.multiflag = 0;
-				        [ijMLI.Results, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
-			        case 2
-				        inp.multiflag = 1;
-				        [ijMLI.MultiResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
-			        case 3
-				        inp.multiflag = 0;
-				        [ijMLI.BinResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
-				        inp.multiflag = 1;
-				        [ijMLI.MultiResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
-		        end
-            else
-                inp.multiflag = 0;
-		        [ijOOCV.RegrResults, ijOOCV.FileNames, ijOOCV.RootPath] = nk_MLInterpreter(inp);
+		        [ijMLI.BinResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
+			else
+                [ijMLI.RegrResults, ijMLI.FileNames, ijMLI.RootPath] = nk_MLInterpreter(inp);
 	        end
 	        fprintf('\nSaving:\n%s',Resultsfile);
-	        save(Resultsfile,'ijMLI', 'MLIParams');	
+	        save(Resultsfile,'ijMLI', 'MLI');	
         end
         
         switch MODEFL
             case 'classification'
-                if isfield(ijOOCV,'BinResults')
-                    for curclass=1:inp.nclass
-                        OOCVres.predictions{curclass, j} = [ OOCVres.predictions{curclass, j} ijOOCV.BinResults.BinCV2Predictions_DecisionValues{curclass} ];
-                    end
-                    OOCVres.BinResults{j} = ijOOCV.BinResults;
-                end
-                if isfield(ijOOCV,'MultiResults') 
-                    for curclass=1:inp.nclass
-                        OOCVres.predictions{curclass, j} = [ OOCVres.predictions{curclass, j} ijOOCV.MultiResults.BinCV2Predictions_DecisionValues{curclass}];
-                    end
-                    OOCVres.multi_predictions{j} = [ OOCVres.multi_predictions{j} ijOOCV.MultiResults.MultiCV2PredictionsLL ];
-                    OOCVres.MultiResults{j} = ijOOCV.MultiResults;
-                end
-                
+                OOCVres.BinResults{j} = ijOOCV.BinResults;  
             case 'regression'
                 OOCVres.predictions{j} = [ OOCVres.predictions{j} ijOOCV.RegrResults.CV2PredictedValues ];
                 OOCVres.RegrResults{j} = ijOOCV.RegrResults;
