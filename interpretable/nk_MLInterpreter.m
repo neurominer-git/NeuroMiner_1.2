@@ -179,7 +179,7 @@ for f=1:ix % Loop through CV2 permutations
                             cPs = Ps(m,:); sPs = nk_PrepMLParams(Ps, Pdesc, m);                            
                             P_str = nk_DefineMLParamStr(cPs, analysis.Model.ParamDesc, h);
                             
-                            %% Step 2: Apply trained model to OOCV data 
+                            %% Step 2: Apply trained model to original target data 
                             % Optionally, retrain every base learner in current CV1
                             % [k,l] partition (across different grid positions, if available)
                             if ~fndMD,MD{h}{m} = cell(iy,jy); end
@@ -298,6 +298,7 @@ for f=1:ix % Loop through CV2 permutations
                         end
                     end
                     
+                    %% Step 3: Create artificial versions of target cases
                     % Prepare arrays
                     nTs = numel(tInd);
                   
@@ -334,14 +335,12 @@ for f=1:ix % Loop through CV2 permutations
                             end
                             inp = nk_CreateData4MLInterpreter( Tr, Ts , covs, inp, nx);
                         end
-
+                        
+                        %% Step 4: generate predictions for artificial cases
                         for h=1:nclass  % Loop through binary comparisons
 
                             if nclass > 1, fprintf('\n*** %s #%g ***',algostr, h); end
     
-                            %% Step 1: Get optimal model parameters
-                            % Retrieve optimal parameters from precomputed analysis structure
-                            % Differentiate according to binary or multi-group mode
                             [~, ~, nP, ~] = nk_GetModelParams2(analysis, multiflag, ll, h, inp.curlabel);
                            
                             switch inp.MLI.method
@@ -386,11 +385,7 @@ for f=1:ix % Loop through CV2 permutations
                                                 end
                                             end
                                         end
-
-                                        % get training data using pointers
-                                        % Either (a) only CV1 training data, (b) CV1
-                                        % training and test data, (c) CV1 training & test
-                                        % data as well as CV2 test data              
+  
                                         if BINMOD, hix = h; else, hix = 1; end
                                         [ TR , ~, ~, OCV ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, mapYocv.Ts{k,l}{hix}, Param{1}(k,l,hix), pnt);    
 
@@ -428,7 +423,7 @@ for f=1:ix % Loop through CV2 permutations
 
                                             case 'median'
 
-                                                 uD = size(OCV{1},ul);
+                                                uD = zeros(size(OCV,1),ul);
                                                 % Loop through feature subspaces
                                                 for u=1:ul
             
@@ -466,7 +461,8 @@ for f=1:ix % Loop through CV2 permutations
                         else
                             inp.X = rmfield(inp.X,'Yocv');
                         end
-                       
+                        
+                        %% Step 5: Evaluate impact of input data modifications using obtained predictions
                         for h=1:nclass
                             Oh = nm_nanmedian(predOrig{h}(q,:),2);
                             for nx = 1:nM
@@ -497,8 +493,7 @@ for f=1:ix % Loop through CV2 permutations
                 end 
         end
         
-        %% Step 4: Compute OOCV multi-group prediction from current binary classifier arrays
-
+        %% Step 6: Concatenate results and assign them to results container
         [RootPath, FileNames{f,d}] = fileparts(oMLIpath);  
         ll=ll+1;
         for h = 1:nclass

@@ -87,7 +87,7 @@ switch IN.MLI.method
     case 'median'
 
         medi = prctile(Tr(:,mapidx), 50);
-        if ~isinf(IN.nperms)
+        if ~isinf(IN.MLI.nperms)
         
             M = repmat(Ts, IN.MLI.nperms, 1);
             I = false(IN.MLI.nperms, size(Tr,2));
