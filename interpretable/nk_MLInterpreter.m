@@ -410,6 +410,7 @@ for f=1:ix % Loop through CV2 permutations
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g',  f, d, k, l, u, size(OCV_star_pos,1), tInd(q));
                                                     [~, ~, uD_pos(:,u)] = nk_GetTestPerf(OCV_star_pos, ones(size(OCV_star_pos,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
                                                     [~, ~, uD_neg(:,u)] = nk_GetTestPerf(OCV_star_neg, ones(size(OCV_star_neg,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
@@ -439,6 +440,7 @@ for f=1:ix % Loop through CV2 permutations
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g', f, d, k, l, u, size(OCV_star,1), tInd(q));
                                                     [~, ~, uD(:,u)] = nk_GetTestPerf(OCV_star, ones(size(OCV_star,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
                                                     % Detrend regressor predictions, if

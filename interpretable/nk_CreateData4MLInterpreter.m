@@ -11,10 +11,10 @@ end
 if ~isempty(covars) && nx == 1
     switch IN.MLI.method
         case 'posneg'
-            IN.covars_rep{1} = repmat(covars,IN.nperms,1);
-            IN.covars_rep{2} = repmat(covars,IN.nperms,1);
+            IN.covars_rep{1} = repmat(covars,IN.MLI.nperms,1);
+            IN.covars_rep{2} = repmat(covars,IN.MLI.nperms,1);
         case 'median'
-            IN.covars_rep = repmat(covars,IN.nperms,1);
+            IN.covars_rep = repmat(covars,IN.MLI.nperms,1);
     end
 end
 % If map is provided determine subspace for modification
