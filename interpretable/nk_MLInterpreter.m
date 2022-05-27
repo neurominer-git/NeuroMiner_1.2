@@ -61,21 +61,65 @@ CVPOS.fFull = FullPartFlag;
 
 FileNames = cell(ix,jx); fnd=false;
 nM = numel(inp.X);
+RandFeats = struct('I',[]);
 for h=1:nclass
+    switch MODEFL
+        case 'classification'
+            inp.MLI.RangePred(h) = range(analysis.BinClass{h}.mean_predictions);
+        case 'regression'
+            inp.MLI.RangePred = range(analysis.Regr.mean_predictions);
+    end
+    
     for nx=1:nM
+        nY = size(inp.X(nx).Y,2);
+        if inp.oocvflag
+            [mY2,nY2] = size(inp.X(nx).Yocv);
+        else
+            [mY2,nY2] = size(inp.X(nx).Y);
+        end
         switch MODEFL
             case 'classification'
-                if inp.oocvflag
-                    Results.BinResults(h).Modality(nx).Y_mapped = zeros(size(inp.X(nx).Yocv));
-                else 
-                    Results.BinResults(h).Modality(nx).Y_mapped = zeros(size(inp.X(nx).Y));
-                end
+                Results.BinResults(h).Modality(nx).Y_mapped = zeros(mY2,nY2);
+                Results.BinResults(h).Modality(nx).Y_mapped_ciu = zeros(mY2,nY2);
+                Results.BinResults(h).Modality(nx).Y_mapped_cil = zeros(mY2,nY2);
+                Results.BinResults(h).Modality(nx).Y_mapped_std = zeros(mY2,nY2);
             case 'regression'
-                if inp.oocvflag
-                    Results.RegrResults.Modality(nx).Y_mapped = zeros(size(inp.X(nx).Yocv));
-                else 
-                    Results.RegrResults.Modality(nx).Y_mapped = zeros(size(inp.X(nx).Y));
-                end
+                Results.RegrResults.Modality(nx).Y_mapped = zeros(mY2,nY2);
+                Results.RegrResults.Modality(nx).Y_mapped_ciu = zeros(mY2,nY2);
+                Results.RegrResults.Modality(nx).Y_mapped_cil = zeros(mY2,nY2);
+                Results.RegrResults.Modality(nx).Y_mapped_std = zeros(mY2,nY2);
+        end
+        
+        % If map is provided determine subspace for modification
+        if isfield(inp.MLI,'MAP') && inp.MLI.MAP.flag && isfield(analysis,'visdata')
+            maptype = inp.MLI.MAP.map; inp.MLI.MAP.map=[];
+            switch maptype
+                case 'cvr'
+                    inp.MLI.MAP.map{h} = analysis.visdata{inp.curmodal,inp.curlabel}.CVRatio{h};
+                case 'p_sgn'
+                    inp.MLI.MAP.map{h} = analysis.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_uncorr{h};
+                case 'p_FDR_sgn'
+                    inp.MLI.MAP.map{h} = analysis.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_fdr{h};
+            end
+            cutoff = inp.MLI.MAP.cutoff;
+            if isfield(inp.MLI.MAP,'percentile') && inp.MLI.MAP.percentmode
+                cutoff = prctile(inp.MLI.MAP.map{h}, inp.MLI.MAP.cutoff);
+            end
+            inp.MLI.MAP.mapidx = return_imgind(inp.MLI.MAP.operator, cutoff, inp.MLI.MAP.map{h});
+        else
+            inp.MLI.MAP.mapidx = 1:nY;
+        end
+        nYmap = numel(inp.MLI.MAP.mapidx);
+        nfrac = ceil(nYmap*inp.MLI.frac);
+        permfile = fullfile(inp.rootdir,[SAV.matname '_MLIpermmat_ID' inp.id '.mat']);
+        if exist(permfile,'file')
+            fprintf('\nLoading %s', permfile);
+            load(permfile)
+        else
+            fprintf('\nGenerating random feature subspaces ...')
+            [ ~, RandFeats(h, nx).I ] = uperms( inp.MLI.MAP.mapidx, inp.MLI.nperms, nfrac);   
+            fprintf('\nSaving to %s', permfile);
+            save(permfile, 'RandFeats');
         end
     end
 end
@@ -309,10 +353,16 @@ for f=1:ix % Loop through CV2 permutations
                             predInterp = cell(nTs, nclass);
                     end
                     mapInterp = cell(nclass, nM);
+                    mapInterp_ciu = cell(nclass, nM);
+                    mapInterp_cil = cell(nclass, nM);
+                    mapInterp_std = cell(nclass, nM);
                     for h=1:nclass
                         for nx = 1:nM
                             nY = size(inp.X(nx).Y,2);
                             mapInterp{h,nx} = zeros(nTs, nY);
+                            mapInterp_ciu{h,nx} = zeros(nTs, nY);
+                            mapInterp_cil{h,nx} = zeros(nTs, nY);
+                            mapInterp_std{h,nx} = zeros(nTs, nY);
                         end
                     end
 
@@ -333,7 +383,7 @@ for f=1:ix % Loop through CV2 permutations
                                 if ~isempty(inp.covars), covs = inp.covars(tInd(q,:)); end
                                 Ts = inp.X(nx).Y(tInd(q,:),:);
                             end
-                            inp = nk_CreateData4MLInterpreter( Tr, Ts , covs, inp, nx);
+                            inp = nk_CreateData4MLInterpreter( RandFeats(h, nx).I, Tr, Ts , covs, inp, nx );
                         end
                         
                         %% Step 4: generate predictions for artificial cases
@@ -473,11 +523,17 @@ for f=1:ix % Loop through CV2 permutations
                                         Rh = nm_nanmedian(predInterp{q,h},2);
                                 end
                             end
-                            mapInterp{h, nx}(q,:) = nk_MapModelPredictions(Oh, Rh, inp.X(nx).I, inp.MLI.method);
+                            [mapInterp{h, nx}(q,:), ...
+                                mapInterp_ciu{h, nx}(q,:), ...
+                                mapInterp_cil{h, nx}(q,:), ...
+                                mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(Oh, Rh, inp.X(nx).I, inp.MLI.method, inp.MLI.RangePred(h));
                         end
                     end
-                    fprintf('\nSaving %s', oMLIpath); save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'operm','ofold');
-                    if saveparam, fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); end
+                    fprintf('\nSaving %s', oMLIpath); 
+                    save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
+                    if saveparam 
+                        fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
+                    end
                 end
                 
             case 1
@@ -501,13 +557,46 @@ for f=1:ix % Loop through CV2 permutations
                 switch MODEFL
                     case 'classification'
                         Results.BinResults(h).Modality(nx).Y_mapped(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped(tInd,:) + mapInterp{h,nx}/ix;
+                        Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:) + mapInterp_ciu{h,nx}/ix;
+                        Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:) + mapInterp_cil{h,nx}/ix;
+                        Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:) + mapInterp_std{h,nx}/ix;
                     case 'regression'
                         Results.RegrResults.Modality(nx).Y_mapped(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped(tInd,:) + mapInterp{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:) + mapInterp_ciu{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:) + mapInterp_cil{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped_std(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_std(tInd,:) + mapInterp_std{h,nx}/ix;
                 end
             end
         end
     end
 end
 
+function imgind = return_imgind(typthresh, thresh, img)
 
+if length(thresh) > 1
+    switch typthresh
+        case 1
+            imgind = (img < thresh(1) | img > thresh(2)); 
+        case 2
+            imgind = (img <= thresh(1) | img >= thresh(2)); 
+        case 3
+            imgind = (img > thresh(1) | img < thresh(2)); 
+        case 4
+            imgind = (img >= thresh(1) | img <= thresh(2)); 
+    end
+else
+    switch typthresh
+        case 1
+            imgind = img < thresh; 
+        case 2
+            imgind = img <= thresh;
+        case 3
+            imgind = img > thresh;
+        case 4
+            imgind = img >= thresh;
+        case 5
+            imgind = img == thresh;
+    end
+end
+imgind = find(imgind);
 

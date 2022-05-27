@@ -1,0 +1,21 @@
+function [Y_mapped, Y_mapped_ciu, Y_mapped_cil, Y_mapped_std] = nk_MapModelPredictions(O, R, I, Method, NormRange)
+
+[m, n] = size(I);
+tY_mapped = zeros(m,n);
+switch Method
+    case 'posneg'
+        RangeD = R(:,1) - R(:,2);
+    case 'median'
+        RangeD = R-O;
+end
+for i=1:m
+    tY_mapped(i,I(i,:)) = RangeD(i)*100/NormRange;
+end
+Y_mapped = zeros(1,)
+for i=1:n
+Y_mapped_ci = nm_95confint(Y_mapped);
+Y_mapped_cil = Y_mapped_ci(1,:);
+Y_mapped_ciu = Y_mapped_ci(2,:);
+Y_mapped_std = nm_nanstd(Y_mapped);
+Y_mapped = nm_nanmean(Y_mapped);
+end

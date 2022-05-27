@@ -60,12 +60,47 @@ BINMOD = iPREPROC.BINMOD;
 CVPOS.fFull = FullPartFlag;
 
 FileNames = cell(ix,jx); fnd=false;
-
+nM = numel(inp.X);
+RandFeats = struct('I',[]);
 for h=1:nclass
-    for nx=1:numel(inp.X)
+    for nx=1:nM
+        nY = size(inp.X(nx).Y,2);
         switch MODEFL
+            case 'classification'
+                if inp.oocvflag
+                    Results.BinResults(h).Modality(nx).Y_mapped = zeros(size(inp.X(nx).Yocv));
+                else 
+                    Results.BinResults(h).Modality(nx).Y_mapped = zeros(size(inp.X(nx).Y));
+                end
             case 'regression'
-                
+                if inp.oocvflag
+                    Results.RegrResults.Modality(nx).Y_mapped = zeros(size(inp.X(nx).Yocv));
+                else 
+                    Results.RegrResults.Modality(nx).Y_mapped = zeros(size(inp.X(nx).Y));
+                end
+        end
+        
+        % If map is provided determine subspace for modification
+        if isfield(inp.MLI,'MAP') && inp.MLI.MAP.flag     
+            cutoff = inp.MLI.MAP.cutoff;
+            if isfield(inp.MLI.MAP,'percentile') && inp.MLI.MAP.percentmode
+                cutoff = percentile(inp.MLI.MAP.map{h}, inp.MLI.MAP.cutoff);
+            end
+            inp.MLI.MAP.mapidx = return_imgind(inp.MLI.MAP.operator, cutoff, inp.MLI.MAP.map{h});
+        else
+            inp.MLI.MAP.mapidx = 1:nY;
+        end
+        nYmap = numel(inp.MLI.MAP.mapidx);
+        nfrac = ceil(nYmap*inp.MLI.frac);
+        permfile = fullfile(inp.rootdir,[SAV.matname '_MLIpermmat_ID' inp.id '.mat']);
+        if exist(permfile,'file'),
+            load(permfile)
+        else
+            fprintf('\nGenerating random feature subspaces ...')
+            [ ~, RandFeats(h, nx).I ] = uperms( inp.MLI.MAP.mapidx, inp.MLI.nperms, nfrac);   
+            fprintf('\nSaving to %s', permfile);
+            save(permfile, 'RandFeats');
+        end
     end
 end
 
@@ -168,7 +203,7 @@ for f=1:ix % Loop through CV2 permutations
                             cPs = Ps(m,:); sPs = nk_PrepMLParams(Ps, Pdesc, m);                            
                             P_str = nk_DefineMLParamStr(cPs, analysis.Model.ParamDesc, h);
                             
-                            %% Step 2: Apply trained model to OOCV data 
+                            %% Step 2: Apply trained model to original target data 
                             % Optionally, retrain every base learner in current CV1
                             % [k,l] partition (across different grid positions, if available)
                             if ~fndMD,MD{h}{m} = cell(iy,jy); end
@@ -287,9 +322,10 @@ for f=1:ix % Loop through CV2 permutations
                         end
                     end
                     
+                    %% Step 3: Create artificial versions of target cases
                     % Prepare arrays
                     nTs = numel(tInd);
-                    nM = numel(inp.X);
+                  
                     switch inp.MLI.method
                         case 'posneg'
                             predInterp = cell(nTs, nclass, 2);
@@ -297,10 +333,16 @@ for f=1:ix % Loop through CV2 permutations
                             predInterp = cell(nTs, nclass);
                     end
                     mapInterp = cell(nclass, nM);
+                    mapInterp_ciu = cell(nclass, nM);
+                    mapInterp_cil = cell(nclass, nM);
+                    mapInterp_std = cell(nclass, nM);
                     for h=1:nclass
                         for nx = 1:nM
                             nY = size(inp.X(nx).Y,2);
                             mapInterp{h,nx} = zeros(nTs, nY);
+                            mapInterp_ciu{h,nx} = zeros(nTs, nY);
+                            mapInterp_cil{h,nx} = zeros(nTs, nY);
+                            mapInterp_std{h,nx} = zeros(nTs, nY);
                         end
                     end
 
@@ -321,16 +363,14 @@ for f=1:ix % Loop through CV2 permutations
                                 if ~isempty(inp.covars), covs = inp.covars(tInd(q,:)); end
                                 Ts = inp.X(nx).Y(tInd(q,:),:);
                             end
-                            inp = nk_CreateData4MLInterpreter( Tr, Ts , covs, inp, nx);
+                            inp = nk_CreateData4MLInterpreter( RandFeats(h, nx).I, Tr, Ts , covs, inp, nx );
                         end
-
+                        
+                        %% Step 4: generate predictions for artificial cases
                         for h=1:nclass  % Loop through binary comparisons
 
                             if nclass > 1, fprintf('\n*** %s #%g ***',algostr, h); end
     
-                            %% Step 1: Get optimal model parameters
-                            % Retrieve optimal parameters from precomputed analysis structure
-                            % Differentiate according to binary or multi-group mode
                             [~, ~, nP, ~] = nk_GetModelParams2(analysis, multiflag, ll, h, inp.curlabel);
                            
                             switch inp.MLI.method
@@ -375,11 +415,7 @@ for f=1:ix % Loop through CV2 permutations
                                                 end
                                             end
                                         end
-
-                                        % get training data using pointers
-                                        % Either (a) only CV1 training data, (b) CV1
-                                        % training and test data, (c) CV1 training & test
-                                        % data as well as CV2 test data              
+  
                                         if BINMOD, hix = h; else, hix = 1; end
                                         [ TR , ~, ~, OCV ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, mapYocv.Ts{k,l}{hix}, Param{1}(k,l,hix), pnt);    
 
@@ -399,6 +435,7 @@ for f=1:ix % Loop through CV2 permutations
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g',  f, d, k, l, u, size(OCV_star_pos,1), tInd(q));
                                                     [~, ~, uD_pos(:,u)] = nk_GetTestPerf(OCV_star_pos, ones(size(OCV_star_pos,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
                                                     [~, ~, uD_neg(:,u)] = nk_GetTestPerf(OCV_star_neg, ones(size(OCV_star_neg,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
@@ -416,7 +453,7 @@ for f=1:ix % Loop through CV2 permutations
 
                                             case 'median'
 
-                                                 uD = size(OCV{1},ul);
+                                                uD = zeros(size(OCV,1),ul);
                                                 % Loop through feature subspaces
                                                 for u=1:ul
             
@@ -428,6 +465,7 @@ for f=1:ix % Loop through CV2 permutations
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g', f, d, k, l, u, size(OCV_star,1), tInd(q));
                                                     [~, ~, uD(:,u)] = nk_GetTestPerf(OCV_star, ones(size(OCV_star,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
                                                     % Detrend regressor predictions, if
@@ -453,7 +491,8 @@ for f=1:ix % Loop through CV2 permutations
                         else
                             inp.X = rmfield(inp.X,'Yocv');
                         end
-                       
+                        
+                        %% Step 5: Evaluate impact of input data modifications using obtained predictions
                         for h=1:nclass
                             Oh = nm_nanmedian(predOrig{h}(q,:),2);
                             for nx = 1:nM
@@ -464,11 +503,17 @@ for f=1:ix % Loop through CV2 permutations
                                         Rh = nm_nanmedian(predInterp{q,h},2);
                                 end
                             end
-                            mapInterp{h, nx}(q,:) = nk_MapModelPredictions(Oh, Rh, inp.X(nx).I, inp.MLI.method);
+                            [mapInterp{h, nx}(q,:), ...
+                                mapInterp_ciu{h, nx}(q,:), ...
+                                mapInterp_cil{h, nx}(q,:), ...
+                                mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(Oh, Rh, inp.X(nx).I, inp.MLI.method);
                         end
                     end
-                    fprintf('\nSaving %s', oMLIpath); save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'operm','ofold');
-                    if saveparam, fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); end
+                    fprintf('\nSaving %s', oMLIpath); 
+                    save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
+                    if saveparam 
+                        fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
+                    end
                 end
                 
             case 1
@@ -484,22 +529,54 @@ for f=1:ix % Loop through CV2 permutations
                 end 
         end
         
-        %% Step 4: Compute OOCV multi-group prediction from current binary classifier arrays
-
+        %% Step 6: Concatenate results and assign them to results container
         [RootPath, FileNames{f,d}] = fileparts(oMLIpath);  
         ll=ll+1;
         for h = 1:nclass
             for nx = 1 : nM
                 switch MODEFL
                     case 'classification'
-                        Results.BinResults{h}.Modality{nx}.Y_mapped(tInd,:) = Results.BinResults{h}.Modality{nx}.Y_mapped(tInd,:) + mapInterp{h,nx}/ix;
+                        Results.BinResults(h).Modality(nx).Y_mapped(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped(tInd,:) + mapInterp{h,nx}/ix;
+                        Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:) + mapInterp_ciu{h,nx}/ix;
+                        Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:) + mapInterp_cil{h,nx}/ix;
+                        Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:) + mapInterp_std{h,nx}/ix;
                     case 'regression'
-                        Results.RegrResults.Modality{nx}.Y_mapped(tInd,:) = Results.RegrResults.Modality{nx}.Y_mapped(tInd,:) + mapInterp{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped(tInd,:) + mapInterp{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:) + mapInterp_ciu{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:) + mapInterp_cil{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped_std(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_std(tInd,:) + mapInterp_std{h,nx}/ix;
                 end
             end
         end
     end
 end
 
+function imgind = return_imgind(typthresh, thresh, img)
 
+if length(thresh) > 1
+    switch typthresh
+        case 1
+            imgind = (img < thresh(1) | img > thresh(2)); 
+        case 2
+            imgind = (img <= thresh(1) | img >= thresh(2)); 
+        case 3
+            imgind = (img > thresh(1) | img < thresh(2)); 
+        case 4
+            imgind = (img >= thresh(1) | img <= thresh(2)); 
+    end
+else
+    switch typthresh
+        case 1
+            imgind = img < thresh; 
+        case 2
+            imgind = img <= thresh;
+        case 3
+            imgind = img > thresh;
+        case 4
+            imgind = img >= thresh;
+        case 5
+            imgind = img == thresh;
+    end
+end
+imgind = find(imgind);
 
