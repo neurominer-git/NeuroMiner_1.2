@@ -1,4 +1,4 @@
-function [f, ax] = barMLI(casenum, MLIcont, feats)
+function [f, ax] = barMLI(casenum, MLIcont, feats, refdata)
 
 f=figure; hold on; 
 nF = numel(feats);
@@ -27,12 +27,30 @@ if any(idx2)
 end
 feats = regexprep(feats,'_', '\\_');
 ax.XTickLabel=feats(idx);
-ax.Title.String = sprintf('Predictive profile of subject #%g', casenum);
-ax.Title.FontWeight = 'bold';
-ax.Title.FontSize = 14;
 ax.YAxis.Label.String = 'Percentage change of prediction [ % maximum range ]';
 ax.YAxis.Label.FontWeight = 'bold'; 
 ax.YAxis.Label.FontSize = 12; 
 %ax.XAxis.Label.String = 'Features'; 
 ax.Box="on";
 f.Position = [100 100 750 750];
+if exist('refdata','var')
+    ax.Position(4) = .50;
+    pos = ax.Position;
+    pos([2 4]) = [0.75 0.2];
+    ax2 = axes('Position', pos);
+    centiles = nk_ComputePercentiles(refdata,refdata(casenum,:),'inverse');
+    bar(ax2,centiles(idx),'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
+    ax2.YAxis.Label.String = 'Percentile rank [%]';
+    ax2.YAxis.Label.FontWeight = 'bold'; 
+    ax2.YAxis.Label.FontSize = 12; 
+    ax2.XTick=1:numel(feats); 
+    ax2.XLim=[-0.2 numel(feats)+1.2];
+    ax2.XTickLabel=[];
+    ax2.Title.String = sprintf('Predictive profile of subject #%g', casenum);
+    ax2.Title.FontWeight = 'bold';
+    ax2.Title.FontSize = 14;
+else
+    ax.Title.String = sprintf('Predictive profile of subject #%g', casenum);
+    ax.Title.FontWeight = 'bold';
+    ax.Title.FontSize = 14;
+end
