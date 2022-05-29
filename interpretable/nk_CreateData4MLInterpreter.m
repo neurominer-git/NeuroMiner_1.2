@@ -34,14 +34,14 @@ switch IN.MLI.method
             
             % Create modified instances of case
             for i=1:IN.MLI.nperms
-                P(i, RandFeats(i,:)) = upper(RandFeats(i,:)); 
-                N(i, RandFeats(i,:)) = lower(RandFeats(i,:));
-                I(i, RandFeats(i,:)) = true;
+                P(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = upper(RandFeats(i,:)); 
+                N(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = lower(RandFeats(i,:));
+                I(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = true;
             end
         else
             I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
             while iter <= IN.MLI.max_iter
-                I(iter, RandFeats(iter,:)) = true;
+                I(iter, IN.MLI.MAP.mapidx(RandFeats(iter,:))) = true;
                 if sum( sum(I(1:iter,:)) >= IN.MLI.n_visited ) == n
                     completed = true;
                     break
@@ -64,10 +64,7 @@ switch IN.MLI.method
         IN.X(nx).(Yocvstr){1} = P;
         IN.X(nx).(Yocvstr){2} = N;
         IN.X(nx).I = I;
-        ix = isnan(IN.X(nx).(Yocvstr){1});
-        IN.X(nx).(Yocvstr){1}(ix) = 0;
-        IN.X(nx).(Yocvstr){2}(ix) = 0;
-
+      
     case 'median'
 
         medi = prctile(Tr(:,IN.MLI.MAP.mapidx), 50);
@@ -78,13 +75,13 @@ switch IN.MLI.method
             
             % Create modified instances of case
             for i=1:IN.MLI.nperms
-                M(i, RandFeats(i,:)) = medi(RandFeats(i,:)); 
-                I(i, RandFeats(i,:)) = true;
+                M(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = medi(RandFeats(i,:)); 
+                I(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = true;
             end
         else
             I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
             while iter <= IN.MLI.max_iter
-                I(iter, RandFeats(iter,:)) = true;
+                I(iter, IN.MLI.MAP.mapidx(RandFeats(iter,:))) = true;
                 if sum( sum(I(1:iter,:)) >= IN.MLI.n_visited ) == n
                     completed = true;
                     break
@@ -102,10 +99,7 @@ switch IN.MLI.method
                 M(i, I(i,:)) = medi(I(i,:)); 
             end
         end
-        % Remove nans
-        IN.X(nx).(Yocvstr){1} = M;
+        IN.X(nx).(Yocvstr) = M;
         IN.X(nx).I = I;
-        ix = isnan(IN.X(nx).(Yocvstr){1});
-        IN.X(nx).(Yocvstr){1}(ix) = 0;
 end
 

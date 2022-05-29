@@ -37,6 +37,7 @@ if ~exist('inp','var') || isempty(inp)
                     'ovrwrt', 2, ...            % if lfl == 1 ==> 1 = overwrite existing OOCVdatamats 
                     ...                         % 2 = do not overwrite (use existing OOCVdatamats automatically)
                     'saveparam', 2, ...         % if loadparam == 2=> 1 = save OOCV processing parameters (preprocessing / models)
+                    'ovrwrtperm', 2, ...        % Overwrite permutation file.
                     ...                         % 2 = do not save parameters to disk
                     'saveCV1', 2, ...           % if loadparam == 2 && saveparam ==1 => 1 = save large OOCV processing containers at the CV1 level 
                     ...                         % 2 = operate at CV2 level
@@ -102,9 +103,12 @@ if ~isempty(analysis)
         OverWriteStr = sprintf('Specify %s files [ %s ]|', inp.datatype, nMatFiles);                                      OverWriteAct = 4; 
     end
     
+    % from scratch
+    OverWritePermStr = sprintf('Overwrite existing permutations file [ %s ]|', OVRWRT_opts{inp.ovrwrt}) ;                 OverWriteAct = 5; 
+
     % Retrieve CV2 partitions to operate on
     if ~isfield(inp,'GridAct'), inp.GridAct = analysis.GDdims{1}.GridAct; end;                                              
-    GridSelectStr = sprintf('Select CV2 partitions to operate on [ %g selected ]|',  sum(inp.GridAct(:)));                GridSelectAct = 5;
+    GridSelectStr = sprintf('Select CV2 partitions to operate on [ %g selected ]|',  sum(inp.GridAct(:)));                GridSelectAct = 6;
     
     % Configure loading of pre-existing parameters and models
     if inp.saveparam == 2 && inp.lfl == 1
@@ -119,14 +123,14 @@ if ~isempty(analysis)
             else, 
                 nParamFiles = na_str; 
             end
-            LoadParamsStr = sprintf('Select preprocessing parameter files [ %s ]|' ,nParamFiles);                         LoadParamsAct = 8;
+            LoadParamsStr = sprintf('Select preprocessing parameter files [ %s ]|' ,nParamFiles);                         LoadParamsAct = 9;
             if isfield(inp,'optmodelmat') 
                 selGridModel = ~cellfun(@isempty,inp.optmodelmat);
                 nModelFiles = sprintf('%g files selected', sum(selGridModel(:))); 
             else 
                 nModelFiles = na_str; 
             end
-            LoadModelsStr = sprintf('Select model files [ %s ]|',nModelFiles);                                            LoadModelsAct = 9;
+            LoadModelsStr = sprintf('Select model files [ %s ]|',nModelFiles);                                            LoadModelsAct = 10;
         end
     end
     
@@ -134,7 +138,7 @@ if ~isempty(analysis)
     % save the computed params and models to disk
     if inp.loadparam == 2 && inp.lfl == 1
         SAVE_opts       = {'yes', 'no'};   
-        SaveStr = sprintf('Save pre-processing params and models to disk [ %s ]|', SAVE_opts{inp.saveparam});             SaveAct = 6;
+        SaveStr = sprintf('Save pre-processing params and models to disk [ %s ]|', SAVE_opts{inp.saveparam});             SaveAct = 8;
         if inp.saveparam == 1
             SaveCV1Str = sprintf('Save pre-processing params at CV1 level [ %s ]|', SAVE_opts{inp.saveCV1});              SaveCV1Act = 12;
         end
@@ -274,13 +278,13 @@ else
 end
 %
 % =========================================================================
-function OOCVres = MLInterpreterPrep(dat, inp1, analysis)
+function MLIres = MLInterpreterPrep(dat, inp1, analysis)
 global SAV MODEFL CV FUSION MULTILABEL MLI
 if inp1.saveparam   == 2, inp1.saveparam    = 0; end
 if inp1.loadparam   == 2, inp1.loadparam    = 0; end
 if inp1.ovrwrt      == 2, inp1.ovrwrt       = 0; end
 if inp1.lfl         == 1, inp1.analmode     = 0; else, inp1.analmode = 1; end
-
+inp1.multiflag = 0;
 F = 1; nF = 1;
 if ~isempty(FUSION)        
     F = analysis.params.TrainParam.FUSION.M;
@@ -306,16 +310,6 @@ inp1.id              = dat.id;
 stranalysis          = SAV.matname;
 inp1.ngroups         = numel(unique(dat.label(~isnan(dat.label))));
 
-switch MODEFL
-    case 'classification'
-        OOCVres.predictions = cell(inp1.nclass, MULTILABEL.dim);
-        if OOCV.groupmode > 1
-            OOCVres.multi_predictions = cell(MULTILABEL.dim,1);
-        end
-    case 'regression'
-        OOCVres.predictions = cell(MULTILABEL.dim,1);
-end
-
 if isfield(inp1.OO,'groups') && numel(inp1.OO.groups)==numel(inp1.OO.cases)
     inp1.groupind = inp1.OO.groups;
     if isfield(inp1.OO,'groupnames')
@@ -332,7 +326,7 @@ if inp1.oocvflag
         inp1.rootdir = fullfile(pwd,analysis.params.TrainParam.SVM.prog, [ inp1.oocvname '_MLI']);
     end
 else
-    inp1.rootdir = fullfile(pwd,analysis.params.TrainParam.SVM.prog,'MLI');
+    inp1.rootdir = fullfile(analysis.rootdir,analysis.params.TrainParam.SVM.prog,'MLI');
 end
 
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
@@ -375,16 +369,12 @@ for i = 1:inp1.nF
         
         switch MODEFL
             case 'classification'
-                OOCVres.BinResults{j} = ijOOCV.BinResults;  
+                MLIres.Label(j) = ijMLI.BinResults;  
             case 'regression'
-                OOCVres.predictions{j} = [ OOCVres.predictions{j} ijOOCV.RegrResults.CV2PredictedValues ];
-                OOCVres.RegrResults{j} = ijOOCV.RegrResults;
+                MLIres.Label(j) = ijMLI.RegrResults;
         end
-        OOCVres.FileNames{i,j} = ijOOCV.FileNames;
+        MLIres.FileNames{i,j} = ijMLI.FileNames;
     end
-    OOCVres.RootPath{i} = ijOOCV.RootPath;
+    MLIres.RootPath{i} = ijMLI.RootPath;
 end
 clear inp1 inp2
-OOCVres =  nk_OOCVMeta(OOCVres, inp);
-hu = findobj('Tag','OOCV');
-if ~isempty(hu), delete(hu); end

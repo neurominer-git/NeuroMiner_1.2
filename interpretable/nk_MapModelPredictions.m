@@ -4,7 +4,7 @@ function [Y_mapped, Y_mapped_ciu, Y_mapped_cil, Y_mapped_std] = nk_MapModelPredi
 tY_mapped = zeros(m,n);
 switch Method
     case 'posneg'
-        RangeD = R(:,1) - R(:,2);
+        RangeD = (R(:,1) - R(:,2))-O;
     case 'median'
         RangeD = R-O;
 end

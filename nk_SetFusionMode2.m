@@ -117,5 +117,9 @@ else
     end
 end
 
+if isfield(analysis,'visdata')
+    OUT.visdata = analysis.visdata;
+end
+
 OUT.varstr = varstr;
 

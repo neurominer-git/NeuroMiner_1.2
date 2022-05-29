@@ -1,4 +1,4 @@
-function [nPerms, pInds, Perms] = uperms(X, k, ulim)
+function [pInds, k_adjusted] = uperms(X, k, ulim)
 %uperms: unique permutations of an input vector or rows of an input matrix
 % Usage:  nPerms              = uperms(X)
 %        [nPerms pInds]       = uperms(X, k)
@@ -64,26 +64,22 @@ if ~exist("ulim","var") || isempty(ulim)
         ulim = size(X,2);
     end
 end
+k_adjusted = k;
 %% Count number of repetitions of each unique row, and get representative x
 if isvector(X)
-    [~, uind, x] = unique(X(:)); % x codes unique elements with integers
+    [~, ~, x] = unique(X(:)); % x codes unique elements with integers
 else
-    [u, uind, x] = unique(X, 'rows'); % x codes unique rows with integers
+    [~, ~, x] = unique(X, 'rows'); % x codes unique rows with integers
 end
-c = nan(size(uind, 1), 1); % counts
-for n = 1:length(c)
-    c(n) = sum(x == n);
-end
-c = sort(c);
-% Number of permutations is the factorial of the sum of the counts divided
-% by the product of the factorials of the counts:
-%   nPerms = factorial(sum(c)) / prod(factorial(c));
-% cancelling the largest factorial to reduce risk of overflow/inaccuracy:
-nPerms = prod(c(end)+1:sum(c)) / prod(factorial(c(1:end-1)));
-if nargout < 2, return, end
+nPerms = nchoosek(numel(x), ulim);
+
 %% Computation of permutations
 % Basics
 n = length(x);
+if nPerms < k 
+    k = nPerms; 
+    k_adjusted = k;
+end
 if n > uint32(inf), error('Sorry, data is too big!'), end % would be v.slow
 if nargin < 2 || k > nPerms
     k = nPerms; % default to computing all unique permutations
@@ -93,25 +89,13 @@ pInds(1, :) = 1:ulim;
 % Add permutations that are unique
 u = 1; % to start with
 while u < k
-    pInd = uint32(randperm(n, ulim));
+    fprintf('\b\b\b\b\b\b%6.0f',u);
+    % b=sprintf('%s', repmat('\b',numel(a),1));
+    pInd = sort(uint32(randperm(n, ulim)));
     % (Note: better data structures could make the next line much faster!)
-    out = unique([pInds(1:u, :); pInd], 'rows');
+    out = FastUniqueRows([pInds(1:u, :); pInd]);
     if size(out, 1) > u % implying x(pInd) was new to Perms
         u = u + 1;
         pInds(u, :) = pInd;
-    end
-end
-%% Construct permutations of input
-if nargout > 2 
-    if isvector(X)
-        Perms = repmat(X(:)', k, 1);
-        for n = 2:k
-            Perms(n, :) = X(pInds(n, :));
-        end
-    else
-        Perms = repmat(X, [1 1 k]);
-        for n = 2:k
-            Perms(:, :, n) = X(pInds(n, :), :);
-        end
     end
 end

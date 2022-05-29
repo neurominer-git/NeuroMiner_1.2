@@ -37,7 +37,6 @@ inp.MLI         = MLI;
 if ~exist('GridAct','var') || isempty(GridAct), GridAct = nk_CVGridSelector(ix,jx); end
 if ~exist('batchflag','var') || isempty(batchflag), batchflag = false; end
 
-
 % Check and transform labels if needed
 inp = nk_ApplyLabelTransform( SCALE, MODEFL, inp );
 
@@ -79,27 +78,27 @@ for h=1:nclass
         end
         switch MODEFL
             case 'classification'
-                Results.BinResults(h).Modality(nx).Y_mapped = zeros(mY2,nY2);
-                Results.BinResults(h).Modality(nx).Y_mapped_ciu = zeros(mY2,nY2);
-                Results.BinResults(h).Modality(nx).Y_mapped_cil = zeros(mY2,nY2);
-                Results.BinResults(h).Modality(nx).Y_mapped_std = zeros(mY2,nY2);
+                Results.BinResults(h).Modality(nx).Y_mapped = zeros(mY2,nY2,ix);
+                Results.BinResults(h).Modality(nx).Y_mapped_ciu = zeros(mY2,nY2,ix);
+                Results.BinResults(h).Modality(nx).Y_mapped_cil = zeros(mY2,nY2,ix);
+                Results.BinResults(h).Modality(nx).Y_mapped_std = zeros(mY2,nY2,ix);
             case 'regression'
-                Results.RegrResults.Modality(nx).Y_mapped = zeros(mY2,nY2);
-                Results.RegrResults.Modality(nx).Y_mapped_ciu = zeros(mY2,nY2);
-                Results.RegrResults.Modality(nx).Y_mapped_cil = zeros(mY2,nY2);
-                Results.RegrResults.Modality(nx).Y_mapped_std = zeros(mY2,nY2);
+                Results.RegrResults.Modality(nx).Y_mapped = zeros(mY2,nY2,ix);
+                Results.RegrResults.Modality(nx).Y_mapped_ciu = zeros(mY2,nY2,ix);
+                Results.RegrResults.Modality(nx).Y_mapped_cil = zeros(mY2,nY2,ix);
+                Results.RegrResults.Modality(nx).Y_mapped_std = zeros(mY2,nY2,ix);
         end
         
         % If map is provided determine subspace for modification
-        if isfield(inp.MLI,'MAP') && inp.MLI.MAP.flag && isfield(analysis,'visdata')
+        if isfield(inp.MLI,'MAP') && inp.MLI.MAP.flag && isfield(inp,'visdata')
             maptype = inp.MLI.MAP.map; inp.MLI.MAP.map=[];
             switch maptype
                 case 'cvr'
-                    inp.MLI.MAP.map{h} = analysis.visdata{inp.curmodal,inp.curlabel}.CVRatio{h};
+                    inp.MLI.MAP.map{h} = inp.visdata{inp.curmodal,inp.curlabel}.CVRatio{h};
                 case 'p_sgn'
-                    inp.MLI.MAP.map{h} = analysis.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_uncorr{h};
+                    inp.MLI.MAP.map{h} = inp.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_uncorr{h};
                 case 'p_FDR_sgn'
-                    inp.MLI.MAP.map{h} = analysis.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_fdr{h};
+                    inp.MLI.MAP.map{h} = inp.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_fdr{h};
             end
             cutoff = inp.MLI.MAP.cutoff;
             if isfield(inp.MLI.MAP,'percentile') && inp.MLI.MAP.percentmode
@@ -109,21 +108,29 @@ for h=1:nclass
         else
             inp.MLI.MAP.mapidx = 1:nY;
         end
-        nYmap = numel(inp.MLI.MAP.mapidx);
-        nfrac = ceil(nYmap*inp.MLI.frac);
-        permfile = fullfile(inp.rootdir,[SAV.matname '_MLIpermmat_ID' inp.id '.mat']);
-        if exist(permfile,'file')
-            fprintf('\nLoading %s', permfile);
-            load(permfile)
-        else
-            fprintf('\nGenerating random feature subspaces ...')
-            [ ~, RandFeats(h, nx).I ] = uperms( inp.MLI.MAP.mapidx, inp.MLI.nperms, nfrac);   
-            fprintf('\nSaving to %s', permfile);
-            save(permfile, 'RandFeats');
-        end
     end
 end
 
+nYmap = numel(inp.MLI.MAP.mapidx);
+nfrac = ceil(nYmap*inp.MLI.frac);
+permfile = fullfile(inp.rootdir,[SAV.matname '_MLIpermmat_ID' inp.id '.mat']);
+if exist(permfile,'file') && inp.ovrwrtperm == 2
+    fprintf('\nLoading %s', permfile);
+    load(permfile)
+else
+    clc
+    sprintf('Generating random feature subspaces ... \n\n\n');
+    for h=1:nclass
+        if strcmp(MODEFL,'classification') && nclass >1, fprintf('\n\tBinary classifier #%g', h); end
+        for nx=1:nM
+            if nM > 1, fprintf('\n\t\tModality #%g', nx); end
+            [ RandFeats(h, nx).I, inp.MLI.nperms ] = uperms( inp.MLI.MAP.mapidx, inp.MLI.nperms, nfrac);   
+        end
+    end 
+    fprintf('\nSaving to %s', permfile);
+    save(permfile, 'RandFeats');
+end
+ol=1;
 % =========================================================================
 for f=1:ix % Loop through CV2 permutations
 
@@ -320,11 +327,9 @@ for f=1:ix % Loop through CV2 permutations
                                         fprintf(' Predict CV2 test data...')
                                         % Apply model to CV2 test data 
                                         if inp.oocvflag
-                                            OCV_star = nk_ExtractFeatures(OCV, F, [], u);
-                                            [~, ~, uD(:,u)] = nk_GetTestPerf(OCV_star, ones(size(CV2_star,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
+                                            [~, ~, uD(:,u)] = nk_GetTestPerf(OCV, ones(size(OCV,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
                                         else
-                                            CV2_star = nk_ExtractFeatures(CV2, F, [], u);
-                                            [~, ~, uD(:,u)] = nk_GetTestPerf(CV2_star, ones(size(CV2_star,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
+                                            [~, ~, uD(:,u)] = nk_GetTestPerf(CV2, ones(size(CV2,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
 
                                         end
                                         fprintf(' done.')
@@ -449,15 +454,14 @@ for f=1:ix % Loop through CV2 permutations
             
                                                     % Extract features according to mask
                                                     TR_star   = nk_ExtractFeatures(TR, F, [], u);
-                                                    OCV_star_pos  = nk_ExtractFeatures(OCV{1}, F, [], u);
-                                                    OCV_star_neg  = nk_ExtractFeatures(OCV{2}, F, [], u);
+
                                                     % Apply trained model to
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
-                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g',  f, d, k, l, u, size(OCV_star_pos,1), tInd(q));
-                                                    [~, ~, uD_pos(:,u)] = nk_GetTestPerf(OCV_star_pos, ones(size(OCV_star_pos,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
-                                                    [~, ~, uD_neg(:,u)] = nk_GetTestPerf(OCV_star_neg, ones(size(OCV_star_neg,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g',  f, d, k, l, u, size(OCV{1},1), tInd(q));
+                                                    [~, ~, uD_pos(:,u)] = nk_GetTestPerf(OCV{1}, ones(size(OCV{1},1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
+                                                    [~, ~, uD_neg(:,u)] = nk_GetTestPerf(OCV{2}, ones(size(OCV{2},1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
                                                     % Detrend regressor predictions, if
                                                     % required by user input
@@ -479,14 +483,13 @@ for f=1:ix % Loop through CV2 permutations
             
                                                     % Extract features according to mask
                                                     TR_star   = nk_ExtractFeatures(TR, F, [], u);
-                                                    OCV_star  = nk_ExtractFeatures(OCV, F, [], u);
 
                                                     % Apply trained model to
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
-                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g', f, d, k, l, u, size(OCV_star,1), tInd(q));
-                                                    [~, ~, uD(:,u)] = nk_GetTestPerf(OCV_star, ones(size(OCV_star,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g', f, d, k, l, u, size(OCV,1), tInd(q));
+                                                    [~, ~, uD(:,u)] = nk_GetTestPerf(OCV, ones(size(OCV,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
                                                     % Detrend regressor predictions, if
                                                     % required by user input
@@ -556,17 +559,35 @@ for f=1:ix % Loop through CV2 permutations
             for nx = 1 : nM
                 switch MODEFL
                     case 'classification'
-                        Results.BinResults(h).Modality(nx).Y_mapped(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped(tInd,:) + mapInterp{h,nx}/ix;
-                        Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:) + mapInterp_ciu{h,nx}/ix;
-                        Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:) + mapInterp_cil{h,nx}/ix;
-                        Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:) = Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:) + mapInterp_std{h,nx}/ix;
+                        Results.BinResults(h).Modality(nx).Y_mapped(tInd,:,f) = mapInterp{h,nx};
+                        Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:,f) = mapInterp_ciu{h,nx};
+                        Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:,f) = mapInterp_cil{h,nx};
+                        Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:,f) = mapInterp_std{h,nx};
                     case 'regression'
-                        Results.RegrResults.Modality(nx).Y_mapped(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped(tInd,:) + mapInterp{h,nx}/ix;
-                        Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:) + mapInterp_ciu{h,nx}/ix;
-                        Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:) + mapInterp_cil{h,nx}/ix;
-                        Results.RegrResults.Modality(nx).Y_mapped_std(tInd,:) = Results.RegrResults.Modality(nx).Y_mapped_std(tInd,:) + mapInterp_std{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped(tInd,:,f) = mapInterp{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:,f) = mapInterp_ciu{h,nx};
+                        Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:,f) = mapInterp_cil{h,nx};
+                        Results.RegrResults.Modality(nx).Y_mapped_std(tInd,:,f) = mapInterp_std{h,nx};
                 end
             end
+        end
+    end
+    ol=ol+1;
+end
+ol=ol-1;
+for h = 1:nclass
+    for nx = 1 : nM
+        switch MODEFL
+            case 'classification'
+                Results.BinResults(h).Modality(nx).Y_mapped     = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped(:,:,1:ol),3);
+                Results.BinResults(h).Modality(nx).Y_mapped_ciu = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_ciu(:,:,1:ol),3);
+                Results.BinResults(h).Modality(nx).Y_mapped_cil = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_cil(:,:,1:ol),3);
+                Results.BinResults(h).Modality(nx).Y_mapped_std = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_std(:,:,1:ol),3);
+            case 'regression'
+                Results.RegrResults.Modality(nx).Y_mapped       = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped(:,:,1:ol),3);
+                Results.RegrResults.Modality(nx).Y_mapped_ciu   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_ciu(:,:,1:ol),3);
+                Results.RegrResults.Modality(nx).Y_mapped_cil   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_cil(:,:,1:ol),3);
+                Results.RegrResults.Modality(nx).Y_mapped_std   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_std(:,:,1:ol),3);
         end
     end
 end

@@ -54,7 +54,7 @@ for k=1:s % Loop through all feature subspaces
     tXtest  = nk_ExtractFeatures(Xtest, Features, [], k);
     
     % ******************** Get Model of current subpace *******************
-    if iscell(Model), md = Model{k}; else md = Model; end
+    if iscell(Model), md = Model{k}; else, md = Model; end
     
     % Check test matrix for NaN observations and remove them
     switch SVM.prog
