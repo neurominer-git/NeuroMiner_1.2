@@ -117,12 +117,8 @@ if ~defaultsfl
         OcclusionMapCutoffOperator = '';
     end
     
-    if znormdata 
-        ZnormDataStr = 'yes';
-    else
-        ZnormDataStr = 'no';
-    end
-    OcclusionZnormData = ['Produce z-normalized prediction change estimates [ ' ZnormDataStr ' ]' ];
+    ZnormDataOpts = {'None','Mean centering','Z-normalization'};
+    OcclusionZnormData = ['Produce z-normalized prediction change estimates [ ' ZnormDataOpts{znormdata} ' ]' ];
     mnuact = [ mnuact 12 ];
 
     mnustr = [OcclusionMethodStr ...
@@ -200,7 +196,7 @@ if ~defaultsfl
                      1:6, cutoffoperator);
             end
         case 12
-             if ~znormdata, znormdata=1; else, znormdata = 0; end
+            znormdata = nk_input('Define centering procedure', 0, 'm', 'None|Mean centering|Z-normalization', 1:3, znormdata);
     end
 end
 param.MLI.method = method;
@@ -215,4 +211,4 @@ param.MLI.MAP.map = mapfeat;
 param.MLI.MAP.cutoff = cutoff;
 param.MLI.MAP.percentmode = cutoffmode;
 param.MLI.MAP.operator = cutoffoperator;
-param.MLI.MAP.znormdata = znormdata;
+param.MLI.znormdata = znormdata;

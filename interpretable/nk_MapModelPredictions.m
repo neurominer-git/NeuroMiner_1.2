@@ -26,11 +26,21 @@ for i=1:n
     Y_mapped_std(i) = nm_nanstd(tY_mapped(idx,i));
     Y_mapped(i) = nm_nanmean(tY_mapped(idx,i));
 end
-if ZnormData 
-    % we should do mean centering here rather than z-normalizing
-    idx = Y_mapped ~=0 | isfinite(Y_mapped);
-    mYmapped = nm_nanmean(Y_mapped(idx));
-    Y_mapped(idx) = Y_mapped(idx) -  mYmapped ; 
+switch ZnormData 
+    case 2
+        % mean centering 
+        idx = Y_mapped ~=0 | isfinite(Y_mapped);
+        mYmapped = nm_nanmean(Y_mapped(idx));
+        Y_mapped(idx) = Y_mapped(idx) -  mYmapped ; 
+    case 3
+        % z-normalisation
+        idx = Y_mapped ~=0 | isfinite(Y_mapped);
+        mYmapped = nm_nanmean(Y_mapped(idx));
+        sdYmapped = nm_nanmean(Y_mapped(idx));
+        Y_mapped(idx) = ( Y_mapped(idx) -  mYmapped ) / sdYmapped;
+        Y_mapped_cil(idx) = ( Y_mapped_cil(idx) -  mYmapped ) / sdYmapped;
+        Y_mapped_ciu(idx) = ( Y_mapped_ciu(idx) -  mYmapped ) / sdYmapped;
+        Y_mapped_std(idx) = ( Y_mapped_std(idx) -  mYmapped ) / sdYmapped;
 end
 idx = ~isfinite(Y_mapped);
 Y_mapped(idx) = 0;

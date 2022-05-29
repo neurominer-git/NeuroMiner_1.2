@@ -61,6 +61,11 @@ CVPOS.fFull = FullPartFlag;
 FileNames = cell(ix,jx); fnd=false;
 nM = numel(inp.X);
 RandFeats = struct('I',[]);
+if inp.oocvflag
+    cases  = inp.OO.cases;
+else
+    cases  = evalin('base','NM.cases');
+end
 for h=1:nclass
     switch MODEFL
         case 'classification'
@@ -526,7 +531,7 @@ for f=1:ix % Loop through CV2 permutations
                 if ~loadfl || (loadfl && inp.recompute_estimates ==1)
                     fprintf('\nComputing MLI prediction change estimates in CV2 partition [ %g, %g ]:', f, d);
                     for q=1:numel(tInd) % Loop through CV2/OOCV cases 
-                         fprintf('\n\tCase %g of %g cases', q, numel(tInd));
+                        fprintf('\n\tCase %s (%g of %g cases)', cases{tInd(q)}, q, numel(tInd));
                         for h=1:nclass
                             Oh = nm_nanmedian(predOrig{h}(q,:),2);
                             for nx = 1:nM
@@ -544,7 +549,14 @@ for f=1:ix % Loop through CV2 permutations
                                                                     inp.MLI.MAP.mapidx , inp.MLI.method, ...
                                                                     inp.MLI.RangePred(h), inp.MLI.znormdata);
                                 if inp.X(nx).datatype == 1
-                                    filpth = fullfile(inp.rootdir,sprintf('Case%g_Interp_CV2-%g-%g', tInd(q), f, d));
+                                    switch inp.MLI.znormdata
+                                        case 1
+                                            filpth = fullfile(inp.rootdir,sprintf('%s_Interp_CV2-%g-%g', cases{tInd(q)}, f, d));
+                                        case 2
+                                            filpth = fullfile(inp.rootdir,sprintf('%s_InterpMC_CV2-%g-%g', cases{tInd(q)}, f, d));
+                                        case 3
+                                            filpth = fullfile(inp.rootdir,sprintf('%s_InterpZ_CV2-%g-%g', cases{tInd(q)}, f, d));
+                                    end
                                     nk_WriteVol(mapInterp{h, nx}(q,:), filpth,1, inp.X(nx).brainmask{1},inp.X(nx).badcoords{1},0,'gt');
                                 end
                             end
@@ -566,7 +578,7 @@ for f=1:ix % Loop through CV2 permutations
                         fprintf('\nRecomputing MLI prediction change estimates in CV2 partition [ %g, %g ]:', f, d);
                         %% Step 5: Evaluate impact of input data modifications using obtained predictions
                         for q=1:numel(tInd) % Loop through CV2/OOCV cases 
-                            fprintf('\n\tCase %g of %g cases', q, numel(tInd));
+                            fprintf('\n\tCase %s (%g of %g cases)', cases{tInd(q)}, q, numel(tInd));
                             for h=1:nclass
                                 Oh = nm_nanmedian(predOrig{h}(q,:),2);
                                 for nx = 1:nM

@@ -15,9 +15,10 @@ end
 
 bar(y(idx),'FaceColor',rgb('DodgerBlue'),'EdgeColor',rgb("SlateGrey")); 
 errorbar(1:nF, y(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', 'k'); 
-bar(y2(idx), 'FaceColor',rgb('LightGrey'),'EdgeColor',rgb("Grey")); 
-errorbar(1:nF, y2(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', rgb("Grey")); 
-    
+if any(idx2)
+    bar(y2(idx), 'FaceColor',rgb('LightGrey'),'EdgeColor',rgb("Grey")); 
+    errorbar(1:nF, y2(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', rgb("Grey")); 
+end
 ax=gca; 
 ax.XTick=1:numel(feats); 
 if any(idx2)
