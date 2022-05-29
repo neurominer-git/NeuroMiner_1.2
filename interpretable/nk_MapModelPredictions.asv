@@ -1,6 +1,9 @@
-function [Y_mapped, Y_mapped_ciu, Y_mapped_cil, Y_mapped_std] = nk_MapModelPredictions(O, R, I, Method, NormRange)
+function [Y_mapped, Y_mapped_ciu, Y_mapped_cil, Y_mapped_std] = nk_MapModelPredictions(O, R, I, Method, NormRange, ZnormData)
 
 [m, n] = size(I);
+if exist('ZnormData','var') && ~isempty('ZnormData')
+    ZnormData =
+end
 tY_mapped = zeros(m,n);
 switch Method
     case 'posneg'

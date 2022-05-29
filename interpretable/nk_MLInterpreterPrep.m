@@ -38,6 +38,7 @@ if ~exist('inp','var') || isempty(inp)
                     ...                         % 2 = do not overwrite (use existing OOCVdatamats automatically)
                     'saveparam', 2, ...         % if loadparam == 2=> 1 = save OOCV processing parameters (preprocessing / models)
                     'ovrwrtperm', 2, ...        % Overwrite permutation file.
+                    'recompute_estimates', 2, ...% Recompute prediction change estimates
                     ...                         % 2 = do not save parameters to disk
                     'saveCV1', 2, ...           % if loadparam == 2 && saveparam ==1 => 1 = save large OOCV processing containers at the CV1 level 
                     ...                         % 2 = operate at CV2 level
@@ -103,18 +104,22 @@ if ~isempty(analysis)
         OverWriteStr = sprintf('Specify %s files [ %s ]|', inp.datatype, nMatFiles);                                      OverWriteAct = 4; 
     end
     
-    % from scratch
+    % Overwrite permutation file
     OverWritePermStr = sprintf('Overwrite existing permutations file [ %s ]|', OVRWRT_opts{inp.ovrwrtperm}) ;             OverWritePermAct = 5; 
+    
+    % Recompute prediction change estimate
+    LOAD_opts        = {'yes', 'no'}; 
+    RecomputeChangeStr = sprintf('Recompute prediction change estimates [ %s ]|', LOAD_opts{inp.recompute_estimates}) ;   RecomputeChangeAct = 6; 
 
     % Retrieve CV2 partitions to operate on
     if ~isfield(inp,'GridAct'), inp.GridAct = analysis.GDdims{1}.GridAct; end;                                              
-    GridSelectStr = sprintf('Select CV2 partitions to operate on [ %g selected ]|',  sum(inp.GridAct(:)));                GridSelectAct = 6;
+    GridSelectStr = sprintf('Select CV2 partitions to operate on [ %g selected ]|',  sum(inp.GridAct(:)));                GridSelectAct = 7;
     
     % Configure loading of pre-existing parameters and models
     if inp.saveparam == 2 && inp.lfl == 1
-        LOAD_opts        = {'yes', 'no'}; 
+        
         if ~DATASCRAM
-            LoadStr = sprintf('Use saved pre-processing params and models [ %s ]|', LOAD_opts{inp.loadparam});            LoadAct = 7;
+            LoadStr = sprintf('Use saved pre-processing params and models [ %s ]|', LOAD_opts{inp.loadparam});            LoadAct = 8;
         end
         if inp.loadparam == 1
             if isfield(inp,'optpreprocmat') 
@@ -123,14 +128,14 @@ if ~isempty(analysis)
             else, 
                 nParamFiles = na_str; 
             end
-            LoadParamsStr = sprintf('Select preprocessing parameter files [ %s ]|' ,nParamFiles);                         LoadParamsAct = 9;
+            LoadParamsStr = sprintf('Select preprocessing parameter files [ %s ]|' ,nParamFiles);                         LoadParamsAct = 10;
             if isfield(inp,'optmodelmat') 
                 selGridModel = ~cellfun(@isempty,inp.optmodelmat);
                 nModelFiles = sprintf('%g files selected', sum(selGridModel(:))); 
             else 
                 nModelFiles = na_str; 
             end
-            LoadModelsStr = sprintf('Select model files [ %s ]|',nModelFiles);                                            LoadModelsAct = 10;
+            LoadModelsStr = sprintf('Select model files [ %s ]|',nModelFiles);                                            LoadModelsAct = 11;
         end
     end
     
@@ -138,7 +143,7 @@ if ~isempty(analysis)
     % save the computed params and models to disk
     if inp.loadparam == 2 && inp.lfl == 1
         SAVE_opts       = {'yes', 'no'};   
-        SaveStr = sprintf('Save pre-processing params and models to disk [ %s ]|', SAVE_opts{inp.saveparam});             SaveAct = 8;
+        SaveStr = sprintf('Save pre-processing params and models to disk [ %s ]|', SAVE_opts{inp.saveparam});             SaveAct = 9;
     end
 end
  
@@ -148,6 +153,7 @@ menustr = [ AnalSelectStr ...
             ModeStr ...
             OverWriteStr ...
             OverWritePermStr ...
+            RecomputeChangeStr ...
             GridSelectStr ...
             SaveStr ...
             SaveCV1Str ...
@@ -160,6 +166,7 @@ menuact = [ AnalSelectAct ...
             ModeAct ...
             OverWriteAct ...
             OverWritePermAct ...
+            RecomputeChangeAct ...
             GridSelectAct ...
             SaveAct ...
             SaveCV1Act ...
@@ -177,7 +184,7 @@ if inp.loadparam == 1
     if ~isfield(inp,'optmodelmat') || isempty(inp.optmodelmat), disallow = true; end
 end
 
-if ~disallow, menustr = [menustr '|PROCEED >>>']; menuact = [menuact 11]; end 
+if ~disallow, menustr = [menustr '|PROCEED >>>']; menuact = [menuact 12]; end 
 
 %% Display menu and act on user selections
 nk_PrintLogo
@@ -221,21 +228,23 @@ switch act
     case 5
         if inp.ovrwrtperm == 1, inp.ovrwrtperm = 2; elseif inp.ovrwrtperm == 2, inp.ovrwrtperm = 1; end
     case 6
+        if inp.recompute_estimates == 1, inp.recompute_estimates = 2; elseif inp.recompute_estimates == 2, inp.recompute_estimates = 1; end
+    case 7
         [operms,ofolds] = size(CV.TrainInd);
         tact = 1; while tact > 0 && tact < 10, [ tact, inp.GridAct ] = nk_CVGridSelector(operms, ofolds, inp.GridAct, 0); end
-    case 7
-        if inp.saveparam == 1, inp.saveparam = 2; elseif inp.saveparam == 2,  inp.saveparam = 1; end
     case 8
-        if inp.loadparam == 1, inp.loadparam = 2; elseif inp.loadparam == 2,  inp.loadparam = 1; end
+        if inp.saveparam == 1, inp.saveparam = 2; elseif inp.saveparam == 2,  inp.saveparam = 1; end
     case 9
+        if inp.loadparam == 1, inp.loadparam = 2; elseif inp.loadparam == 2,  inp.loadparam = 1; end
+    case 10
         tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind);
         optpreprocmat = nk_GenDataMaster(NM.id, 'OptPreprocParam', CV, [], tdir);
         if ~isempty(optpreprocmat), inp.optpreprocmat = optpreprocmat; end
-    case 10
+    case 11
         tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind);
         optmodelmat = nk_GenDataMaster(NM.id, 'OptModel', CV, [], tdir);
         if ~isempty(optmodelmat), inp.optmodelmat = optmodelmat; end
-    case {11,12}
+    case {12,13}
         if inp.oocvflag
             inp.oocvname = sprintf('OOCV_%g',inp.oocvind);
         end

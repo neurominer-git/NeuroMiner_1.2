@@ -514,28 +514,41 @@ for f=1:ix % Loop through CV2 permutations
                         else
                             inp.X = rmfield(inp.X,'Yocv');
                         end
-                        
-                        %% Step 5: Evaluate impact of input data modifications using obtained predictions
+                    end
+                    fprintf('\nSaving %s', oMLIpath); 
+                    save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
+                    if saveparam 
+                        fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
+                    end
+                end
+
+                %% Step 5: Evaluate impact of input data modifications using obtained predictions
+                if ~loadfl || (loadfl && inp.recompute_estimates ==1)
+                    fprintf('\nComputing MLI prediction change estimates in CV2 partition [ %g, %g ]:', f, d);
+                    for q=1:numel(tInd) % Loop through CV2/OOCV cases 
+                         fprintf('\n\tCase %g of %g cases', q, numel(tInd));
                         for h=1:nclass
                             Oh = nm_nanmedian(predOrig{h}(q,:),2);
                             for nx = 1:nM
+                                nY = size(inp.X(nx).Y,2);
                                 switch inp.MLI.method
                                     case 'posneg'
                                         Rh = [ nm_nanmedian(predInterp{q,h,1},2) nm_nanmedian(predInterp{q,h,2},2)]; 
                                     case 'median'
                                         Rh = nm_nanmedian(predInterp{q,h},2);
                                 end
-                            end
-                            [mapInterp{h, nx}(q,:), ...
+                                [mapInterp{h, nx}(q,:), ...
                                 mapInterp_ciu{h, nx}(q,:), ...
                                 mapInterp_cil{h, nx}(q,:), ...
-                                mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(Oh, Rh, inp.X(nx).I, inp.MLI.method, inp.MLI.RangePred(h));
+                                mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(nY, Oh, Rh, RandFeats(h, nx).I, ...
+                                                                    inp.MLI.MAP.mapidx , inp.MLI.method, ...
+                                                                    inp.MLI.RangePred(h), inp.MLI.znormdata);
+                                if inp.X(nx).datatype == 1
+                                    filpth = fullfile(inp.rootdir,sprintf('Case%g_Interp_CV2-%g-%g', tInd(q), f, d));
+                                    nk_WriteVol(mapInterp{h, nx}(q,:), filpth,1, inp.X(nx).brainmask{1},inp.X(nx).badcoords{1},0,'gt');
+                                end
+                            end
                         end
-                    end
-                    fprintf('\nSaving %s', oMLIpath); 
-                    save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
-                    if saveparam 
-                        fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
                     end
                 end
                 
@@ -549,6 +562,31 @@ for f=1:ix % Loop through CV2 permutations
                     fprintf('\n\nLoading MLI results for CV2 partition [ %g, %g ]:', f, d);
                     fprintf('\n%s',vnam);
                     load(vpth)
+                    if inp.recompute_estimates == 1
+                        fprintf('\nRecomputing MLI prediction change estimates in CV2 partition [ %g, %g ]:', f, d);
+                        %% Step 5: Evaluate impact of input data modifications using obtained predictions
+                        for q=1:numel(tInd) % Loop through CV2/OOCV cases 
+                            fprintf('\n\tCase %g of %g cases', q, numel(tInd));
+                            for h=1:nclass
+                                Oh = nm_nanmedian(predOrig{h}(q,:),2);
+                                for nx = 1:nM
+                                    nY = size(inp.X(nx).Y,2);
+                                    switch inp.MLI.method
+                                        case 'posneg'
+                                            Rh = [ nm_nanmedian(predInterp{q,h,1},2) nm_nanmedian(predInterp{q,h,2},2)]; 
+                                        case 'median'
+                                            Rh = nm_nanmedian(predInterp{q,h},2);
+                                    end
+                                    [mapInterp{h, nx}(q,:), ...
+                                     mapInterp_ciu{h, nx}(q,:), ...
+                                     mapInterp_cil{h, nx}(q,:), ...
+                                     mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(Oh, Rh, RandFeats(h, nx).I, ...
+                                                                     inp.MLI.MAP.mapidx, inp.MLI.method, ...
+                                                                     inp.MLI.RangePred(h), inp.MLI.znormdata);
+                                end
+                            end
+                        end
+                    end
                 end 
         end
         
@@ -564,7 +602,7 @@ for f=1:ix % Loop through CV2 permutations
                         Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:,f) = mapInterp_cil{h,nx};
                         Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:,f) = mapInterp_std{h,nx};
                     case 'regression'
-                        Results.RegrResults.Modality(nx).Y_mapped(tInd,:,f) = mapInterp{h,nx}/ix;
+                        Results.RegrResults.Modality(nx).Y_mapped(tInd,:,f) = mapInterp{h,nx};
                         Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:,f) = mapInterp_ciu{h,nx};
                         Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:,f) = mapInterp_cil{h,nx};
                         Results.RegrResults.Modality(nx).Y_mapped_std(tInd,:,f) = mapInterp_std{h,nx};

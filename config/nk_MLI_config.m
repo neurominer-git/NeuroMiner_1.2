@@ -22,6 +22,7 @@ mapfeat = 'cvr';
 cutoff = [-2 2];
 cutoffmode = 'absolute';
 cutoffoperator = 1;
+znormdata = false;
 
 if ~defaultsfl
     
@@ -38,6 +39,7 @@ if ~defaultsfl
         cutoff = param.MLI.MAP.cutoff;
         cutoffmode = param.MLI.MAP.percentmode;
         cutoffoperator = param.MLI.MAP.operator;
+        znormdata = param.MLI.MAP.znormdata;
     end
 
     switch method
@@ -106,7 +108,7 @@ if ~defaultsfl
         else
             MapCutoffOperatorStr = {'<', '<=', '>', '>=', '==', '~='};
         end
-        OcclusionMapCutoffOperator = ['Define cutoff operator [ ' MapCutoffOperatorStr{cutoffoperator} ' ]'];
+        OcclusionMapCutoffOperator = ['Define cutoff operator [ ' MapCutoffOperatorStr{cutoffoperator} ' ]|'];
         mnuact = [ mnuact 11 ];
     else
         OcclusionMapFeatStr = '';
@@ -114,6 +116,14 @@ if ~defaultsfl
         OcclusionMapCutoffModeStr = '';
         OcclusionMapCutoffOperator = '';
     end
+    
+    if znormdata 
+        ZnormDataStr = 'yes';
+    else
+        ZnormDataStr = 'no';
+    end
+    OcclusionZnormData = ['Produce z-normalized prediction change estimates [ ' ZnormDataStr ' ]' ];
+    mnuact = [ mnuact 12 ];
 
     mnustr = [OcclusionMethodStr ...
               OcclusionUpperThreshStr ...
@@ -125,7 +135,8 @@ if ~defaultsfl
               OcclusionMapFeatStr ...
               OcclusionMapCutoffStr ...
               OcclusionMapCutoffModeStr ...
-              OcclusionMapCutoffOperator];
+              OcclusionMapCutoffOperator ...
+              OcclusionZnormData];
     
     nk_PrintLogo
     act = nk_input('MAIN INTERFACE >> DEFINE PARAMETERS >> Model interpreter settings',0,'mq', mnustr, mnuact);
@@ -188,6 +199,8 @@ if ~defaultsfl
                      '~='], ... 
                      1:6, cutoffoperator);
             end
+        case 12
+             if ~znormdata, znormdata=1; else, znormdata = 0; end
     end
 end
 param.MLI.method = method;
@@ -202,3 +215,4 @@ param.MLI.MAP.map = mapfeat;
 param.MLI.MAP.cutoff = cutoff;
 param.MLI.MAP.percentmode = cutoffmode;
 param.MLI.MAP.operator = cutoffoperator;
+param.MLI.MAP.znormdata = znormdata;
