@@ -58,7 +58,7 @@ BINMOD = iPREPROC.BINMOD;
 
 CVPOS.fFull = FullPartFlag;
 
-FileNames = cell(ix,jx); fnd=false;
+FileNames = cell(ix,jx); 
 nM = numel(inp.X);
 RandFeats = struct('I',[]);
 if inp.oocvflag
@@ -99,37 +99,52 @@ for h=1:nclass
             maptype = inp.MLI.MAP.map; inp.MLI.MAP.map=[];
             switch maptype
                 case 'cvr'
-                    inp.MLI.MAP.map{h} = inp.visdata{inp.curmodal,inp.curlabel}.CVRatio{h};
+                    inp.MLI.MAP.map{h,nx} = inp.visdata{inp.curmodal,inp.curlabel}.CVRatio{h};
                 case 'p_sgn'
-                    inp.MLI.MAP.map{h} = inp.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_uncorr{h};
+                    inp.MLI.MAP.map{h,nx} = inp.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_uncorr{h};
                 case 'p_FDR_sgn'
-                    inp.MLI.MAP.map{h} = inp.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_fdr{h};
+                    inp.MLI.MAP.map{h,nx} = inp.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_fdr{h};
             end
             cutoff = inp.MLI.MAP.cutoff;
             if isfield(inp.MLI.MAP,'percentile') && inp.MLI.MAP.percentmode
-                cutoff = prctile(inp.MLI.MAP.map{h}, inp.MLI.MAP.cutoff);
+                cutoff = prctile(inp.MLI.MAP.map{h,nx}, inp.MLI.MAP.cutoff);
             end
-            inp.MLI.MAP.mapidx = return_imgind(inp.MLI.MAP.operator, cutoff, inp.MLI.MAP.map{h});
+            inp.MLI.MAP.mapidx{h,nx} = return_imgind(inp.MLI.MAP.operator, cutoff, inp.MLI.MAP.map{h,nx});
         else
-            inp.MLI.MAP.mapidx = 1:nY;
+            inp.MLI.MAP.mapidx{h,nx} = 1:nY;
         end
     end
 end
 
-nYmap = numel(inp.MLI.MAP.mapidx);
-nfrac = ceil(nYmap*inp.MLI.frac);
+
 permfile = fullfile(inp.rootdir,[SAV.matname '_MLIpermmat_ID' inp.id '.mat']);
 if exist(permfile,'file') && inp.ovrwrtperm == 2
     fprintf('\nLoading %s', permfile);
-    load(permfile)
+    load(permfile,"RandFeats")
 else
     clc
     sprintf('Generating random feature subspaces ... \n\n\n');
     for h=1:nclass
         if strcmp(MODEFL,'classification') && nclass >1, fprintf('\n\tBinary classifier #%g', h); end
         for nx=1:nM
+            % Compute subspace size of current modality
+            nYmap = numel(inp.MLI.MAP.mapidx{h,nx});
+            nfrac = ceil(nYmap*inp.MLI.frac);
             if nM > 1, fprintf('\n\t\tModality #%g', nx); end
-            [ RandFeats(h, nx).I, inp.MLI.nperms ] = uperms( inp.MLI.MAP.mapidx, inp.MLI.nperms, nfrac);   
+            % Create random feature indices within subspace.
+            switch inp.MLI.method
+                case {'posneg','median','medianflip'}
+                    % ordered permutations without replacement
+                    % no repetitions
+                    [ RandFeats(h, nx).I, inp.MLI.nperms ] = uperms( inp.MLI.MAP.mapidx{h,nx}, inp.MLI.nperms, nfrac);   
+                case {'random'}
+                    % non-ordered permutations without replacement,
+                    % repetitions are allowed.
+                    RandFeats(h, nx).I = uint32(zeros(inp.MLI.nperms, nfrac));
+                    for nq = 1:inp.MLI.nperms
+                        RandFeats(h, nx).I(nq,:) = randperm( nYmap, nfrac);   
+                    end
+            end
         end
     end 
     fprintf('\nSaving to %s', permfile);
@@ -147,9 +162,7 @@ for f=1:ix % Loop through CV2 permutations
             fprintf('\nSkipping CV2 [%g,%g] (user-defined).',f,d)
             continue 
         end
-        if ~fnd
-            ll_start=ll; fnd=true; 
-        end
+       
         % Prepare variables for current CV2 partition
         CVPOS.CV2p = f;
         CVPOS.CV2f = d;
@@ -359,7 +372,7 @@ for f=1:ix % Loop through CV2 permutations
                     switch inp.MLI.method
                         case 'posneg'
                             predInterp = cell(nTs, nclass, 2);
-                        case {'median','medianflip'}
+                        case {'median','medianflip','random'}
                             predInterp = cell(nTs, nclass);
                     end
                     mapInterp = cell(nclass, nM);
@@ -393,7 +406,7 @@ for f=1:ix % Loop through CV2 permutations
                                 if ~isempty(inp.covars), covs = inp.covars(tInd(q,:)); end
                                 Ts = inp.X(nx).Y(tInd(q,:),:);
                             end
-                            inp = nk_CreateData4MLInterpreter( RandFeats(h, nx).I, Tr, Ts , covs, inp, nx );
+                            inp = nk_CreateData4MLInterpreter( RandFeats(h, nx).I, inp.MLI.MAP.mapidx{h, nx}, Tr, Ts , covs, inp, nx );
                         end
                         
                         %% Step 4: generate predictions for artificial cases
@@ -411,6 +424,8 @@ for f=1:ix % Loop through CV2 permutations
                                     inp.desc_oocv = 'median modification';
                                 case 'medianflip'
                                     inp.desc_oocv = 'median flipped modification';
+                                case 'random'
+                                    inp.desc_oocv = 'random value modification';
                             end
                             [ inp, ~, ~, ~, ~, ~, ~, ~, mapYocv] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param);
                             for m = 1 : nP      % Loop through parameter combinations
@@ -481,7 +496,7 @@ for f=1:ix % Loop through CV2 permutations
                                                 predInterp{q,h,1} = [predInterp{q,h,1} uD_pos];
                                                 predInterp{q,h,2} = [predInterp{q,h,2} uD_neg];
 
-                                            case {'median','medianflip'}
+                                            case {'median','medianflip','random'}
 
                                                 uD = zeros(size(OCV,1),ul);
                                                 % Loop through feature subspaces
@@ -540,14 +555,14 @@ for f=1:ix % Loop through CV2 permutations
                                 switch inp.MLI.method
                                     case 'posneg'
                                         Rh = [ nm_nanmedian(predInterp{q,h,1},2) nm_nanmedian(predInterp{q,h,2},2)]; 
-                                    case {'median','medianflip'}
+                                    case {'median','medianflip','random'}
                                         Rh = nm_nanmedian(predInterp{q,h},2);
                                 end
                                 [mapInterp{h, nx}(q,:), ...
                                 mapInterp_ciu{h, nx}(q,:), ...
                                 mapInterp_cil{h, nx}(q,:), ...
                                 mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(nY, Oh, Rh, RandFeats(h, nx).I, ...
-                                                                    inp.MLI.MAP.mapidx , inp.MLI.method, ...
+                                                                    inp.MLI.MAP.mapidx{h,nx} , inp.MLI.method, ...
                                                                     inp.MLI.RangePred(h), inp.MLI.znormdata);
                                 if inp.X(nx).datatype == 1
                                     switch inp.MLI.znormdata
@@ -587,14 +602,14 @@ for f=1:ix % Loop through CV2 permutations
                                     switch inp.MLI.method
                                         case 'posneg'
                                             Rh = [ nm_nanmedian(predInterp{q,h,1},2) nm_nanmedian(predInterp{q,h,2},2)]; 
-                                        case 'median'
+                                        case {'median','medianflip','random'}
                                             Rh = nm_nanmedian(predInterp{q,h},2);
                                     end
                                     [mapInterp{h, nx}(q,:), ...
                                      mapInterp_ciu{h, nx}(q,:), ...
                                      mapInterp_cil{h, nx}(q,:), ...
                                      mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(Oh, Rh, RandFeats(h, nx).I, ...
-                                                                     inp.MLI.MAP.mapidx, inp.MLI.method, ...
+                                                                     inp.MLI.MAP.mapidx{h, nx}, inp.MLI.method, ...
                                                                      inp.MLI.RangePred(h), inp.MLI.znormdata);
                                 end
                             end

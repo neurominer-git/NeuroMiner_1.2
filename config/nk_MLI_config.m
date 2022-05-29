@@ -61,6 +61,12 @@ if ~defaultsfl
             OcclusionLowerThreshStr = '';
             DEFMETHOD = 3;
             mnuact = 1;
+        case 'random'
+            MethodStr = 'Random value';
+            OcclusionUpperThreshStr = '';
+            OcclusionLowerThreshStr = '';
+            DEFMETHOD = 4;
+            mnuact = 1;
     end
     OcclusionMethodStr = ['Define occlusion method [ ' MethodStr ' ]|']; 
     
@@ -148,8 +154,9 @@ if ~defaultsfl
             method = char(nk_input('Define occlusion method', 0, 'm', ...
                 ['Replace feature with upper and lower percentile cutoffs|' ...
                  'Replace feature with median|' ...
-                 'Replace feature by adding/subtracting the median quantile'], ...
-                 {'posneg','median','medianflip'}, DEFMETHOD));
+                 'Replace feature by adding/subtracting the median quantile|' ...
+                 'Replace feature by randomly picking a value from the feature''s training sample distribution'], ...
+                 {'posneg','median','medianflip','random'}, DEFMETHOD));
         case 2
             upper_thresh = nk_input('Define upper percentile', 0, 'e', upper_thresh);
         case 3

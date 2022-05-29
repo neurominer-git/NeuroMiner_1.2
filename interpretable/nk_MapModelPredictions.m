@@ -13,7 +13,7 @@ Y_mapped_std    = zeros(1,n);
 switch Method
     case 'posneg'
         RangeD = (R(:,1) - R(:,2))-O;
-    case {'median','medianflip'}
+    case {'median','medianflip','random'}
         RangeD = R-O;
 end
 for i=1:m
