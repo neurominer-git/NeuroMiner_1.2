@@ -55,6 +55,12 @@ if ~defaultsfl
             OcclusionLowerThreshStr = '';
             DEFMETHOD = 2;
             mnuact = 1;
+        case 'medianflip'
+            MethodStr = 'Median span flipped';
+            OcclusionUpperThreshStr = '';
+            OcclusionLowerThreshStr = '';
+            DEFMETHOD = 3;
+            mnuact = 1;
     end
     OcclusionMethodStr = ['Define occlusion method [ ' MethodStr ' ]|']; 
     
@@ -141,8 +147,9 @@ if ~defaultsfl
         case 1
             method = char(nk_input('Define occlusion method', 0, 'm', ...
                 ['Replace feature with upper and lower percentile cutoffs|' ...
-                 'Replace feature with median'], ...
-                 {'posneg','median'}, DEFMETHOD));
+                 'Replace feature with median|' ...
+                 'Replace feature by adding/subtracting the median quantile'], ...
+                 {'posneg','median','medianflip'}, DEFMETHOD));
         case 2
             upper_thresh = nk_input('Define upper percentile', 0, 'e', upper_thresh);
         case 3

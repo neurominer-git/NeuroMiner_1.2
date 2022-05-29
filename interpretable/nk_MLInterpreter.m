@@ -188,7 +188,7 @@ for f=1:ix % Loop through CV2 permutations
                      % in batch mode we do not compute statistics across the
                     % CV2 partitions
                     [~, onam] = fileparts(oMLIpath);
-                    fprintf('\nINTERdatamat found for CV2 [%g,%g]:\n%s',f,d,onam)
+                    fprintf('\nMLIdatamat found for CV2 [%g,%g]:\n%s',f,d,onam)
                     fprintf('\nBatch mode detected. Continue.')
                     [RootPath, FileNames{f,d}] = fileparts(oMLIpath); 
                     load(oMLIpath)
@@ -359,7 +359,7 @@ for f=1:ix % Loop through CV2 permutations
                     switch inp.MLI.method
                         case 'posneg'
                             predInterp = cell(nTs, nclass, 2);
-                        case 'median'
+                        case {'median','medianflip'}
                             predInterp = cell(nTs, nclass);
                     end
                     mapInterp = cell(nclass, nM);
@@ -407,11 +407,12 @@ for f=1:ix % Loop through CV2 permutations
                                 case 'posneg'
                                     inp.desc_oocv{1} = sprintf('%g%%-percentile modification', inp.MLI.upper_thresh);
                                     inp.desc_oocv{2} = sprintf('%g%%-percentile modification', inp.MLI.lower_thresh);
-                                    [ inp, ~, ~, ~, ~, ~, ~, ~, mapYocv ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param);
                                 case 'median'
                                     inp.desc_oocv = 'median modification';
-                                    [ inp, ~, ~, ~, ~, ~, ~, ~, mapYocv] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param);
+                                case 'medianflip'
+                                    inp.desc_oocv = 'median flipped modification';
                             end
+                            [ inp, ~, ~, ~, ~, ~, ~, ~, mapYocv] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param);
                             for m = 1 : nP      % Loop through parameter combinations
                                 for k=1:iy      % Loop through CV1 permutations
                                     for l=1:jy  % Loop through CV1 folds
@@ -480,7 +481,7 @@ for f=1:ix % Loop through CV2 permutations
                                                 predInterp{q,h,1} = [predInterp{q,h,1} uD_pos];
                                                 predInterp{q,h,2} = [predInterp{q,h,2} uD_neg];
 
-                                            case 'median'
+                                            case {'median','medianflip'}
 
                                                 uD = zeros(size(OCV,1),ul);
                                                 % Loop through feature subspaces
@@ -539,7 +540,7 @@ for f=1:ix % Loop through CV2 permutations
                                 switch inp.MLI.method
                                     case 'posneg'
                                         Rh = [ nm_nanmedian(predInterp{q,h,1},2) nm_nanmedian(predInterp{q,h,2},2)]; 
-                                    case 'median'
+                                    case {'median','medianflip'}
                                         Rh = nm_nanmedian(predInterp{q,h},2);
                                 end
                                 [mapInterp{h, nx}(q,:), ...

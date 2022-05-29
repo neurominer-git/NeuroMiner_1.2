@@ -13,20 +13,18 @@ if ~isempty(covars) && nx == 1
         case 'posneg'
             IN.covars_rep{1} = repmat(covars,IN.MLI.nperms,1);
             IN.covars_rep{2} = repmat(covars,IN.MLI.nperms,1);
-        case 'median'
+        case {'median','medianflip'}
             IN.covars_rep = repmat(covars,IN.MLI.nperms,1);
     end
 end
 
-% Determine extremes of the distribution
-n = numel(mapidx);
-nfrac = ceil(n*IN.MLI.frac);
+n = numel(IN.MLI.MAP.mapidx);
 
 switch IN.MLI.method
     case 'posneg'
-
-        upper = prctile(Tr(:,IN.MAP.mapidx), IN.MLI.upper_thresh);
-        lower = prctile(Tr(:,INmapidx), IN.MLI.lower_thresh);
+        % Determine extremes of the distribution
+        upper = prctile(Tr(:,IN.MLI.MAP.mapidx), IN.MLI.upper_thresh);
+        lower = prctile(Tr(:,IN.MLI.MAP.mapidx), IN.MLI.lower_thresh);
                 
         if ~isinf(IN.MLI.nperms)
         
@@ -36,14 +34,14 @@ switch IN.MLI.method
             
             % Create modified instances of case
             for i=1:IN.MLI.nperms
-                P(i, RandFeats(i,:)) = upper(RandFeats(i,:)); 
-                N(i, RandFeats(i,:)) = lower(RandFeats(i,:));
-                I(i, RandFeats(i,:)) = true;
+                P(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = upper(RandFeats(i,:)); 
+                N(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = lower(RandFeats(i,:));
+                I(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = true;
             end
         else
             I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
             while iter <= IN.MLI.max_iter
-                I(iter, mapidx(uperms(mapidx, nfrac))) = true;
+                I(iter, IN.MLI.MAP.mapidx(RandFeats(iter,:))) = true;
                 if sum( sum(I(1:iter,:)) >= IN.MLI.n_visited ) == n
                     completed = true;
                     break
@@ -63,19 +61,13 @@ switch IN.MLI.method
                 N(i, I(i,:)) = lower(I(i,:));
             end
         end
-        % Remove duplicates
-        [~, ix1] = unique(P-N,'rows'); 
-        IN.X(nx).(Yocvstr){1} = P(ix1,:);
-        IN.X(nx).(Yocvstr){2} = N(ix1,:);
-        IN.X(nx).I = I(ix1,:);
-        % Remove nans
-        ix2 = isnan(IN.X(nx).(Yocvstr){1});
-        IN.X(nx).(Yocvstr){1}(ix2) = 0;
-        IN.X(nx).(Yocvstr){2}(ix2) = 0;
-
-    case 'median'
-
-        medi = prctile(Tr(:,mapidx), 50);
+        IN.X(nx).(Yocvstr){1} = P;
+        IN.X(nx).(Yocvstr){2} = N;
+        IN.X(nx).I = I;
+      
+    case {'median','medianflip'}
+        
+        medi = prctile(Tr(:,IN.MLI.MAP.mapidx), 50);
         if ~isinf(IN.MLI.nperms)
         
             M = repmat(Ts, IN.MLI.nperms, 1);
@@ -83,14 +75,13 @@ switch IN.MLI.method
             
             % Create modified instances of case
             for i=1:IN.MLI.nperms
-                idx = uperms(mapidx, nfrac);
-                M(i, mapidx(idx)) = medi(idx); 
-                I(i, mapidx(idx)) = true;
+                M(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = medi(RandFeats(i,:)); 
+                I(i, IN.MLI.MAP.mapidx(RandFeats(i,:))) = true;
             end
         else
             I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
             while iter <= IN.MLI.max_iter
-                I(iter, mapidx(uperms(mapidx, nfrac))) = true;
+                I(iter, IN.MLI.MAP.mapidx(RandFeats(iter,:))) = true;
                 if sum( sum(I(1:iter,:)) >= IN.MLI.n_visited ) == n
                     completed = true;
                     break
@@ -108,12 +99,7 @@ switch IN.MLI.method
                 M(i, I(i,:)) = medi(I(i,:)); 
             end
         end
-        % Remove duplicates
-        [~, ix1] = unique(M,'rows');
-        IN.X(nx).(Yocvstr){1} = M(ix1,:);
-        IN.X(nx).I = I(ix1,:);
-        % Remove nans
-        ix2 = isnan(IN.X(nx).(Yocvstr){1});
-        IN.X(nx).(Yocvstr){1}(ix2) = 0;
+        IN.X(nx).(Yocvstr) = M;
+        IN.X(nx).I = I;
 end
 

@@ -13,7 +13,7 @@ if ~isempty(covars) && nx == 1
         case 'posneg'
             IN.covars_rep{1} = repmat(covars,IN.MLI.nperms,1);
             IN.covars_rep{2} = repmat(covars,IN.MLI.nperms,1);
-        case 'median'
+        case {'median','medianflip'}
             IN.covars_rep = repmat(covars,IN.MLI.nperms,1);
     end
 end
@@ -65,9 +65,18 @@ switch IN.MLI.method
         IN.X(nx).(Yocvstr){2} = N;
         IN.X(nx).I = I;
       
-    case 'median'
-
-        medi = prctile(Tr(:,IN.MLI.MAP.mapidx), 50);
+    case {'median','medianflip'}
+        switch IN.MLI.method
+            case 'median'
+                medi = prctile(Tr(:,IN.MLI.MAP.mapidx), 50);
+            case 'medianflip'
+                centiles = nk_ComputePercentiles(Tr(:,IN.MLI.MAP.mapidx), Ts(:,IN.MLI.MAP.mapidx),'inverse');
+                idxU = centiles>50;
+                idxL = centiles<=50;
+                centiles(idxU) = centiles(idxU) - 50;
+                centiles(idxL) = centiles(idxL) + 50;
+                medi = nk_ComputePercentiles(Tr(:,IN.MLI.MAP.mapidx), centiles, 'normal');
+        end
         if ~isinf(IN.MLI.nperms)
         
             M = repmat(Ts, IN.MLI.nperms, 1);
