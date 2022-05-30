@@ -78,7 +78,7 @@ function [Y, IN] = PartialCorrelationsObj( Y, IN )
 
 if isempty(IN),eIN=true; else, eIN=false; end
 
-if eIN|| ~isfield(IN,'G') || isempty(IN.G), 
+if eIN|| ~isfield(IN,'G') || isempty(IN.G) 
     error('No covariates defined in parameter structure'), 
 end
 

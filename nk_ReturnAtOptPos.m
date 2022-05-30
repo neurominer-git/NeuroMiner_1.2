@@ -1,5 +1,8 @@
-function [ Tr, CV, Ts, Ocv, TrainedParam ] = nk_ReturnAtOptPos(oTr, oCV, oTs, oOcv, Pnt, z)
+function [ Tr, CV, Ts, Ocv, TrainedParam ] = nk_ReturnAtOptPos(oTr, oCV, oTs, oOcv, Pnt, z, oocvonly)
 
+if ~exist("oocvonly",'var') || isempty(oocvonly)
+    oocvonly = false;
+end
 Ocv = [];
 if ~isempty(Pnt.data_ind)
     Ix = Pnt.data_ind(z);
@@ -7,10 +10,22 @@ else
     Ix = 1;
 end
 if iscell(oTr)
-    Tr = oTr{Ix}; CV = oCV{Ix}; Ts = oTs{Ix};   
-    if ~isempty(oOcv), Ocv = oOcv{Ix}; end
+    Tr = oTr{Ix}; 
+    if ~oocvonly
+        CV = oCV{Ix}; Ts = oTs{Ix};   
+    end
+    if ~isempty(oOcv)
+        if size(oOcv,2)>1
+            Ocv = oOcv(Ix,:);
+        else
+            Ocv = oOcv{Ix}; 
+        end
+    end
 else
-    Tr = oTr; CV = oCV; Ts = oTs;   
+    Tr = oTr; 
+    if ~oocvonly
+        CV = oCV; Ts = oTs;   
+    end
     if ~isempty(oOcv), Ocv = oOcv; end
 end
 

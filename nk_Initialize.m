@@ -161,8 +161,13 @@ if action.all
         if ~checkpaths(matpaths,fullfile(defs.path,'visual'))
             addpath(fullfile(defs.path,'visual')); fprintf('.');
         end
+
+        % MLI subdirectory
+        if ~checkpaths(matpaths,fullfile(defs.path,'interpretable'))
+            addpath(fullfile(defs.path,'interpretable')); fprintf('.');
+        end
         
-        % Visualization subdirectory
+        % GUI subdirectory
         if ~checkpaths(matpaths,fullfile(defs.path,'gui'))
             addpath(fullfile(defs.path,'gui')); fprintf('.');
             addpath(fullfile(defs.path,'gui/export_fig')); fprintf('.');

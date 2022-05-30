@@ -410,9 +410,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
             end
             if oocvonly
                 if multoocv
-                    ocv = [];
                     for n=1:numel(Yocv)
-                        ocv = [ocv squeeze(InputParam.Ts(:,n,:))];
+                        ocv{n} = squeeze(InputParam.Ts(:,n,:));
                     end
                 else
                     ocv = squeeze(InputParam.Ts(:,1,:));
@@ -426,9 +425,9 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 tsd = squeeze(InputParam.Ts(:,3,:));
                 if ~isempty(Yocv) 
                     if multoocv
-                        ocv = [];
+                        oocv 
                         for n=1:numel(Yocv)
-                            ocv = [ocv squeeze(InputParam.Ts(:,3+n,:))]; 
+                            ocv{n} = squeeze(InputParam.Ts(:,3+n,:)); 
                         end
                     else
                         ocv = squeeze(InputParam.Ts(:,4,:));

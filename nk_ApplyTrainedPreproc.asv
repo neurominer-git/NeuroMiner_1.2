@@ -77,11 +77,12 @@ else
         
         % Check if the modality has to be skipped in case all observations
         % consist of NaN
+        if isfield(inp,'NanModality') && inp.NanModality(n), continue; end
 
         % Has the [imaging] data been smoothed already?
         if issmoothed, sstr='s'; else, sstr=''; end
 
-        % Training/CV data extraction from container
+        % Traing/CV data extraction from container
         Y = inp.X(n).([ sstr 'Y']);
 
         % Is the a second Yocv container (e.g. if OOCV data is interpreted, 
@@ -122,8 +123,7 @@ else
         elseif isfield(tparamfl,'Param')
             tparamfl = rmfield(tparamfl,'Param');
         end
-        
-        % now we are ready to run the preprocessing pipeline
+
         if inp.stacking
             [mapY{n}, Param{n}, P{n}, mapYocv{n}] = nk_PerfPreprocessMeta(inp, inp.label, tparamfl);
         else

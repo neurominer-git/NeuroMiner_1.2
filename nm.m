@@ -36,25 +36,29 @@ function nm(varargin)
 %     pipelines. The model generation and validation process is split into
 %     three steps - preprocessing, model training and visualization. These
 %     steps are completely wrapped into a repeated, nested cross-validation 
-%     structure that is defined by the user. NM currently provides
-%     classification and regression models. Classification can be conducted 
-%     for binary and multi-group problems, with the latter being always
-%     decomposed into one-vs-one or one-vs-all binary classifiers.
+%     structure that is defined by the user. In addition, the user can run 
+%     NM's intepretable ML module to compute the input features' saliencies 
+%     for the individual predictions obtained at the CV2 level. NM currently 
+%     provides classification and regression models. Classification can be 
+%     conducted for binary and multi-group problems, with the latter being 
+%     always decomposed into one-vs-one or one-vs-all binary classifiers.
 %     Currently, a real multi-group learning process is not implemented, 
 %     but it is planned for a future release. Results can be inspected with
-%     the NM Results Viewer
+%     the NM Results Viewer.
 %     
 % (3) Application to independent data: Allows the user to apply models
 %     trained in (2) to new datasets, which have to comply with the input 
 %     settings defined in (1). The entire set of models obtained
 %     from the cross-validation setup defined in (1) and trained in (2)
-%     will be applied to these new data
+%     will be applied to these new data. In addition, the user can use NM's
+%     interpretation module to gain insight into which features determined 
+%     the individual prediction most.
 %
 % Each stage has to be completed in order to move to the next stage
 % User can choose to use NM in expert mode by invoking nm with the 'expert'
 % option.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 12/2021
+% (c) Nikolaos Koutsouleris, 05/2022
 global EXPERT OCTAVE NM 
 
 nosplash  = false; EXPERT = false; OCTAVE = false;
@@ -167,8 +171,9 @@ try
                     if s.analyses_ready
                         mn_str = [mn_str ...
                             'Visualize ' mdltypestr '|' ...
+                            'Interpret predictions of ' mdltypestr ' in discovery data|' ...
                             'Open NM Results Viewer (cross-validation results)|'];
-                        mn_act = [mn_act 6 7];
+                        mn_act = [mn_act 6 18 7];
                     end
                     
                     if s.analyses_completed 
@@ -183,7 +188,12 @@ try
                     mn_str = [ mn_str '|Load data for model application' ]; mn_act = [mn_act 1 ];
                     if s.oocv_data_ready
                         mn_str = [ mn_str '|Set up parameters for model application' ]; mn_act = [ mn_act 2 ];
-                        if s.oocv_anal_ready, mn_str = [ mn_str '|Apply ' mdltypestr ' to independent data']; mn_act = [ mn_act 10]; end
+                        if s.oocv_anal_ready
+                            mn_str = [ mn_str ...
+                                '|Apply ' mdltypestr ' to independent data' ...
+                                '|Interpret predictions of ' mdltypestr ' in independent data']; 
+                            mn_act = [ mn_act 10 18]; 
+                        end
                     end
                     if s.oocv_anal_ready
                         mn_str = [mn_str '|Open NM Results Viewer (cross-validation & independent test results)']; 
@@ -219,7 +229,7 @@ try
         fprintf('\n\n')
         cprintf('*red','Parameter setup not complete! \n')
         if iscell(paramstr), paramstr = char(paramstr); end
-        for i=1:size(paramstr,1), 
+        for i=1:size(paramstr,1) 
             cprintf('red','%s \n',paramstr(i,:)); 
         end
     end
@@ -259,7 +269,8 @@ try
               'help', ...
               'utilities', ...
               'export', ...
-              'update'};
+              'update', ...
+              'interpret'};
     
     switch mn_sel
         case 0
@@ -316,6 +327,16 @@ try
         case 'visual'
             if isfield(NM,'analysis')
                 inp = []; act = 1; while act>0, [act, inp] = nk_VisModelsPrep(act, inp, 'MAIN INTERFACE >> VISUALIZE MODELS'); end
+            end
+
+        case 'interpret'
+            if isfield(NM,'analysis') 
+                if isfield(NM.defs,'analyses_locked') && NM.defs.analyses_locked
+                    titstr = 'MAIN INTERFACE >> INTERPRET MODELS'' PREDICTIONS [application mode]';
+                else
+                    titstr = 'MAIN INTERFACE >> INTERPRET MODELS'' PREDICTIONS [discovery mode]';
+                end
+                inp = []; act = 1; while act>0, [act, NM, inp] = nk_MLInterpreterPrep(NM, act, inp, titstr); end
             end
             
         case 'oocv'

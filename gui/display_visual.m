@@ -496,9 +496,7 @@ switch meas{measind}
          nF = numel(feats);
          if nF<50, FS = 10; elseif nF<100, FS = 7; elseif nF < 150, FS = 5; else, FS = 0; end
          yy = y; 
-                      
-         
-%            
+                        
          try
              cla reset;
              switch meas{measind}

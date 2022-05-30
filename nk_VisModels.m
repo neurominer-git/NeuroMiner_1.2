@@ -999,7 +999,7 @@ if ~batchflag
         % Number of classifiers / predictors
         [ D, datatype, brainmaski, badcoordsi, labeli, labelopi ] = getD(FUSION.flag, inp, n);
         
-        if iscell(inp.VIS), nVIS = inp.VIS{n}; else nVIS = inp.VIS; end
+        if iscell(inp.VIS), nVIS = inp.VIS{n}; else, nVIS = inp.VIS; end
         
         % Probability of feature selection across all CV2 * CV1 partitions
         for h=1:nclass
