@@ -391,7 +391,7 @@ for f=1:ix % Loop through CV2 permutations
 
                     for q=1:numel(tInd) % Loop through CV2/OOCV cases 
 
-                        fprintf('\n\n--- Working on case %s ---', cases{tInd(q)});
+                        fprintf('\n\n--- Working on case %s (%g of %g cases) ---', cases{tInd(q)}, q, numel(tInd));
                         inp.NanModality = false(1, numel(inp.X));
 
                         for nx = 1:numel(inp.X)
@@ -511,7 +511,7 @@ for f=1:ix % Loop through CV2 permutations
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
-                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g',  f, d, k, l, u, size(OCV{1},1), tInd(q));
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of %s',  f, d, k, l, u, size(OCV{1},1), cases{tInd(q)});
                                                     [~, ~, uD_pos(:,u)] = nk_GetTestPerf(OCV{1}, ones(size(OCV{1},1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
                                                     [~, ~, uD_neg(:,u)] = nk_GetTestPerf(OCV{2}, ones(size(OCV{2},1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
@@ -540,7 +540,7 @@ for f=1:ix % Loop through CV2 permutations
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
-                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of case %g', f, d, k, l, u, size(OCV,1), tInd(q));
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of %s', f, d, k, l, u, size(OCV,1), cases{tInd(q)});
                                                     [~, ~, uD(:,u)] = nk_GetTestPerf(OCV, ones(size(OCV,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
                                                     % Detrend regressor predictions, if
