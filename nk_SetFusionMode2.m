@@ -5,7 +5,7 @@ if ~exist('oocvind','var'), oocvind = []; end; varstr = [];
 if ~exist('curmodal','var') || isempty(curmodal), curmodal = 1; end
 stk_flag = false; if ~isempty(STACKING) && STACKING.flag == 1, stk_flag = true; end
 OUT.curmodal = curmodal;
-
+OUT.FUSION = FUSION;
 %% Get Training / CV data (Y) & Build modality suffix
 switch FUSION.flag
     

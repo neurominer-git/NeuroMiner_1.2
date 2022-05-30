@@ -382,23 +382,25 @@ for f=1:ix % Loop through CV2 permutations
                     for h=1:nclass
                         for nx = 1:nM
                             nY = size(inp.X(nx).Y,2);
-                            mapInterp{h,nx} = zeros(nTs, nY);
-                            mapInterp_ciu{h,nx} = zeros(nTs, nY);
-                            mapInterp_cil{h,nx} = zeros(nTs, nY);
-                            mapInterp_std{h,nx} = zeros(nTs, nY);
+                            mapInterp{h,nx} = nan(nTs, nY);
+                            mapInterp_ciu{h,nx} = nan(nTs, nY);
+                            mapInterp_cil{h,nx} = nan(nTs, nY);
+                            mapInterp_std{h,nx} = nan(nTs, nY);
                         end
                     end
 
                     for q=1:numel(tInd) % Loop through CV2/OOCV cases 
 
-                        fprintf('\n\n--- Working on case %g ---', tInd(q));
+                        fprintf('\n\n--- Working on case %s ---', cases{tInd(q)});
+                        inp.NanModality = false(1, numel(inp.X));
+
                         for nx = 1:numel(inp.X)
                             % Create artificial data and add it as "OOCV
                             % data" (inp.X(nx).Yocv) to the input structure. 
                             % if OOCV data has been selected for interpretation, then create
                             % inp.X(nx).Yocv2 and deal with this scenario in nk_ApplyTrainedPreproc 
                             % (see there)
-                            Tr = inp.X(nx).Y(TrInd,:); covs = [];
+                            covs = [];
                             if inp.oocvflag
                                 if ~isempty(inp.covars_oocv), covs = inp.covars_oocv(tInd(q,:)); end
                                 Ts = inp.X(nx).Yocv(tInd(q,:),:);
@@ -406,9 +408,37 @@ for f=1:ix % Loop through CV2 permutations
                                 if ~isempty(inp.covars), covs = inp.covars(tInd(q,:)); end
                                 Ts = inp.X(nx).Y(tInd(q,:),:);
                             end
+                            % Check if the modality consists only of NaNs
+                            if sum(isnan(Ts)) == size(inp.X(nx).Y,2)
+                                % processing this modality further makes
+                                % only sense for early fusion (where
+                                % imputation based on the other modalities
+                                % can remove the NaNs
+                                inp.NanModality(nx) = true;
+                                continue;
+                            end
+                            Tr = inp.X(nx).Y(TrInd,:); 
                             inp = nk_CreateData4MLInterpreter( RandFeats(h, nx).I, inp.MLI.MAP.mapidx{h, nx}, Tr, Ts , covs, inp, nx );
                         end
-                        
+
+                        if any(inp.NanModality)
+                            idxNan = find(any(inp.NanModality));
+                            if numel(idxNan)>1
+                                frstr = sprintf('Modalities %g', inp.F(idxNan(1)));
+                                for qp = 2:numel(idxNan)
+                                    frstr = sprintf('%s, %g', inp.F(idxNan(qp)));
+                                end
+                            else
+                                frstr = sprintf('Modality %g', inp.F(idxNan));
+                            end
+                            switch inp.FUSION.flag
+                                case {0,2,3} 
+                                    warning('\nCase %s consists only of NaNs in %s! Skip interpretation',cases{tInd(q)}, frstr); continue;
+                                case 1 
+                                    warning('\nCase %s consists only of NaNs in %s! Proceed because of early fusion mode',cases{tInd(q)}, frstr);
+                            end
+                        end
+
                         %% Step 4: generate predictions for artificial cases
                         for h=1:nclass  % Loop through binary comparisons
 
@@ -428,6 +458,7 @@ for f=1:ix % Loop through CV2 permutations
                                     inp.desc_oocv = 'random value modification';
                             end
                             [ inp, ~, ~, ~, ~, ~, ~, ~, mapYocv] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param);
+
                             for m = 1 : nP      % Loop through parameter combinations
                                 for k=1:iy      % Loop through CV1 permutations
                                     for l=1:jy  % Loop through CV1 folds
