@@ -557,7 +557,7 @@ if isfield(TemplParam,'ACTPARAM')
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
                 end
-        end
+       end
     end
     if VERBOSE, fprintf('\nPreprocessing sequence setup completed. Executing ...'); end
     if exist('TrainedParam','var') && ~isempty(TrainedParam)

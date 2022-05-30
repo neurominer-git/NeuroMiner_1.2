@@ -43,5 +43,24 @@ switch SVM.prog
                  if isfield(SVM.(SVM.prog),'MakeInsensitive') && SVM.(SVM.prog).MakeInsensitive
                      CMDSTR.CCLambda = nk_ReturnParam('CC-Lambda', Params_desc, Params(i,:));
                  end
+                 if SVM.kernel.kerndef == 5
+                     CMDSTR.WLiter = nk_ReturnParam('Kernel', Params_desc, Params(i,:)); 
+                 end
+                 if SVM.kernel.kerndef == 6
+                     CMDSTR.WLiter = nk_ReturnParam('Kernel', Params_desc, Params(i,:)); 
+                 end
+                 if SVM.kernel.kerndef == 7
+                     CMDSTR.WLiter = nk_ReturnParam('Kernel', Params_desc, Params(i,:)); 
+                 end
+                 if SVM.kernel.kerndef == 8
+                     if SVM.kernel.customfunc_nargin >0
+                        for n = 1:SVM.kernel.customfunc_nargin
+                            argName = sprintf('customkernel_arg%d', n); 
+                            eval(sprintf("CMDSTR.%s = nk_ReturnParam('Kernel function argument %d', Params_desc, Params(i,:))", argName, n));%, argName, argName));
+                            %nk_ReturnParam('Kernel function', Params_desc, Params(i,:));
+                        end
+                     end
+                     %CMDSTR.KernelFunc =  
+                 end
         end
 end

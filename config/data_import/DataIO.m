@@ -1131,7 +1131,7 @@ switch act
             end
         end
         
-        [t_selFeats,t_selCases] = nk_ItemSelector('List', F, 'Matrix', M, 'Cases',ID, 'selFeats', selFeats, 'selCases', selCases, 'mode', mode);
+        [t_selFeats,t_selCases] = nk_ItemSelectorApp('List', F, 'Matrix', M, 'Cases',ID, 'selFeats', selFeats, 'selCases', selCases, 'mode', mode);
         
         if ~isempty(t_selFeats), IO.selFeats = t_selFeats; end
         if ~isempty(t_selCases), IO.selCases = t_selCases; end

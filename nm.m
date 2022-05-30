@@ -238,15 +238,17 @@ try
         mn_str = [ mn_str ...
             '|Load NeuroMiner structure' ...
             '|Change working directory' ...
+            '|Investigate sample size' ...
             '|Utilities'];
-        mn_act = [ mn_act 11, 13, 15 ];
+        mn_act = [ mn_act 11, 13, 99, 15 ];
     else
         mn_str = [ mn_str ...
             '|Load NeuroMiner structure' ...
             '|Save NeuroMiner structure' ...
             '|Change working directory' ...
+            '|Investigate sample size' ...
             '|Utilities'];
-        mn_act = [ mn_act 11 12 13 15 ];
+        mn_act = [ mn_act 11 12 13 99 15 ];
     end
     
     mn_sel = nk_input(menutitle,0,'mq',mn_str,mn_act);
@@ -274,6 +276,9 @@ try
         case 0
             action = 'quit';
             return
+        case 99 %sample size simulation
+            action = 'simulateML';
+
         otherwise
             action = mn_opt{mn_sel};
             
@@ -379,6 +384,14 @@ try
             end
             newdir = nk_DirSelector('Update analyses'' root paths');
             NM = nk_UpdateRootPaths(NM, analind, newdir);
+        case 'simulateML'
+            if s.analyses_locked
+                % use information from your sample TO DO
+                %simulationRes = simulate_sampleSize(NM);
+            else
+                app1;
+                %simulationRes = simulate_sampleSize();
+            end
     end
 
 catch ERR
