@@ -22,7 +22,7 @@ mapfeat = 'cvr';
 cutoff = [-2 2];
 cutoffmode = 'absolute';
 cutoffoperator = 1;
-znormdata = false;
+znormdata = 1;
 
 if ~defaultsfl
     

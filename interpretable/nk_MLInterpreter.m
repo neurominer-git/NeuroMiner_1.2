@@ -402,10 +402,10 @@ for f=1:ix % Loop through CV2 permutations
                             % (see there)
                             covs = [];
                             if inp.oocvflag
-                                if ~isempty(inp.covars_oocv), covs = inp.covars_oocv(tInd(q,:)); end
+                                if ~isempty(inp.covars_oocv), covs = inp.covars_oocv(tInd(q,:),:); end
                                 Ts = inp.X(nx).Yocv(tInd(q,:),:);
                             else
-                                if ~isempty(inp.covars), covs = inp.covars(tInd(q,:)); end
+                                if ~isempty(inp.covars), covs = inp.covars(tInd(q,:),:); end
                                 Ts = inp.X(nx).Y(tInd(q,:),:);
                             end
                             % Check if the modality consists only of NaNs
