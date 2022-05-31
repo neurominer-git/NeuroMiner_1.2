@@ -128,7 +128,7 @@ for i=1:nact
         if nTs > 1, InputParamj.Ts  = cell(1,nTs);   end
         
         % Do we have to take Adasyn into account?
-        if adasynfl,
+        if adasynfl
             TrainLabelSyn = cell(nComb,nL); 
             CovarSyn = cell(nComb,nL);
         end
@@ -154,7 +154,7 @@ for i=1:nact
                         InputParamj.Tr = InputParam.Tr{jj,nl}; 
                    end
                 end
-                if isfield(InputParam,'Yw'), 
+                if isfield(InputParam,'Yw') 
                     try
                         if i==1
                             InputParamj.Yw = InputParam.Yw{j}; 
@@ -169,7 +169,7 @@ for i=1:nact
                         end
                     end
                 end
-                if ~isempty(TEMPL), 
+                if ~isempty(TEMPL)
                     if isstruct(TEMPL.Param{InputParam.curclass}{i})
                         ActParam.Templ = TEMPL.Param{InputParam.curclass}{i};
                     else
@@ -222,7 +222,7 @@ for i=1:nact
                     if adasynfl, TrainLabelSyn{kl,nl} = SrcParam.TrainLabelSyn{ActParam.j}; CovarSyn{kl,nl} = SrcParam.covarsSyn{ActParam.j}; end
                     if isfield(Out,'Yw'), Yw{kl,nl} = Out.Yw; end
                     if nTs>1
-                        for k = 1:nTs,
+                        for k = 1:nTs
                             Ts{kl,k,nl} = Out.Ts{k};
                         end
                     elseif nTs==1

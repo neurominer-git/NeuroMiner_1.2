@@ -49,16 +49,4 @@ if ~isempty(grandchildren) && nC >0
         end
     end
 end
-%     if newfl || ~isfield(NM,'cv') || isempty(NM.cv), STATUS.CV = 'CV'; else STATUS.CV= '...'; end
-%     if newfl || ~isfield(NM,'SVM') || isempty(NM.SVM), STATUS.SVM = 'SVM'; else STATUS.SVM = '...'; end
-%     if newfl || ~isfield(NM.TrainParam,'GRD') || isempty(NM.TrainParam.GRD), STATUS.GRD = 'UNDEFINED'; else STATUS.GRD = '...'; end
-%     if newfl || ~isfield(NM.TrainParam,'PREPROC') || isempty(NM.TrainParam.PREPROC), 
-%         STATUS.PREPROC = 'UNDEFINED'; STATUS.FEATGEN = 'UNDEFINED'; 
-%     else
-%         STATUS.PREPROC = '...'; STATUS.FEATGEN = '...'; 
-%     end
-%     if newfl || ~isfield(NM.TrainParam,'RFE') || isempty(NM.TrainParam.RFE), STATUS.RFE = 'UNDEFINED'; else STATUS.RFE = '...'; end
-%     if newfl || ~isfield(NM.TrainParam,'MULTI') || isempty(NM.TrainParam.MULTI), STATUS.MULTI = 'UNDEFINED'; else STATUS.MULTI = '...'; end
-%     if newfl || ~isfield(NM.TrainParam,'VIS') || isempty(NM.TrainParam.VIS), STATUS.VIS= 'UNDEFINED'; else STATUS.VIS = '...'; end
-%     if newfl || ~isfield(NM.TrainParam,'SAV') || isempty(NM.TrainParam.SAV), STATUS.SAV = 'UNDEFINED'; else STATUS.SAV = '...'; end
-%     if newfl || ~isfield(NM.TrainParam,'OOCV') || isempty(NM.TrainParam.OOCV), STATUS.OOCV = 'UNDEFINED'; else STATUS.OOCV = '...'; end
+

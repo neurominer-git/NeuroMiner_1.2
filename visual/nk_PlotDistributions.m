@@ -23,7 +23,10 @@ ax= gca;
 ax.XAxis.Label.String='Decision score';
 ax.YAxis.Label.String='Percentage of outcome class';
 if exist('singleP','var') && ~isempty(singleP)
-    er= errorbar(ax,singleP(1),0,singleP(2),singleP(3),'ko-');
+	singleP = [ NM.analysis{analind}.GDdims{1}.BinClass{1}.mean_predictions(singleP) ...
+				NM.analysis{analind}.GDdims{1}.BinClass{1}.CI1_predictions(singleP) ...
+				NM.analysis{analind}.GDdims{1}.BinClass{1}.CI2_predictions(singleP) ];
+    er= errorbar(ax,singleP(1), singleP(2),singleP(3),'ko-');
     er.MarkerSize=12;
     er.MarkerFaceColor='k';
 end

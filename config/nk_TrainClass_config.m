@@ -37,6 +37,7 @@ if ~isfield(NM,'TrainParam')
     NM.TrainParam.MULTI.flag    = 0;
     NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
     [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1); 
+    NM.TrainParam               = nk_MLI_config(NM.TrainParam, true);
     NM.TrainParam.verbosity     = 1;
 elseif ~isfield(NM.TrainParam,'verbosity')
     NM.TrainParam.verbosity     = 1;
@@ -80,7 +81,7 @@ end
 
 nan_in_label=false;         if sum(isnan(NM.label(:)))>0, nan_in_label=true; end
 %% Create further default configurations
-if ~isfield(NM.TrainParam,'PREPROC'),
+if ~isfield(NM.TrainParam,'PREPROC')
     % Create PREPROC structure
     nan_in_pred = false;        if sum(isnan(NM.Y{varind}(:)))>0, nan_in_pred=true; end
     NM.TrainParam.PREPROC{1}    = DefPREPROC(NM.modeflag,nan_in_pred,nan_in_label);
@@ -119,10 +120,10 @@ end
 
 %% Check data entry status
 if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'MLI'});
     STATUS = nk_CheckFieldStatus(NM.TrainParam.STRAT{varind},{'PREPROC','SVM','GRD','RFE','MULTI','VIS'}, [], [], STATUS);
 else
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI'});
 end
 switch STATUS.PREPROC
     case '...'
@@ -184,7 +185,7 @@ if ~exist('act','var') || isempty(act)
                 varstr = ['Set active modality for configuration [ #' num2str(varind) descstr ' ]|']; menuact = [menuact 2];
                 if fusemode == 3, NM.TrainParam.META.flag = 1; end
                 resetstr = '';
-                if fusemode == 3,
+                if fusemode == 3
                     resetstr = 'Reset all modality configurations to current modality setup|';  menuact = [ menuact 4];
                 end
                 menustr = [menustr varstr resetstr];
@@ -277,6 +278,7 @@ if ~exist('act','var') || isempty(act)
     
     menustr = [ menustr ... 
                 'Visualization options [ ' STATUS.VIS ' ]|' ...
+                'Prediction interpretation options [ ' STATUS.MLI ' ]|' ...
                 'Model saving options [ ' STATUS.SAV ' ]|' ...
                 oocvstr ...
                 'Define verbosity level [ ' verbostr ' ]|' ...
@@ -285,7 +287,7 @@ if ~exist('act','var') || isempty(act)
                 'Load training template'];
                 
                 
-    menuact = [ menuact 11 12 ];
+    menuact = [ menuact 10 11 12 ];
     if oocvflag, menuact = [ menuact 13 ]; end
     menuact = [ menuact 16 19 14 15 ];
 
@@ -422,12 +424,8 @@ switch act
             act = 1; while act>0, [ NM.TrainParam.MULTI, act ] = nk_Multi_config(NM.TrainParam.MULTI,[], navistr); end
         end
         
-    % DATA FUSION-BASED ENSEMBLE STRATEGIES ============================================================================================================================   
-    case 10
-        %nk_Ensemble_config;
-        
     % VISUALIZATION ====================================================================================================================================================    
-    case 11
+    case 10
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
             if ~isfield(NM.TrainParam,'VIS'), NM.TrainParam.STRAT{varind}.VIS = nk_Vis_config(NM.TrainParam.STRAT{varind}.VIS, NM.TrainParam.STRAT{varind}.PREPROC, 1, 1, navistr); end
             act = 1; while act>0, [ NM.TrainParam.STRAT{varind}.VIS, act] = nk_Vis_config(NM.TrainParam.STRAT{varind}.VIS, NM.TrainParam.STRAT{varind}.PREPROC, 1, [], navistr); end
@@ -435,6 +433,10 @@ switch act
             if ~isfield(NM.TrainParam,'VIS'), NM.TrainParam.VIS{varind} = nk_Vis_config(NM.TrainParam.VIS{varind}, NM.TrainParam.PREPROC{varind}, varind, 1, navistr); end
             act = 1; while act>0, [ NM.TrainParam.VIS{varind}, act ] = nk_Vis_config(NM.TrainParam.VIS{varind}, NM.TrainParam.PREPROC{varind}, varind , [], navistr); end
         end 
+    
+    % ML INTEPRETATION STRATEGIES =======================================================================================================================================   
+    case 11
+        act = 1; while act>0, [ NM.TrainParam, act ] = nk_MLI_config(NM.TrainParam); end
         
     % SAVING OPTIONS ====================================================================================================================================================     
     case 12

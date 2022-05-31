@@ -1187,11 +1187,11 @@ case {'m','mq'}                                             %-Process menu type
                    k = str2double(k);
                end
         end
-        if DefItem && isempty(k), k=DefItem; end
+        if ~isempty(DefItem) && DefItem && isempty(k), k=DefItem; end
         while isempty(k) || ~any((1:nLabels)==k)
             if ~isempty(k),fprintf('\n!Selected menu item does not exist \n'),end
             k = input([fprintf('%s',Prmpt) ' ? ']);
-            if DefItem && isempty(k), k=DefItem; end
+            if ~isempty(DefItem) && DefItem && isempty(k), k=DefItem; end
         end
     end
     fprintf('\n')
