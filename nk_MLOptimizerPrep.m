@@ -283,7 +283,7 @@ function analysis = MLOptimizerPrep(dat, analysis, inp1)
 
 global PARMODE MULTI SAV MODEFL CV PREPROC RAND FUSION META SVM
 
-nk_SetupGlobVars2(analysis.params, 'setup_strat', 0, inp1.F(inp1.varind(1))); 
+nk_SetupGlobVars2(analysis.params, 'setup_strat', 0, inp1.varind(1)); 
 strout = nk_Preprocess_StrCfg([], []);
 
 % Define # of classifiers to train (1 for multi-group classification & regression)
