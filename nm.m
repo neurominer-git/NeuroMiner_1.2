@@ -389,7 +389,9 @@ try
                 % use information from your sample TO DO
                 %simulationRes = simulate_sampleSize(NM);
             else
-                app1;
+                
+                
+                simSample_App(NM.Y, NM.label);
                 %simulationRes = simulate_sampleSize();
             end
     end
