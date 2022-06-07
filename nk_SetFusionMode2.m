@@ -103,6 +103,8 @@ if ~isempty(oocvind),
 end
 OUT.featnames   = [];
 
+
+
 if stk_flag
     if isfield(STACKING,'featnames'), 
         try 

@@ -10,6 +10,7 @@ fprintf('******************************\n')
 
 if ~isfield(inp,'batchflag') || isempty(inp.batchflag), inp.batchflag = false; end
 if ~isfield(inp,'probflag') || isempty(inp.probflag), inp.probflag = false; end
+if ~isfield(inp,'simFlag') || isempty(inp.simFlag), inp.simFlag = false; end
 BATCH = inp.batchflag;
 [ ~, strout] = GetMLType(SVM);
 
@@ -40,6 +41,7 @@ inparams.ovrwrtRes =        inp.ovrwrtRes;
 inparams.updRes =           inp.updRes;
 inparams.label =            inp.labels;
 inparams.l =                size(inp.labels,1);
+inparams.simFlag =          inp.simFlag;
 if strcmp(MODEFL,'classification')
     inparams.ngroups =      numel(unique(inp.labels(~isnan(inp.labels))));           
 else
@@ -259,3 +261,4 @@ end
 
 analysis = nk_MLOptimizer(inparams, inparams.stranalysis, inparams.id, inparams.GridAct, inparams.batchflag);
 
+end

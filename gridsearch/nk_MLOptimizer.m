@@ -7,10 +7,11 @@
 % (c) Nikolaos Koutsouleris, 12/2021
 function GDanalysis = nk_MLOptimizer(inp, strout, id, GridAct, batchflag)
 
-global SVM RFE SAV GRD MULTI MODEFL BATCH ENSEMBLE MKLRVM CV DATID CL RAND MULTILABEL PREPROC TEMPL W2AVAIL OCTAVE
+global SVM RFE SAV GRD MULTI MODEFL BATCH ENSEMBLE MKLRVM CV xCV DATID CL RAND MULTILABEL PREPROC TEMPL W2AVAIL OCTAVE xNM fromData
 
 CL = {'b*-','r*-','g*-','y*-','m*-','c*-','k*-'};
 W2AVAIL = false;
+   
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 label           = inp.label;        % targets to predict
 nclass          = inp.nclass;       % # of binary comparisons
@@ -22,7 +23,11 @@ Params_desc     = inp.Params_desc;
 nl              = nk_GetLabelDim(MULTILABEL); % Multi-label mode?
 n_preml         = inp.nPreMLparams(1) - 1 ;
 modalvec        = inp.ModalityVec;
-[ix, jx]        = size(CV(1).TrainInd);
+if isfield(inp,'simFlag') && inp.simFlag
+    [ix, jx]        = size(xCV(1).TrainInd);
+else
+    [ix, jx]        = size(CV(1).TrainInd);
+end
 
 tdir = pwd; if isfield(inp,'rootdir'), tdir = inp.rootdir; end
 % overwrite existing CVdatamats
@@ -247,7 +252,12 @@ for f=1:ix % Loop through CV2 permutations
 
         if ~GridAct(f,d), ll = ll +1; continue, end
         DISP.f = f; DISP.d = d;
-        TsInd = CV(1).TestInd{f,d};
+        if isfield(inp,'simFlag') && inp.simFlag
+            TsInd = xCV(1).TestInd{f,d};
+        else
+            TsInd = CV(1).TestInd{f,d};
+        end
+        
         GDxfl = false;
         inp.ll=ll;
         cvstr = ['_oCV' num2str(f) '.' num2str(d) ];
@@ -259,17 +269,27 @@ for f=1:ix % Loop through CV2 permutations
         switch GDfl 
             % ---------------- COMPUTE FROM SCRATCH -----------------------
             case -1 % No PreprocData / CVdatamat specified
-                
-                GD=[]; if ~inp.ovrwrtGD, GD = nk_CheckLoadFile(oCVpath, 'CVdatamat', f, d, ovrwrtGD, nclass); end
-                
+                if fromData
+                    GD=[];
+                else
+                    GD=[]; if ~inp.ovrwrtGD, GD = nk_CheckLoadFile(oCVpath, 'CVdatamat', f, d, ovrwrtGD, nclass); end
+                end
                 if isempty(GD)
                    
                     fprintf('\nComputing PreprocData on the fly.')
                     inp.f = f; inp.d = d; inp.nclass = nclass;
                     if strcmp(MODEFL,'classification') && size(label,2)>1
-                        TCV = CV;
+                        if isfield(inp,'simFlag') && inp.simFlag
+                            TCV = xCV;
+                        else
+                            TCV = CV;
+                        end
                         for curlabel = 1:size(label,2)
-                            CV = TCV(curlabel);
+                            if isfield(inp,'simFlag') && inp.simFlag
+                                xCV = TCV(curlabel);
+                            else
+                                CV = TCV(curlabel);
+                            end
                             inp.curlabel=curlabel;
                             if inp.stacking
                                 mapY(curlabel) = nk_PerfPreprocessMeta(inp, label(:,curlabel), paramfl);
@@ -277,7 +297,11 @@ for f=1:ix % Loop through CV2 permutations
                                 mapY(curlabel) = nk_PerfPreprocess(Y, inp, label(:,curlabel), paramfl);
                             end
                         end
-                        CV = TCV;
+                        if isfield(inp,'simFlag') && inp.simFlag
+                            xCV = TCV;
+                        else
+                            CV = TCV;
+                        end
                     else
                         inp.curlabel = 1;
                         if inp.stacking
@@ -460,6 +484,7 @@ for f=1:ix % Loop through CV2 permutations
             
             % Set saving flag to store GD on hard disk
             saveGDflag = true;
+            
 
         else %Pre-existing data will be used
 
@@ -491,6 +516,10 @@ for f=1:ix % Loop through CV2 permutations
         end
 
         %%%%%%%%%%%%%%%%%%%%%%%%% Save CVDATAMAT %%%%%%%%%%%%%%%%%%%%%%%%%
+        if isfield(inp,'simFlag') && inp.simFlag
+            saveGDflag = 0;
+        end
+
         [~,oCVnam] = fileparts(oCVpath); 
         if saveGDflag && updGD
             operm = d; ofold = f; 
@@ -646,16 +675,28 @@ for f=1:ix % Loop through CV2 permutations
                             TsI = TsInd;
                         case 1 % BINARY-GROUP analysis
                             if strcmp(MODEFL,'classification')
-                                TsI = TsInd(CV(curlabel).classnew{f,d}{curclass}.ind); 
+                                if isfield(inp,'simFlag') && inp.simFlag
+                                    TsI = TsInd(xCV(curlabel).classnew{f,d}{curclass}.ind); 
+                                else
+                                    TsI = TsInd(CV(curlabel).classnew{f,d}{curclass}.ind); 
+                                end
                             else
-                                TsI = TsInd(CV.classnew{f,d}{curclass}.ind); 
+                                if isfield(inp,'simFlag') && inp.simFlag
+                                    TsI = TsInd(xCV.classnew{f,d}{curclass}.ind); 
+                                else
+                                    TsI = TsInd(CV.classnew{f,d}{curclass}.ind); 
+                                end
                             end
                     end
 
                     switch MODEFL
                         case 'classification'
                             if RAND.Decompose ~=9
-                                binInd = CV(curlabel).classnew{f,d}{curclass}.ind;
+                                if isfield(inp,'simFlag') && inp.simFlag
+                                    binInd = xCV(curlabel).classnew{f,d}{curclass}.ind;
+                                else
+                                   binInd = CV(curlabel).classnew{f,d}{curclass}.ind;
+                                end
                             else
                                 binInd = 1:size(EnsDat,1);
                             end
@@ -926,13 +967,24 @@ if GDfl || ~batchflag
             %predh = zeros(size(label,1),nclass);
             for h=1:nclass
                 % Build binary label vector
-                if numel(CV.class{1,1}{h}.groups) == 2
-                    ind1 = label == CV.class{1,1}{h}.groups(1); ind2 = label == CV.class{1,1}{h}.groups(2);
-                    labelh(ind1,h) = 1; labelh(ind2,h) = -1;
+                if isfield(inp,'simFlag') && inp.simFlag
+                    if numel(xCV.class{1,1}{h}.groups) == 2
+                        ind1 = label == xCV.class{1,1}{h}.groups(1); ind2 = label == xCV.class{1,1}{h}.groups(2);
+                        labelh(ind1,h) = 1; labelh(ind2,h) = -1;
+                    else
+                        ind1 = label == xCV.class{1,1}{h}.groups(1);
+                        labelh(ind1,h) = 1; labelh(~ind1,h) = -1;
+                    end
                 else
-                    ind1 = label == CV.class{1,1}{h}.groups(1); 
-                    labelh(ind1,h) = 1; labelh(~ind1,h) = -1;
+                    if numel(CV.class{1,1}{h}.groups) == 2
+                        ind1 = label == CV.class{1,1}{h}.groups(1); ind2 = label == CV.class{1,1}{h}.groups(2);
+                        labelh(ind1,h) = 1; labelh(ind2,h) = -1;
+                    else
+                        ind1 = label == CV.class{1,1}{h}.groups(1);
+                        labelh(ind1,h) = 1; labelh(~ind1,h) = -1;
+                    end
                 end
+
                 labelhx = labelh(:,h); labelhx(labelh(:,h)<0)=0; Ix = find(labelh(:,h)); nIx = numel(Ix); 
                 if ix>1
                     Px = GDanalysis.CV2grid.predictions; [Mx, Nx, ~] = size(Px); 
@@ -1030,5 +1082,9 @@ if GDfl || ~batchflag
         end
     end
 else
-    GDanalysis = [];
+    if fromData
+        xNM.simanalysis = GDanalysis;
+    else 
+        GDanalysis = [];
+    end
 end
