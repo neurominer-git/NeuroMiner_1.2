@@ -1,6 +1,6 @@
-function [handles, visdata, oocvdata] = switch_analysis(handles)
+function [handles, visdata, oocvdata, mlidata] = switch_analysis(handles)
 
-visdata = []; oocvdata = [];
+visdata = []; oocvdata = []; mlidata = [];
 analind = handles.curranal;
 handles.curmodal = 1; if strcmp(handles.selModal.Enable,'on'), handles.curmodal = handles.selModal.Value; end
 
@@ -18,7 +18,7 @@ if size(handles.NM.label,2)>1, handles.multilabel = true; else, handles.multilab
 handles.curlabel = get(handles.selLabel,'Value');
 
 % Check whether selected analysis has visualisation data
-if isfield(handles.NM.analysis{analind},'visdata'), 
+if isfield(handles.NM.analysis{analind},'visdata')
     visdata = handles.NM.analysis{analind}.visdata; 
     
 elseif isfield(handles,'visdata')
@@ -26,10 +26,17 @@ elseif isfield(handles,'visdata')
 end
 
 % Check whether selected analysis has OOCV data
-if isfield(handles.NM.analysis{analind},'OOCV') && handles.NM.defs.analyses_locked, 
+if isfield(handles.NM.analysis{analind},'OOCV') && handles.NM.defs.analyses_locked
     oocvdata = handles.NM.analysis{analind}.OOCV; 
 elseif isfield(handles,'OOCV')
     handles = rmfield(handles,'OOCV');
+end
+
+% Check whether selected analysis has MLI data 
+if isfield(handles.NM.analysis{analind},'MLI') 
+    mlidata = handles.NM.analysis{analind}.MLI; 
+elseif isfield(handles,'MLI')
+    handles = rmfield(handles,'MLI');
 end
 
 handles = load_analysis(handles, ...
@@ -37,4 +44,5 @@ handles = load_analysis(handles, ...
                     'Params', handles.NM.analysis{analind}.params, ...
                     'Analysis', handles.NM.cv, handles.NM.label(I,:), GDdims, ...
                     'Visdata', visdata, ...
-                    'OOCVdata', oocvdata );
+                    'OOCVdata', oocvdata, ...
+                    'MLIdata', mlidata);

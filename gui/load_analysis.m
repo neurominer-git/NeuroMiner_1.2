@@ -34,7 +34,12 @@ for i = 1:nVarIn
     elseif strcmpi(varargin{i}, 'OOCVdata')
         
         handles = load_OOCV(handles, varargin{i+1});
+
+    elseif strcmpi(varargin{i}, 'MLIdata')
     
+        mli = varargin{i+1};
+        handles.MLIdata = mli;   
     end
+    
     
 end
