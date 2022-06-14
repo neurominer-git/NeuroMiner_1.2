@@ -68,7 +68,7 @@ if isfield(handles,'visdata') && ~isempty(handles.visdata) && strcmp(handles.MET
 end
 
 if isfield(handles,'MLIdata') && ~isempty(handles.MLIdata) && strcmp(handles.METAstr,'none')
-    popupstr{l} = 'ML Interpreter results'; 
+    popupstr{l+1} = 'ML Interpreter results'; 
     handles.selModelMeasures.Enable = 'on';
 end
 
