@@ -203,7 +203,7 @@ if ~defaultsfl
                 switch NM.modeflag
                     case 'regression'
                         EQstr = ['Equalize label histogram at the CV1 cycle by undersampling [ ' enabledstr addremoved2teststr ' ]|']; 
-                        if NM.TrainParam.RAND.Eq.enabled
+                        if isfield(NM.TrainParam.RAND, 'Eq') && NM.TrainParam.RAND.Eq.enabled
                             EQcovstr = sprintf('Define target label(s) for uniform distribution [ size: %g,%g ]|', size(Eq.Covar));
                             EQminstr = sprintf('Define minimum # of observations at the lower end of label histogram [ %g ]|', Eq.mincount);
                             EQmaxstr = sprintf('Define minimum # of observations at the upper end of label histogram [ %g ]|', Eq.maxcount);
