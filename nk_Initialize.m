@@ -4,7 +4,7 @@ function nk_Initialize(action)
 % =========================================================================
 % startup script for NeuroMiner 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 11/2021
+% (c) Nikolaos Koutsouleris, 06/2022
 
 global NMinfo NM CALIBAVAIL OOCVAVAIL SPMAVAIL FSAVAIL OCTAVE
 
@@ -19,7 +19,7 @@ NMinfo.info.author  = 'Nikolaos Koutsouleris, Clara Vetter, Ariane Wiegand';
 NMinfo.info.affil   = 'Section for Precision Psychiatry';
 NMinfo.info.dep     = 'Department of Psychiatry and Psychotherapy';
 NMinfo.info.inst    = 'Ludwig-Maximilian-University';
-NMinfo.info.datever = '05/2022';
+NMinfo.info.datever = '06/2022';
 NMinfo.info.timestamp = date;
 NMinfo.info.email   = 'nm@pronia.eu';
 try
