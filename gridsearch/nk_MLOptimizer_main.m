@@ -10,6 +10,7 @@ fprintf('******************************\n')
 
 if ~isfield(inp,'batchflag') || isempty(inp.batchflag), inp.batchflag = false; end
 if ~isfield(inp,'probflag') || isempty(inp.probflag), inp.probflag = false; end
+if ~isfield(inp,'simFlag') || isempty(inp.simFlag), inp.simFlag = false; end
 BATCH = inp.batchflag;
 [ ~, strout] = GetMLType(SVM);
 
@@ -40,6 +41,7 @@ inparams.ovrwrtRes =        inp.ovrwrtRes;
 inparams.updRes =           inp.updRes;
 inparams.label =            inp.labels;
 inparams.l =                size(inp.labels,1);
+inparams.simFlag =          inp.simFlag;
 if strcmp(MODEFL,'classification')
     inparams.ngroups =      numel(unique(inp.labels(~isnan(inp.labels))));           
 else
@@ -222,6 +224,33 @@ for i=1:inparams.nclass
             inparams.Params_desc{i}{1} = 'Decision Trees';
             inparams.Params{i}{2} = GRD.NumDparams;
             inparams.Params_desc{i}{2} = 'Num Feats';
+            inparams.Params{i}{3} = GRD.NumDparams;
+            inparams.Params_desc{i}{3} = 'Criterion';
+            inparams.Params{i}{4} = GRD.NumDparams;
+            inparams.Params_desc{i}{4} = 'Max Depth';
+            inparams.Params{i}{5} = GRD.NumDparams;
+            inparams.Params_desc{i}{5} = 'Min Samples Split';
+            inparams.Params{i}{6} = GRD.NumDparams;
+            inparams.Params_desc{i}{6} = 'Min Samples Leaf';
+            inparams.Params{i}{7} = GRD.NumDparams;
+            inparams.Params_desc{i}{7} = 'Min Weight Fract Leaf';
+            inparams.Params{i}{8} = GRD.NumDparams;
+            inparams.Params_desc{i}{8} = 'Max Leaf Nodes';
+            inparams.Params{i}{9} = GRD.NumDparams;
+            inparams.Params_desc{i}{9} = 'Min Impurity Decrease';
+            inparams.Params{i}{10} = GRD.NumDparams;
+            inparams.Params_desc{i}{10} = 'Bootstrap';
+            inparams.Params{i}{11} = GRD.NumDparams;
+            inparams.Params_desc{i}{11} = 'Out-Of-Bag Score';
+            inparams.Params{i}{12} = GRD.NumDparams;
+            inparams.Params_desc{i}{12} = 'Class Weigths';
+            inparams.Params{i}{13} = GRD.NumDparams;
+            inparams.Params_desc{i}{13} = 'CCP Alpha';
+            inparams.Params{i}{14} = GRD.NumDparams;
+            inparams.Params_desc{i}{14} = 'Max Sample';
+
+            
+            
         case 'SEQOPT'
             inparams.Params{i}{1} = 1:size(SVM.SEQOPT.C,1);
             inparams.Params_desc{i}{1} = 'Sequence';
@@ -259,3 +288,4 @@ end
 
 analysis = nk_MLOptimizer(inparams, inparams.stranalysis, inparams.id, inparams.GridAct, inparams.batchflag);
 
+end

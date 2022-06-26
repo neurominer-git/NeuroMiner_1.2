@@ -36,8 +36,25 @@ switch OptimFlag
         WLiters                         = [2 4 6 8 10];
         Neurondefs                      = [25 50 75 100];
         Leafdefs                        = logspace(1,2,10);
+        % Random Forest
         Treedefs                        = [25 50 75 100 150 200];
-        NumDdefs                        = 50;
+        NumDdefs                        = -1; % = "sqrt";
+        Critdefs                        = 1; % = "gini";
+        MaxDdefs                        = 0; % = "None";
+        MinSSplitdefs                   = 2;
+        MinSLeafdefs                    = 1;
+        MinWeightFractLeafdefs          = 0.0;
+        MaxLeafNodesdefs                = 0; % = "None";
+        MinImpDecrdefs                  = 0.0;
+        Bootstrapdefs                   = 1;
+        OobScoredefs                    = 0;
+        %NJobsdefs                       = "None";
+        %RandomStatedefs                 = "None";
+        %WarmStartdefs                   = "False";
+        ClassWeightdefs                 = 0; % = "None";
+        CcpAlphadefs                    = 0.0;
+        MaxSampdefs                     = 0; % = "None";
+
         Kdefs                           = 7;
         Weightdefs                      = 1;
         CoxCutoffsdefs                  = [20:10:80];
@@ -91,8 +108,23 @@ switch OptimFlag
             if isfield(GRD,'Kparams'),                  Kdefs = GRD.Kparams; end
             if isfield(GRD,'Tolparams'),                Toldefs = GRD.Tolparams; end
             if isfield(GRD,'Leafparams'),               Leafdefs = GRD.Leafparams; end
+            % random forest
             if isfield(GRD,'Treeparams'),               Treedefs = GRD.Treeparams; end
             if isfield(GRD,'NumDparams'),               NumDdefs = GRD.NumDparams; end
+            if isfield(GRD,'RFCritdefsparams'),               Critdefs = GRD.RFCritdefsparams; end
+            if isfield(GRD,'MaxDparams'),               MaxDdefs = GRD.MaxDparams; end
+            if isfield(GRD,'RFMinSSplitparams'),               MinSSplitdefs = GRD.RFMinSSplitparams; end
+            if isfield(GRD,'RFMinSLeafparam'),               MinSLeafdefs = GRD.RFMinSLeafparam; end
+            if isfield(GRD,'RFMinWFLeafparams'),               MinWeightFractLeafdefs = GRD.RFMinWFLeafparams; end
+            if isfield(GRD,'RFMaxLeafNparams'),               MaxLeafNodesdefs = GRD.RFMaxLeafNparams; end
+            if isfield(GRD,'RFMinImpDecrparams'),               MinImpDecrdefs = GRD.RFMinImpDecrparams; end
+            if isfield(GRD,'RFBootstrapparams'),               Bootstrapdefs = GRD.RFBootstrapparams; end
+            if isfield(GRD,'RFOobScoreparams'),               OobScoredefs = GRD.RFOobScoreparams; end
+            if isfield(GRD,'RFClassWeightparams'),               ClassWeightdefs = GRD.RFClassWeightparams; end
+            if isfield(GRD,'RFCcpAlphaparams'),               CcpAlphadefs = GRD.RFCcpAlphaparams; end
+            if isfield(GRD,'MaxSampparams'),               MaxSampdefs = GRD.MaxSampparams; end
+
+
             if isfield(GRD,'Weightparams'),             Weightdefs = GRD.Weightparams; end
             if isfield(GRD,'CutOffparams'),             SEQOPTstepsdefs = GRD.CutOffparams; end
             if isfield(GRD,'LimsLparams'),              SEQOPTlimsLdefs = GRD.LimsLparams; end
@@ -294,11 +326,84 @@ switch OptimFlag
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Lfparstr, Lfstr);                                 menuact = [ menuact 16 ];
                 case 'RNDFOR'
                     Dtparstr = 'Number of decision trees'; [Dtstr, n_pars(end+1)] = nk_ConcatParamstr( Treedefs );
-                    PX = nk_AddParam(Leafdefs, ['ML-' Dtstr], 2, PX);
+                    PX = nk_AddParam(Treedefs, ['ML-' Dtstr], 2, PX);
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Dtparstr, Dtstr);                                 menuact = [ menuact 17 ];
-                    Dnparstr = 'Number of features'; [Dnstr, n_pars(end+1)] = nk_ConcatParamstr( NumDdefs );
+                    
+                    Dnparstr = 'Maximum number of features'; [Dnstr, n_pars(end+1)] = nk_ConcatParamstr( NumDdefs );
                     PX = nk_AddParam(NumDdefs, ['ML-' Dnstr], 2, PX);
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Dnparstr, Dnstr);                                 menuact = [ menuact 18 ];
+
+          
+                    Critparstr = 'Function to measure the quality of a split'; ; [Critstr, n_pars(end+1)] = nk_ConcatParamstr( Critdefs );
+                    PX = nk_AddParam(Critdefs, ['ML-' Critstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, Critparstr, Critstr);                                 menuact = [ menuact 31 ];
+                    
+                    MaxDparstr = 'Maximum depth of the tree'; ; [MaxDstr, n_pars(end+1)] = nk_ConcatParamstr( MaxDdefs );
+                    PX = nk_AddParam(MaxDdefs, ['ML-' MaxDstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MaxDparstr, MaxDstr);                                 menuact = [ menuact 32 ];
+                    
+                    MinSSplitparstr = 'Minimum number of samples to split'; ; [MinSSplitstr, n_pars(end+1)] = nk_ConcatParamstr( MinSSplitdefs );
+                    PX = nk_AddParam(MinSSplitdefs, ['ML-' MinSSplitstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MinSSplitparstr, MinSSplitstr);                                 menuact = [ menuact 33 ];
+                    
+                    MinSLeafparstr = 'Minimum number of samples to be at a leaf'; ; [MinSLeafstr, n_pars(end+1)] = nk_ConcatParamstr( MinSLeafdefs );
+                    PX = nk_AddParam(MinSLeafdefs, ['ML-' MinSLeafstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MinSLeafparstr, MinSLeafstr);                                 menuact = [ menuact 34 ];
+                    
+                    MinWeightFractLeafparstr = 'Minimum weighted fraction of the sum total of weights at a leaf'; ; [MinWeightFractLeafstr, n_pars(end+1)] = nk_ConcatParamstr( MinWeightFractLeafdefs );
+                    PX = nk_AddParam(MinWeightFractLeafdefs, ['ML-' MinWeightFractLeafstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MinWeightFractLeafparstr, MinWeightFractLeafstr);                                 menuact = [ menuact 35 ];
+                    
+                    MaxLeafNodesparstr = 'Maximum number of leaf nodes'; ; [MaxLeafNodesstr, n_pars(end+1)] = nk_ConcatParamstr( MaxLeafNodesdefs );
+                    PX = nk_AddParam(MaxLeafNodesdefs, ['ML-' MaxLeafNodesstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MaxLeafNodesparstr, MaxLeafNodesstr);                                 menuact = [ menuact 36 ];
+                    
+                    MinImpDecrparstr = 'Minimum decrease of impurity'; ; [MinImpDecrstr, n_pars(end+1)] = nk_ConcatParamstr( MinImpDecrdefs );
+                    PX = nk_AddParam(MinImpDecrdefs, ['ML-' MinImpDecrstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MinImpDecrparstr, MinImpDecrstr);                                 menuact = [ menuact 37 ];
+                    
+                    Bootstrapparstr = 'Bootstrap samples yes/no'; ; [Bootstrapstr, n_pars(end+1)] = nk_ConcatParamstr( Bootstrapdefs );
+                    PX = nk_AddParam(Bootstrapdefs, ['ML-' Bootstrapstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, Bootstrapparstr, Bootstrapstr);                                 menuact = [ menuact 38 ];
+                    
+                    OobScoreparstr = 'Out-of-bag samples yes/no'; ; [OobScorestr, n_pars(end+1)] = nk_ConcatParamstr( OobScoredefs );
+                    PX = nk_AddParam(OobScoredefs, ['ML-' OobScorestr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, OobScoreparstr, OobScorestr);                                 menuact = [ menuact 39 ];
+                    
+%                     NJobsparstr = 'Number of jobs to run in parallel'; ; [NJobsstr, n_pars(end+1)] = nk_ConcatParamstr( NJobsdefs );
+%                     PX = nk_AddParam(NJobsdefs, ['ML-' NJobsstr], 2, PX);
+%                     menustr = sprintf('%s|Define %s [ %s ]', menustr, NJobsparstr, NJobsstr);                                 menuact = [ menuact 40 ];
+%                     
+%                     RandomStateparstr = 'Randomness of bootstrapping'; ; [RandomStatestr, n_pars(end+1)] = nk_ConcatParamstr( RandomStatedefs );
+%                     PX = nk_AddParam(RandomStatedefs, ['ML-' RandomStatestr], 2, PX);
+%                     menustr = sprintf('%s|Define %s [ %s ]', menustr, RandomStateparstr, RandomStatestr);                                 menuact = [ menuact 41 ];
+%                     
+%                     WarmStartparstr = ''; ; [WarmStartstr, n_pars(end+1)] = nk_ConcatParamstr( WarmStartdefs );
+%                     PX = nk_AddParam(WarmStartdefs, ['ML-' WarmStartstr], 2, PX);
+%                     menustr = sprintf('%s|Define %s [ %s ]', menustr, WarmStartparstr, WarmStartstr);                                 menuact = [ menuact 17 ];
+%                     
+                    ClassWeightparstr = 'Class weights'; ; [ClassWeightstr, n_pars(end+1)] = nk_ConcatParamstr( ClassWeightdefs );
+                    PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, ClassWeightparstr, ClassWeightstr);                                 menuact = [ menuact 42 ];
+                    
+                    CcpAlphaparstr = 'Complexity parameter for Minimal Cost-Complexity Pruning'; ; [CcpAlphastr, n_pars(end+1)] = nk_ConcatParamstr( CcpAlphadefs );
+                    PX = nk_AddParam(CcpAlphadefs, ['ML-' CcpAlphastr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, CcpAlphaparstr, CcpAlphastr);                                 menuact = [ menuact 43 ];
+                    
+                    MaxSampparstr = 'Number of samples to draw from X to train base estimators (if bootstrap)'; ; [MaxSampstr, n_pars(end+1)] = nk_ConcatParamstr( MaxSampdefs );
+                    PX = nk_AddParam(MaxSampdefs, ['ML-' MaxSampstr], 2, PX);
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MaxSampparstr, MaxSampstr);                                 menuact = [ menuact 44 ];
+                    
+        
+        
+        
+        
+        
+   
+        ClassWeightdefs                 = "None";
+        CcpAlphadefs                    = 0.0;
+        MaxSampdefs                     = "None";
+
                 case 'SEQOPT'
                     CutOffparstr = 'No. of threshold for ambiguous case propagation'; 
                     [CutOffstr, n_pars(end+1)] = nk_ConcatParamstr( SEQOPTstepsdefs );
@@ -438,7 +543,83 @@ switch OptimFlag
                 case 17
                     Treedefs    =  nk_input([Dtparstr ' range'],0,'e',Treedefs);                        PX = nk_AddParam(Treedefs, ['ML-' Dtparstr], 2, PX);
                 case 18
-                    NumDdefs    =  nk_input([Dnparstr ' range'],0,'e',NumDdefs);                        PX = nk_AddParam(NumDdefs, ['ML-' Dnparstr], 2, PX);
+                    NumDdefs    = nk_input('Specify maximum number of features to consider', 0, 'mq', ...
+                                               ['Square root (default)|' ...
+                                                'Logarithm (log2)|' ... %'Generate cross-node ensemble by applying ensemble strategy on base learners above predefined threshold|' ...
+                                                'Fraction|' ...
+                                                'Absolute N|' ...
+                                                'N features'], [-1,-2, -3, -3, 0], NumDdefs);
+                   
+                    switch NumDdefs
+                        case -3
+                            NumDdefs    =  nk_input([Dnparstr ' range'],0,'e',NumDdefs); 
+                        case 0
+                            
+                    end
+                            PX = nk_AddParam(NumDdefs, ['ML-' Dnparstr], 2, PX);
+                case 31
+                    Critdefs    = nk_input('Specify function to measure quality of split', 0, 'mq', ...
+                                               ['Gini impurity (default)|' ...
+                                                'Log loss|' ...
+                                                'Entropy'], [1,2,3], Critdefs);
+                    
+                    %PX = nk_AddParam(Critdefs, ['ML-' Critparstr], 2, PX);
+                case 32
+                    MaxDdefs    = nk_input([MaxDparstr ' range'], 'e', MaxDdefs);
+                    PX = nk_AddParam(MaxDdefs, ['ML-' MaxDparstr], 2, PX);
+                case 33
+                    MinSSplitdefs    = nk_input([MinSSplitparstr ' range'], 'e', MinSSplitdefs);
+                    PX = nk_AddParam(MinSSplitdefs, ['ML-' MinSSplitparstr], 2, PX);
+                case 34
+                    MinSLeafdefs    = nk_input([MinSLeafparstr ' range'], 'e', MinSLeafdefs);
+                    PX = nk_AddParam(MinSLeafdefs, ['ML-' MinSLeafparstr], 2, PX);
+               
+                case 35
+                    MinWeightFractLeafdefs    = nk_input([MinWeightFractLeafparstr ' range'], 'e', MinWeightFractLeafdefs);
+                    PX = nk_AddParam(MinWeightFractLeafdefs, ['ML-' MinWeightFractLeafparstr], 2, PX);
+               
+                case 36
+                    MaxLeafNodesdefs    = nk_input([MaxLeafNodesparstr ' range'], 'e', MaxLeafNodesdefs);
+                    PX = nk_AddParam(MaxLeafNodesdefs, ['ML-' MaxLeafNodesparstr], 2, PX);
+               
+                case 37
+                    MinImpDecrdefs    = nk_input([MinImpDecrparstr ' range'], 'e', MinImpDecrdefs);
+                    PX = nk_AddParam(MinImpDecrdefs, ['ML-' MinImpDecrparstr], 2, PX);
+               
+                case 38
+                    Bootstrapdefs    = nk_input('Bootstrap yes or no', 0, 'mq', ...
+                                               ['Yes|' ...
+                                                'No'], [1,0], Bootstrapdefs);
+                    PX = nk_AddParam(Bootstrapdefs, ['ML-' Bootstrapparstr], 2, PX);
+               
+                    
+                case 39
+                    OobScoredefs    = nk_input('Out-of-bag yes or no', 0, 'mq', ...
+                                               ['Yes|' ...
+                                                'No'], [1,0], OobScoredefs);
+                    PX = nk_AddParam(OobScoredefs, ['ML-' OobScoreparstr], 2, PX);
+               
+%                 case 40
+%                     NJobsdefs    = nk_input([MinSSplitparstr ' range'], 'e', NJobsdefs);
+%                     PX = nk_AddParam(NJobsdefs, ['ML-' NJobsparstr], 2, PX);
+               
+%                 case 41
+%                     RandomStatedefs    = nk_input([RandomStateparstr ' range'], 'e', RandomStatedefs);
+%                     PX = nk_AddParam(NJobsdefs, ['ML-' NJobsparstr], 2, PX);
+                case 42
+                    ClassWeightdefs    = nk_input('Class weights', 0, 'mq', ...
+                                               ['All equal (default)|' ...
+                                                'Balanced|' ...
+                                                'Balanced subsample|'...
+                                                'Define yourself (will be added in the future)'], [0,1,2,3], ClassWeightdefs);
+                    PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightparstr], 2, PX);
+                case 43
+                    CcpAlphadefs    = nk_input([CcpAlphaparstr ' range'], 'e', CcpAlphadefs);
+                    PX = nk_AddParam(CcpAlphadefs, ['ML-' CcpAlphaparstr], 2, PX);
+                case 44
+                    MaxSampdefs    = nk_input([MMaxSampparstr ' range'], 'e', MaxSampdefs);
+                    PX = nk_AddParam(MaxSampdefs, ['ML-' MaxSampparstr], 2, PX);
+
                 case 20
                     GRD.matLearn = nk_matLearn_config(GRD.matLearn,SVM.matLRN.learner.framework,2);
                     if isfield(GRD.matLearn,'Params')
@@ -479,6 +660,7 @@ switch OptimFlag
         else
             n_pars = numel(Cdefs);
         end
+
         GRD.Cparams             = Cdefs;
         GRD.Gparams             = Gdefs;
         GRD.Epsparams           = Epsdefs;
@@ -490,8 +672,26 @@ switch OptimFlag
         GRD.Tolparams           = Toldefs;
         GRD.Weightparams        = Weightdefs;
         GRD.Leafparams          = Leafdefs;
+        % random forest
         GRD.Treeparams          = Treedefs;
         GRD.NumDparams          = NumDdefs;
+        GRD.RFMaxDparams     = MaxDdefs;
+        GRD.RFCritdefsparams    = Critdefs;
+        GRD.RFMinSSplitparams   = MinSSplitdefs;
+        GRD.RFMinSLeafparams    = MinSLeafdefs;
+        GRD.RFMinWFLeafparams   = MinWeightFractLeafdefs;
+        GRD.RFMaxLeafNparams    = MaxLeafNodesdefs;
+        GRD.RFMinImpDecrparams  = MinImpDecrdefs;
+        GRD.RFBootstrapparams   = Bootstrapdefs;
+        GRD.RFOobScoreparams    = OobScoredefs;
+        %GRD.RFNJobsparams       = NJobsdefs;
+        GRD.RFClassWeightparams = ClassWeightdefs;
+        GRD.RFCcpAlphaparams    = CcpAlphadefs;
+        GRD.RFMaxSampparams     = MaxSampdefs;
+     
+        
+
+
         GRD.CutOffparams        = SEQOPTstepsdefs;
         GRD.LimsLparams         = SEQOPTlimsLdefs;
         GRD.LimsUparams         = SEQOPTlimsUdefs;

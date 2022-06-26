@@ -510,7 +510,7 @@ switch meas{measind}
                     pgy.EdgeCData(pgy.EdgeCData > 0) = 0.5;
                     pgy.EdgeCData(pgy.EdgeCData < 0) = -0.5;
                     pgy.EdgeColor = 'flat';
-                    colormap parula;
+                    colormap gray;
                     gy.Edges.LWidths = 7*abs(gy.Edges.Weight);
                     pgy.LineWidth = gy.Edges.LWidths;
                     pgy.NodeColor = 'k';
@@ -527,7 +527,7 @@ switch meas{measind}
                     pgy.EdgeAlpha = 0.1;
                     %pgy.EdgeAlpha(pgy.EdgeCData < 0.05) = 0.5;
                     pgy.EdgeColor = 'flat';
-                    colormap parula;
+                    colormap gray;
                     gy.Edges.LWidths = 0.1*(max(gy.Edges.Weight)+1 -(abs(gy.Edges.Weight)));
                     pgy.LineWidth = gy.Edges.LWidths;
                     pgy.NodeColor = 'k';
@@ -545,7 +545,7 @@ switch meas{measind}
                     %pgy.EdgeAlpha = 0.1;
                     %pgy.EdgeAlpha(pgy.EdgeCData < 0.05) = 0.5;
                     pgy.EdgeColor = 'flat';
-                    colormap parula;
+                    colormap gray;
                     gy.Edges.LWidths = 0.1*(max(gy.Edges.Weight)+1 -(abs(gy.Edges.Weight)));
                     pgy.LineWidth = gy.Edges.LWidths;
                     pgy.NodeColor = 'k';

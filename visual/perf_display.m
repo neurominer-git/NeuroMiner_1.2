@@ -38,7 +38,7 @@ if handles.multilabel
     end
 end
 
-[handles, visdata] = switch_analysis(handles);
+[handles, visdata, oocvdata, mlidata] = switch_analysis(handles);
 
 handles.lbStartup.String = 'Customize menus ...';
 set_panel_visibility(handles,'on')
@@ -55,6 +55,12 @@ if ~isempty(visdata),
 else
     handles.selModelMeasures.Value = 1;
 end
+
+% if ~isempty(mlidata) 
+%     handles.MLIdata = mlidata;
+%    %appMLI; 
+% end
+
 if isfield(handles,'MultiClass'), load_selOneVsAll_Info(handles); end
 handles = display_main(handles);
 

@@ -158,7 +158,7 @@ function varargout = spider_plot(P, varargin)
 %
 %   AxesAngular      - Used to toggle angular axes.
 %                      ['on' (default) | 'off']
-% 
+%
 %   AxesShaded       - Used to toggle shaded area around axes.
 %                      ['off' (default) | 'on']
 %
@@ -171,10 +171,13 @@ function varargout = spider_plot(P, varargin)
 %                      ['green' | RGB triplet | hexadecimal color code | 'r' | 'g' | 'b' | ...]
 %
 %   AxesShadedTransparency- Used to the shaded area transparency.
-%                           [0.2 (default) | scalar in range (0, 1)]      
+%                           [0.2 (default) | scalar in range (0, 1)]
 %
 %   AxesLabelsRotate - Used to rotate the axes labels to be aligned with axes.
 %                      ['off' (default) | 'on']
+%
+%   ADDED: AxesObject - if specified, plot will be shown in existing axes
+%                       object
 %
 % Examples:
 %   % Example 1: Minimal number of arguments. All non-specified, optional
@@ -323,7 +326,7 @@ function varargout = spider_plot(P, varargin)
 %       'AxesPrecision', 0);
 %
 %   % Example 8: Spider plot with values only on data points.
-%   
+%
 %   D1 = [1 3 4 1 2];
 %   D2 = [5 8 7 5 9];
 %   P = [D1; D2];
@@ -336,7 +339,7 @@ function varargout = spider_plot(P, varargin)
 %   legend('D1', 'D2', 'Location', 'southoutside');
 %
 %   % Example 9: Spider plot with shaded area around axes.
-%   
+%
 %   D1 = [5 3 9 1 2];
 %   D2 = [5 8 7 2 9];
 %   D3 = [8 2 1 4 6];
@@ -469,13 +472,14 @@ axes_shaded_limits = axes_limits;
 axes_shaded_color = 'g';
 axes_shaded_transparency = 0.2;
 axes_labels_rotate = 'off';
+axfl = false;
 
 % Check if optional arguments were specified
 if numvarargs > 1
     % Initialze name-value arguments
     name_arguments = varargin(1:2:end);
     value_arguments = varargin(2:2:end);
-    
+
     % Iterate through name-value arguments
     for ii = 1:length(name_arguments)
         % Set value arguments depending on name
@@ -572,11 +576,16 @@ if numvarargs > 1
                 axes_shaded_transparency = value_arguments{ii};
             case 'axeslabelsrotate'
                 axes_labels_rotate = value_arguments{ii};
+            case 'axesobject'
+                axes_object = value_arguments{ii};
+                axfl = true;
+            %case 'axesfigure'
+             %   axes_figure = value_arguments{ii};
             otherwise
                 error('Error: Please enter in a valid name-value pair.');
         end
     end
-    
+
 end
 
 %%% Error Check %%%
@@ -788,7 +797,7 @@ end
 if ischar(axes_interpreter)
     % Convert to cell array of char
     axes_interpreter = cellstr(axes_interpreter);
-    
+
     % Repeat cell to number of data groups
     axes_interpreter = repmat(axes_interpreter, length(axes_labels), 1);
 elseif iscellstr(axes_interpreter)
@@ -832,7 +841,7 @@ end
 if ischar(line_style)
     % Convert to cell array of char
     line_style = cellstr(line_style);
-    
+
     % Repeat cell to number of data groups
     line_style = repmat(line_style, num_data_groups, 1);
 elseif iscellstr(line_style)
@@ -864,7 +873,7 @@ end
 if ischar(marker_type)
     % Convert to cell array of char
     marker_type = cellstr(marker_type);
-    
+
     % Repeat cell to number of data groups
     marker_type = repmat(marker_type, num_data_groups, 1);
 elseif iscellstr(marker_type)
@@ -973,7 +982,7 @@ end
 %%% Axes Scaling Properties %%%
 % Selected data
 P_selected = P;
-            
+
 % Check axes scaling option
 log_index = strcmp(axes_scaling, 'log');
 
@@ -981,46 +990,62 @@ log_index = strcmp(axes_scaling, 'log');
 if any(log_index)
     % Initialize copy
     P_log = P_selected(:, log_index);
-    
+
     % Logarithm of base 10, account for numbers less than 1
     P_log = sign(P_log) .* log10(abs(P_log));
-    
+
     % Minimum and maximun log limits
     min_limit = min(min(fix(P_log)));
     max_limit = max(max(ceil(P_log)));
     recommended_axes_interval = max_limit - min_limit;
-    
+
     % Warning message
     warning('For the log scale values, recommended axes limit is [%i, %i] with an axes interval of %i.',...
         10^min_limit, 10^max_limit, recommended_axes_interval);
-    
+
     % Replace original
     P_selected(:, log_index) = P_log;
 end
 
 %%% Figure Properties %%%
 % Grab current figure
-fig = gcf;
-if nargout > 1
-    error('Error: Too many output arguments assigned.');
-end
-varargout{1} = fig;
-
-% Set figure background
-fig.Color = background_color;
-
 % Reset axes
-cla reset;
 
-% Current axes handle
-ax = gca;
-ax.Color = background_color;
+if ~axfl
+    cla reset;
+    fig = gcf;
+    if nargout > 1
+        error('Error: Too many output arguments assigned.');
+    end
+    varargout{1} = fig;
+
+    % Set figure background
+    fig.Color = background_color;
+
+    % Reset axes
+    cla reset;
+
+    % Current axes handle
+    ax = gca;
+    ax.Color = background_color;
+
+    axis square;
+    scaling_factor = 1 + (1 - axes_zoom);
+    axis([-1, 1, -1, 1] * scaling_factor);
+    hold on;
+    
+else
+    %fig = axes_figure;
+    %varargout{1} = fig;
+    ax = axes_object;
+    axis(axes_object, 'square');
+    scaling_factor = 1 + (1 - axes_zoom);
+    axis(axes_object, [-1, 1, -1, 1] * scaling_factor);
+    hold(axes_object, 'on')
+end
 
 % Axis limits
-hold on;
-axis square;
-scaling_factor = 1 + (1 - axes_zoom);
-axis([-1, 1, -1, 1] * scaling_factor);
+
 
 % Axis properties
 ax.XTickLabel = [];
@@ -1028,6 +1053,7 @@ ax.YTickLabel = [];
 ax.XColor = 'none';
 ax.YColor = 'none';
 
+%drawnow
 % Polar increments
 theta_increment = 2*pi/num_data_points;
 full_interval = axes_interval + 1;
@@ -1056,7 +1082,7 @@ for ii = 1:num_data_points
         % Group of points
         group_points = P_selected(:, ii);
     end
-    
+
     % Check for log axes scaling option
     if log_index(ii)
         % Minimum and maximun log limits
@@ -1067,10 +1093,10 @@ for ii = 1:num_data_points
         min_value = min(group_points);
         max_value = max(group_points);
     end
-    
+
     % Range of min and max values
     range = max_value - min_value;
-    
+
     % Check if axes_limits is not empty
     if ~isempty(axes_limits)
         % Check for log axes scaling option
@@ -1078,26 +1104,26 @@ for ii = 1:num_data_points
             % Logarithm of base 10, account for numbers less than 1
             axes_limits(:, ii) = sign(axes_limits(:, ii)) .* log10(abs(axes_limits(:, ii)));
         end
-        
+
         % Manually set the range of each group
         min_value = axes_limits(1, ii);
         max_value = axes_limits(2, ii);
         range = max_value - min_value;
-        
+
         % Check if the axes limits are within range of points
         if min_value > min(group_points) || max_value < max(group_points)
             error('Error: Please make sure the manually specified axes limits are within range of the data points.');
         end
     end
-    
+
     % Check if range is valid
     if range == 0
         error('Error: Range of data values is not valid. Please specify the axes limits.');
     end
-    
+
     % Scale points to range from [0, 1]
     P_scaled(:, ii) = ((P_selected(:, ii) - min_value) / range);
-    
+
     % If reverse axes direction is specified
     if axes_direction_index(ii)
         % Store to array
@@ -1107,7 +1133,7 @@ for ii = 1:num_data_points
         % Store to array
         axes_range(:, ii) = [min_value; max_value; range];
     end
-    
+
     % Add offset of [rho_offset] and scaling factor of [1 - rho_offset]
     P_scaled(:, ii) = P_scaled(:, ii) * (1 - rho_offset) + rho_offset;
 end
@@ -1144,7 +1170,7 @@ if strcmp(axes_radial, 'on')
         [x_axes, y_axes] = pol2cart(theta(ii), rho);
 
         % Plot webs
-        h = plot(x_axes, y_axes,...
+        h = plot(ax, x_axes, y_axes,...
             'LineWidth', 1.5,...
             'Color', axes_color);
 
@@ -1161,7 +1187,7 @@ if strcmp(axes_angular, 'on')
         [x_axes, y_axes] = pol2cart(theta, rho(ii));
 
         % Plot axes
-        h = plot(x_axes, y_axes,...
+        h = plot(ax, x_axes, y_axes,...
             'Color', axes_color);
 
         % Turn off legend annotation
@@ -1182,7 +1208,7 @@ if strcmp(minor_grid, 'on')
         [x_axes, y_axes] = pol2cart(theta, rho_minor(ii));
 
         % Plot axes
-        h = plot(x_axes, y_axes, '--',...
+        h = plot(ax, x_axes, y_axes, '--',...
             'Color', axes_color,...
             'LineWidth', 0.5);
 
@@ -1193,9 +1219,9 @@ end
 
 % Check if axes zero is toggled on
 if strcmp(axes_zero, 'on') && strcmp(axes_display, 'one')
-     % Scale points to range from [0, 1]
+    % Scale points to range from [0, 1]
     zero_scaled = (0 - min_value) / range;
-    
+
     % If reverse axes direction is specified
     if strcmp(axes_direction, 'reverse')
         zero_scaled = -zero_scaled - 1;
@@ -1208,7 +1234,7 @@ if strcmp(axes_zero, 'on') && strcmp(axes_display, 'one')
     [x_axes, y_axes] = pol2cart(theta, zero_scaled);
 
     % Plot webs
-    h = plot(x_axes, y_axes,...
+    h = plot(ax, x_axes, y_axes,...
         'LineWidth', axes_zero_width,...
         'Color', axes_zero_color);
 
@@ -1240,25 +1266,25 @@ vert_align = axes_vert_align;
 for ii = 1:theta_end_index
     % Convert polar to cartesian coordinates
     [x_axes, y_axes] = pol2cart(theta(ii), rho);
-    
+
     % Check if horizontal alignment is quadrant based
     if strcmp(axes_horz_align, 'quadrant')
         % Alignment based on quadrant
         [horz_align, ~] = quadrant_position(theta(ii));
     end
-    
+
     % Check if vertical alignment is quadrant based
     if strcmp(axes_vert_align, 'quadrant')
         % Alignment based on quadrant
         [~, vert_align] = quadrant_position(theta(ii));
     end
-    
+
     % Iterate through points on isocurve
     for jj = rho_start_index:length(rho)
         % Axes increment range
         min_value = axes_range(1, ii);
         range = axes_range(3, ii);
-        
+
         % If reverse axes direction is specified
         if axes_direction_index(ii)
             % Axes increment value
@@ -1267,13 +1293,13 @@ for ii = 1:theta_end_index
             % Axes increment value
             axes_value = min_value + (range/offset_interval) * (jj-rho_start_index);
         end
-        
+
         % Check for log axes scaling option
         if log_index(ii)
             % Exponent to the tenth power
             axes_value = 10^axes_value;
         end
-        
+
         % Display axes text
         if strcmp(axes_tick_labels, 'data')
             text_str = sprintf(sprintf('%%.%if', axes_precision(ii)), axes_value);
@@ -1304,19 +1330,19 @@ fill_option_index = strcmp(fill_option, 'on');
 for ii = 1:num_data_groups
     % Convert polar to cartesian coordinates
     [x_points, y_points] = pol2cart(theta(1:end-1), P_scaled(ii, :));
-    
+
     % Make points circular
     x_circular = [x_points, x_points(1)];
     y_circular = [y_points, y_points(1)];
-    
+
     % Plot data points
-    h = plot(x_circular, y_circular,...
+    h = plot(ax, x_circular, y_circular,...
         'LineStyle', line_style{ii},...
         'Color', colors(ii, :),...
         'LineWidth', line_width(ii),...
         'Visible', plot_visible);
     h.Color(4) = line_transparency(ii);
-    
+
     % Turn off legend annotation
     h.Annotation.LegendInformation.IconDisplayStyle = 'off';
 
@@ -1328,12 +1354,12 @@ for ii = 1:num_data_groups
         'MarkerFaceAlpha', marker_transparency(ii),...
         'MarkerEdgeAlpha', marker_transparency(ii),...
         'Visible', plot_visible);
-    
+
     % Turn off legend annotation
     h.Annotation.LegendInformation.IconDisplayStyle = 'off';
 
     % Plot empty line with combined attributes for legend
-    plot(nan, nan,...
+    plot(ax, nan, nan,...
         'Marker', marker_type{ii},...
         'MarkerSize', marker_size(ii)/6,...
         'MarkerFaceColor', colors(ii, :),...
@@ -1342,14 +1368,14 @@ for ii = 1:num_data_groups
         'Color', colors(ii, :),...
         'LineWidth', line_width(ii),...
         'Visible', plot_visible);
-    
+
     % Iterate through number of data points
     if strcmp(axes_display, 'data')
         for jj = 1:num_data_points
             % Convert polar to cartesian coordinates
             [current_theta, current_rho] = cart2pol(x_points(jj), y_points(jj));
             [x_pos, y_pos] = pol2cart(current_theta, current_rho+axes_data_offset);
-            
+
             % Display axes text
             data_value = P(ii, jj);
             text_str = sprintf(sprintf('%%.%if', axes_precision(jj)), data_value);
@@ -1362,14 +1388,14 @@ for ii = 1:num_data_groups
                 'VerticalAlignment', 'middle');
         end
     end
-    
+
     % Check if fill option is toggled on
     if fill_option_index(ii)
         % Fill area within polygon
-        h = patch(x_circular, y_circular, colors(ii, :),...
+        h = patch(ax, x_circular, y_circular, colors(ii, :),...
             'EdgeColor', 'none',...
             'FaceAlpha', fill_transparency(ii));
-        
+
         % Turn off legend annotation
         h.Annotation.LegendInformation.IconDisplayStyle = 'off';
     end
@@ -1398,7 +1424,7 @@ if strcmp(axes_shaded, 'on')
         % Verticies and face points
         v = [x_points(ii:ii+3), y_points(ii:ii+3)];
         f = [1 2 4 3];
-        
+
         % Patch polygon
         h = patch('Faces', f, 'Vertices', v,...
             'FaceColor', axes_shaded_color,...
@@ -1454,9 +1480,9 @@ if ~strcmp(axes_labels, 'none')
 
         % Convert polar to cartesian coordinates
         [x_pos, y_pos] = pol2cart(theta(ii), rho(end)+axes_labels_offset);
-        
+
         % Display text label
-        text(x_pos, y_pos, axes_labels{ii},...
+        text(ax, x_pos, y_pos, axes_labels{ii},...
             'Units', 'Data',...
             'HorizontalAlignment', horz_align,...
             'VerticalAlignment', 'middle',...
@@ -1531,7 +1557,7 @@ end
         elseif theta_point > 3*pi/2 && theta_point < 2*pi
             quadrant = 4;
         end
-        
+
         % Adjust label alignment depending on quadrant
         switch quadrant
             case 0

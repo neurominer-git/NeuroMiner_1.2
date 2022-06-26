@@ -1,6 +1,6 @@
 function handles = load_selAnalysis(handles)
 
-flg1 = 0; flg2=0;  
+flg1 = 0; flg2=0;  flg3 = 0; 
 if isfield(handles,'ExportPredictionsM')
     delete(handles.ExportPredictionsM);
     delete(handles.ExportPerformanceM);
@@ -22,6 +22,14 @@ for i=1:numel(handles.NM.analysis)
                 handles.ExportFeaturesMenu = uimenu(handles.ExportMenuItem,'Label','Export Features');
             end
             handles.ExportFeaturesM(flg2) = uimenu(handles.ExportFeaturesMenu,'Label',popupstr{i}, 'Tag', num2str(i));
+        end
+
+        if isfield(handles.NM.analysis{i},'MLI')
+            flg3=flg3+1;
+            if ~isfield(handles,'ExportFeaturesMenu')
+                handles.ExportFeaturesMenu = uimenu(handles.ExportMenuItem,'Label','Export Features');
+            end
+            handles.ExportFeaturesM(flg3) = uimenu(handles.ExportFeaturesMenu,'Label',popupstr{i}, 'Tag', num2str(i));
         end
     else
         popupstr{i} = sprintf('Analysis %g - NOT computed',i);

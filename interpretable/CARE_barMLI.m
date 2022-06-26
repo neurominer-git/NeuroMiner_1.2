@@ -1,15 +1,22 @@
-function [f, ax] = barMLI(casenum, MLIcont, feats, refdata, uiaxes, uiaxes2) %newdata
+function [f, ax] = CARE_barMLI(casenum, MLIcont, feats, refdata, origdata)
+% casenum = index of subject of interest in oocv dataset (if I understood
+% it correctly this will always only include one subject (?))
+% MLIcont = the results of the MLInterpreter
+% feats = feature names
+% refdata = trainings dataset
+% origdata = data of oocv dataset (index of row containing the data of the 
+% subject of interest should be = casenum)
 
-if exist('uiaxes','var') 
-    ax = uiaxes; 
+if exist('uiaxes','var')
+    ax = uiaxes;
     f=0;
-else 
+else
     f=figure;
     f.Position = [100 100 750 750];
     ax = gca;
 end
 
-hold(ax,'on'); 
+hold(ax,'on');
 nF = numel(feats);
 y = MLIcont.Y_mapped(casenum,:);
 y_ciu = MLIcont.Y_mapped_ciu(casenum,:);
@@ -23,15 +30,15 @@ if any(idx2)
 end
 
 bar(ax, y(idx),'FaceColor',rgb('DodgerBlue'),'EdgeColor',rgb("SlateGrey"));
-errorbar(ax,1:nF, y(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', 'k'); 
+errorbar(ax,1:nF, y(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', 'k');
 if any(idx2)
-    bar(ax,y2(idx), 'FaceColor',rgb('LightGrey'),'EdgeColor',rgb("Grey")); 
-    errorbar(ax,1:nF, y2(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', rgb("Grey")); 
+    bar(ax,y2(idx), 'FaceColor',rgb('LightGrey'),'EdgeColor',rgb("Grey"));
+    errorbar(ax,1:nF, y2(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', rgb("Grey"));
 end
 
 
-%ax=gca; 
-ax.XTick=1:numel(feats); 
+%ax=gca;
+ax.XTick=1:numel(feats);
 if any(idx2)
     featsI = strcat('\color{gray}',feats(idx2));
     feats(idx2) = featsI;
@@ -39,31 +46,31 @@ end
 feats = regexprep(feats,'_', '\\_');
 ax.XTickLabel=feats(idx);
 ax.YAxis.Label.String = 'Percentage change of prediction [ % maximum range ]';
-ax.YAxis.Label.FontWeight = 'bold'; 
-ax.YAxis.Label.FontSize = 12; 
-ax.XAxis.Label.String = 'Features'; 
+ax.YAxis.Label.FontWeight = 'bold';
+ax.YAxis.Label.FontSize = 12;
+ax.XAxis.Label.String = 'Features';
 ax.Box="on";
 
 if exist('refdata','var') && ~isempty(refdata)
     if exist('uiaxes2','var')
         ax2 = uiaxes2;
-    else 
+    else
         ax.Position(4) = .50;
         pos = ax.Position;
         pos([2 4]) = [0.75 0.2];
         ax2 = axes('Position', pos);
-    end 
+    end
     if exist('origdata','var')&& ~isempty(origdata) % for CARE project
-        refdata = [origdata(casenum,:), refdata];
-        centiles = nk_ComputePercentiles(refdata,refdata(1,:),'inverse');
+        %refdata = [origdata(casenum,:), refdata];
+        centiles = nk_ComputePercentiles(refdata,origdata(casenum,:),'inverse');
     else
         centiles = nk_ComputePercentiles(refdata,refdata(casenum,:),'inverse');
     end
-        bar(ax2,centiles(idx),'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
+    bar(ax2,centiles(idx),'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
     ax2.YAxis.Label.String = 'Percentile rank [%]';
-    ax2.YAxis.Label.FontWeight = 'bold'; 
-    ax2.YAxis.Label.FontSize = 12; 
-    ax2.XTick=1:numel(feats); 
+    ax2.YAxis.Label.FontWeight = 'bold';
+    ax2.YAxis.Label.FontSize = 12;
+    ax2.XTick=1:numel(feats);
     ax2.XLim=[-0.2 numel(feats)+1.2];
     ax2.XTickLabel=[];
     ax2.Title.String = sprintf('Predictive profile of subject #%g', casenum);
