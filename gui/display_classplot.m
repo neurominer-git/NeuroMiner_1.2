@@ -20,6 +20,7 @@ if ~isfield(handles.BinClass{h},'Xaxis') || isempty(handles.BinClass{h}.Xaxis),
     AltAx = false;
     set(handles.axes1,'Position', handles.axes1pos_orig)
     set(handles.axes38,'Visible','off'); cla(handles.axes38);
+    
 else
     lxL = handles.BinClass{h}.Xaxis;
     lxN = handles.XaxisName;

@@ -107,6 +107,9 @@ set(handles.axes1, 'FontUnits','normalized','FontSize', 0.03, ...
 set(handles.axes38, ...%'FontSize', handles.AxisTickSize, ...
             'FontWeight', handles.AxisTickWeight, ...
             'LineWidth', handles.AxisLineWidth);
+% set(handles.axes39, ...%'FontSize', handles.AxisTickSize, ...
+%             'FontWeight', handles.AxisTickWeight, ...
+%             'LineWidth', handles.AxisLineWidth);
 set(handles.axes2,  'FontUnits','normalized','FontSize', 0.06, ...
             'FontWeight', handles.RocAxisTickWeight, ...
             'LineWidth', handles.RocAxisLineWidth);
@@ -116,7 +119,8 @@ set(handles.axes4,...%'FontSize', handles.PieAxisTickSize, ...
             'FontWeight', handles.PieAxisTickWeight);
 set(handles.axes17, 'FontUnits','normalized','FontSize', 0.03, ...
             'FontWeight', handles.AxisTickWeight, ...
-            'LineWidth', handles.AxisLineWidth);      
+            'LineWidth', handles.AxisLineWidth);     
+
         
 %% Load analysis
 NM = []; analind = 1; sz = get(0,'ScreenSize'); handles.screensize = sz(3:4);
@@ -811,6 +815,7 @@ if strcmp(handles.axes38.Visible,'on')
 else
     h_md_anal = [];
 end
+
 copyobj_subplot([handles.axes1 handles.legend_classplot h_md_anal], titl);
 
 function [h_new, targ] = copyobj_subplot(obj, titl, targ, pos)
@@ -827,6 +832,22 @@ h_new = copyobj(obj,targ);
 h_new(1).Position = pos; 
 h_new(1).Title.String = titl;
 
+% --- Executes on button press in cmdExportAxes1.
+function cmdMLInterpret_Callback(hObject, eventdata, handles)
+% hObject    handle to cmdExportAxes1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+%copyobj_subplot([handles.axes1 handles.legend_classplot h_md_anal], titl);
+barMLI(I, handles.MLIdata.Label.BinResults.Modality, ...
+        handles.visdata{1,1}.params.features, ...
+        handles.NM.Y{1}, ...
+        0); 
+
+
+
+
+%copyobj_subplot([handles.axes1 handles.legend_classplot h_md_anal], titl);
 
 % --- Executes on button press in cmdExportAxes2.
 function cmdExportAxes2_Callback(hObject, eventdata, handles)
@@ -1012,7 +1033,12 @@ axes(handles.axes1);
 %[figx,figy] = dsxy2figxy(handles.axes1,[x1 y1],[x2 y2]);
 if isfield(handles,'caseplot'), delete(handles.caseplot); end
 handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
-
+if isfield(handles, 'MLIdata')
+    barMLI(I, handles.MLIdata.Label.BinResults.Modality, ...
+        handles.visdata{1,1}.params.features, ...
+        handles.NM.Y{1}, ...
+        0); % change to something in handles! & add this as input argument for app   
+end
 guidata(handles.figure1,handles);
 
 % --- Executes during object creation, after setting all properties.

@@ -1,4 +1,4 @@
-function centiles = nk_ComputePercentiles(refdata, values, direction)
+function centiles = nk_ComputePercentiles(refdata, values, direction, groupnames)
 % =========================================================================
 % FORMAT centiles = nk_ComputePercentiles(data, values)
 % =========================================================================
