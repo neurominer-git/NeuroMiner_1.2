@@ -56,7 +56,20 @@ TNrate = TN / ( TN + FP);
 param.GMean = sqrt(TPrate + TNrate);
 
 % Calculate further measures
-if numel(unique(expected))>1 , param.AUC = fastAUC(expected, predicted, 1); end
+if numel(unique(expected))>1 , 
+    % Compute AUC
+    param.AUC = fastAUC(expected, predicted, 1); 
+    % Compute confidence intervals of AUC value
+    n1 = sum(expected == 1);
+    n2 = sum(expected == -1);
+    q0 = param.AUC*(1-param.AUC);
+    q1 = param.AUC/(2-param.AUC)-param.AUC.^2;
+    q2 = 2*param.AUC.^2/(1+param.AUC)-param.AUC.^2;
+    se = sqrt( ( q0 + (n1-1)*q1 + (n2-1)*q2 ) / (n1*n2) ) ;
+    zcrit = -1*norminv(0.05/2);
+    param.AUC_lower =  param.AUC - zcrit * se;
+    param.AUC_upper =  param.AUC + zcrit * se;
+end
 param.BAC = (param.sens +  param.spec)/ 2;
 param.Fscore = (2 * TP) / (2 * TP + FP + FN) ;
 param.MCC = (TP * TN - FP * FN) / sqrt( (TP+FP) * (TP+FN) * (TN+FP) * (TN+FN) );
