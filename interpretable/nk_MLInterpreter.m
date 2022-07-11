@@ -684,12 +684,15 @@ for h = 1:nclass
                 Results.BinResults(h).Modality(nx).Y_mapped_ciu = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_ciu(:,:,1:ol),3);
                 Results.BinResults(h).Modality(nx).Y_mapped_cil = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_cil(:,:,1:ol),3);
                 Results.BinResults(h).Modality(nx).Y_mapped_std = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_std(:,:,1:ol),3);
+                Results.BinResults(h).RangePred = inp.MLI.RangePred(h);
             case 'regression'
                 Results.RegrResults.Modality(nx).Y_mapped       = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_ciu   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_ciu(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_cil   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_cil(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_std   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_std(:,:,1:ol),3);
+                Results.RegrResults.RangePred = inp.MLI.RangePred(h);
         end
+
     end
 end
 

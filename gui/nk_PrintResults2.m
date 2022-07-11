@@ -22,7 +22,7 @@ function varargout = nk_PrintResults2(varargin)
 
 % Edit the above text to modify the response to help nk_PrintResults2
 
-% Last Modified by GUIDE v2.5 30-Mar-2021 18:19:54
+% Last Modified by GUIDE v2.5 11-Jul-2022 16:50:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -944,12 +944,6 @@ function tglSort_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of tglSort
-switch hObject.Value
-    case 0
-        hObject.String = 'Sort -> Values';
-    case 1
-        hObject.String = 'Sort -> Cases';
-end
 handles = perf_display(handles);
 guidata(handles.figure1,handles);
 
@@ -1257,4 +1251,15 @@ function tglVisMeas2_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of tglVisMeas2
 handles = display_visual(handles);
+guidata(handles.figure1,handles);
+
+
+% --- Executes on button press in tglPercRank.
+function tglPercRank_Callback(hObject, eventdata, handles)
+% hObject    handle to tglPercRank (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of tglPercRank
+handles = perf_display(handles);
 guidata(handles.figure1,handles);

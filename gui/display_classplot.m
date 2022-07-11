@@ -36,6 +36,10 @@ switch GraphType
     case {1,2,3}
        
         predh = handles.BinClass{h}.mean_predictions;
+        if handles.tglPercRank.Value
+            zeroline = nk_ComputePercentiles(predh, 0,'inverse');
+            predh = ranktransform(predh);
+        end
         switch GraphType
             case 2
                 % Mean predictions with 95%-CI
@@ -70,9 +74,17 @@ switch GraphType
     case 4
         % Majority voting probabilities
         predh = handles.BinClass{h}.prob_predictions(:,1);
+        if handles.tglPercRank.Value
+            zeroline = nk_ComputePercentiles(predh, 0.5,'inverse');
+            predh = ranktransform(predh);
+        end
     case 5
         % Cross-CV2 perm majority voting probabilities (95%-CIs)
         predh = handles.BinClass{h}.CV2grid.mean_predictions;
+        if handles.tglPercRank.Value
+            zeroline = nk_ComputePercentiles(predh, 0.5,'inverse');
+            predh = ranktransform(predh);
+        end
         errbarCI2 = handles.BinClass{h}.CV2grid.CI2_predictions;
         errbarCI1 = handles.BinClass{h}.CV2grid.CI1_predictions;
         switch handles.tglSort.Value
@@ -89,6 +101,10 @@ switch GraphType
     case 6
          % Cross-CV2 perm majority voting probabilities with standard deviation
         predh = handles.BinClass{h}.CV2grid.mean_predictions;
+        if handles.tglPercRank.Value
+            zeroline = nk_ComputePercentiles(predh, 0.5,'inverse');
+            predh = ranktransform(predh);
+        end
         errbar  = handles.BinClass{h}.CV2grid.std_predictions;
         switch handles.tglSort.Value
             case 0
@@ -128,12 +144,12 @@ else
 end
 
 for i=1:numel(pss)
-    if handles.BinClass{h}.labelh(i) > 0, 
+    if handles.BinClass{h}.labelh(i) > 0
         expgroupi = handles.BinClass{h}.groupnames{1}; 
     else
         expgroupi = handles.BinClass{h}.groupnames{2};
     end
-    if predh(i) > offs(i),
+    if predh(i) > offs(i)
        predgroupi = handles.BinClass{h}.groupnames{1}; 
     else
        predgroupi = handles.BinClass{h}.groupnames{2}; 
@@ -186,15 +202,19 @@ end
 divx1 = sum(id1); xl1 = 1:divx1;
 divx2 = divx1 + sum(id2); xl2 = divx1+1:divx2;
 
-if size(handles.BinClass{h}.labelh,1) == 1, 
+if size(handles.BinClass{h}.labelh,1) == 1
     labelh = handles.BinClass{h}.labelh'; 
 else
     labelh = handles.BinClass{h}.labelh;
 end
-if GraphType > 3, 
-    signpred = sign(predh-0.5); offy =0.5;
+if GraphType > 3 || handles.tglPercRank.Value
+    if handles.tglPercRank.Value
+        signpred = sign(predh-zeroline); offy = zeroline;
+    else
+        signpred = sign(predh-0.5); offy = 0.5;
+    end
 else
-    signpred = sign(predh-offs); offy=0;
+    signpred = sign(predh-offs); offy = 0;
 end
 err = signpred ~= labelh;
 idx1 = id1 & ~err; idx2 = id2 & ~err; b(1) = 0; b(2)= 0;
@@ -202,7 +222,7 @@ idx1 = id1 & ~err; idx2 = id2 & ~err; b(1) = 0; b(2)= 0;
 if sum(idx1)
     if ~AltAx
         fIdx1 = find(id1);
-        v = [ [offy offy]; [offy YLIMS(2)]; [lxL(fIdx1(end))+r YLIMS(2)]; [lxL(fIdx1(end))+r offy] ];             
+        v = [ [0 offy]; [0 YLIMS(2)]; [lxL(fIdx1(end))+r YLIMS(2)]; [lxL(fIdx1(end))+r offy] ];             
         patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', handles.colptin(handles.BinClass{h}.groupind(1),:), 'EdgeColor', 'none', 'FaceAlpha', 0.15)
     end
     b(1) = plot(lxL(idx1),predh(idx1),handles.colpt,...
@@ -238,9 +258,14 @@ else
     b(2) = plot(1,NaN,'LineStyle','none');
 end
 
-if GraphType >3 
-    probfx = 0.5;
-    predhx = predh-0.5;
+if GraphType >3 || handles.tglPercRank.Value
+    if handles.tglPercRank.Value
+        probfx = zeroline;
+        predhx = predh-zeroline;
+    else
+        probfx = 0.5;
+        predhx = predh-0.5;
+    end
     handles.BinClass{h}.predh = predhx;
 else
     probfx = 0;
@@ -374,6 +399,9 @@ switch GraphType
         algostr = 'Mean OOT-Probability (95%-CIs)';
     case 6
         algostr = 'Mean OOT-Probability (SD)';
+end
+if handles.tglPercRank.Value
+    algostr = [algostr ' (%-ranks)'];
 end
 hx(1) = xlabel(lxN); 
 set(hx(1), ...%'FontSize',handles.AxisLabelSize-2,
