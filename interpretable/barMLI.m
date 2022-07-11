@@ -33,7 +33,6 @@ if any(idx2)
     errorbar(ax,1:nF, y2(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', rgb("Grey"));
 end
 
-
 %ax=gca;
 ax.XTick=1:numel(feats);
 if any(idx2)

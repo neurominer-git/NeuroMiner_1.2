@@ -1,12 +1,12 @@
-function [sY, IN] = nk_PerfRemMeanDiffObj(Y, IN)
+function [sY, IN] = nk_PerfRemMeanDiffObj( Y, IN )
 % =========================================================================
-% FORMAT function [sY, IN] = nk_PerfRemMeanDiffObj(Y, IN)
+% FORMAT [sY, IN] = nk_PerfRemMeanDiffObj( Y, IN )
 % =========================================================================
 % Normalizes given data (specified ind dIND) to global mean of given groups 
 % (specified in sIND) by first subtracting global mean (meanY) and then 
-% subtracting offsets (meanG) from data 
+% subtracting offsets (meanG) from target data 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 10/2015
+% (c) Nikolaos Koutsouleris, 07/2022
 
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) && exist('IN','var') && ~isempty(IN)

@@ -1158,7 +1158,6 @@ function CompModelsVisual_Callback(hObject, eventdata, handles)
 
 display_comparator(handles, 'visual');
 
-
 function txtPager_Callback(hObject, eventdata, handles)
 % hObject    handle to txtPager (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB

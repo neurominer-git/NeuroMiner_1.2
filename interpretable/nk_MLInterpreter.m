@@ -136,7 +136,8 @@ else
                 case {'posneg','median','medianflip'}
                     % ordered permutations without replacement
                     % no repetitions
-                    [ RandFeats(h, nx).I, inp.MLI.nperms ] = uperms( inp.MLI.MAP.mapidx{h,nx}, inp.MLI.nperms, nfrac);   
+                    [ RandFeats(h, nx).I, inp.MLI.nperms, ] = uperms( inp.MLI.MAP.mapidx{h,nx}, inp.MLI.nperms, nfrac); 
+                     
                 case {'random'}
                     % non-ordered permutations without replacement,
                     % repetitions are allowed.

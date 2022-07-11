@@ -1,14 +1,16 @@
 function [sY, IN, dT] = nk_PerfAdjForCovarsUsingPCAObj(Y, IN, S)
 % =========================================================================
-% function [adjT, IN] = nk_AdjForCovarsUsingPCAObj(T, IN)
+% function [adjT, IN] = nk_PerfAdjForCovarsUsingPCAObj(T, IN, S)
 % =========================================================================
 % ----- INPUTS -----
-% IN.S :            Source Matrix (row = patterns, cols = features)
+% Y :               Target matrix (row = patterns, cols = features), from 
+%                   which the covariate effects will be removed 
+% S :               Source Matrix (row = patterns, cols = features)
 %                   Used to (1) determine which eigenvectors are correlated
-%                   with CS, and (2) to reduce and reconstruct T
+%                   with IN.G, and (2) to reduce and reconstruct T
 % IN.G :            Covariate matrix 
 %
-% Optional fields in IN include:
+% Additional fields in IN include:
 % IN.recon :        back-project adjusted target matrix to input space 
 %                   (def: true)
 % IN.varop :        operator for identification of correlated factors 
@@ -20,10 +22,8 @@ function [sY, IN, dT] = nk_PerfAdjForCovarsUsingPCAObj(Y, IN, S)
 %                   nk_DimRed_config)
 % IN.indX :         logical index vector to subcohort of IN.S
 %
-% Y :               Target matrix, from which the covariate effects will be 
-%                   removed
 %
-% ----- OUTPUT -----
+% ----- OUTPUTS -----
 % adjT :            Adjusted target matrix 
 % IN :              Parameter structure containing orig. and comp. params
 % =========================================================================
