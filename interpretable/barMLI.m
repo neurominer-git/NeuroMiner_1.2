@@ -56,7 +56,7 @@ if exist('refdata','var') && ~isempty(refdata)
         pos([2 4]) = [0.75 0.2];
         ax2 = axes('Position', pos);
     end
-    if exist('origdata','var')&& ~isempty(origdata) % for CARE project
+    if exist('origdata','var') && ~isempty(origdata) % for CARE project
         refdata = [origdata(casenum,:), refdata];
         centiles = nk_ComputePercentiles(refdata,origdata(casenum,:),'inverse');
     else

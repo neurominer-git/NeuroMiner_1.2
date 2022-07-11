@@ -393,6 +393,9 @@ for f=1:ix % Loop through CV2 permutations
                     for q=1:numel(tInd) % Loop through CV2/OOCV cases 
 
                         fprintf('\n\n--- Working on case %s (%g of %g cases) ---', cases{tInd(q)}, q, numel(tInd));
+                        if strcmp(cases{tInd(q)},'33450_MRI_sMRI_400639')
+                            fprintf('found');
+                        end
                         inp.NanModality = false(1, numel(inp.X));
 
                         for nx = 1:numel(inp.X)

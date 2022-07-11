@@ -73,7 +73,10 @@ switch h_list{h_val}
         %handles.pnVisual.Visible            ='on';
         %load_selModality(handles)
         %handles = display_mli(handles);
-        appMLI(handles.subjects, handles.MLIdata.Label.BinResults.Modality, handles.visdata{handles.curmodal}.params.features);
+        appMLI(handles.subjects, ...
+            handles.NM.Y{handles.visdata{handles.curmodal}.params.varind}, ...
+            handles.visdata{handles.curmodal}.params.features, ...
+            handles.MLIdata.Label.BinResults.Modality);
 
     otherwise
       
