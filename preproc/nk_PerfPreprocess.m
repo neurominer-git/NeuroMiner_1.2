@@ -1,6 +1,8 @@
-function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, paramfl, Yocv, Cocv)
+function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, ...
+                                                       paramfl, Yocv, Cocv)
 % =========================================================================
-% [tY, Param] = nk_PerfPreprocess(Y, inp, labels, paramfl, Yocv, Cocv)
+% [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, ...
+%                                                      paramfl, Yocv, Cocv)
 % =========================================================================
 % Core function of NM's preprocessing module that can be run in training
 % mode as well as in OOCV mode and executes the sequence of preprocessing
@@ -22,7 +24,7 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, paramfl, 
 % paramfl   = modified script execution parameters
 % tYocv     = the preprocessed independent test data
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2021
+% (c) Nikolaos Koutsouleris, 07/2022
 
 global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL
 
@@ -80,6 +82,7 @@ tY.CVL = cell(iy,jy);
 tY.TrInd = cell(iy,jy);
 tY.CVInd = cell(iy,jy);
 multoocv = false; if iscell(Yocv) && numel(Yocv)>1, multoocv = true; end
+
 % Eventually, apply spatial operations to image data
 % (This function will be extended beyond smoothing ops on nifti data)
 [sY, sYocv, sCocv, inp, optfl, ukbin, uBINMOD, BINMOD] = ...
@@ -478,7 +481,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
             end
             
             % Check whether we have imputed labels
-            if isfield(SrcParam,'TrL_imputed'), 
+            if isfield(SrcParam,'TrL_imputed')
                 TrL = SrcParam.TrL_imputed; 
                 [~,TrL] = nk_ManageNanCases(vTs{1}, TrL, SrcParam.iTr); 
                 tTrL = labels(TrI,lb);

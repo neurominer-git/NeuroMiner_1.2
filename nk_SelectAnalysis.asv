@@ -46,7 +46,7 @@ if isfield(dat,'analysis')
         if stackmin > 0 && ~isempty(analstatus.stacking_analyses)
             complstr = sprintf('COMPLETED and no. of inputs for stacking >= %g',stackmin);
             analstacked = true(1, numel(dat.analysis));
-            analstacked((analstatus.n_inputanalyses < stackmin & analstatus.stacking_analyses) | analstatus.sequence_analyses) = false;
+            analstacked(analstatus.n_inputanalyses < stackmin & analstatus.stacking_analyses) = false;
             indanal = find(analstatus.completed_analyses & analstacked);
         else    
             complstr = 'COMPLETED ';
