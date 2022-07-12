@@ -168,7 +168,7 @@ for f=1:ix % Loop through CV2 permutations
         CVPOS.CV2p = f;
         CVPOS.CV2f = d;
         if oocvflag
-            tInd =  1:numel(inp.nOOCVsubj);
+            tInd =  1:inp.nOOCVsubj;
         else
             tInd = CV.TestInd{f,d};
         end
@@ -406,11 +406,11 @@ for f=1:ix % Loop through CV2 permutations
                             % (see there)
                             covs = [];
                             if inp.oocvflag
-                                if ~isempty(inp.covars_oocv), covs = inp.covars_oocv(tInd(q,:),:); end
-                                Ts = inp.X(nx).Yocv(tInd(q,:),:);
+                                if ~isempty(inp.covars_oocv), covs = inp.covars_oocv(tInd(q),:); end
+                                Ts = inp.X(nx).Yocv(tInd(q),:);
                             else
-                                if ~isempty(inp.covars), covs = inp.covars(tInd(q,:),:); end
-                                Ts = inp.X(nx).Y(tInd(q,:),:);
+                                if ~isempty(inp.covars), covs = inp.covars(tInd(q),:); end
+                                Ts = inp.X(nx).Y(tInd(q),:);
                             end
                             % Check if the modality consists only of NaNs
                             if sum(isnan(Ts)) == size(inp.X(nx).Y,2)

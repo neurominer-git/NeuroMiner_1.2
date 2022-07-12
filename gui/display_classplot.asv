@@ -232,12 +232,14 @@ else
     id2 = ~handles.BinClass{h}.ind1; 
 end
 
+divx1 = sum(id1); xl1 = 1:divx1;
+divx2 = divx1 + sum(id2); xl2 = divx1+1:divx2;
+
 if size(handles.BinClass{h}.labelh,1) == 1
     labelh = handles.BinClass{h}.labelh'; 
 else
     labelh = handles.BinClass{h}.labelh;
 end
-
 if GraphType > 3 || handles.tglPercRank.Value
     if handles.tglPercRank.Value
         signpred = sign(predh-zeroline); offy = zeroline;
@@ -247,11 +249,9 @@ if GraphType > 3 || handles.tglPercRank.Value
 else
     signpred = sign(predh-offs); offy = 0;
 end
-
 err = signpred ~= labelh;
 idx1 = id1 & ~err; idx2 = id2 & ~err; b(1) = 0; b(2)= 0;
 
-% Plot Group A results
 if sum(idx1)
     if ~AltAx && ~handles.tglSort.Value
         fIdx1 = find(id1);
@@ -268,7 +268,6 @@ else
     b(1) = plot(1,NaN,'LineStyle','none');
 end
 
-% Plot Group B results
 if sum(idx2)
     if ~handles.BinClass{h}.one_vs_all
         CLP = handles.colpt;
@@ -292,7 +291,6 @@ else
     b(2) = plot(1,NaN,'LineStyle','none');
 end
 
-% Adjust y scaling depending on prob/rank estimates or decision scores
 if GraphType >3 || handles.tglPercRank.Value
     if handles.tglPercRank.Value
         probfx = zeroline;
@@ -306,36 +304,31 @@ else
     probfx = 0;
     handles.BinClass{h}.predh = predh;
 end
-
-% Zeroline tweaks
 xLimits = get(handles.axes1,'XLim'); xLimitsVec = linspace(xLimits(1),xLimits(2), numel(handles.axes1.XAxis.TickValues)-1);
 zeroline = ones(1,numel(xLimitsVec))*probfx;
-
 if handles.BinClass{h}.CoxMode
     zeroline = handles.BinClass{h}.mean_cutoff_probabilities;
     xLimitsVec(1)=[]; xLimitsVec(end)=[];
 end
-
-% Error plotting
+    
 ide1 = id1 & err; ide2 = id2 & err;
-% Mark errors in Group A
+
 x1 = plot(lxL(ide1),predh(ide1), '*', 'Color', handles.colptin(handles.BinClass{h}.groupind(1),:),'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);
 if handles.BinClass{h}.one_vs_all 
     Color2 = rgb('DarkGrey');
 else
     Color2 = handles.colptin(handles.BinClass{h}.groupind(2),:);
 end
-
-% Mark errors in Group B
+% 
 x2 = plot(lxL(ide2),predh(ide2), '*', 'Color', Color2,'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);  
 
 % Create legend
 if GraphType > 1
     switch GraphType
         case {2,5}
-            errest = '95%-CI';
-        case {3,6}
             errest = 'SD';
+        case {3,6}
+            errest = '95%-CI';
     end 
     handlevec = [b,x1,x2,handles.classplot];
     legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'},{errest}];
@@ -365,7 +358,7 @@ if AltAx,
     [err_hist1, Bins1] = hist3([lxL(id1) err(id1)],[10 2]); 
     perr_hist1 = err_hist1(:,2) ./ sum(err_hist1,2);
      % Group 2 misclassification histogram
-    err_hist2 = hist3([lxL(id2) err(id2)], Bins1); 
+    [err_hist2, Bins2] = hist3([lxL(id2) err(id2)], Bins1); 
     perr_hist2 = err_hist2(:,2) ./ sum(err_hist2,2);
     axes(handles.axes38); 
     bar(handles.axes38, Bins1{1}, perr_hist1,'BarWidth',1,'FaceColor', handles.colptin(handles.BinClass{h}.groupind(1),:),'FaceAlpha',0.5); 
@@ -384,6 +377,24 @@ if AltAx,
     bar(handles.axes38, Bins1{1}, perr_hist2,'BarWidth',1,'FaceColor', Color2,'FaceAlpha',0.5); 
     hold(handles.axes38,'off'); 
     axes(handles.axes1);
+    
+    % Kolomogorv-Smirnov-Tests if available
+%         if exist('kstest2','file')
+%             pnull_hist1 = repmat(sum(err_hist1(:,2))/10,10,1)./sum(err(id1));
+%             alt_hist1   = err_hist1(:,2)/sum(err(id1));
+%             bs1 = nk_BattacharyyaCoef( alt_hist1, pnull_hist1);
+%             pnull_hist2 = repmat(sum(err_hist2(:,2))/10,10,1)./sum(err(id2));
+%             alt_hist2   = err_hist2(:,2)/sum(err(id2));
+%             bs2 = nk_BattacharyyaCoef( alt_hist2, pnull_hist2);
+%             bs3 = nk_BattacharyyaCoef( alt_hist1, alt_hist2);
+%             fprintf('\n\n'); cprintf('*black','Battacharyya tests for inequality of distributions');
+%             fprintf('\n'); cprintf('*black','========================================================');
+%             fprintf('\nGroup %s vs equality:  Battacharyya Coefficient = %1.3f',  handles.BinClass{h}.groupnames{1}, bs1);
+%             fprintf('\nGroup %s vs equality:  Battacharyya Coefficient = %1.3f',  handles.BinClass{h}.groupnames{2}, bs2);
+%             fprintf('\nGroup %s vs. Group %s: Battacharyya Coefficient = %1.3f', handles.BinClass{h}.groupnames{1}, handles.BinClass{h}.groupnames{2}, bs3);
+%             fprintf('\n'); cprintf('*black','========================================================');
+%             fprintf('\n')
+%         end
 end
 
 plot(xLimitsVec,zeroline,'LineWidth',handles.ZeroLineWidth,'Color',rgb('Grey'))

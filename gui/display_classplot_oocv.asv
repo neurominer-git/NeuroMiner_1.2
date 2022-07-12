@@ -188,13 +188,13 @@ pss = cell(1,numel(N));psslen=0;
 for i=1:numel(pss)
     expgroupi = 'not labeled';
     if labels_known
-        if label_oocv_h(i) > 0
+        if label_oocv_h(i) > 0, 
             expgroupi = handles.BinClass{h}.groupnames{1}; 
-        elseif  label_oocv_h(i) < 0
+        elseif  label_oocv_h(i) < 0, 
             expgroupi = handles.BinClass{h}.groupnames{2}; 
         end
     end
-    if sign(P_oocv_h(i)) > 0
+    if sign(P_oocv_h(i)) > 0,
         predgroupi = handles.BinClass{h}.groupnames{1}; 
     else
         predgroupi = handles.BinClass{h}.groupnames{2}; 
@@ -225,15 +225,27 @@ figdata.textHdl     = annotation(figdata.hPanel, 'textbox', 'String','', ...
                             'FitBoxToText','on', ...
                             'Visible','off');
 set(handles.axes1,'UserData',figdata);
+    
+if GraphType > 3 
+    probfx = 0.5;
+    P_hx = P_h-0.5; handles.BinClass{h}.P_h = P_hx;
+else
+    probfx = 0; handles.BinClass{h}.P_h = P_h;
+end
 
 % Adjust y scaling depending on prob/rank estimates or decision scores
 if GraphType >3 || handles.tglPercRank.Value
-    probfx = zeroln;
-    P_hx = P_h - probfx;
-    handles.BinClass{h}.P_h = P_hx;
+    if handles.tglPercRank.Value
+        probfx = zeroln;
+        predhx = predh-zeroline;
+    else
+        probfx = 0.5;
+        predhx = predh-0.5;
+    end
+    handles.BinClass{h}.predh = predhx;
 else
     probfx = 0;
-    handles.BinClass{h}.P_h = P_h;
+    handles.BinClass{h}.predh = predh;
 end
 
 legvecn = logical(legvecn);
