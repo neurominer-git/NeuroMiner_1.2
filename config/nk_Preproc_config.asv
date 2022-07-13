@@ -587,7 +587,7 @@ switch cmd
     case 19
         CURACT = config_graphConstruction(CURACT, navistr);
     case 20
-        CURACT = config_customPreproc(CURACT, navistr);
+        CURACT = config_customPreprocF
 end
 
 switch replflag
@@ -867,14 +867,7 @@ act = 1; while act >0, [ CURACT.GRAPHCONSTRUCTION, CURACT.PX, act ] = graphConst
 CURACT.cmd = 'graphConstruction';
 
 end
-function CURACT = config_customPreproc(CURACT, navistr)
 
-if ~isfield(CURACT,'CUSTOMPREPROC'), CURACT.CUSTOMPREPROC=[]; end
-if ~isfield(CURACT,'PX'), CURACT.PX = []; end
-act = 1; while act >0, [ CURACT.CUSTOMPREPROC, CURACT.PX, act ] = customPreproc_config(CURACT.CUSTOMPREPROC, CURACT.PX, navistr); end
-CURACT.cmd = 'customPreproc';
-
-end
 
 % -------------------------------------------------------------------------
 function [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu)

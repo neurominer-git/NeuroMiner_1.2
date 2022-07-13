@@ -334,16 +334,8 @@ switch OptimFlag
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Dnparstr, Dnstr);                                 menuact = [ menuact 18 ];
 
           
-                    Critparstr = 'Function to measure the quality of a split'; ; %[Critstr, n_pars(end+1)] = nk_ConcatParamstr( Critdefs );
-                    %PX = nk_AddParam(Critdefs, ['ML-' Critstr], 2, PX);
-                    switch Critdefs
-                        case 1
-                            Critstr = 'Gini';
-                        case 2
-                            Critstr = 'Log loss';
-                        case 3
-                            Critstr = 'Entropy';
-                    end
+                    Critparstr = 'Function to measure the quality of a split'; ; [Critstr, n_pars(end+1)] = nk_ConcatParamstr( Critdefs );
+                    PX = nk_AddParam(Critdefs, ['ML-' Critstr], 2, PX);
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Critparstr, Critstr);                                 menuact = [ menuact 31 ];
                     
                     MaxDparstr = 'Maximum depth of the tree'; ; [MaxDstr, n_pars(end+1)] = nk_ConcatParamstr( MaxDdefs );
@@ -370,14 +362,12 @@ switch OptimFlag
                     PX = nk_AddParam(MinImpDecrdefs, ['ML-' MinImpDecrstr], 2, PX);
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, MinImpDecrparstr, MinImpDecrstr);                                 menuact = [ menuact 37 ];
                     
-                    Bootstrapparstr = 'Bootstrap samples yes/no'; ; %[Bootstrapstr, n_pars(end+1)] = nk_ConcatParamstr( Bootstrapdefs );
-                    %PX = nk_AddParam(Bootstrapdefs, ['ML-' Bootstrapstr], 2, PX);
-                    if Bootstrapdefs Bootstrapstr = "Yes"; else Bootstrapstr = "No"; end; 
+                    Bootstrapparstr = 'Bootstrap samples yes/no'; ; [Bootstrapstr, n_pars(end+1)] = nk_ConcatParamstr( Bootstrapdefs );
+                    PX = nk_AddParam(Bootstrapdefs, ['ML-' Bootstrapstr], 2, PX);
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Bootstrapparstr, Bootstrapstr);                                 menuact = [ menuact 38 ];
                     
-                    OobScoreparstr = 'Out-of-bag samples yes/no'; ; %[OobScorestr, n_pars(end+1)] = nk_ConcatParamstr( OobScoredefs );
-                    %PX = nk_AddParam(OobScoredefs, ['ML-' OobScorestr], 2, PX);
-                    if OobScoredefs OobScorestr = "Yes"; else OobScorestr = "No"; end;
+                    OobScoreparstr = 'Out-of-bag samples yes/no'; ; [OobScorestr, n_pars(end+1)] = nk_ConcatParamstr( OobScoredefs );
+                    PX = nk_AddParam(OobScoredefs, ['ML-' OobScorestr], 2, PX);
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, OobScoreparstr, OobScorestr);                                 menuact = [ menuact 39 ];
                     
 %                     NJobsparstr = 'Number of jobs to run in parallel'; ; [NJobsstr, n_pars(end+1)] = nk_ConcatParamstr( NJobsdefs );
@@ -392,18 +382,8 @@ switch OptimFlag
 %                     PX = nk_AddParam(WarmStartdefs, ['ML-' WarmStartstr], 2, PX);
 %                     menustr = sprintf('%s|Define %s [ %s ]', menustr, WarmStartparstr, WarmStartstr);                                 menuact = [ menuact 17 ];
 %                     
-                    ClassWeightparstr = 'Class weights'; ; %[ClassWeightstr, n_pars(end+1)] = nk_ConcatParamstr( ClassWeightdefs );
-                    %PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightstr], 2, PX);
-                    switch ClassWeightdefs
-                        case 0
-                            ClassWeightstr = 'All equal';                  
-                        case 1
-                            ClassWeightstr = 'Balanced'; 
-                        case 2
-                            ClassWeightstr = 'Balanced subsample';
-                        case 3
-                            ClassWeightStr = 'User defined';
-                    end
+                    ClassWeightparstr = 'Class weights'; ; [ClassWeightstr, n_pars(end+1)] = nk_ConcatParamstr( ClassWeightdefs );
+                    PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightstr], 2, PX);
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, ClassWeightparstr, ClassWeightstr);                                 menuact = [ menuact 42 ];
                     
                     CcpAlphaparstr = 'Complexity parameter for Minimal Cost-Complexity Pruning'; ; [CcpAlphastr, n_pars(end+1)] = nk_ConcatParamstr( CcpAlphadefs );
@@ -420,6 +400,9 @@ switch OptimFlag
         
         
    
+        ClassWeightdefs                 = "None";
+        CcpAlphadefs                    = 0.0;
+        MaxSampdefs                     = "None";
 
                 case 'SEQOPT'
                     CutOffparstr = 'No. of threshold for ambiguous case propagation'; 
