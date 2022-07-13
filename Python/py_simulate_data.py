@@ -15,5 +15,5 @@ model.fit(data)
 
 sample = model.sample(n_obs)
 #sample.head()
-out_path = '/Users/claravetter/Documents/Documents_Clara_MacBookAir/LMU/Simulations/simData.csv'
+out_path = f'{rootdir}/simData.csv'
 sample.to_csv(out_path,index=False)

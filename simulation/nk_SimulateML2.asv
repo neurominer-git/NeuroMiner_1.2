@@ -199,18 +199,16 @@ if fromData
             num_labels = labels_a;
             num_labels= num_labels-1; % simulate function could potentially better be adjusted to fit NM strucutre of labels
         end
-        analrootdir = xNM.analysis{1,varargin{1,4}}.rootdir;
-        origData = sprintf('%s/origData.csv',analrootdir);
+        path = '/Users/claravetter/Documents/Documents_Clara_MacBookAir/LMU/Simulations/origData.csv';
         if isa(varargin{1,2},'double')
             varargin{1,2} = array2table(varargin{1,2});
         end
-        writetable(varargin{1,2}, origData);
-        
+        writetable(varargin{1,2}, path);
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
-            data_file = origData, ...
+            data_file = path, ...
             labels = int64(num_labels), ...
             n_obs = int64(nc), ...
-            rootdir = analrootdir);
+            rootdir = );
         %M = readtable(simData_file);
         M = readtable(py2mat(M_file));
 
