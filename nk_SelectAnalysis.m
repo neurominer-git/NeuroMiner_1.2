@@ -1,5 +1,5 @@
 function [act, analdim, dat, showmodalvec, brief] = nk_SelectAnalysis(dat, newflag, ...
-    titlestr, analind, modflag, complflag, showmodalvec, brief)
+    titlestr, analind, modflag, complflag, showmodalvec, brief, stackmin)
 % =========================================================================
 % [act, analdim, dim, showmodalvec] = nk_SelectAnalysis(dat, newflag, ...
 %                     titlestr, analind, modflag, complflag, showmodalflag)
@@ -31,19 +31,28 @@ if ~exist('newflag','var')  || isempty(newflag),     newflag = false; end
 if ~exist('modflag','var')  || isempty(modflag),     modflag = false; end
 if ~exist('complflag','var')|| isempty(complflag),   complflag = false; end
 if ~exist('brief','var')    || isempty(brief),       brief = true; end
+if ~exist('stackmin','var') || isempty(stackmin),    stackmin = 0; end
 if ~exist('titlestr','var') || isempty(titlestr),    titlestr='Select'; end
 
-if iscell(dat.Y), nvar = length(dat.Y); else nvar = 1; end
+if iscell(dat.Y), nvar = length(dat.Y); else, nvar = 1; end
 
 analdim = []; act = 0;
 
 % Select analysis 
 if isfield(dat,'analysis')
     
-    if complflag 
-        complstr = 'COMPLETED ';
+    if complflag
         analstatus = nk_GetAnalysisStatus(dat);
-        analyses = dat.analysis(analstatus.completed_analyses);
+        if stackmin > 0 && ~isempty(analstatus.stacking_analyses)
+            complstr = sprintf('COMPLETED and no. of inputs for stacking >= %g',stackmin);
+            analstacked = true(1, numel(dat.analysis));
+            analstacked((analstatus.n_inputanalyses < stackmin & analstatus.stacking_analyses) | analstatus.sequence_analyses) = false;
+            indanal = find(analstatus.completed_analyses & analstacked);
+        else    
+            complstr = 'COMPLETED ';
+            indanal = analstatus.completed_analyses;
+        end
+        analyses = dat.analysis(indanal);
     else
         complstr = '';
         analyses = dat.analysis;
@@ -56,7 +65,12 @@ if isfield(dat,'analysis')
             return; 
         elseif analsel > 0
             if complflag
-                analselcompl = find(analstatus.completed_analyses);
+                if stackmin > 0 && ~isempty(analstatus.stacking_analyses)
+                    analstacked = analstatus.n_inputanalyses >= stackmin;
+                    analselcompl = find(analstatus.completed_analyses & analstacked);
+                else    
+                    analselcompl = find(analstatus.completed_analyses);
+                end
                 analdim = analselcompl(analsel);
                 return
             else

@@ -55,7 +55,7 @@ if DATASCRAM, inp.loadparam = 1; inp.saveparam = 2; end
 if ~isempty(analysis)
     
     % Initialize global parameters for the selected analysis
-    nk_setupGlobVars2(analysis.params, 'setup_main', 0); 
+    nk_SetupGlobVars2(analysis.params, 'setup_main', 0); 
     
     % Compute from scratch or use pre-computed datamats ?
     LFL_opts        = {'Compute from scratch',sprintf('Use precomputed %s',inp.datatype)};                                      

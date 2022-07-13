@@ -87,8 +87,12 @@ switch IN.MLI.method
             
             % Create modified instances of case
             for i=1:IN.MLI.nperms
-                M(i, MapIdx(RandFeats(i,:))) = medi(RandFeats(i,:)); 
-                I(i, MapIdx(RandFeats(i,:))) = true;
+                try
+                    M(i, MapIdx(RandFeats(i,:))) = medi(RandFeats(i,:)); 
+                    I(i, MapIdx(RandFeats(i,:))) = true;
+                catch
+                    fprintf('prob');
+                end
             end
         else
             I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;

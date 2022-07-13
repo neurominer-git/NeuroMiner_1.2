@@ -200,7 +200,7 @@ switch act
         showmodalvec = []; analind = inp.analind; 
         if length(NM.analysis)>1, t_act = 1; brief = 1;
             while t_act>0
-                [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief); 
+                [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief, 7); 
             end
             if ~isempty(analind), inp.analind = complvec(analind) ; end
         end

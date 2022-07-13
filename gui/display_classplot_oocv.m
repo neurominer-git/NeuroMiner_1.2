@@ -44,21 +44,41 @@ else
     P_fld = 'BinResults';
 end
 
-switch GraphType
+if handles.tglPercRank.Value
+    switch GraphType
+        case {1,2,3}
+            refsample =  handles.BinClass{h}.mean_predictions;
+            targetsample = handles.OOCV(oocvind).data.(P_fld){l}.MeanCV2PredictedValues{h};
+            zeroline = 0;
+        case 4
+            refsample =  handles.BinClass{h}.prob_predictions(:,1);
+            targetsample = handles.OOCV(oocvind).data.(P_fld){l}.BinMajVoteProbabilities{h};
+            zeroline = 0;
+        case {5,6}
+            refsample =  handles.BinClass{h}.mean_predictions;
+            targetsample = handles.OOCV(oocvind).data.(P_fld){l}.BinMajVoteProbabilities{h};
+            zeroline = 0;
+    end
+    zeroln = nk_ComputePercentiles(refsample, zeroline,'inverse');
+    P_h = ranktransform(refsample);
+    P_oocv_h    = ranktransform(refsample, targetsample);
+else
+    switch GraphType
     case {1,2,3}
         P_h         = handles.BinClass{h}.mean_predictions;
         P_oocv_h    = handles.OOCV(oocvind).data.(P_fld){l}.MeanCV2PredictedValues{h};
+        zeroln = 0;
     case 4
         % Majority voting probabilities
         P_h = handles.BinClass{h}.prob_predictions(:,1);
         P_oocv_h    = handles.OOCV(oocvind).data.(P_fld){l}.BinMajVoteProbabilities{h};
-    case 5
-        % Mean Manjority voting probabilities
+        zeroln = 0.5;
+    case {5,6}
+        % Mean Majority voting probabilities
         P_h = handles.BinClass{h}.CV2grid.mean_predictions;
         P_oocv_h    = handles.OOCV(oocvind).data.(P_fld){l}.BinMajVoteProbabilities{h};
-    case 6
-        P_h = handles.BinClass{h}.CV2grid.mean_predictions;
-        P_oocv_h    = handles.OOCV(oocvind).data.(P_fld){l}.BinMajVoteProbabilities{h};
+        zeroln = 0;
+    end
 end
 
 % Get subindex if available
@@ -168,13 +188,13 @@ pss = cell(1,numel(N));psslen=0;
 for i=1:numel(pss)
     expgroupi = 'not labeled';
     if labels_known
-        if label_oocv_h(i) > 0, 
+        if label_oocv_h(i) > 0
             expgroupi = handles.BinClass{h}.groupnames{1}; 
-        elseif  label_oocv_h(i) < 0, 
+        elseif  label_oocv_h(i) < 0
             expgroupi = handles.BinClass{h}.groupnames{2}; 
         end
     end
-    if sign(P_oocv_h(i)) > 0,
+    if sign(P_oocv_h(i)) > 0
         predgroupi = handles.BinClass{h}.groupnames{1}; 
     else
         predgroupi = handles.BinClass{h}.groupnames{2}; 
@@ -205,13 +225,17 @@ figdata.textHdl     = annotation(figdata.hPanel, 'textbox', 'String','', ...
                             'FitBoxToText','on', ...
                             'Visible','off');
 set(handles.axes1,'UserData',figdata);
-    
-if GraphType >3 
-    probfx = 0.5;
-    P_hx = P_h-0.5; handles.BinClass{h}.P_h = P_hx;
+
+% Adjust y scaling depending on prob/rank estimates or decision scores
+if GraphType >3 || handles.tglPercRank.Value
+    probfx = zeroln;
+    P_hx = P_h - probfx;
+    handles.BinClass{h}.P_h = P_hx;
 else
-    probfx = 0; handles.BinClass{h}.P_h = P_h;
+    probfx = 0;
+    handles.BinClass{h}.P_h = P_h;
 end
+
 legvecn = logical(legvecn);
 LegendStr = { sprintf('Discovery: %s', handles.BinClass{h}.groupnames{1}), ...
               sprintf('Discovery: %s', handles.BinClass{h}.groupnames{2}), ...
@@ -269,6 +293,11 @@ switch GraphType
     case 6
         algostr = 'Mean OOT-Probability (SD)';
 end
+
+if handles.tglPercRank.Value
+    algostr = [algostr ' (%-ranks)'];
+end
+
 hx(1) = xlabel('Samples'); 
 set(hx(1), ...%'FontSize',handles.AxisLabelSize-2,
     'FontWeight',handles.AxisLabelWeight);
@@ -277,7 +306,7 @@ set(hx(2), ...%'FontSize',handles.AxisLabelSize-2, ...
     'FontWeight',handles.AxisLabelWeight);
 handles.legend_classplot = legend(Hvec, legendvec, 'Location','Best','FontSize', 8,'LineWidth',1);%,'FontSize',handles.LegendFontSize); 
 legend('boxon')
-flg = 'off'; flg2='off';  xlims = numel(legendvec);
+flg = 'off'; flg2='off';  
 switch labels_known
     case 1
         flg='on';
@@ -315,6 +344,3 @@ handles.pnContigCmds.Visible = flg;
 handles.cmdExportCobWeb.Visible = flg;
 handles.cmdMetricExport.Visible = flg;
 handles.cmdExportAxes20.Visible = flg;
-
-
-    

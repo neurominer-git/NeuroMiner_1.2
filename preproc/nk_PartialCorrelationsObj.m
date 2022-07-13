@@ -1,6 +1,6 @@
 function [sY, IN] = nk_PartialCorrelationsObj( Y, IN )
 % =========================================================================
-% FORMAT [Y, IN] = nk_PartialCorrelationsObj(Y, IN)
+% FORMAT [sY, IN] = nk_PartialCorrelationsObj( Y, IN )
 % =========================================================================
 % Remove nuisance effects IN.G from Y (opt. using predefined estimators)
 %
@@ -11,9 +11,10 @@ function [sY, IN] = nk_PartialCorrelationsObj( Y, IN )
 % IN.nointercept    : Include an intercept in the model or not
 % IN.subgroup       : Index vector of cases in Y to compute the beta(s) from
 % IN.beta           : The estimated beta coefficients
-% IN.revertflag     : Increase (=1) or attenuate (=0) IN.G effects 
+% IN.revertflag     : Increase (=1) or attenuate (=0) IN.G effects
+% IN.METHOD         : Partial correlations (=1) or ComBat (=2)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07 / 2021
+% (c) Nikolaos Koutsouleris, 07 / 2022
 
 method = @PartialCorrelationsObj; methodsel = 1;
 if exist('IN','var') && ~isempty(IN) && isfield(IN,'METHOD') && IN.METHOD == 2

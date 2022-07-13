@@ -18,7 +18,7 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocessMeta(inp, labels, paramfl)
 % paramfl   : parameter structure describing the stacking process to be
 %               done
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 01/2020
+% (c) Nikolaos Koutsouleris, 07/2022
 
 global MODEFL MULTI CV RAND VERBOSE PREPROC STACKING SVM
 
@@ -150,7 +150,8 @@ for am = 1:nA
         if nM>1, bgstr = 'bagged '; else, bgstr=''; end
          if ~exist(inp.analyses{am}.GDdims{jm}.RootPath,'dir')
              cprintf('red*','\nRoot path %s of analysis %g not found.', inp.analyses{am}.GDdims{jm}.RootPath, am);
-             GDD(cnt).RootPath = cellstr(spm_select(nM,'dir',sprintf('Select the root path(s) [n=%g] of %sanalysis %g [%s]:', nM, bgstr, am, inp.analyses{am}.desc)));
+             GDD(cnt).RootPath = cellstr(spm_select(nM,'dir',sprintf('Select the root path(s) [n=%g] of %sanalysis %g [%s]:', ...
+                 nM, bgstr, am, inp.analyses{am}.desc)));
          else
             GDD(cnt).RootPath = inp.analyses{am}.GDdims{jm}.RootPath;
          end
@@ -164,8 +165,9 @@ for am = 1:nA
              CVpath = fullfile(GDD(cnt).RootPath,GDD(cnt).CVfilename);
              if exist(CVpath,'file'), flfnd = true; end
          end
-         if ~flfnd || exist(CVpath,'dir'),
-             error('CVdatamat is missing for:\tAnalysis %g (%s),\n\tModality %g,\n\tCV2 [%g, %g].\nMake sure you have computed it before running the stacked analysis.', am, inp.analyses{am}.id, jm, inp.f, inp.d);
+         if ~flfnd || exist(CVpath,'dir')
+             error('CVdatamat is missing for:\tAnalysis %g (%s),\n\tModality %g,\n\tCV2 [%g, %g].\nMake sure you have computed it before running the stacked analysis.', ...
+                 am, inp.analyses{am}.id, jm, inp.f, inp.d);
          end
          cprintf('blue*','\n%s: ', analid(am,:)); [~,nam]= fileparts(CVpath); fprintf('Loading %s', nam); load(CVpath,'GD'); 
          GDD(cnt).GD = GD; clear GD;
@@ -175,7 +177,8 @@ for am = 1:nA
             OOCVDD(cnt).FileNames   = inp.analyses{am}.OOCV{oocvind}.FileNames{jm}{inp.f,inp.d};
             OOCVpath                = fullfile(OOCVDD(cnt).RootPath,[OOCVDD(cnt).FileNames, '.mat']);
             if ~exist(OOCVpath,'file')
-                error('OOCVdatamat is missing for Analysis %g, Modality %g, CV2 [%g, %g].\nMake sure you have computed it before running the stacked analysis.',  am, jm, inp.f, inp.d);
+                error('OOCVdatamat is missing for Analysis %g, Modality %g, CV2 [%g, %g].\nMake sure you have computed it before running the stacked analysis.', ...
+                    am, jm, inp.f, inp.d);
             end
             load(OOCVpath,'binOOCVDh','cntOOCVDh'); 
             OOCVDD(cnt).GD          = binOOCVDh; 

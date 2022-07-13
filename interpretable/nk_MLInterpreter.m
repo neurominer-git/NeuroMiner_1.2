@@ -136,7 +136,8 @@ else
                 case {'posneg','median','medianflip'}
                     % ordered permutations without replacement
                     % no repetitions
-                    [ RandFeats(h, nx).I, inp.MLI.nperms ] = uperms( inp.MLI.MAP.mapidx{h,nx}, inp.MLI.nperms, nfrac);   
+                    [ RandFeats(h, nx).I, inp.MLI.nperms, ] = uperms( inp.MLI.MAP.mapidx{h,nx}, inp.MLI.nperms, nfrac); 
+                     
                 case {'random'}
                     % non-ordered permutations without replacement,
                     % repetitions are allowed.
@@ -167,7 +168,7 @@ for f=1:ix % Loop through CV2 permutations
         CVPOS.CV2p = f;
         CVPOS.CV2f = d;
         if oocvflag
-            tInd =  1:numel(inp.nOOCVsubj);
+            tInd =  1:inp.nOOCVsubj;
         else
             tInd = CV.TestInd{f,d};
         end
@@ -392,6 +393,9 @@ for f=1:ix % Loop through CV2 permutations
                     for q=1:numel(tInd) % Loop through CV2/OOCV cases 
 
                         fprintf('\n\n--- Working on case %s (%g of %g cases) ---', cases{tInd(q)}, q, numel(tInd));
+                        if strcmp(cases{tInd(q)},'33450_MRI_sMRI_400639')
+                            fprintf('found');
+                        end
                         inp.NanModality = false(1, numel(inp.X));
 
                         for nx = 1:numel(inp.X)
@@ -402,11 +406,11 @@ for f=1:ix % Loop through CV2 permutations
                             % (see there)
                             covs = [];
                             if inp.oocvflag
-                                if ~isempty(inp.covars_oocv), covs = inp.covars_oocv(tInd(q,:),:); end
-                                Ts = inp.X(nx).Yocv(tInd(q,:),:);
+                                if ~isempty(inp.covars_oocv), covs = inp.covars_oocv(tInd(q),:); end
+                                Ts = inp.X(nx).Yocv(tInd(q),:);
                             else
-                                if ~isempty(inp.covars), covs = inp.covars(tInd(q,:),:); end
-                                Ts = inp.X(nx).Y(tInd(q,:),:);
+                                if ~isempty(inp.covars), covs = inp.covars(tInd(q),:); end
+                                Ts = inp.X(nx).Y(tInd(q),:);
                             end
                             % Check if the modality consists only of NaNs
                             if sum(isnan(Ts)) == size(inp.X(nx).Y,2)
@@ -680,12 +684,15 @@ for h = 1:nclass
                 Results.BinResults(h).Modality(nx).Y_mapped_ciu = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_ciu(:,:,1:ol),3);
                 Results.BinResults(h).Modality(nx).Y_mapped_cil = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_cil(:,:,1:ol),3);
                 Results.BinResults(h).Modality(nx).Y_mapped_std = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_std(:,:,1:ol),3);
+                Results.BinResults(h).RangePred = inp.MLI.RangePred(h);
             case 'regression'
                 Results.RegrResults.Modality(nx).Y_mapped       = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_ciu   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_ciu(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_cil   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_cil(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_std   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_std(:,:,1:ol),3);
+                Results.RegrResults.RangePred = inp.MLI.RangePred(h);
         end
+
     end
 end
 

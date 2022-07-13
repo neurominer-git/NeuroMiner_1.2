@@ -76,8 +76,6 @@ switch h_list{h_val}
         %appMLI(handles.subjects, handles.MLIdata.Label.BinResults.Modality, handles.visdata{1,1}.params.features, handles);
         appMLI(handles);
 
-
-    
     otherwise
       
         handles.pnBinary.Visible            = 'off';

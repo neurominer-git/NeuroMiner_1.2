@@ -50,7 +50,8 @@ ax.YAxis.Label.FontWeight = 'bold';
 ax.YAxis.Label.FontSize = 10;
 ax.XAxis.Label.String = 'Features';
 ax.Box="on";
-
+ax.XTickLabelRotation=15;
+ax.YLim=[-100 100];
 if exist('refdata','var') && ~isempty(refdata)
     if exist('uiaxes2','var')
         ax2 = uiaxes2;
@@ -60,7 +61,7 @@ if exist('refdata','var') && ~isempty(refdata)
         pos([2 4]) = [0.75 0.2];
         ax2 = axes('Position', pos);
     end
-    if exist('origdata','var')&& ~isempty(origdata) % for CARE project
+    if exist('origdata','var') && ~isempty(origdata) % for CARE project
         refdata = [origdata(casenum,:), refdata];
         centiles = nk_ComputePercentiles(refdata,origdata(casenum,:),'inverse');
     else
@@ -107,6 +108,7 @@ if exist('refdata','var') && ~isempty(refdata)
     ax2.YAxis.Label.FontSize = 10;
     ax2.XTick=1:numel(feats);
     ax2.XLim=[-0.2 numel(feats)+1.2];
+    ax2.Box ="on";
     ax2.XTickLabel=[];
     if ~exist('uiaxes2','var')
         g = grouplabel(casenum);
@@ -115,6 +117,9 @@ if exist('refdata','var') && ~isempty(refdata)
         ax2.Title.FontWeight = 'bold';
         ax2.Title.FontSize = 14;
     end
+    ax2.XTickLabel=feats(idx);
+    ax2.XTickLabelRotation=15;
+    ax2.YLim=[ 0 100 ];
 else
     if ~exist('uiaxes','var')
         ax.Title.String = sprintf('Predictive profile of subject #%g', casenum);

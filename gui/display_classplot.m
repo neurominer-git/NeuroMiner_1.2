@@ -20,7 +20,6 @@ if ~isfield(handles.BinClass{h},'Xaxis') || isempty(handles.BinClass{h}.Xaxis),
     AltAx = false;
     set(handles.axes1,'Position', handles.axes1pos_orig)
     set(handles.axes38,'Visible','off'); cla(handles.axes38);
-    
 else
     lxL = handles.BinClass{h}.Xaxis;
     lxN = handles.XaxisName;
@@ -37,11 +36,21 @@ switch GraphType
     case {1,2,3}
        
         predh = handles.BinClass{h}.mean_predictions;
+        if handles.tglPercRank.Value
+            zeroline = nk_ComputePercentiles(predh, 0,'inverse');
+            predh = ranktransform(predh);
+        end
+        
         switch GraphType
-            case 2
-                % Mean predictions with 95%-CI
+
+            % Mean predictions with 95%-CI
+            case 2    
                 errbarCI2 = handles.BinClass{h}.CI2_predictions;
                 errbarCI1 = handles.BinClass{h}.CI1_predictions;
+                if handles.tglPercRank.Value
+                    errbarCI2 = ranktransform(handles.BinClass{h}.mean_predictions, errbarCI2);
+                    errbarCI1 = ranktransform(handles.BinClass{h}.mean_predictions, errbarCI1);
+                end
                 switch handles.tglSort.Value
                     case 0 
                         L = predh - errbarCI1; U = errbarCI2 - predh;
@@ -53,29 +62,54 @@ switch GraphType
                     case 1
                         handles.classplot = plotshaded(lxL,[errbarCI1'; errbarCI2'], 'k');
                 end
+            
+            % Mean predictions with standard deviation
             case 3
-                % Mean predictions with standard deviation
+               
                 errbar  = handles.BinClass{h}.std_predictions;
+                if handles.tglPercRank.Value
+                    errbarL = ranktransform(handles.BinClass{h}.mean_predictions, handles.BinClass{h}.mean_predictions-errbar/2);
+                    errbarU = ranktransform(handles.BinClass{h}.mean_predictions, handles.BinClass{h}.mean_predictions+errbar/2);
+                    errbarL = predh - errbarL;
+                    errbarU = errbarU - predh;
+                else
+                    errbarL = errbar/2;
+                    errbarU = errbar/2;
+                end
                 switch handles.tglSort.Value
                     case 0
                         handles.classplot = errorbar(lxL, predh, ...
-                                            errbar, ...
+                                            errbarL, errbarU, ...
                                             'k','LineWidth',handles.ErrorMarkerWidth, ...
                                             'MarkerSize',handles.ErrorMarkerSize, ...
                                             'LineStyle','none');
                     case 1
-                         handles.classplot = plotshaded(lxL,[(predh-errbar)'; (predh+errbar)'], 'k');
+                         handles.classplot = plotshaded(lxL,[(predh-errbarL)'; (predh+errbarU)'], 'k');
                 end
                        
         end
+    
+    % Majority voting probabilities
     case 4
-        % Majority voting probabilities
         predh = handles.BinClass{h}.prob_predictions(:,1);
+        if handles.tglPercRank.Value
+            zeroline = nk_ComputePercentiles(predh, 0.5,'inverse');
+            predh = ranktransform(predh);
+        end
+
+    % Cross-CV2 perm majority voting probabilities (95%-CIs)
     case 5
-        % Cross-CV2 perm majority voting probabilities (95%-CIs)
         predh = handles.BinClass{h}.CV2grid.mean_predictions;
+        if handles.tglPercRank.Value
+            zeroline = nk_ComputePercentiles(predh, 0.5,'inverse');
+            predh = ranktransform(predh);
+        end
         errbarCI2 = handles.BinClass{h}.CV2grid.CI2_predictions;
         errbarCI1 = handles.BinClass{h}.CV2grid.CI1_predictions;
+        if handles.tglPercRank.Value
+            errbarCI2 = ranktransform( handles.BinClass{h}.CV2grid.mean_predictions, errbarCI2);
+            errbarCI1 = ranktransform( handles.BinClass{h}.CV2grid.mean_predictions, errbarCI1);
+        end
         switch handles.tglSort.Value
             case 0 
                 L = predh - errbarCI1; U = errbarCI2 - predh;
@@ -87,19 +121,33 @@ switch GraphType
             case 1
                 handles.classplot = plotshaded(lxL,[errbarCI1'; errbarCI2'], 'k');
         end
-    case 6
-         % Cross-CV2 perm majority voting probabilities with standard deviation
+    
+    % Cross-CV2 perm majority voting probabilities with standard deviation
+    case 6    
         predh = handles.BinClass{h}.CV2grid.mean_predictions;
+        if handles.tglPercRank.Value
+            zeroline = nk_ComputePercentiles(predh, 0.5,'inverse');
+            predh = ranktransform(predh);
+        end
         errbar  = handles.BinClass{h}.CV2grid.std_predictions;
+        if handles.tglPercRank.Value
+            errbarL = ranktransform(handles.BinClass{h}.mean_predictions, handles.BinClass{h}.CV2grid.mean_predictions-errbar/2);
+            errbarU = ranktransform(handles.BinClass{h}.mean_predictions, handles.BinClass{h}.CV2grid.mean_predictions+errbar/2);
+            errbarL = predh - errbarL;
+            errbarU = errbarU - predh;
+        else
+            errbarL = errbar/2;
+            errbarU = errbar/2;
+        end
         switch handles.tglSort.Value
             case 0
                 handles.classplot = errorbar(lxL, predh, ...
-                                    errbar, ...
+                                    errbarL, errbarU, ...
                                     'k','LineWidth',handles.ErrorMarkerWidth, ...
                                     'MarkerSize',handles.ErrorMarkerSize, ...
                                     'LineStyle','none');
             case 1
-                 handles.classplot = plotshaded(lxL,[(predh-errbar)'; (predh+errbar)'], 'k');
+                 handles.classplot = plotshaded(lxL,[(predh-errbarL)'; (predh+errbarU)'], 'k');
         end
 end
 
@@ -129,12 +177,12 @@ else
 end
 
 for i=1:numel(pss)
-    if handles.BinClass{h}.labelh(i) > 0, 
+    if handles.BinClass{h}.labelh(i) > 0
         expgroupi = handles.BinClass{h}.groupnames{1}; 
     else
         expgroupi = handles.BinClass{h}.groupnames{2};
     end
-    if predh(i) > offs(i),
+    if predh(i) > offs(i)
        predgroupi = handles.BinClass{h}.groupnames{1}; 
     else
        predgroupi = handles.BinClass{h}.groupnames{2}; 
@@ -184,26 +232,30 @@ else
     id2 = ~handles.BinClass{h}.ind1; 
 end
 
-divx1 = sum(id1); xl1 = 1:divx1;
-divx2 = divx1 + sum(id2); xl2 = divx1+1:divx2;
-
-if size(handles.BinClass{h}.labelh,1) == 1, 
+if size(handles.BinClass{h}.labelh,1) == 1
     labelh = handles.BinClass{h}.labelh'; 
 else
     labelh = handles.BinClass{h}.labelh;
 end
-if GraphType > 3, 
-    signpred = sign(predh-0.5); offy =0.5;
+
+if GraphType > 3 || handles.tglPercRank.Value
+    if handles.tglPercRank.Value
+        signpred = sign(predh-zeroline); offy = zeroline;
+    else
+        signpred = sign(predh-0.5); offy = 0.5;
+    end
 else
-    signpred = sign(predh-offs); offy=0;
+    signpred = sign(predh-offs); offy = 0;
 end
+
 err = signpred ~= labelh;
 idx1 = id1 & ~err; idx2 = id2 & ~err; b(1) = 0; b(2)= 0;
 
+% Plot Group A results
 if sum(idx1)
-    if ~AltAx
+    if ~AltAx && ~handles.tglSort.Value
         fIdx1 = find(id1);
-        v = [ [offy offy]; [offy YLIMS(2)]; [lxL(fIdx1(end))+r YLIMS(2)]; [lxL(fIdx1(end))+r offy] ];             
+        v = [ [0 offy]; [0 YLIMS(2)]; [lxL(fIdx1(end))+r YLIMS(2)]; [lxL(fIdx1(end))+r offy] ];             
         patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', handles.colptin(handles.BinClass{h}.groupind(1),:), 'EdgeColor', 'none', 'FaceAlpha', 0.15)
     end
     b(1) = plot(lxL(idx1),predh(idx1),handles.colpt,...
@@ -216,6 +268,7 @@ else
     b(1) = plot(1,NaN,'LineStyle','none');
 end
 
+% Plot Group B results
 if sum(idx2)
     if ~handles.BinClass{h}.one_vs_all
         CLP = handles.colpt;
@@ -224,7 +277,7 @@ if sum(idx2)
         CLP = 'o';
         CLR = rgb('DarkGrey');
     end
-    if ~AltAx
+    if ~AltAx && ~handles.tglSort.Value
         fIdx2 = find(id2);
         v = [ [lxL(fIdx2(1)) offy]; [lxL(fIdx2(1)) YLIMS(1)]; [XLIMS(2) YLIMS(1)]; [XLIMS(2) offy] ];             
         patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
@@ -239,32 +292,57 @@ else
     b(2) = plot(1,NaN,'LineStyle','none');
 end
 
-if GraphType >3 
-    probfx = 0.5;
-    predhx = predh-0.5;
+% Adjust y scaling depending on prob/rank estimates or decision scores
+if GraphType >3 || handles.tglPercRank.Value
+    if handles.tglPercRank.Value
+        probfx = zeroline;
+        predhx = predh-zeroline;
+    else
+        probfx = 0.5;
+        predhx = predh-0.5;
+    end
     handles.BinClass{h}.predh = predhx;
 else
     probfx = 0;
     handles.BinClass{h}.predh = predh;
 end
+
+% Zeroline tweaks
 xLimits = get(handles.axes1,'XLim'); xLimitsVec = linspace(xLimits(1),xLimits(2), numel(handles.axes1.XAxis.TickValues)-1);
 zeroline = ones(1,numel(xLimitsVec))*probfx;
+
 if handles.BinClass{h}.CoxMode
     zeroline = handles.BinClass{h}.mean_cutoff_probabilities;
     xLimitsVec(1)=[]; xLimitsVec(end)=[];
 end
-    
-ide1 = id1 & err; ide2 = id2 & err;
 
+% Error plotting
+ide1 = id1 & err; ide2 = id2 & err;
+% Mark errors in Group A
 x1 = plot(lxL(ide1),predh(ide1), '*', 'Color', handles.colptin(handles.BinClass{h}.groupind(1),:),'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);
 if handles.BinClass{h}.one_vs_all 
     Color2 = rgb('DarkGrey');
 else
     Color2 = handles.colptin(handles.BinClass{h}.groupind(2),:);
 end
+
+% Mark errors in Group B
 x2 = plot(lxL(ide2),predh(ide2), '*', 'Color', Color2,'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);  
-handlevec = [b,x1,x2];
-legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'}];
+
+% Create legend
+if GraphType > 1
+    switch GraphType
+        case {2,5}
+            errest = '95%-CI';
+        case {3,6}
+            errest = 'SD';
+    end 
+    handlevec = [b,x1,x2,handles.classplot];
+    legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'},{errest}];
+else
+    handlevec = [b,x1,x2];
+    legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'}];
+end
 handles.axes1.XTickMode='auto'; 
 handles.axes1.YGrid='off'; 
 handles.axes1.XGrid='off'; 
@@ -287,7 +365,7 @@ if AltAx,
     [err_hist1, Bins1] = hist3([lxL(id1) err(id1)],[10 2]); 
     perr_hist1 = err_hist1(:,2) ./ sum(err_hist1,2);
      % Group 2 misclassification histogram
-    [err_hist2, Bins2] = hist3([lxL(id2) err(id2)], Bins1); 
+    err_hist2 = hist3([lxL(id2) err(id2)], Bins1); 
     perr_hist2 = err_hist2(:,2) ./ sum(err_hist2,2);
     axes(handles.axes38); 
     bar(handles.axes38, Bins1{1}, perr_hist1,'BarWidth',1,'FaceColor', handles.colptin(handles.BinClass{h}.groupind(1),:),'FaceAlpha',0.5); 
@@ -306,24 +384,6 @@ if AltAx,
     bar(handles.axes38, Bins1{1}, perr_hist2,'BarWidth',1,'FaceColor', Color2,'FaceAlpha',0.5); 
     hold(handles.axes38,'off'); 
     axes(handles.axes1);
-    
-    % Kolomogorv-Smirnov-Tests if available
-%         if exist('kstest2','file')
-%             pnull_hist1 = repmat(sum(err_hist1(:,2))/10,10,1)./sum(err(id1));
-%             alt_hist1   = err_hist1(:,2)/sum(err(id1));
-%             bs1 = nk_BattacharyyaCoef( alt_hist1, pnull_hist1);
-%             pnull_hist2 = repmat(sum(err_hist2(:,2))/10,10,1)./sum(err(id2));
-%             alt_hist2   = err_hist2(:,2)/sum(err(id2));
-%             bs2 = nk_BattacharyyaCoef( alt_hist2, pnull_hist2);
-%             bs3 = nk_BattacharyyaCoef( alt_hist1, alt_hist2);
-%             fprintf('\n\n'); cprintf('*black','Battacharyya tests for inequality of distributions');
-%             fprintf('\n'); cprintf('*black','========================================================');
-%             fprintf('\nGroup %s vs equality:  Battacharyya Coefficient = %1.3f',  handles.BinClass{h}.groupnames{1}, bs1);
-%             fprintf('\nGroup %s vs equality:  Battacharyya Coefficient = %1.3f',  handles.BinClass{h}.groupnames{2}, bs2);
-%             fprintf('\nGroup %s vs. Group %s: Battacharyya Coefficient = %1.3f', handles.BinClass{h}.groupnames{1}, handles.BinClass{h}.groupnames{2}, bs3);
-%             fprintf('\n'); cprintf('*black','========================================================');
-%             fprintf('\n')
-%         end
 end
 
 plot(xLimitsVec,zeroline,'LineWidth',handles.ZeroLineWidth,'Color',rgb('Grey'))
@@ -375,6 +435,9 @@ switch GraphType
         algostr = 'Mean OOT-Probability (95%-CIs)';
     case 6
         algostr = 'Mean OOT-Probability (SD)';
+end
+if handles.tglPercRank.Value
+    algostr = [algostr ' (%-ranks)'];
 end
 hx(1) = xlabel(lxN); 
 set(hx(1), ...%'FontSize',handles.AxisLabelSize-2,

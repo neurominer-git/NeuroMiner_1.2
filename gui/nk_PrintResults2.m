@@ -22,7 +22,7 @@ function varargout = nk_PrintResults2(varargin)
 
 % Edit the above text to modify the response to help nk_PrintResults2
 
-% Last Modified by GUIDE v2.5 30-Mar-2021 18:19:54
+% Last Modified by GUIDE v2.5 12-Jul-2022 09:29:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -107,9 +107,6 @@ set(handles.axes1, 'FontUnits','normalized','FontSize', 0.03, ...
 set(handles.axes38, ...%'FontSize', handles.AxisTickSize, ...
             'FontWeight', handles.AxisTickWeight, ...
             'LineWidth', handles.AxisLineWidth);
-% set(handles.axes39, ...%'FontSize', handles.AxisTickSize, ...
-%             'FontWeight', handles.AxisTickWeight, ...
-%             'LineWidth', handles.AxisLineWidth);
 set(handles.axes2,  'FontUnits','normalized','FontSize', 0.06, ...
             'FontWeight', handles.RocAxisTickWeight, ...
             'LineWidth', handles.RocAxisLineWidth);
@@ -119,8 +116,7 @@ set(handles.axes4,...%'FontSize', handles.PieAxisTickSize, ...
             'FontWeight', handles.PieAxisTickWeight);
 set(handles.axes17, 'FontUnits','normalized','FontSize', 0.03, ...
             'FontWeight', handles.AxisTickWeight, ...
-            'LineWidth', handles.AxisLineWidth);     
-
+            'LineWidth', handles.AxisLineWidth);      
         
 %% Load analysis
 NM = []; analind = 1; sz = get(0,'ScreenSize'); handles.screensize = sz(3:4);
@@ -815,7 +811,6 @@ if strcmp(handles.axes38.Visible,'on')
 else
     h_md_anal = [];
 end
-
 copyobj_subplot([handles.axes1 handles.legend_classplot h_md_anal], titl);
 
 function [h_new, targ] = copyobj_subplot(obj, titl, targ, pos)
@@ -965,12 +960,6 @@ function tglSort_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of tglSort
-switch hObject.Value
-    case 0
-        hObject.String = 'Sort -> Values';
-    case 1
-        hObject.String = 'Sort -> Cases';
-end
 handles = perf_display(handles);
 guidata(handles.figure1,handles);
 
@@ -1184,7 +1173,6 @@ function CompModelsVisual_Callback(hObject, eventdata, handles)
 
 display_comparator(handles, 'visual');
 
-
 function txtPager_Callback(hObject, eventdata, handles)
 % hObject    handle to txtPager (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1284,4 +1272,15 @@ function tglVisMeas2_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of tglVisMeas2
 handles = display_visual(handles);
+guidata(handles.figure1,handles);
+
+
+% --- Executes on button press in tglPercRank.
+function tglPercRank_Callback(hObject, eventdata, handles)
+% hObject    handle to tglPercRank (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of tglPercRank
+handles = perf_display(handles);
 guidata(handles.figure1,handles);

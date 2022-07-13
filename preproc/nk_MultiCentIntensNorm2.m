@@ -72,7 +72,7 @@ if flags.train
     
     switch flags.corrmethod 
         case 1
-            fprintf('\nCorrecting centers offsets using Partial correlations')
+            fprintf('\nCorrecting centers offsets using Partial correlations/Combat')
             IN.TrCovars = G(I,:); [~, IN] = nk_PartialCorrelationsObj(Y(I,:),IN);
             params = struct('Edges',Edges,'H',H,'N',N,'SelEdgeIndex',sH_max_ind,'I',I,'beta',IN.beta);
         case 2
@@ -92,10 +92,8 @@ switch flags.corrmethod
         IN.TsCovars = G; sY = nk_PartialCorrelationsObj(Y, IN);
     case 2
         sY = nk_PerfNorm(Y, G, meanY, indL);
-        
     case 3
         sY = nk_PerfRemMeanDiff(Y, G, G, meanY, meanG);
-        
 end
 if flags.display
     figure; 

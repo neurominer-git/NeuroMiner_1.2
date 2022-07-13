@@ -80,7 +80,7 @@ switch FUSION.flag
         if ~isempty(X.brainmask{1})
             X.brainmask{1} = nk_RemCommaFromStr( X.brainmask{1} );
         end
-        if ~isempty(oocvind) && isfield(NM,'OOCV') && oocvind <= numel(NM.OOCV),
+        if ~isempty(oocvind) && isfield(NM,'OOCV') && oocvind <= numel(NM.OOCV)
             X.Yocv = NM.OOCV{oocvind}.Y{varind}; 
             % If the original space-defining image cannot be found use
             % the one used to read-in the OOCV data
