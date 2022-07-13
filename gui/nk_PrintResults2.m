@@ -1000,7 +1000,9 @@ function selCase_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns selCase contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from selCase
+contents = cellstr(get(hObject,'String'));
 selCase = hObject.String{hObject.Value};
+CaseId = str2num(contents{get(hObject,'Value')}) ;
 AxesData = handles.axes1.UserData;
 I = find(~cellfun(@isempty,strfind(AxesData.cases,selCase)));
 x1 = AxesData.x(I);
@@ -1012,7 +1014,7 @@ if isfield(handles,'caseplot'), delete(handles.caseplot); end
 handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
 if isfield(handles, 'MLIdata')
     thisMLIresult.Visible = 'on';
-    handles.curCase = I;
+    handles.curCase = str2num(selCase);
 end
 guidata(handles.figure1,handles);
 
