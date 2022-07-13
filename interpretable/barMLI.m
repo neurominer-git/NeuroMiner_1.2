@@ -55,6 +55,9 @@ ax.YLim=[-100 100];
 if exist('refdata','var') && ~isempty(refdata)
     if exist('uiaxes2','var')
         ax2 = uiaxes2;
+        % resize to size of other plot
+        ax2.InnerPosition(1) = ax.InnerPosition(1);
+        ax2.InnerPosition(3) = ax.InnerPosition(3);
     else
         ax.Position(4) = .50;
         pos = ax.Position;
@@ -70,6 +73,7 @@ if exist('refdata','var') && ~isempty(refdata)
         group1_idx = grouplabel == 1;
         group2_idx = grouplabel == 2; 
         group1 = refdata(group1_idx,:);
+        
         for i = 1:size(group1,1)
             centiles_i = nk_ComputePercentiles(refdata, group1(i,:), 'inverse');
             if i == 1
@@ -95,8 +99,8 @@ if exist('refdata','var') && ~isempty(refdata)
     
     bar(ax2, centiles(idx),'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
     hold(ax2,'on');
-    plot(ax2, idx, av_centiles_group1(idx), 'LineWidth', 3, 'color', rgb('blue'));%,'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
-    plot(ax2, idx, av_centiles_group2(idx), 'LineWidth', 3, 'color', rgb('orange'));
+    plot(ax2, av_centiles_group1(idx), 'LineWidth', 3, 'color', rgb('blue'));%,'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
+    plot(ax2, av_centiles_group2(idx), 'LineWidth', 3, 'color', rgb('orange'));
     hold(ax2, 'off');
 
     groupnames = evalin('base', 'NM.groupnames');
@@ -117,7 +121,7 @@ if exist('refdata','var') && ~isempty(refdata)
         ax2.Title.FontWeight = 'bold';
         ax2.Title.FontSize = 14;
     end
-    ax2.XTickLabel=feats(idx);
+    %ax2.XTickLabel=feats(idx);
     ax2.XTickLabelRotation=15;
     ax2.YLim=[ 0 100 ];
 else
