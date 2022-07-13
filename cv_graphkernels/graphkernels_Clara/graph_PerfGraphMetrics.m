@@ -16,6 +16,7 @@ function [Y, IN] = PerfGraphMetrics(Y, IN)
         G_struct = array_to_graph(Y(i,:));
         %G = graph(G_struct.am);
         A = G_struct.am;
+        %local
         degree = degrees_und(A);
         strength = strengths_und(A);
         betweenness = betweenness_wei(A);

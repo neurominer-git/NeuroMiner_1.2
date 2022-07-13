@@ -164,7 +164,7 @@ for i=1:nP % Loop through hyperparameter combinations
     if fromData
         [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose, IN.Data, IN.DataLabel, IN.NRanalysis);
     else
-        [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);
+        [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);;
     end
     % Update the simulation plot
     plot(ax,1:i,R(1:i),'b-');
@@ -199,18 +199,16 @@ if fromData
             num_labels = labels_a;
             num_labels= num_labels-1; % simulate function could potentially better be adjusted to fit NM strucutre of labels
         end
-        analrootdir = xNM.analysis{1,varargin{1,4}}.rootdir;
-        origData = sprintf('%s/origData.csv',analrootdir);
+        path = '/Users/claravetter/Documents/Documents_Clara_MacBookAir/LMU/Simulations/origData.csv';
         if isa(varargin{1,2},'double')
             varargin{1,2} = array2table(varargin{1,2});
         end
-        writetable(varargin{1,2}, origData);
-        
+        writetable(varargin{1,2}, path);
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
-            data_file = origData, ...
+            data_file = path, ...
             labels = int64(num_labels), ...
             n_obs = int64(nc), ...
-            rootdir = analrootdir);
+            rootdir = );
         %M = readtable(simData_file);
         M = readtable(py2mat(M_file));
 
