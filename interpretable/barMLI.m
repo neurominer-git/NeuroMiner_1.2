@@ -26,12 +26,16 @@ if any(idx2)
     y(idx2) = nan;
 end
 
-bar(ax, y(idx),'FaceColor',rgb('DodgerBlue'),'EdgeColor',rgb("SlateGrey"));
-errorbar(ax,1:nF, y(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', 'k');
+b1 = bar(ax, y(idx),'FaceColor',rgb('DodgerBlue'),'EdgeColor',rgb("SlateGrey"));
+e1 = errorbar(ax,1:nF, y(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', 'k');
+
+legend(ax, b1, 'significant prediction change');
 if any(idx2)
-    bar(ax,y2(idx), 'FaceColor',rgb('LightGrey'),'EdgeColor',rgb("Grey"));
-    errorbar(ax,1:nF, y2(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', rgb("Grey"));
+    b2 = bar(ax,y2(idx), 'FaceColor',rgb('LightGrey'),'EdgeColor',rgb("Grey"));
+    e2= errorbar(ax,1:nF, y2(idx), y_ciu(idx), y_cil(idx), 'LineStyle','none', 'Color', rgb("Grey"));
+    legend(ax, [b1,b2], 'significant prediction change', 'non-significant prediction change');
 end
+
 
 %ax=gca;
 ax.XTick=1:numel(feats);
@@ -41,7 +45,7 @@ if any(idx2)
 end
 feats = regexprep(feats,'_', '\\_');
 ax.XTickLabel=feats(idx);
-ax.YAxis.Label.String = 'Percentage change of prediction [ % maximum range ]';
+ax.YAxis.Label.String = '95% CI Mean Percentage Change of Prediction';%'Percentage change of prediction [ % maximum range ]';
 ax.YAxis.Label.FontWeight = 'bold';
 ax.YAxis.Label.FontSize = 10;
 ax.XAxis.Label.String = 'Features';
@@ -62,16 +66,54 @@ if exist('refdata','var') && ~isempty(refdata)
         centiles = nk_ComputePercentiles(refdata,origdata(casenum,:),'inverse');
     else
         centiles = nk_ComputePercentiles(refdata,refdata(casenum,:),'inverse');
+        grouplabel = evalin('base', 'NM.label');
+        group1_idx = grouplabel == 1;
+        group2_idx = grouplabel == 2; 
+        group1 = refdata(group1_idx,:);
+        for i = 1:size(group1,1)
+            centiles_i = nk_ComputePercentiles(refdata, group1(i,:), 'inverse');
+            if i == 1
+                centiles_group1 = centiles_i;
+            else 
+                centiles_group1 = [centiles_group1; centiles_i];
+            end
+        end
+        av_centiles_group1 = mean(centiles_group1);
+
+        group2 = refdata(group2_idx,:);
+        for i = 1:size(group2,1)
+            centiles_i = nk_ComputePercentiles(refdata, group2(i,:), 'inverse');
+            if i == 1
+                centiles_group2 = centiles_i;
+            else 
+                centiles_group2 = [centiles_group2; centiles_i];
+            end
+        end
+        av_centiles_group2 = mean(centiles_group2);
+        
     end
-    bar(ax2,centiles(idx),'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
+    
+    bar(ax2, centiles(idx),'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
+    hold(ax2,'on');
+    plot(ax2, idx, av_centiles_group1(idx), 'LineWidth', 3, 'color', rgb('blue'));%,'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
+    plot(ax2, idx, av_centiles_group2(idx), 'LineWidth', 3, 'color', rgb('orange'));
+    hold(ax2, 'off');
+
+    groupnames = evalin('base', 'NM.groupnames');
+    legend(ax2, "subject's percentiles" , sprintf('mean percentiles of group %s', char(groupnames(1))), ...
+        sprintf('mean percentiles of group %s', char(groupnames(2))));
+
     ax2.YAxis.Label.String = 'Percentile rank [%]';
     ax2.YAxis.Label.FontWeight = 'bold';
     ax2.YAxis.Label.FontSize = 10;
     ax2.XTick=1:numel(feats);
     ax2.XLim=[-0.2 numel(feats)+1.2];
     ax2.Box ="on";
+    ax2.XTickLabel=[];
     if ~exist('uiaxes2','var')
-        ax2.Title.String = sprintf('Predictive profile of subject #%g', casenum);
+        g = grouplabel(casenum);
+        case_groupname = char(groupnames(g));
+        ax2.Title.String = sprintf('Predictive profile of subject #%g, Group: %s', casenum, case_groupname);
         ax2.Title.FontWeight = 'bold';
         ax2.Title.FontSize = 14;
     end
