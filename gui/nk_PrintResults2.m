@@ -22,7 +22,7 @@ function varargout = nk_PrintResults2(varargin)
 
 % Edit the above text to modify the response to help nk_PrintResults2
 
-% Last Modified by GUIDE v2.5 12-Jul-2022 09:29:00
+% Last Modified by GUIDE v2.5 13-Jul-2022 21:44:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -827,18 +827,6 @@ h_new = copyobj(obj,targ);
 h_new(1).Position = pos; 
 h_new(1).Title.String = titl;
 
-% --- Executes on button press in cmdExportAxes1.
-function cmdMLInterpret_Callback(hObject, eventdata, handles)
-% hObject    handle to cmdExportAxes1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-%copyobj_subplot([handles.axes1 handles.legend_classplot h_md_anal], titl);
-barMLI(I, handles.MLIdata.Label.BinResults.Modality, ...
-        handles.visdata{1,1}.params.features, ...
-        handles.NM.Y{1}, ...
-        0); 
-
 
 
 
@@ -1023,10 +1011,8 @@ axes(handles.axes1);
 if isfield(handles,'caseplot'), delete(handles.caseplot); end
 handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
 if isfield(handles, 'MLIdata')
-    barMLI(I, handles.MLIdata.Label.BinResults.Modality, ...
-        handles.visdata{1,1}.params.features, ...
-        handles.NM.Y{1}, ...
-        0); % change to something in handles! & add this as input argument for app   
+    thisMLIresult.Visible = 'on';
+    handles.curCase = I;
 end
 guidata(handles.figure1,handles);
 
@@ -1284,3 +1270,16 @@ function tglPercRank_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of tglPercRank
 handles = perf_display(handles);
 guidata(handles.figure1,handles);
+
+
+% --- Executes on button press in thisMLIresult.
+function thisMLIresult_Callback(hObject, eventdata, handles)
+% hObject    handle to thisMLIresult (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+%copyobj_subplot([handles.axes1 handles.legend_classplot h_md_anal], titl);
+
+barMLI(handles.curCase, handles.MLIdata.Label.BinResults.Modality, ...
+        handles.visdata{1,1}.params.features, ...
+        handles.NM.Y{1}, ...
+        0); 
