@@ -121,7 +121,8 @@ if isfield(PREPROC,'ACTPARAM')
                 case 'rankfeat'
                      suffx = [ suffx '_rnk'];
                 case 'remvarcomp'
-                    suffx = [ suffx '_rmvar'];
+                    suffx = [ suffx ]
+
             end
         end
     end
