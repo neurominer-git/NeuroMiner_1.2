@@ -77,6 +77,7 @@ switch h_list{h_val}
             handles.NM.Y{handles.visdata{handles.curmodal}.params.varind}, ...
             handles.visdata{handles.curmodal}.params.features, ...
             handles.MLIdata.Label.BinResults.Modality);
+        %appMLI2(handles);
 
     otherwise
       

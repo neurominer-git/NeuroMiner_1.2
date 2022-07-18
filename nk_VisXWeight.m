@@ -273,14 +273,18 @@ for n=1:nM
                     mP{m} = nmP(indX);
                     mR{m} = nmR(indX);
                     mSR{m} = nmSR(indX);
-                    mC{m} = nmC(indX, indX);
+                    if ~decompfl(n)
+                        mC{m} = nmC(indX, indX);
+                    end
                     if ~isempty(PA), mPA{m} = nmPA(indX); end
                 else
                     mW{m} = nmW;
                     mP{m} = nmP;
                     mR{m} = nmR;
                     mSR{m} = nmSR;
-                    mC{m} = nmC;
+                    if ~decompfl(n)
+                        mC{m} = nmC;
+                    end
                     if ~isempty(PA), mPA{m} = nmPA; end
                 end
             end
