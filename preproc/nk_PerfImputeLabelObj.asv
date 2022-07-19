@@ -28,9 +28,8 @@ global VERBOSE MODEFL
 %% Prepare
 if ~isfield(IN,'method') || isempty(IN.method), IN.method = 'dist2'; end
 if ~isfield(IN,'k') || isempty(IN.k), IN.k = 7; end
-idxnan = ~isfinite(Y);
-fnan = find(idxnan);
-ffin = ( sum(~isfinite(IN.X),2) == 0 ) & ~idxnan;
+fnan = find(~isfinite(Y));
+ffin = sum(isfinite(Y),2);
 S = IN.X(ffin,:);
 SL = Y(ffin,:);
 sY = Y;

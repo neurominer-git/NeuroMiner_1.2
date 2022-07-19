@@ -103,13 +103,13 @@ switch IN.method
                     fprintf('\n');warning('I did not find observations with non-missing values for feature %g. Check your settings!', j)
                 end
                 indi_Yi = 1:size(tX,2); indi_Yi(ind_Yi(j))=[];
-
+                
+                % Find cases without missings 
                 indnan_Xj = isnan(tX(indnan_Xi, indi_Yi));
-                [c_indnan_Xj, ind_c]  = sort(sum(indnan_Xj),'ascend');
-                [r_indnan_Xj, ind_r]  = sort(sum(indnan_Xj,2),'ascend');
-
-                idx_c = c_indnan_Xj==0; indi_Yi = indi_Yi(ind_c(idx_c));
-                idx_r = r_indnan_Xj==0; indnan_Xi = indnan_Xi(ind_r(idx_r));
+                [~, ind_c]  = sort(sum(indnan_Xj),'ascend');
+                idx_c = sum(isnan(tX(indnan_Xi, indi_Yi(ind_c))))==0;
+                indi_Yi = indi_Yi(ind_c(idx_c));
+                
                 Xj = tX(indnan_Xi, indi_Yi);
     
                 % Compute distance metric

@@ -330,18 +330,19 @@ end
 x2 = plot(lxL(ide2),predh(ide2), '*', 'Color', Color2,'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);  
 
 % Create legend
-if GraphType > 1
+switch GraphType
+    case {2,3,5,6}
     switch GraphType
         case {2,5}
             errest = '95%-CI';
         case {3,6}
             errest = 'SD';
     end 
-    handlevec = [b,x1,x2,handles.classplot];
-    legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'},{errest}];
-else
-    handlevec = [b,x1,x2];
-    legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'}];
+        handlevec = [b,x1,x2,handles.classplot];
+        legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'},{errest}];
+    otherwise
+        handlevec = [b,x1,x2];
+        legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'}];
 end
 handles.axes1.XTickMode='auto'; 
 handles.axes1.YGrid='off'; 
@@ -407,7 +408,7 @@ switch GraphType
                 
             case 'MVTRVR'
                 algostr = 'RVR score';
-            case 'MEXELM';
+            case 'MEXELM'
                 algostr = 'ELM score';
             case 'LIBLIN'
                 switch handles.params.TrainParam.SVM.LIBLIN.classifier

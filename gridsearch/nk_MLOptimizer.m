@@ -728,12 +728,6 @@ for f=1:ix % Loop through CV2 permutations
                     GDanalysis.predictions(TsI, curclass, curlabel) = ...
                         cellmat_mergecols(GDanalysis.predictions(TsI, curclass,curlabel), ...
                                             num2cell(EnsDat(binInd,:),2));
-                    
-%                     switch inp.modeflag
-%                         case 'classification'
-%                             PPX = ALLPARAM(labelh(TsI),
-%                             GDanalysis.grid.sensitivity = SENSITIVIT
-%                     end
 
                     % Concatenate node propagation indices in case the
                     % sequence optimization algorithm has been run on 
@@ -995,14 +989,14 @@ if GDfl || ~batchflag
                     try
                         %[ GDanalysis.CV2grid.Xsvm(:,:,h), GDanalysis.CV2grid.Ysvm(:,:,h) ] = arrayfun( @(j) perfcurve2(labelh(:,h), Px(:,j,h), 1), 1:Nx );
                         GDanalysis.CV2grid.CI_predictions(Ix,:,h)= cell2mat(arrayfun(@(i) percentile(Px(Ix(i),:,h),[2.5 97.5]),1:numel(Ix),'UniformOutput',false)');
-                        GDanalysis.CV2grid.BAC(:,h)              = arrayfun( @(j) BAC(labelh(Ix,h),Px(Ix,j,h)-0.5), 1:Nx );
-                        GDanalysis.CV2grid.sens(:,h)             = arrayfun( @(j) SENSITIVITY(labelh(Ix,h), Px(Ix,j,h)-0.5), 1:Nx );
-                        GDanalysis.CV2grid.spec(:,h)             = arrayfun( @(j) SPECIFICITY(labelh(Ix,h), Px(Ix,j,h)-0.5), 1:Nx );
-                        GDanalysis.CV2grid.accuracy(:,h)         = arrayfun( @(j) ACCURACY(labelh(Ix,h), Px(Ix,j,h)-0.5), 1:Nx );
-                        GDanalysis.CV2grid.PPV(:,h)              = arrayfun( @(j) PPV(labelh(Ix,h), Px(Ix,j,h)-0.5 ), 1:Nx );
-                        GDanalysis.CV2grid.NPV(:,h)              = arrayfun( @(j) NPV(labelh(Ix,h), Px(Ix,j,h)-0.5 ), 1:Nx );
-                        GDanalysis.CV2grid.AUC(:,h)              = arrayfun( @(j) fastAUC(labelhx(Ix), Px(Ix,j,h)-0.5, 1), 1:Nx );
-                        GDanalysis.CV2grid.DOR(:,h)              = arrayfun( @(j) DOR(labelh(Ix,h), Px(Ix,j,h)-0.5 ), 1:Nx );
+                        GDanalysis.CV2grid.BAC(:,h)              = arrayfun( @(j) BAC( labelh(Ix,h),Px(Ix,j,h)-0.5), 1:Nx );
+                        GDanalysis.CV2grid.sens(:,h)             = arrayfun( @(j) SENSITIVITY( labelh(Ix,h), Px(Ix,j,h)-0.5), 1:Nx );
+                        GDanalysis.CV2grid.spec(:,h)             = arrayfun( @(j) SPECIFICITY( labelh(Ix,h), Px(Ix,j,h)-0.5), 1:Nx );
+                        GDanalysis.CV2grid.accuracy(:,h)         = arrayfun( @(j) ACCURACY( labelh(Ix,h), Px(Ix,j,h)-0.5), 1:Nx );
+                        GDanalysis.CV2grid.PPV(:,h)              = arrayfun( @(j) PPV( labelh(Ix,h), Px(Ix,j,h)-0.5 ), 1:Nx );
+                        GDanalysis.CV2grid.NPV(:,h)              = arrayfun( @(j) NPV( labelh(Ix,h), Px(Ix,j,h)-0.5 ), 1:Nx );
+                        GDanalysis.CV2grid.AUC(:,h)              = arrayfun( @(j) fastAUC( labelhx(Ix), Px(Ix,j,h)-0.5, 1), 1:Nx );
+                        GDanalysis.CV2grid.DOR(:,h)              = arrayfun( @(j) DOR( labelh(Ix,h), Px(Ix,j,h)-0.5 ), 1:Nx );
                     catch
                         warning('CVdatamats of more than one CV2 permutation are needed.')
                     end

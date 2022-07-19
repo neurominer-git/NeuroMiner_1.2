@@ -20,7 +20,7 @@ if ~defaultsfl && ~isempty(PFE)
     if isfield(PFE,'flag'), tPFE.flag = PFE.flag; end
     if ~tPFE.PruneFlag, tPFE.PruneFlag = 2; else, tPFE.PruneFlag = 1; end
     
-    if tPFE.flag==1, PROBFEASTR_FLAG = 'yes'; else PROBFEASTR_FLAG = 'no'; end
+    if tPFE.flag==1, PROBFEASTR_FLAG = 'yes'; else, PROBFEASTR_FLAG = 'no'; end
     
     switch tPFE.Mode
         case 1
