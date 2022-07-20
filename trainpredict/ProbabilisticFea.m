@@ -58,6 +58,9 @@ if isfield(EnsStrat,'PruneFlag')
             % mask
             AgreeFeat = logical(F);
             AgreeFeat(bsxfun(@ne,AgreeFeat, tF)) = false;
+            if any(sum(AgreeFeat)==0)
+                error(sprintf('\nFeature pruning resulted in empty feature spaces!\nChange your settings to the use of a single feature mask.'))
+            end
         case 2
             % Here we take over only the selected features into a single
             % mask for all CV1 training partitions
