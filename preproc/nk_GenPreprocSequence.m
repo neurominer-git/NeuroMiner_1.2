@@ -17,6 +17,7 @@ if isfield(TemplParam,'ACTPARAM')
     InputParam.CV1fold      = SrcParam.CV1fold;
     actionseq               = cell(1,lact);
     InputParam.curclass     = SrcParam.u;
+    if ~isfield(SrcParam,'oocvonly'), SrcParam.oocvonly = 0; end
     if SrcParam.oocvonly, tscnt = 0; else, tscnt=3; end
 
     % Loop through ACTPARAM sequence
