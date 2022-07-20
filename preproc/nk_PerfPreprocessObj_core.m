@@ -979,8 +979,31 @@ end
 
 if tsproc, InputParam.Ts = graph_PerfGraphConstruction(InputParam.Ts, TrParami); end
 end
+% =========================================================================
 
+function [SrcParam, InputParam, TrParami, actparam ] = act_customPreproc(SrcParam, InputParam, ~, TrParami, actparam)
+global VERBOSE
+trfl    = actparam.trfl;
+tsfl    = actparam.tsfl;
+paramfl = actparam.paramfl;
+i       = actparam.i;
+tsproc  = false;  
 
+if isfield(actparam,'opt')
+    InputParam.P{i}.CUSTOMPREPROC.p = actparam.opt;
+end
+
+if paramfl && tsfl 
+     tsproc = true;
+elseif trfl
+    if VERBOSE;fprintf('\tCustom preprocessing function ...'); end
+    [InputParam.Tr, TrParami] = perfCustomPreproc(InputParam.Tr, InputParam.P{i}.CUSTOMPREPROC);
+
+    if tsfl, tsproc = true; end
+end
+
+if tsproc, InputParam.Ts = perfCustomPreproc(InputParam.Ts, TrParami); end
+end
 % =========================================================================
 function [InputParam, SrcParam] = perform_adasyn(InputParam, SrcParam)
 global SVM MODEFL

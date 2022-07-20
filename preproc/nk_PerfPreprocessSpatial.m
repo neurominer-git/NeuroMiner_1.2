@@ -84,7 +84,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                 if ~isempty(Yocv), 
                     if iscell(Yocv)
                         for n=1:numel(Yocv)
-                           fprintf('\nPredictor #%g: Smoothing independent test data (%s)', u, inp.desc_oocv);
+                           fprintf('\nPredictor #%g: Smoothing independent test data (%s)', u, inp.desc_oocv{n});
                            sYocv{u,n} = nk_PerfSpatFilt2( Yocv{n}, uPREPROC, paramfl.PV ); 
                         end
                     else

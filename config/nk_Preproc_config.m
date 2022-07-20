@@ -59,7 +59,8 @@ if ~isstruct(enind)
                     'devmap',        fl, ...
                     'graphSparsity', fl, ...
                     'graphMetrics', fl, ...
-                    'graphComputation', fl);
+                    'graphComputation', fl, ...
+                    'customPreproc', fl);
                     
 else
     EF = enind;
@@ -451,6 +452,8 @@ if modflag && ~replflag
             cmd = 18;
         case 'graphComputation'
             cmd = 19;
+        case 'customPreproc'
+            cmd = 20;
     end
    
 else    
@@ -530,6 +533,8 @@ else
                     cmdstr = 'Compute network metrics from connectivity matrices';                  cmdmnu = 18;
                 case 'graphComputation'
                     cmdstr = 'Compute individual networks from input data';                         cmdmnu = 19;
+                case 'customPreproc'
+                    cmdstr = 'Add a custom preproc function (from .m-Flie)';                        cmdmnu = 20;
             end
             [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu);
             cmdstr =[]; cmdmnu=[];
@@ -581,6 +586,8 @@ switch cmd
         CURACT = config_graphMetrics(CURACT, navistr);
     case 19
         CURACT = config_graphConstruction(CURACT, navistr);
+    case 20
+        CURACT = config_customPreproc(CURACT, navistr);
 end
 
 switch replflag
@@ -860,7 +867,14 @@ act = 1; while act >0, [ CURACT.GRAPHCONSTRUCTION, CURACT.PX, act ] = graphConst
 CURACT.cmd = 'graphConstruction';
 
 end
+function CURACT = config_customPreproc(CURACT, navistr)
 
+if ~isfield(CURACT,'CUSTOMPREPROC'), CURACT.CUSTOMPREPROC=[]; end
+if ~isfield(CURACT,'PX'), CURACT.PX = []; end
+act = 1; while act >0, [ CURACT.CUSTOMPREPROC, CURACT.PX, act ] = customPreproc_config(CURACT.CUSTOMPREPROC, CURACT.PX, navistr); end
+CURACT.cmd = 'customPreproc';
+
+end
 
 % -------------------------------------------------------------------------
 function [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu)

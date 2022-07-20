@@ -1,4 +1,4 @@
-function CM = graph_constructionJBE(A, method, referenceGroup, similarityMeasure)
+function CM = graph_constructionREFPLUSP(A, method, referenceGroup, similarityMeasure)
 % Jackknife Bias Estimation for network construction (Das et al., 2018)
 %
 % INPUT: matrix format, dimensions: n people x m features 
