@@ -17,7 +17,7 @@ if isfield(TemplParam,'ACTPARAM')
     InputParam.CV1fold      = SrcParam.CV1fold;
     actionseq               = cell(1,lact);
     InputParam.curclass     = SrcParam.u;
-    if SrcParam.oocvonly, tscnt = 0; else, tscnt=3; end
+    if isfield(SrcParam, 'oocvonly') && SrcParam.oocvonly, tscnt = 0; else, tscnt=3; end
 
     % Loop through ACTPARAM sequence
     for ac = 1:lact
@@ -553,6 +553,12 @@ if isfield(TemplParam,'ACTPARAM')
                 end
             case 'graphConstruction'
                 if VERBOSE, fprintf('\n* COMPUTE CONNECTIVITY MATRICES OF INDIVIDUAL NETWORKS'); end
+                InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+                if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
+                    InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
+                end
+            case 'customPreproc'
+                if VERBOSE, fprintf('\n* APPLY CUSTOM PREPROCESSING STEP'); end
                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;

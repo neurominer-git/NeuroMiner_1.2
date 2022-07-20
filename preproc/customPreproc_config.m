@@ -1,0 +1,76 @@
+function [CUSTOMPREPROC, PX, act ] = customPreproc_config(CUSTOMPREPROC, PX, parentstr, defaultsfl)
+
+funcFile = '';
+funcParams = [];
+
+if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
+
+if ~defaultsfl
+    
+    if isfield(CUSTOMPREPROC,'filename') && ~isempty(CUSTOMPREPROC.filename) 
+        funcFile = CUSTOMPREPROC.filename; 
+    end
+    if isfield(CUSTOMPREPROC,'nParam') && ~isempty(CUSTOMPREPROC.nParam) 
+        funcParams = CUSTOMPREPROC.nParam; 
+    end
+    if ~isempty(funcFile)
+        NameDef = 1;
+        FUNCNAMESTR = funcFile;
+    else
+        NameDef = 2;
+        FUNCNAMESTR = 'not defined';
+    end
+    if ~isempty(funcParams)
+        ParamsDef = 1;
+        FUNCPARAMSSTR = ['yes, ' nk_ConcatParamstr(funcParams)];
+    else
+        ParamsDef = 2;
+        FUNCPARAMSSTR = 'no';
+    end
+
+    menustr = ['Custom preprocessing step [' FUNCNAMESTR ']|' ...
+        'Add function parameters [' FUNCPARAMSSTR ']'];
+    menuact = [1 2];
+
+    nk_PrintLogo
+    mestr = 'Custom prepocessing step setup'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr);
+    act = nk_input(mestr,0,'mq', menustr, menuact);
+
+    switch act
+        case 1
+            funcFile = nk_input('Enter function name of custom preprocessing step (file location must be on matlab path): ',0, 's', funcFile);
+            CUSTOMPREPROC.filename = funcFile;
+        case 2
+            if ParamsDef == 1, ParamsDef = 2; elseif ParamsDef == 2, ParamsDef = 1; end
+            if ParamsDef == 1
+                funcParams = nk_input('Define number of parameters',0, 'i');
+                CUSTOMPREPROC.nParam = funcParams;
+                for i = 1:funcParams
+                    paramName = nk_input(sprintf('Parameter %d name:',i),0,'s');
+
+                    eval(sprintf("%sValues = nk_input('Parameter %d values:',0,'e');", paramName, i));
+                    %eval(sprintf("PX = nk_AddParam(%sValues, paramName, 1,[] );" , paramName));
+                    %eval(sprintf("CUSTOMPREPROC.%s = %sValues;", paramName, paramName));
+
+                end
+                paramCombos = allcomb([1 2],[3 4],[5 6]);
+                combosIdx = 1:size(paramCombos,1);
+                PX = nk_AddParam(combosIdx, paramName,1,[]);
+                CUSTOMPREPROC.ParamCombos = paramCombos;
+
+
+            end
+    end
+else
+    act = 0;
+end
+% Generate parameter array for preprocessing pipeline runner
+
+if exist('PX','var') && ~isempty(PX) && ...
+        isfield (PX,'Px') && ...
+        isfield(PX.Px,'Params') && ...
+        ~isempty(PX.Px.Params)
+    PX.opt = allcomb(PX.Px.Params,'matlab');
+else
+    PX.opt = [];
+end

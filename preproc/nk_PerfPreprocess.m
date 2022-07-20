@@ -307,7 +307,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         if ~isempty(Yocv)
                              if multoocv
                                  for n=1:numel(usYocv)
-                                     [vTs{pu,3+n}, ~, iOCV{n}] = nk_ManageNanCases(usYocv{n}{pu});
+                                     [vTs{pu,3+n}, ~, iOCV{n}] = nk_ManageNanCases(usYocv{n,pu});
                                  end
                              else
                                 [vTs{pu,4}, ~, iOCV] = nk_ManageNanCases(usYocv{pu});
