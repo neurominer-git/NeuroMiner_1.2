@@ -17,6 +17,9 @@ if isfield(NM,'analysis')
     Status.completed_analyses = false(1,n_anal);
     Status.isequal_cv = false(1,n_anal);
     Status.nmodal_analyses = zeros(1,n_anal);
+    Status.sequence_analyses = false(1,n_anal);
+    Status.stacking_analyses = false(1,n_anal);
+    Status.n_inputanalyses = zeros(1,n_anal);
     for i = 1:n_anal
         if NM.analysis{i}.status
             Status.completed_analyses(i)= true; 
