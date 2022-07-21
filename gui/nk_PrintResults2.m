@@ -1013,7 +1013,7 @@ axes(handles.axes1);
 if isfield(handles,'caseplot'), delete(handles.caseplot); end
 handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
 if isfield(handles, 'MLIdata')
-    thisMLIresult.Visible = 'on';
+    handles.thisMLIresult.Visible = 'on';
     handles.curCase = str2num(selCase);
 end
 guidata(handles.figure1,handles);
@@ -1281,7 +1281,8 @@ function thisMLIresult_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 %copyobj_subplot([handles.axes1 handles.legend_classplot h_md_anal], titl);
 
-barMLI(handles.curCase, handles.MLIdata.Label.BinResults.Modality, ...
-        handles.visdata{1,1}.params.features, ...
-        handles.NM.Y{1}, ...
-        0); 
+%barMLI(handles, handles.curCase);%, handles.MLIdata.Label.BinResults.Modality, ...
+        %handles.visdata{1,1}.params.features, ...
+        %handles.NM.Y{1}, ...
+        %0);
+ appMLI(handles, handles.curCase);
