@@ -32,24 +32,26 @@ global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL
 i       = inp.f; % Curration permutation
 j       = inp.d; % Current fold
 kbin    = inp.nclass;
+if isfield(inp,'simFlag') && inp.simFlag
+    [iy,jy] = size(xCV(1).cvin{i,j}.TrainInd); 
+    TrInd   = xCV(1).TrainInd{i,j}; 
+    TsInd   = xCV(1).TestInd{i,j}; 
+else
+    [iy,jy] = size(CV(1).cvin{i,j}.TrainInd); 
+    TrInd   = CV(1).TrainInd{i,j}; 
+    TsInd   = CV(1).TestInd{i,j}; 
+end
+TsI     = cell(kbin,1);
+if ~exist('paramfl','var'), paramfl.use_exist = false; end
+cv2flag = false; if isfield(PREPROC,'CV2flag') && (PREPROC.CV2flag - 1) == 1; cv2flag = true; end
+tYocv   = []; if exist('Yocv','var') && ~isempty(Yocv), tYocv.Ts = cell(iy,jy); else, Yocv = []; end
+if ~exist('Cocv','var'), Cocv = []; end
 
-% Check whether the function is used by the simulation module or not and
-% transfer the right CV structure to tCV
 if isfield(inp,'simFlag') && inp.simFlag
     tCV = xCV;
 else
     tCV = CV;
 end
-
-[iy,jy] = size(tCV(1).cvin{i,j}.TrainInd); 
-TrInd   = tCV(1).TrainInd{i,j}; 
-TsInd   = tCV(1).TestInd{i,j}; 
-TsI     = cell(kbin,1);
-
-if ~exist('paramfl','var'), paramfl.use_exist = false; end
-cv2flag = false; if isfield(PREPROC,'CV2flag') && (PREPROC.CV2flag - 1) == 1; cv2flag = true; end
-tYocv   = []; if exist('Yocv','var') && ~isempty(Yocv), tYocv.Ts = cell(iy,jy); else, Yocv = []; end
-if ~exist('Cocv','var'), Cocv = []; end
 
 % Set binary/regression or multi-group processing mode
 if iscell(PREPROC)
@@ -202,7 +204,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
             % Assign data to containers
             mult_contain = false; iOCV=[]; 
             if oocvonly
-                TrI = TrInd(tCV.cvin{i,j}.TrainInd{k,l});
+                TrI = TrInd(xCV.cvin{i,j}.TrainInd{k,l});
                 TrL = labels(TrI,lb);
                 if size(TrI,2)>2, TrI = TrI'; end
                 if iscell(usY)
@@ -505,17 +507,19 @@ for k=sta_iy:stp_iy % Inner permutation loop
                     % Write dichotomization labels to CV1 partition
                     for zu=1:kbin % Binary loop depending on the # of binary comparisons
                         % Generate logical indices
-                        if isfield(tCV,'class') && length(tCV.class{i,j}{zu}.groups) == 2
-                            % One-vs-One
-                            indtr = ( TrL == tCV.class{i,j}{zu}.groups(1) | TrL == tCV.class{i,j}{zu}.groups(2) ) | isnan(TrL);
-                            if ~oocvonly
-                                indcv = ( CVL == tCV.class{i,j}{zu}.groups(1) | CVL == tCV.class{i,j}{zu}.groups(2) ) | isnan(CVL);
-                            end
-                        else
-                            % One-vs-All
-                            indtr = TrL~=0;
-                            if ~oocvonly
-                                indcv = CVL~=0;
+                        if isfield(inp,'simFlag') && inp.simFlag
+                            if isfield(tCV,'class') && length(xCV.class{i,j}{zu}.groups) == 2
+                                % One-vs-One
+                                indtr = ( TrL == xCV.class{i,j}{zu}.groups(1) | TrL == xCV.class{i,j}{zu}.groups(2) ) | isnan(TrL);
+                                if ~oocvonly
+                                    indcv = ( CVL == xCV.class{i,j}{zu}.groups(1) | CVL == xCV.class{i,j}{zu}.groups(2) ) | isnan(CVL);
+                                end
+                            else
+                                % One-vs-All
+                                indtr = TrL~=0;
+                                if ~oocvonly
+                                    indcv = CVL~=0;
+                                end
                             end
                         end
                         % Write indices
@@ -524,12 +528,22 @@ for k=sta_iy:stp_iy % Inner permutation loop
                             tY.CVInd{k,l}{zu} = indcv;
                         end
                         % Write labels to CV1 partition
-                        if isfield(tCV,'class')
-                            tY.TrL{k,l}{zu} = tCV.class{i,j}{zu}.TrainLabel{k,l};
-                            if ~oocvonly, tY.CVL{k,l}{zu} = tCV.class{i,j}{zu}.TestLabel{k,l}; end
+                        if isfield(inp,'simFlag') && inp.simFlag
+                            if isfield(xCV,'class')
+                                tY.TrL{k,l}{zu} = xCV.class{i,j}{zu}.TrainLabel{k,l};
+                                if ~oocvonly, tY.CVL{k,l}{zu} = xCV.class{i,j}{zu}.TestLabel{k,l}; end
+                            else
+                                tY.TrL{k,l}{zu} = labels(xCV.TrainInd{i,j}(xCV.cvin{i,j}.TrainInd{k,l}),lb);
+                                if ~oocvonly, tY.CVL{k,l}{zu} = labels(xCV.TrainInd{i,j}(xCV.cvin{i,j}.TestInd{k,l}),lb); end
+                            end
                         else
-                            tY.TrL{k,l}{zu} = labels(tCV.TrainInd{i,j}(tCV.cvin{i,j}.TrainInd{k,l}),lb);
-                            if ~oocvonly, tY.CVL{k,l}{zu} = labels(tCV.TrainInd{i,j}(tCV.cvin{i,j}.TestInd{k,l}),lb); end
+                            if isfield(CV,'class')
+                                tY.TrL{k,l}{zu} = CV.class{i,j}{zu}.TrainLabel{k,l};
+                                if ~oocvonly, tY.CVL{k,l}{zu} = CV.class{i,j}{zu}.TestLabel{k,l}; end
+                            else
+                                tY.TrL{k,l}{zu} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TrainInd{k,l}),lb);
+                                if ~oocvonly, tY.CVL{k,l}{zu} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TestInd{k,l}),lb); end
+                            end
                         end
                     end
 
@@ -550,12 +564,22 @@ for k=sta_iy:stp_iy % Inner permutation loop
                             tYocv.Ts{k,l}{u} = nk_ManageNanCases(ocv, [], SrcParam.iOCV); 
                         end
                     end
-                    if ~strcmp(MODEFL,'regression') && length(tCV.class{i,j}{u}.groups) == 2
-                        indtr = ( TrL == tCV.class{i,j}{u}.groups(1) | TrL == tCV.class{i,j}{u}.groups(2) ) | isnan(TrL);
-                        if ~oocvonly, indcv = ( CVL == tCV.class{i,j}{u}.groups(1) | CVL == tCV.class{i,j}{u}.groups(2) ) | isnan(CVL); end
+                    if isfield(inp,'simFlag') && inp.simFlag
+                        if ~strcmp(MODEFL,'regression') && length(xCV.class{i,j}{u}.groups) == 2
+                            indtr = ( TrL == xCV.class{i,j}{u}.groups(1) | TrL == xCV.class{i,j}{u}.groups(2) ) | isnan(TrL);
+                            if ~oocvonly, indcv = ( CVL == xCV.class{i,j}{u}.groups(1) | CVL == xCV.class{i,j}{u}.groups(2) ) | isnan(CVL); end
+                        else
+                            indtr = true(size(TrI,1),1);
+                            if ~oocvonly, indcv = true(size(CVI,1),1); end
+                        end
                     else
-                        indtr = true(size(TrI,1),1);
-                        if ~oocvonly, indcv = true(size(CVI,1),1); end
+                        if ~strcmp(MODEFL,'regression') && length(CV.class{i,j}{u}.groups) == 2
+                            indtr = ( TrL == CV.class{i,j}{u}.groups(1) | TrL == CV.class{i,j}{u}.groups(2) ) | isnan(TrL);
+                            if ~oocvonly, indcv = ( CVL == CV.class{i,j}{u}.groups(1) | CVL == CV.class{i,j}{u}.groups(2) ) | isnan(CVL); end
+                        else
+                            indtr = true(size(TrI,1),1);
+                            if ~oocvonly, indcv = true(size(CVI,1),1); end
+                        end
                     end
                     % Write indices
                     tY.TrInd{k,l}{u} = indtr;
@@ -568,11 +592,21 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         case 'classification'
                             if RAND.Decompose ~=9
                                 % Write labels to CV1 partition
-                                tY.TrL{k,l}{u} = tCV.class{i,j}{u}.TrainLabel{k,l}(:,lb);	
-                                if ~oocvonly, tY.CVL{k,l}{u} = tCV.class{i,j}{u}.TestLabel{k,l}(:,lb); end
+                                if isfield(inp,'simFlag') && inp.simFlag
+                                    tY.TrL{k,l}{u} = xCV.class{i,j}{u}.TrainLabel{k,l}(:,lb);	
+                                    if ~oocvonly, tY.CVL{k,l}{u} = xCV.class{i,j}{u}.TestLabel{k,l}(:,lb); end	
+                                else
+                                    tY.TrL{k,l}{u} = CV.class{i,j}{u}.TrainLabel{k,l}(:,lb);	
+                                    if ~oocvonly, tY.CVL{k,l}{u} = CV.class{i,j}{u}.TestLabel{k,l}(:,lb); end	
+                               
+                                end
                             else
                                 tY.TrL{k,l}{u} = TrL;
-                                if ~oocvonly, tY.CVL{k,l}{u} = labels(tCV.TrainInd{i,j}(tCV.cvin{i,j}.TestInd{k,l}),lb); end
+                                if isfield(inp,'simFlag') && inp.simFlag
+                                    if ~oocvonly, tY.CVL{k,l}{u} = labels(xCV.TrainInd{i,j}(xCV.cvin{i,j}.TestInd{k,l}),lb); end
+                                else
+                                    if ~oocvonly, tY.CVL{k,l}{u} = labels(CV.TrainInd{i,j}(CV.cvin{i,j}.TestInd{k,l}),lb); end
+                                end
                             end
                     end
 
