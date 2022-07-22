@@ -25,7 +25,7 @@ else
 end
 
 if SPMAVAIL
-    if ~isempty(imgfile) && ~iscell(imgfile),
+    if ~isempty(imgfile) && ~iscell(imgfile)
         imgfile = cellstr(imgfile);
     end
     imgfile = spm_select(nimg, fltstr, titlestr, imgfile, startdir, fltstr);

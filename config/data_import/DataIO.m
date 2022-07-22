@@ -928,7 +928,7 @@ switch act
                 break
             end	
         end
-        if ~isempty(IO.PP), 
+        if ~isempty(IO.PP)
             IO.PP(1,:)=[]; 
             [IO,mess] = RetrieveImageInfo(IO, datasource,mess);
             IO.n_subjects_all= size(char(IO.PP),1);

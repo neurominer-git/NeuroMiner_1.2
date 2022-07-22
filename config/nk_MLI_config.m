@@ -4,7 +4,8 @@
 % NeuroMiner menu configurator for the interpretation of model predictions 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 05/2022
-function [param, act] = nk_MLI_config(param, defaultsfl)
+function [MLI, act] = nk_MLI_config(MLI, M, defaultsfl, parentstr)
+global NM
 
 if ~exist("defaultsfl","var") || isempty(defaultsfl)
     defaultsfl=false;
@@ -23,23 +24,39 @@ cutoff = [-2 2];
 cutoffmode = 'absolute';
 cutoffoperator = 1;
 znormdata = 1;
+isimaging = false;
+MLIatlasflag = 0;
+IO = NM.datadescriptor{M}.input_settings;
+if ~strcmp(NM.datadescriptor{M}.source,'matrix')
+    isimaging = true;
+end
+if isimaging
+    MLIatlasflag = 1;
+    MLIatlasfile = fullfile(NM.defs.paths,'visual','atlas','aal3.nii');
+    MLIcsvfile  = fullfile(NM.defs.paths,'visual','atlas','aal3.csv');
+end
 
 if ~defaultsfl
+
+    if ~exist('MLI','var') || isempty(MLI) , MLI = nk_MLI_config([], M, 1); end
     
-    if isfield(param,"MLI")
-        method = param.MLI.method;
-        nperms = param.MLI.nperms;
-        frac = param.MLI.frac;
-        upper_thresh = param.MLI.upper_thresh;
-        lower_thresh = param.MLI.lower_thresh;
-        max_iter = param.MLI.max_iter;
-        n_visited = param.MLI.n_visited;
-        usemap = param.MLI.MAP.flag;
-        mapfeat = param.MLI.MAP.map;
-        cutoff = param.MLI.MAP.cutoff;
-        cutoffmode = param.MLI.MAP.percentmode;
-        cutoffoperator = param.MLI.MAP.operator;
-        znormdata = param.MLI.znormdata;
+    method = MLI.method;
+    nperms = MLI.nperms;
+    frac = MLI.frac;
+    upper_thresh = MLI.upper_thresh;
+    lower_thresh = MLI.lower_thresh;
+    max_iter = MLI.max_iter;
+    n_visited = MLI.n_visited;
+    usemap = MLI.MAP.flag;
+    mapfeat = MLI.MAP.map;
+    cutoff = MLI.MAP.cutoff;
+    cutoffmode = MLI.MAP.percentmode;
+    cutoffoperator = MLI.MAP.operator;
+    znormdata = MLI.znormdata;
+    if isimaging
+        MLIatlasflag = MLI.imgops.flag;
+        MLIatlasfile = MLI.imgops.atlas;
+        MLIcsvfile = MLI.imgops.csv;
     end
 
     switch method
@@ -128,12 +145,32 @@ if ~defaultsfl
         OcclusionMapCutoffModeStr = '';
         OcclusionMapCutoffOperator = '';
     end
-    
+
     ZnormDataOpts = {'None','Mean centering','Z-normalization'};
     OcclusionZnormData = ['Produce z-normalized prediction change estimates [ ' ZnormDataOpts{znormdata} ' ]' ];
     mnuact = [ mnuact 12 ];
 
-    mnustr = [OcclusionMethodStr ...
+    if isimaging
+        if ~MLIatlasflag
+            OcclusionAtlasFlag = '|Bind data modification to neuroanatomical atlas [ no ]' ; 
+            OcclusionAtlasImgFile = '';
+            OcclusionAtlasCSVFile = '';
+            mnuact = [ mnuact 13 ];
+        else
+            [~,AtlasFilename, Filename_ext] = fileparts(MLIatlasfile);
+            [~,AtlasCSVname, CSVname_ext] = fileparts(MLIcsvfile);
+            OcclusionAtlasFlag = '|Bind data modification to neuroanatomical atlas [ yes ]|' ;
+            OcclusionAtlasImgFile = [ 'Select atlas imaging file [ ' AtlasFilename Filename_ext ' ]|' ];
+            OcclusionAtlasCSVFile = [ 'Select atlas descriptor file [ ' AtlasCSVname CSVname_ext ' ]' ];
+            mnuact = [ mnuact 13:15 ];
+        end
+    else
+        OcclusionAtlasFlag = '';
+        OcclusionAtlasImgFile = '';
+        OcclusionAtlasCSVFile = '';
+    end
+    
+    mnustr = [ OcclusionMethodStr ...
               OcclusionUpperThreshStr ...
               OcclusionLowerThreshStr ...
               OcclusionIterStr ...
@@ -144,10 +181,19 @@ if ~defaultsfl
               OcclusionMapCutoffStr ...
               OcclusionMapCutoffModeStr ...
               OcclusionMapCutoffOperator ...
-              OcclusionZnormData];
+              OcclusionZnormData ...
+              OcclusionAtlasFlag ...
+              OcclusionAtlasImgFile ...
+              OcclusionAtlasCSVFile ];
     
     nk_PrintLogo
-    act = nk_input('MAIN INTERFACE >> DEFINE PARAMETERS >> Model interpreter settings',0,'mq', mnustr, mnuact);
+    if M>1
+        mestr = sprintf('Model interpretation parameters [ Modality #%g: %s ]', M, NM.datadescriptor{M}.desc) ; 
+    else
+        mestr = 'Model interpretation parameters'; 
+    end
+    navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
+    act = nk_input(mestr,0,'mq', mnustr, mnuact);
     
     switch act
         case 1
@@ -211,19 +257,31 @@ if ~defaultsfl
             end
         case 12
             znormdata = nk_input('Define centering procedure', 0, 'm', 'None|Mean centering|Z-normalization', 1:3, znormdata);
+        case 13
+            MLIatlasflag = ~MLIatlasflag;
+        case 14
+            MLIatlasfile = nk_FileSelector(1, IO.datasource, 'Select atlas file', IO.filtstr, MLIatlasfile);
+        case 15
+            MLIcsvfile = nk_FileSelector(1,0,'Define path of globals text file', '.*\.txt$|.*\.dat$|.*\.csv', MLIcsvfile);
     end
 end
-param.MLI.method = method;
-param.MLI.nperms = nperms;
-param.MLI.frac = frac;
-param.MLI.upper_thresh = upper_thresh;
-param.MLI.lower_thresh = lower_thresh;
-param.MLI.max_iter = max_iter;
-param.MLI.n_visited = n_visited;
-param.MLI.znormdata = znormdata;
-param.MLI.MAP.flag = usemap;
-param.MLI.MAP.map = mapfeat;
-param.MLI.MAP.cutoff = cutoff;
-param.MLI.MAP.percentmode = cutoffmode;
-param.MLI.MAP.operator = cutoffoperator;
-
+MLI.method = method;
+MLI.nperms = nperms;
+MLI.frac = frac;
+MLI.upper_thresh = upper_thresh;
+MLI.lower_thresh = lower_thresh;
+MLI.max_iter = max_iter;
+MLI.n_visited = n_visited;
+MLI.znormdata = znormdata;
+MLI.MAP.flag = usemap;
+MLI.MAP.map = mapfeat;
+MLI.MAP.cutoff = cutoff;
+MLI.MAP.percentmode = cutoffmode;
+MLI.MAP.operator = cutoffoperator;
+if isimaging
+    MLI.imgops.flag = MLIatlasflag;
+    MLI.imgops.atlas = MLIatlasfile;
+    MLI.imgops.csv = MLIcsvfile;
+else
+    MLI.imgops = [];
+end

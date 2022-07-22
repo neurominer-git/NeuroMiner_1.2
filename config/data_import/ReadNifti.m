@@ -77,7 +77,3 @@ end
 IO.Y = nk_ReturnSubSpaces(V, IO.Vm, numel(V), n_subjects, IO.Thresh, filereport);
 
 DeleteTempVol(IO.Vm, tmpflg) 
-
-
-
-

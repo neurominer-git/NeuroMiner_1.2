@@ -37,7 +37,6 @@ if ~isfield(NM,'TrainParam')
     NM.TrainParam.MULTI.flag    = 0;
     NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
     [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1); 
-    NM.TrainParam               = nk_MLI_config(NM.TrainParam, true);
     NM.TrainParam.verbosity     = 1;
 elseif ~isfield(NM.TrainParam,'verbosity')
     NM.TrainParam.verbosity     = 1;
@@ -80,16 +79,19 @@ if NM.TrainParam.STACKING.flag == 1
 end
 
 nan_in_label=false;         if sum(isnan(NM.label(:)))>0, nan_in_label=true; end
+nY = numel(NM.Y);
 %% Create further default configurations
 if ~isfield(NM.TrainParam,'PREPROC')
     % Create PREPROC structure
-    nan_in_pred = false;        if sum(isnan(NM.Y{varind}(:)))>0, nan_in_pred=true; end
-    NM.TrainParam.PREPROC{1}    = DefPREPROC(NM.modeflag,nan_in_pred,nan_in_label);
-    NM.TrainParam.VIS{1}        = nk_Vis_config([], NM.TrainParam.PREPROC, 1, 1); 
+    for i=1:nY
+        nan_in_pred = false;        if sum(isnan(NM.Y{i}(:)))>0, nan_in_pred=true; end
+        NM.TrainParam.PREPROC{i}    = DefPREPROC(NM.modeflag,nan_in_pred,nan_in_label);
+        NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC, i, 1); 
+        NM.TrainParam.MLI{i}        = nk_MLI_config([], i, 1);
+    end
 else
     switch NM.TrainParam.FUSION.flag
         case 3 % If late fusion has been activated create STRAT structure
-            nY = numel(NM.Y);
             for i=1:nY
                 if isempty(NM.TrainParam.STRAT{i})
                     NM.TrainParam.STRAT{i}.SVM          = NM.TrainParam.SVM;
@@ -97,9 +99,11 @@ else
                     if numel(NM.TrainParam.PREPROC) == i
                         NM.TrainParam.STRAT{i}.PREPROC  = NM.TrainParam.PREPROC{i};
                         NM.TrainParam.STRAT{i}.VIS      = NM.TrainParam.VIS{i};
+                        NM.TrainParam.STRAT{i}.MLI      = NM.TrainParam.MLI{i};
                     else
                         NM.TrainParam.STRAT{i}.PREPROC  = NM.TrainParam.PREPROC{1};
                         NM.TrainParam.STRAT{i}.VIS      = NM.TrainParam.VIS{1};
+                        NM.TrainParam.STRAT{i}.MLI      = NM.TrainParam.MLI{1};
                     end
                     NM.TrainParam.STRAT{i}.RFE          = NM.TrainParam.RFE;
                     NM.TrainParam.STRAT{i}.MULTI        = NM.TrainParam.MULTI;
@@ -109,10 +113,15 @@ else
             nY = numel(NM.Y);
             nP = numel(NM.TrainParam.PREPROC); 
             for i=1:nY
-                if i>nP
-                    nan_in_pred=false;          if sum(isnan(NM.Y{i}(:)))>0, nan_in_pred=true; end
+                nan_in_pred=false;          if sum(isnan(NM.Y{i}(:)))>0, nan_in_pred=true; end
+                if ~isfield(NM.TrainParam,'PREPROC') || numel(NM.TrainParam.PREPROC) < nP
                     NM.TrainParam.PREPROC{i}    = DefPREPROC(NM.modeflag, nan_in_pred, nan_in_label);
+                end
+                if ~isfield(NM.TrainParam,'VIS') || numel(NM.TrainParam.VIS) < nP
                     NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC{i}, i, 1); 
+                end
+                if ~isfield(NM.TrainParam,'MLI') || numel(NM.TrainParam.MLI) < nP
+                    NM.TrainParam.MLI{i}        = nk_MLI_config([], i, 1);
                 end
             end
     end
@@ -120,8 +129,8 @@ end
 
 %% Check data entry status
 if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'MLI'});
-    STATUS = nk_CheckFieldStatus(NM.TrainParam.STRAT{varind},{'PREPROC','SVM','GRD','RFE','MULTI','VIS'}, [], [], STATUS);
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING'});
+    STATUS = nk_CheckFieldStatus(NM.TrainParam.STRAT{varind},{'PREPROC','SVM','GRD','RFE','MULTI','VIS','MLI'}, [], [], STATUS);
 else
     STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI'});
 end
@@ -436,7 +445,13 @@ switch act
     
     % ML INTEPRETATION STRATEGIES =======================================================================================================================================   
     case 11
-        act = 1; while act>0, [ NM.TrainParam, act ] = nk_MLI_config(NM.TrainParam); end
+        if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
+            if ~isfield(NM.TrainParam,'MLI'), NM.TrainParam.STRAT{varind}.MLI = nk_MLI_config(NM.TrainParam.STRAT{varind}.MLI, 1, 1, navistr); end
+            act = 1; while act>0, [ NM.TrainParam.STRAT{varind}.MLI, act] = nk_MLI_config(NM.TrainParam.STRAT{varind}.MLI, 1, [], navistr); end
+        else
+            if ~isfield(NM.TrainParam,'MLI'), NM.TrainParam.MLI{varind} = nk_MLI_config(NM.TrainParam.MLI{varind}, varind, 1, navistr); end
+            act = 1; while act>0, [ NM.TrainParam.MLI{varind}, act ] = nk_MLI_config(NM.TrainParam.MLI{varind}, varind , [], navistr); end
+        end 
         
     % SAVING OPTIONS ====================================================================================================================================================     
     case 12
