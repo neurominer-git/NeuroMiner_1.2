@@ -1,4 +1,4 @@
-function IN = nk_CreateData4MLInterpreter(RandFeats, MapIdx, Tr, Ts, covars, IN, nx)
+function IN = nk_CreateData4MLInterpreter(MLI, RandFeats, Tr, Ts, covars, IN, nx, curclass)
 
 if IN.oocvflag
     Yocvstr = 'Yocv2';
@@ -6,42 +6,61 @@ else
     Yocvstr = 'Yocv';
 end
 
+method = MLI.method;
+nperms = MLI.nperms;
+
 if ~isempty(covars) && nx == 1
-    switch IN.MLI.method
+    switch method
         case 'posneg'
-            IN.covars_rep{1} = repmat(covars,IN.MLI.nperms,1);
-            IN.covars_rep{2} = repmat(covars,IN.MLI.nperms,1);
+            IN.covars_rep{1} = repmat(covars,nperms,1);
+            IN.covars_rep{2} = repmat(covars,nperms,1);
         case {'median','medianflip','random'}
-            IN.covars_rep = repmat(covars,IN.MLI.nperms,1);
+            IN.covars_rep = repmat(covars,nperms,1);
     end
 end
 
-n = numel(MapIdx);
+% MapIdx can be the full feature space or a selection based on the CVR and
+% sign-based consistency signature chosen by the user. MapIdx is a logical
+% vector indicating which variables should be used
+MapIdx = MLI.Modality{nx}.MAP.mapidx{curclass}; 
+fMapIdx = find(MapIdx);
 
-switch IN.MLI.method
+n = sum(MapIdx);
+
+switch method
 
     case 'posneg'
         % Determine extremes of the distribution
         upper = prctile(Tr(:,MapIdx), IN.MLI.upper_thresh);
         lower = prctile(Tr(:,MapIdx), IN.MLI.lower_thresh);
                 
-        if ~isinf(IN.MLI.nperms)
+        if ~isinf(nperms)
         
-            P = repmat(Ts, IN.MLI.nperms, 1);
-            N = repmat(Ts, IN.MLI.nperms, 1);
-            I = false(IN.MLI.nperms, size(Tr,2));
+            P = repmat(Ts, nperms, 1);
+            N = repmat(Ts, nperms, 1);
+            I = false(nperms, size(Tr,2));
             
             % Create modified instances of case
-            for i=1:IN.MLI.nperms
-                P(i, MapIdx(RandFeats(i,:))) = upper(RandFeats(i,:)); 
-                N(i, MapIdx(RandFeats(i,:))) = lower(RandFeats(i,:));
-                I(i, MapIdx(RandFeats(i,:))) = true;
+            for i=1:nperms
+                
+                % RandFeats is a random selection index to variables in MapIdx.
+                % It can be selected by randomly indexing the original
+                % input space variables or by using an atlas scheme that
+                % groups input spaces variables together.
+                % Select subsample of features by combining MapIdx and
+                % current row of RandFeats. 
+
+                rIdx = RandFeats(i,:);
+
+                P(i, fMapIdx(rIdx)) = upper(rIdx); 
+                N(i, fMapIdx(rIdx)) = lower(rIdx);
+                I(i, fMapIdx(rIdx)) = true;
             end
         else
-            I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
-            while iter <= IN.MLI.max_iter
+            I = false(MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
+            while iter <= MLI.max_iter
                 I(iter, MapIdx(RandFeats(iter,:))) = true;
-                if sum( sum(I(1:iter,:)) >= IN.MLI.n_visited ) == n
+                if sum( sum(I(1:iter,:)) >= MLI.n_visited ) == n
                     completed = true;
                     break
                 end
@@ -65,7 +84,7 @@ switch IN.MLI.method
         IN.X(nx).I = I;
       
     case {'median','medianflip','random'}
-        switch IN.MLI.method
+        switch method
             case 'median'
                 medi = prctile(Tr(:,MapIdx), 50);
             case 'medianflip'
@@ -80,25 +99,22 @@ switch IN.MLI.method
                 medi = zeros(1,n);
                 for i=1:n, medi(i) = U.UX{i}(randi(numel(U.UX{i}))); end
         end
-        if ~isinf(IN.MLI.nperms)
+        if ~isinf(nperms)
         
-            M = repmat(Ts, IN.MLI.nperms, 1);
-            I = false(IN.MLI.nperms, size(Tr,2));
+            M = repmat(Ts, nperms, 1);
+            I = false(nperms, size(Tr,2));
             
             % Create modified instances of case
-            for i=1:IN.MLI.nperms
-                try
-                    M(i, MapIdx(RandFeats(i,:))) = medi(RandFeats(i,:)); 
-                    I(i, MapIdx(RandFeats(i,:))) = true;
-                catch
-                    fprintf('prob');
-                end
+            for i=1:nperms
+                rIdx = RandFeats(i,:);
+                M(i, fMapIdx(rIdx)) = medi(rIdx); 
+                I(i, fMapIdx(rIdx)) = true;
             end
         else
-            I = false(IN.MLI.max_iter, size(Tr,2)); iter = 1; completed = false;
-            while iter <= IN.MLI.max_iter
+            I = false( MLI.max_iter, size(Tr,2) ); iter = 1; completed = false;
+            while iter <= MLI.max_iter
                 I(iter, MapIdx(RandFeats(iter,:))) = true;
-                if sum( sum(I(1:iter,:)) >= IN.MLI.n_visited ) == n
+                if sum( sum(I(1:iter,:)) >= MLI.n_visited ) == n
                     completed = true;
                     break
                 end
@@ -118,4 +134,3 @@ switch IN.MLI.method
         IN.X(nx).(Yocvstr) = M;
         IN.X(nx).I = I;
 end
-

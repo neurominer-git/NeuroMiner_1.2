@@ -57,6 +57,8 @@ end
 if nargin > 1 && nargout < 2
     error('Set number of permutations requested, but no return argument!')
 end
+if islogical(X), X = find(X); end
+
 if ~exist("ulim","var") || isempty(ulim)
     if isvector(X)
         ulim = size(X,1);
@@ -84,18 +86,18 @@ if n > uint32(inf), error('Sorry, data is too big!'), end % would be v.slow
 if nargin < 2 || k > nPerms
     k = nPerms; % default to computing all unique permutations
 end
-pInds = zeros(k, ulim, 'uint32'); 
-pInds(1, :) = 1:ulim;             
+pInds = false(k, n);              
 % Add permutations that are unique
 u = 1; % to start with
-while u < k
+while u <= k
     fprintf('\b\b\b\b\b\b%6.0f',u);
     % b=sprintf('%s', repmat('\b',numel(a),1));
     pInd = sort(uint32(randperm(n, ulim)));
     % (Note: better data structures could make the next line much faster!)
-    out = FastUniqueRows([pInds(1:u, :); pInd]);
+    tpInd = false(1, n); tpInd(pInd) = true;
+    out = FastUniqueRows([pInds(1:u, :); tpInd]);
     if size(out, 1) > u % implying x(pInd) was new to Perms
+        pInds(u, pInd) = true ;
         u = u + 1;
-        pInds(u, :) = pInd;
     end
 end

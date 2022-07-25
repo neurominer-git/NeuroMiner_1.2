@@ -93,7 +93,7 @@ else
         end
 
         % Do we need to extract a weighting mask, too?
-        if isfield(inp.X(n), [ sstr 'sYw']) && ~isempty(inp.X(n).([ sstr 'Yw']))
+        if isfield(inp.X(n), [ sstr 'Yw']) && ~isempty(inp.X(n).([ sstr 'Yw']))
             inp.iYw = inp.X(n).([ sstr 'Yw']);
         end
     

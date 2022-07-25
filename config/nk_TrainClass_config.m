@@ -5,7 +5,7 @@
 % process. The function also creates default parameters if a new modality 
 % has been added to the NM workspace
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 12/2021
+% (c) Nikolaos Koutsouleris, 07/2022
 
 function [act, varind] = nk_TrainClass_config(act, varind, parentstr)
 global NM
@@ -80,14 +80,20 @@ end
 
 nan_in_label=false;         if sum(isnan(NM.label(:)))>0, nan_in_label=true; end
 nY = numel(NM.Y);
+
 %% Create further default configurations
 if ~isfield(NM.TrainParam,'PREPROC')
     % Create PREPROC structure
     for i=1:nY
         nan_in_pred = false;        if sum(isnan(NM.Y{i}(:)))>0, nan_in_pred=true; end
         NM.TrainParam.PREPROC{i}    = DefPREPROC(NM.modeflag,nan_in_pred,nan_in_label);
-        NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC, i, 1); 
-        NM.TrainParam.MLI{i}        = nk_MLI_config([], i, 1);
+        NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC, i, 1);
+        if isfield(NM.TrainParam,'MLI')
+            MLI = NM.TrainParam.MLI;
+        else
+            MLI = [];
+        end
+        NM.TrainParam.MLI           = nk_MLI_config(MLI, i, 1);
     end
 else
     switch NM.TrainParam.FUSION.flag
@@ -99,14 +105,14 @@ else
                     if numel(NM.TrainParam.PREPROC) == i
                         NM.TrainParam.STRAT{i}.PREPROC  = NM.TrainParam.PREPROC{i};
                         NM.TrainParam.STRAT{i}.VIS      = NM.TrainParam.VIS{i};
-                        NM.TrainParam.STRAT{i}.MLI      = NM.TrainParam.MLI{i};
                     else
                         NM.TrainParam.STRAT{i}.PREPROC  = NM.TrainParam.PREPROC{1};
                         NM.TrainParam.STRAT{i}.VIS      = NM.TrainParam.VIS{1};
-                        NM.TrainParam.STRAT{i}.MLI      = NM.TrainParam.MLI{1};
                     end
                     NM.TrainParam.STRAT{i}.RFE          = NM.TrainParam.RFE;
                     NM.TrainParam.STRAT{i}.MULTI        = NM.TrainParam.MULTI;
+                    NM.TrainParam.STRAT{i}.MLI          = NM.TrainParam.MLI;
+                    NM.TrainParam.STRAT{i}.MLI.Modality{1} = NM.TrainParam.MLI.Modality{i};
                 end
             end
         otherwise
@@ -119,9 +125,6 @@ else
                 end
                 if ~isfield(NM.TrainParam,'VIS') || numel(NM.TrainParam.VIS) < nP
                     NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC{i}, i, 1); 
-                end
-                if ~isfield(NM.TrainParam,'MLI') || numel(NM.TrainParam.MLI) < nP
-                    NM.TrainParam.MLI{i}        = nk_MLI_config([], i, 1);
                 end
             end
     end
@@ -449,8 +452,8 @@ switch act
             if ~isfield(NM.TrainParam,'MLI'), NM.TrainParam.STRAT{varind}.MLI = nk_MLI_config(NM.TrainParam.STRAT{varind}.MLI, 1, 1, navistr); end
             act = 1; while act>0, [ NM.TrainParam.STRAT{varind}.MLI, act] = nk_MLI_config(NM.TrainParam.STRAT{varind}.MLI, 1, [], navistr); end
         else
-            if ~isfield(NM.TrainParam,'MLI'), NM.TrainParam.MLI{varind} = nk_MLI_config(NM.TrainParam.MLI{varind}, varind, 1, navistr); end
-            act = 1; while act>0, [ NM.TrainParam.MLI{varind}, act ] = nk_MLI_config(NM.TrainParam.MLI{varind}, varind , [], navistr); end
+            if ~isfield(NM.TrainParam,'MLI'), NM.TrainParam.MLI = nk_MLI_config(NM.TrainParam.MLI, varind, 1, navistr); end
+            act = 1; while act>0, [ NM.TrainParam.MLI, act ] = nk_MLI_config(NM.TrainParam.MLI, varind, [], navistr); end
         end 
         
     % SAVING OPTIONS ====================================================================================================================================================     

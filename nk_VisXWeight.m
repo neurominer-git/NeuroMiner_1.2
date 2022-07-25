@@ -233,8 +233,8 @@ for n=1:nM
                     % Don't forget to adjust the feature masks and the
                     % indices to modalities in case of fused feature spaces
                     if ~reducedimfl
-                        tlFuVI = false(length(pIND),1); tlFuVI(pIND) = lFuVI; lFuVI = tlFuVI;
-                        tlVI = true(length(pIND),1); tlVI(pIND) = fVI; fVI = tlVI;
+                        tlFuVI = false(length(pIND),1); tlFuVI(lFuVI) = true; lFuVI = tlFuVI;
+                        tlVI = false(length(pIND),1); tlVI(fVI) = true; fVI = tlVI;
                     end
             end
 

@@ -28,7 +28,7 @@ if ~exist('inp','var') || isempty(inp)
         OO = [];
     end
 
-    inp = struct( 'analind', complvec(1), ...   % Index to analysis
+    inp = struct(  'analind', complvec(1), ...  % Index to analysis
                     'oocvflag', oocvflag, ...   % Are we in OOCV mode?
                     'oocvind', oocvind, ...     % Index to OOCV data container
                     'OO', OO, ...               % User-defined OOCV data container (start with oocvind = 1)
@@ -38,7 +38,7 @@ if ~exist('inp','var') || isempty(inp)
                     ...                         % 2 = do not overwrite (use existing OOCVdatamats automatically)
                     'saveparam', 2, ...         % if loadparam == 2=> 1 = save OOCV processing parameters (preprocessing / models)
                     'ovrwrtperm', 2, ...        % Overwrite permutation file.
-                    'recompute_estimates', 2, ...% Recompute prediction change estimates
+                    'recompute_estimates', 2,...% Recompute prediction change estimates
                     ...                         % 2 = do not save parameters to disk
                     'saveCV1', 2, ...           % if loadparam == 2 && saveparam ==1 => 1 = save large OOCV processing containers at the CV1 level 
                     ...                         % 2 = operate at CV2 level
@@ -339,13 +339,14 @@ end
 
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
 nl = nk_GetLabelDim(MULTILABEL);
-
+inp1.MLI = MLI;
 % Loop through modalities
 for i = 1:inp1.nF
     
     % **************************** ANALYSIS SETUP *****************************
     inp2 = nk_SetFusionMode2(dat, analysis, F, nF, i, inp1.oocvind);
     inp = catstruct(inp1,inp2);
+    inp.MLI.Modality = MLI.Modality(inp.tF);
     inp.loadGD = true;
 
     for j = 1:nl

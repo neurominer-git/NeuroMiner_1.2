@@ -3,7 +3,7 @@
 % =========================================================================
 % NeuroMiner menu configurator for the interpretation of model predictions 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 05/2022
+% (c) Nikolaos Koutsouleris, 07/2022
 function [MLI, act] = nk_MLI_config(MLI, M, defaultsfl, parentstr)
 global NM
 
@@ -11,52 +11,66 @@ if ~exist("defaultsfl","var") || isempty(defaultsfl)
     defaultsfl=false;
 end
 
-method  = 'posneg';
-upper_thresh = 95;
-lower_thresh = 5;
-nperms  = 1000;
-max_iter = 1000;
-n_visited = 100;
-frac    = .1;
-usemap  = 0;
-mapfeat = 'cvr';
-cutoff = [-2 2];
-cutoffmode = 'absolute';
-cutoffoperator = 1;
-znormdata = 1;
-isimaging = false;
-MLIatlasflag = 0;
+method          = 'posneg';
+upper_thresh    = 95;
+lower_thresh    = 5;
+nperms          = 1000;
+max_iter        = 1000;
+n_visited       = 100;
+frac            = .1;
+usemap          = 0;
+mapfeat         = 'cvr';
+cutoff          = [-2 2];
+cutoffmode      = 'absolute';
+cutoffoperator  = 1;
+znormdata       = 1;
+isimaging       = false;
+MLIatlasflag    = 0;
 IO = NM.datadescriptor{M}.input_settings;
 if ~strcmp(NM.datadescriptor{M}.source,'matrix')
-    isimaging = true;
+    isimaging   = true;
 end
 if isimaging
     MLIatlasflag = 1;
-    MLIatlasfile = fullfile(NM.defs.paths,'visual','atlas','aal3.nii');
-    MLIcsvfile  = fullfile(NM.defs.paths,'visual','atlas','aal3.csv');
+    MLIatlasfile = [];
+    MLIatlasvec  = [];
+    MLIcsvfile   = [];
+    MLIcsvdelim  = 'space';
+    MLIcsvcol    = 'ROIdesc';
+    MLIcsvid     = 'ROIid';
+    MLIcsvdesc   = [];
+    MLIcsvnum    = [];
 end
 
 if ~defaultsfl
 
-    if ~exist('MLI','var') || isempty(MLI) , MLI = nk_MLI_config([], M, 1); end
+    if ~exist('MLI','var') || isempty(MLI)
+        MLI = nk_MLI_config([], M, 1); 
+    end
     
-    method = MLI.method;
-    nperms = MLI.nperms;
-    frac = MLI.frac;
-    upper_thresh = MLI.upper_thresh;
-    lower_thresh = MLI.lower_thresh;
-    max_iter = MLI.max_iter;
-    n_visited = MLI.n_visited;
-    usemap = MLI.MAP.flag;
-    mapfeat = MLI.MAP.map;
-    cutoff = MLI.MAP.cutoff;
-    cutoffmode = MLI.MAP.percentmode;
-    cutoffoperator = MLI.MAP.operator;
-    znormdata = MLI.znormdata;
+    method          = MLI.method;
+    nperms          = MLI.nperms;
+    upper_thresh    = MLI.upper_thresh;
+    lower_thresh    = MLI.lower_thresh;
+    max_iter        = MLI.max_iter;
+    n_visited       = MLI.n_visited;
+    znormdata       = MLI.znormdata;
+    frac            = MLI.Modality{M}.frac;
+    usemap          = MLI.Modality{M}.MAP.flag;
+    mapfeat         = MLI.Modality{M}.MAP.map;
+    cutoff          = MLI.Modality{M}.MAP.cutoff;
+    cutoffmode      = MLI.Modality{M}.MAP.percentmode;
+    cutoffoperator  = MLI.Modality{M}.MAP.operator;
     if isimaging
-        MLIatlasflag = MLI.imgops.flag;
-        MLIatlasfile = MLI.imgops.atlas;
-        MLIcsvfile = MLI.imgops.csv;
+        MLIatlasflag = MLI.Modality{M}.imgops.flag;
+        MLIatlasfile = MLI.Modality{M}.imgops.atlasfile;
+        MLIatlasvec  = MLI.Modality{M}.imgops.atlasvec;
+        MLIcsvfile   = MLI.Modality{M}.imgops.csvfile;
+        MLIcsvdelim  = MLI.Modality{M}.imgops.csvdelim;
+        MLIcsvid     = MLI.Modality{M}.imgops.csvid ;
+        MLIcsvcol    = MLI.Modality{M}.imgops.csvcol;
+        MLIcsvdesc   = MLI.Modality{M}.imgops.csvdesc;
+        MLIcsvnum    = MLI.Modality{M}.imgops.csvnum;        
     end
 
     switch method
@@ -149,25 +163,35 @@ if ~defaultsfl
     ZnormDataOpts = {'None','Mean centering','Z-normalization'};
     OcclusionZnormData = ['Produce z-normalized prediction change estimates [ ' ZnormDataOpts{znormdata} ' ]' ];
     mnuact = [ mnuact 12 ];
-
+    OcclusionAtlasFlag = '';
+    OcclusionAtlasImgFile = '';
+    OcclusionAtlasCSVDelim = '';
+    OcclusionAtlasCSVID = '';
+    OcclusionAtlasCSVCol = '';
+    OcclusionAtlasCSVFile = '';
     if isimaging
         if ~MLIatlasflag
             OcclusionAtlasFlag = '|Bind data modification to neuroanatomical atlas [ no ]' ; 
-            OcclusionAtlasImgFile = '';
-            OcclusionAtlasCSVFile = '';
             mnuact = [ mnuact 13 ];
         else
-            [~,AtlasFilename, Filename_ext] = fileparts(MLIatlasfile);
-            [~,AtlasCSVname, CSVname_ext] = fileparts(MLIcsvfile);
-            OcclusionAtlasFlag = '|Bind data modification to neuroanatomical atlas [ yes ]|' ;
-            OcclusionAtlasImgFile = [ 'Select atlas imaging file [ ' AtlasFilename Filename_ext ' ]|' ];
-            OcclusionAtlasCSVFile = [ 'Select atlas descriptor file [ ' AtlasCSVname CSVname_ext ' ]' ];
-            mnuact = [ mnuact 13:15 ];
+            if exist(MLIatlasfile,"file")
+                [~,AtlasFilename, Filename_ext] = fileparts(MLIatlasfile);
+            else
+                AtlasFilename = 'undefined'; Filename_ext  = '';
+            end
+            if exist(MLIcsvfile,"file")
+                [~,AtlasCSVname, CSVname_ext] = fileparts(MLIcsvfile);
+            else
+                AtlasCSVname = 'undefined'; CSVname_ext = '';
+            end
+            OcclusionAtlasFlag =    '|Bind data modification to neuroanatomical atlas [ yes ]|' ;
+            OcclusionAtlasImgFile =  [ 'Import atlas imaging file [ ' AtlasFilename Filename_ext ' ]|' ];
+            OcclusionAtlasCSVDelim = [ 'Define delimiter used in atlas descriptor file [ ' char(MLIcsvdelim) ' ]|' ];
+            OcclusionAtlasCSVID =    [ 'Define ID column in atlas descriptor file [ ' MLIcsvid ' ]|' ];
+            OcclusionAtlasCSVCol =   [ 'Define descriptor column in atlas descriptor file [ ' MLIcsvcol ' ]|' ];
+            OcclusionAtlasCSVFile =  [ 'Import atlas descriptor file [ ' AtlasCSVname CSVname_ext ' ]' ];
+            mnuact = [ mnuact 13:18 ];
         end
-    else
-        OcclusionAtlasFlag = '';
-        OcclusionAtlasImgFile = '';
-        OcclusionAtlasCSVFile = '';
     end
     
     mnustr = [ OcclusionMethodStr ...
@@ -184,6 +208,9 @@ if ~defaultsfl
               OcclusionZnormData ...
               OcclusionAtlasFlag ...
               OcclusionAtlasImgFile ...
+              OcclusionAtlasCSVDelim ...
+              OcclusionAtlasCSVID ...
+              OcclusionAtlasCSVCol ...
               OcclusionAtlasCSVFile ];
     
     nk_PrintLogo
@@ -260,28 +287,59 @@ if ~defaultsfl
         case 13
             MLIatlasflag = ~MLIatlasflag;
         case 14
-            MLIatlasfile = nk_FileSelector(1, IO.datasource, 'Select atlas file', IO.filtstr, MLIatlasfile);
+            [MLIatlasfile, Vol] = nk_FileSelector(1, IO.datasource, 'Select atlas file', IO.filt, MLIatlasfile);
+            imgtype = NM.datadescriptor{M}.input_settings.datasource;
+            switch imgtype
+                case {'spm','nifti'}
+                     Thresh = NM.datadescriptor{M}.input_settings.Thresh;
+                     Vm = spm_vol(NM.brainmask{M}); 
+                     MLIatlasvec = nk_ReturnSubSpaces(Vol, Vm, 1, 1, Thresh);
+                case 'surf'
+                     MLIatlasvec = MRIread(MLIatlasfile);
+            end
         case 15
+            MLIcsvdelimopts = {';',',','tab','space'};
+            MLIcsvdelim = spm_input('Choose the delimiter', 0, 'm', strjoin(MLIcsvdelimopts,'|'), MLIcsvdelimopts, find(strcmp(MLIcsvdelimopts,MLIcsvdelim)));
+        case 16
+            MLIcsvid = spm_input('Define the name of the table column containing the ROI indices', 0,'s', MLIcsvid);
+        case 17
+            MLIcsvcol = spm_input('Define the name of the table column containing the ROI labels', 0,'s', MLIcsvcol);
+        case 18
             MLIcsvfile = nk_FileSelector(1,0,'Define path of globals text file', '.*\.txt$|.*\.dat$|.*\.csv', MLIcsvfile);
+            try
+                T = readtable(MLIcsvfile, 'Delimiter', MLIcsvdelim);
+                MLIcsvdesc = T.(MLIcsvcol);
+                MLIcsvnum = T.(MLIcsvid);
+            catch
+                errordlg(sprintf('The CSV file %s could not be processed!\n Check your settings!', MLIcsvfile), 'MLI configuration module');
+            end
     end
 end
 MLI.method = method;
 MLI.nperms = nperms;
-MLI.frac = frac;
 MLI.upper_thresh = upper_thresh;
 MLI.lower_thresh = lower_thresh;
 MLI.max_iter = max_iter;
 MLI.n_visited = n_visited;
 MLI.znormdata = znormdata;
-MLI.MAP.flag = usemap;
-MLI.MAP.map = mapfeat;
-MLI.MAP.cutoff = cutoff;
-MLI.MAP.percentmode = cutoffmode;
-MLI.MAP.operator = cutoffoperator;
+MLI.Modality{M}.frac = frac;
+MLI.Modality{M}.MAP.flag = usemap;
+MLI.Modality{M}.MAP.map = mapfeat;
+MLI.Modality{M}.MAP.cutoff = cutoff;
+MLI.Modality{M}.MAP.percentmode = cutoffmode;
+MLI.Modality{M}.MAP.operator = cutoffoperator;
 if isimaging
-    MLI.imgops.flag = MLIatlasflag;
-    MLI.imgops.atlas = MLIatlasfile;
-    MLI.imgops.csv = MLIcsvfile;
+    MLI.Modality{M}.imgops.flag = MLIatlasflag;
+    MLI.Modality{M}.imgops.atlasfile = MLIatlasfile;
+    MLI.Modality{M}.imgops.atlasvec = MLIatlasvec;
+    MLI.Modality{M}.imgops.atlasvec_unique = unique(MLIatlasvec);
+    MLI.Modality{M}.imgops.csvfile = MLIcsvfile;
+    MLI.Modality{M}.imgops.csvdelim = MLIcsvdelim;
+    MLI.Modality{M}.imgops.csvid = MLIcsvid;
+    MLI.Modality{M}.imgops.csvcol = MLIcsvcol;
+    MLI.Modality{M}.imgops.csvdesc = MLIcsvdesc;
+    MLI.Modality{M}.imgops.csvnum = MLIcsvnum;
+
 else
-    MLI.imgops = [];
+    MLI.Modality{M}.imgops = [];
 end
