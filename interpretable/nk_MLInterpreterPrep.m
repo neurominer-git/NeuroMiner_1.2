@@ -89,10 +89,9 @@ if ~isempty(analysis)
     % Compute from scratch or use pre-computed datamats ?
     LFL_opts        = {'Compute from scratch',sprintf('Use precomputed %s',inp.datatype)};                                      
     ModeStr         = sprintf('Operation mode of ML interpreter module [ %s ]|',LFL_opts{inp.lfl});                       ModeAct = 3;
-    
+    OVRWRT_opts     = {'Overwrite existing','Do not overwrite'}; 
     if inp.lfl == 1
-        % from scratch
-        OVRWRT_opts     = {'Overwrite existing','Do not overwrite'};       
+        % from scratch      
         OverWriteStr = sprintf('Overwrite existing %s files [ %s ]|', inp.datatype, OVRWRT_opts{inp.ovrwrt}) ;            OverWriteAct = 4; 
     else
         % precomputed

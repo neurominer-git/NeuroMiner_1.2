@@ -7,7 +7,7 @@ function [Results, FileNames, RootPath] = nk_MLInterpreter(inp)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, last modified 08/2020
 
-global SVM RFE MODEFL CV SCALE SAV CVPOS 
+global SVM RFE MODEFL CV SCALE SAV CVPOS FUSION
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FullPartFlag    = RFE.ClassRetrain;
 switch inp.analmode
@@ -151,7 +151,7 @@ else
                         nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique) * inp.MLI.Modality{nx}.frac );
                         % Create permutations of atlas indices => tI
                         [ tI, inp.MLI.nperms ] = uperms( inp.MLI.Modality{nx}.imgops.atlasvec_unique, inp.MLI.nperms, nfrac ); 
-                        % Initialize logical index vector to map selected predictors to MapIdx
+                        % Initialize logical index vector to map selected predictors within the space of MapIdx
                         RandFeats(h, nx).I = false(inp.MLI.nperms, nYmap);
                         for nq=1:inp.MLI.nperms
                             % Find permuted atlas indices in masked atlas
@@ -457,7 +457,8 @@ for f=1:ix % Loop through CV2 permutations
                                 inp.NanModality(nx) = true;
                                 continue;
                             end
-                            Tr = inp.X(nx).Y(TrInd,:); 
+                            Tr = inp.X(nx).Y(TrInd,:);
+                            fprintf('\nModality #%g: Creating modified version of %s', nx, cases{tInd(q)})
                             inp = nk_CreateData4MLInterpreter( inp.MLI, RandFeats(h, nx).I, Tr, Ts , covs, inp, nx, h );
                         end
 
@@ -580,7 +581,8 @@ for f=1:ix % Loop through CV2 permutations
                                                     % artificial data and generate
                                                     % predictions for later
                                                     % evaluation
-                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g => Predicting %g modified instances of %s', f, d, k, l, u, size(OCV,1), cases{tInd(q)});
+                                                    fprintf('\nCV2 [%g,%g], CV1 [%g,%g]: Model #%g | Parameter combination #%g => Predicting %g modified instances of %s', ...
+                                                        f, d, k, l, u, m, size(OCV,1), cases{tInd(q)});
                                                     [~, ~, uD(:,u)] = nk_GetTestPerf(OCV, ones(size(OCV,1),1), F(:,u), MD{h}{m}{k,l}{u}, TR_star, 1);
         
                                                     % Detrend regressor predictions, if
@@ -617,11 +619,15 @@ for f=1:ix % Loop through CV2 permutations
                 %% Step 5: Evaluate impact of input data modifications using obtained predictions
                 if ~loadfl || (loadfl && inp.recompute_estimates ==1)
                     fprintf('\nComputing MLI prediction change estimates in CV2 partition [ %g, %g ]:', f, d);
+                  
                     for q=1:numel(tInd) % Loop through CV2/OOCV cases 
                         fprintf('\n\tCase %s (%g of %g cases)', cases{tInd(q)}, q, numel(tInd));
+
                         for h=1:nclass
                             Oh = nm_nanmedian(predOrig{h}(q,:),2);
+
                             for nx = 1:nM
+                                fMapIdx = find( inp.MLI.Modality{nx}.MAP.mapidx{h} );
                                 nY = size(inp.X(nx).Y,2);
                                 switch inp.MLI.method
                                     case 'posneg'
@@ -633,19 +639,8 @@ for f=1:ix % Loop through CV2 permutations
                                 mapInterp_ciu{h, nx}(q,:), ...
                                 mapInterp_cil{h, nx}(q,:), ...
                                 mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(nY, Oh, Rh, RandFeats(h, nx).I, ...
-                                                                    inp.MLI.Modality{nx}.MAP.mapidx{h}, inp.MLI.method, ...
+                                                                    fMapIdx, inp.MLI.method, ...
                                                                     inp.MLI.RangePred(h), inp.MLI.znormdata);
-                                if inp.X(nx).datatype == 1
-                                    switch inp.MLI.znormdata
-                                        case 1
-                                            filpth = fullfile(inp.rootdir,sprintf('%s_Interp_CV2-%g-%g', cases{tInd(q)}, f, d));
-                                        case 2
-                                            filpth = fullfile(inp.rootdir,sprintf('%s_InterpMC_CV2-%g-%g', cases{tInd(q)}, f, d));
-                                        case 3
-                                            filpth = fullfile(inp.rootdir,sprintf('%s_InterpZ_CV2-%g-%g', cases{tInd(q)}, f, d));
-                                    end
-                                    nk_WriteVol(mapInterp{h, nx}(q,:), filpth,1, inp.X(nx).brainmask{1},inp.X(nx).badcoords{1},0,'gt');
-                                end
                             end
                         end
                     end
@@ -665,10 +660,15 @@ for f=1:ix % Loop through CV2 permutations
                         fprintf('\nRecomputing MLI prediction change estimates in CV2 partition [ %g, %g ]:', f, d);
                         %% Step 5: Evaluate impact of input data modifications using obtained predictions
                         for q=1:numel(tInd) % Loop through CV2/OOCV cases 
+
                             fprintf('\n\tCase %s (%g of %g cases)', cases{tInd(q)}, q, numel(tInd));
+                            
                             for h=1:nclass
                                 Oh = nm_nanmedian(predOrig{h}(q,:),2);
+                            
                                 for nx = 1:nM
+                                    fMapIdx = find( inp.MLI.Modality{nx}.MAP.mapidx{h} );
+                                    nY = size(inp.X(nx).Y,2);
                                     switch inp.MLI.method
                                         case 'posneg'
                                             Rh = [ nm_nanmedian(predInterp{q,h,1},2) nm_nanmedian(predInterp{q,h,2},2)]; 
@@ -678,8 +678,8 @@ for f=1:ix % Loop through CV2 permutations
                                     [mapInterp{h, nx}(q,:), ...
                                      mapInterp_ciu{h, nx}(q,:), ...
                                      mapInterp_cil{h, nx}(q,:), ...
-                                     mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(Oh, Rh, RandFeats(h, nx).I, ...
-                                                                     inp.MLI.Modality{nx}.MAP.mapidx{h}, inp.MLI.method, ...
+                                     mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(nY, Oh, Rh, RandFeats(h, nx).I, ...
+                                                                     fMapIdx, inp.MLI.method, ...
                                                                      inp.MLI.RangePred(h), inp.MLI.znormdata);
                                 end
                             end
@@ -713,6 +713,7 @@ end
 ol=ol-1;
 for h = 1:nclass
     for nx = 1 : nM
+        [ ~, datatype, brainmaski, badcoordsi, labeli, labelopi ] = getD(FUSION.flag, inp, nx);
         switch MODEFL
             case 'classification'
                 Results.BinResults(h).Modality(nx).Y_mapped     = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped(:,:,1:ol),3);
@@ -720,14 +721,40 @@ for h = 1:nclass
                 Results.BinResults(h).Modality(nx).Y_mapped_cil = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_cil(:,:,1:ol),3);
                 Results.BinResults(h).Modality(nx).Y_mapped_std = nm_nanmean(Results.BinResults(h).Modality(nx).Y_mapped_std(:,:,1:ol),3);
                 Results.BinResults(h).RangePred = inp.MLI.RangePred(h);
+                vols = Results.BinResults(h).Modality(nx).Y_mapped;
             case 'regression'
                 Results.RegrResults.Modality(nx).Y_mapped       = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_ciu   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_ciu(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_cil   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_cil(:,:,1:ol),3);
                 Results.RegrResults.Modality(nx).Y_mapped_std   = nm_nanmean(Results.RegrResults.Modality(nx).Y_mapped_std(:,:,1:ol),3);
                 Results.RegrResults.RangePred = inp.MLI.RangePred(h);
+                vols = Results.RegrResults.Modality(nx).Y_mapped; 
         end
-
+        
+        % Write image files to disk
+        if datatype == 1 || datatype == 2
+            computedCases = find(any(vols,2));
+            fprintf('\Writing out %g cases.',numel(computedCases));
+            for q=1:numel(computedCases) % Loop through CV2/OOCV cases 
+                switch inp.MLI.znormdata
+                    case 1
+                        volnam = fullfile(inp.rootdir,sprintf('mliR%s', cases{computedCases(q)}));
+                    case 2
+                        volnam  = fullfile(inp.rootdir,sprintf('mliMC%s', cases{computedCases(q)}));
+                    case 3
+                        volnam  = fullfile(inp.rootdir,sprintf('mliZ%s', cases{computedCases(q)}));
+                end
+                switch datatype
+                    case 1 % SPM-based NIFTI write-out
+                        nk_WriteVol(vols(computedCases(q),:), volnam, 1, brainmaski, badcoordsi, labeli, labelopi);
+                    case 2 % Surface-based write-out
+                        s = MRIread(brainmaski);
+                        volnam = fullfile(pwd,[deblank(volnam) '.mgh']);
+                        s.vol = vols(computedCases(q),:);
+                        MRIwrite(s,filename)
+                end
+            end
+        end
     end
 end
 
