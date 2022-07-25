@@ -71,13 +71,10 @@ switch h_list{h_val}
         %handles.pnModelPerf.Visible         ='off';
         %handles.pnBinary.Visible            ='off';
         %handles.pnVisual.Visible            ='on';
-        %load_selModality(handles)
-        %handles = display_mli(handles);
+        load_selModality(handles)
+        
 
-        %appMLI(handles.subjects, ...
-        %    handles.NM.Y{handles.visdata{handles.curmodal}.params.varind}, ...
-        %    handles.visdata{handles.curmodal}.params.features, ...
-        %    handles.MLIdata.Label.BinResults.Modality);
+
         appMLI(handles);
 
 
