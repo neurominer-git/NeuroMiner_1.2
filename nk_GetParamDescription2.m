@@ -523,6 +523,8 @@ switch action
                                 preprocact{i} = sprintf('%s, Method: %s', preprocact{i}, params.ACTPARAM{i}.GRAPHCONSTRUCTION.method);
                             end
 %                             preprocact{i} = sprintf('%s ]', preprocact{i});
+                        case 'customPreproc'
+                            preprocact{i} = sprintf('Perform custom preprocessing step. Function: %s', params.ACTPARAM{i}.CUSTOMPREPROC.filename); 
                     end
                     
                 else

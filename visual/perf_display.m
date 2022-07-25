@@ -56,10 +56,7 @@ else
     handles.selModelMeasures.Value = 1;
 end
 
-% if ~isempty(mlidata) 
-%     handles.MLIdata = mlidata;
-%    %appMLI; 
-% end
+
 
 if isfield(handles,'MultiClass'), load_selOneVsAll_Info(handles); end
 handles = display_main(handles);
