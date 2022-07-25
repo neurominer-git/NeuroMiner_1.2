@@ -100,6 +100,7 @@ for h=1:nclass
             switch maptype
                 case 'cvr'
                     inp.MLI.Modality{nx}.MAP.map{h} = inp.visdata{inp.curmodal,inp.curlabel}.CVRatio{h};
+
                 case 'p_sgn'
                     inp.MLI.Modality{nx}.MAP.map{h} = inp.visdata{inp.curmodal,inp.curlabel}.SignBased_CV2_p_uncorr{h};
                 case 'p_FDR_sgn'
@@ -113,7 +114,8 @@ for h=1:nclass
         else
             inp.MLI.Modality{nx}.MAP.mapidx{h} = true(1,nY);
         end
-
+        if ~any(inp.MLI.Modality{nx}.MAP.mapidx{h}),
+            error('User-specified feature selection map is empty! ')
         if isfield(inp.MLI.Modality{nx},'imgops') && ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag 
             
         end

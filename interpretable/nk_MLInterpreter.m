@@ -113,7 +113,9 @@ for h=1:nclass
         else
             inp.MLI.Modality{nx}.MAP.mapidx{h} = true(1,nY);
         end
-
+        if ~any(inp.MLI.Modality{nx}.MAP.mapidx{h})
+            error(sprintf('User-specified feature selection map ''%s'' is empty! Adapt your settings.', maptype))
+        end
         if isfield(inp.MLI.Modality{nx},'imgops') && ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag 
             
         end
@@ -150,7 +152,7 @@ else
                         % Create permutations of atlas indices => tI
                         [ tI, inp.MLI.nperms ] = uperms( inp.MLI.Modality{nx}.imgops.atlasvec_unique, inp.MLI.nperms, nfrac ); 
                         % Initialize logical index vector to map selected predictors to MapIdx
-                        RandFeats(h, nx).I = false(1, ceil(inp.MLI.nperms, nYmap * inp.MLI.Modality{nx}.frac));
+                        RandFeats(h, nx).I = false(inp.MLI.nperms, nYmap);
                         for nq=1:inp.MLI.nperms
                             % Find permuted atlas indices in masked atlas
                             % file (e.g. masked using CVR, sign-based )
