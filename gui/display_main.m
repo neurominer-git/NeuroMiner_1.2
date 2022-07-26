@@ -73,10 +73,7 @@ switch h_list{h_val}
         %handles.pnVisual.Visible            ='on';
         load_selModality(handles)
         
-
-
-        appMLI(handles);
-
+        handles.MLIapp = appMLI(handles);
 
     otherwise
       
