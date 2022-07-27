@@ -373,7 +373,10 @@ guidata(handles.figure1,handles);
 
 function hoverCallback(src, evt)
     
+    %handles = guidata(gcf);
+    %handles=[];
     % Grab the x & y axes coordinate where the mouse is
+    fprintf('\nEvent: %s', evt.EventName)
     axesHdl = get(gcf,'CurrentAxes');
     mousePoint = get(axesHdl, 'CurrentPoint');
     figdata = get(axesHdl,'UserData');
@@ -398,6 +401,7 @@ function hoverCallback(src, evt)
             figdata.hPanel.Position(2) = mousePoint2(2);% * (figdata.pnpos(4)/figdata.figpos(4));
             figdata.hPanel.Visible='on';
             figdata.textHdl.Visible='on';
+            %uistack(figdata.hPanel,'top')
         else
             figdata.hPanel.Visible='off';
         end
@@ -410,10 +414,10 @@ function clickCallback(src, evt)
     %handles = guidata(gcf);
     %handles=[];
     % Grab the x & y axes coordinate where the mouse is
+    fprintf('\nEvent: %s', evt.EventName)
     axesHdl = get(gcf,'CurrentAxes');
     mousePoint = get(axesHdl, 'CurrentPoint');
     figdata = get(axesHdl,'UserData');
-    handles = guidata(gcf);
     if ~isempty(figdata)
         
         mouseX = mousePoint(1,1);
@@ -432,21 +436,24 @@ function clickCallback(src, evt)
                 
             handles.selCase.Value = indpat;
             selCase = handles.selCase.String{handles.selCase.Value};
-            I = find(~cellfun(@isempty,strfind(figdata.cases,selCase)));
-            x1 = figdata.x(I);
-            y1 = figdata.y(I);
+            AxesData = handles.axes1.UserData;
+            I = find(~cellfun(@isempty,strfind(AxesData.cases,selCase)));
+            x1 = AxesData.x(I);
+            y1 = AxesData.y(I);
             figpos = dsxy2figxy(handles.axes1,x1,y1);
             axes(handles.axes1); 
             if isfield(handles,'caseplot'), delete(handles.caseplot); end
             handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
             if isfield(handles, 'MLIdata')
                 handles.thisMLIresult.Visible = 'on';
-                handles.curCase = indpat;
+                handles.curCase = str2num(selCase);
             end
-            axesHdl.Legend.String{end} = selCase;
+            guidata(handles.figure1,handles);
+
+
         end
         set(axesHdl,'UserData',figdata);
-        guidata(handles.figure1,handles);
+        
     end
     
     % --------------------------------------------------------------------
@@ -1053,7 +1060,6 @@ if isfield(handles, 'MLIdata')
     handles.thisMLIresult.Visible = 'on';
     handles.curCase = str2num(selCase);
 end
-handles.axes.Legend.String{end} = selCase;
 guidata(handles.figure1,handles);
 
 % --- Executes during object creation, after setting all properties.
