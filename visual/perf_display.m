@@ -37,6 +37,12 @@ if handles.multilabel
         handles.curlabel= get(handles.selLabel,'Value');
     end
 end
+if isfield(handles,'MLIapp') && ~isfield(handles.NM.analysis{analind},'MLI')
+    handles.MLIapp.delete;
+    handles = rmfield(handles,'MLIapp');
+elseif isfield(handles,'MLIapp') && ~isnumeric(handles.MLIapp) && isfield(handles.NM.analysis{analind},'MLI')
+    appmli.updateFcn(appmli,handles);
+end
 
 [handles, visdata, oocvdata, mlidata] = switch_analysis(handles);
 

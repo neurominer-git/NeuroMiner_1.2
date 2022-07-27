@@ -39,6 +39,7 @@ for i = 1:nVarIn
     
         mli = varargin{i+1};
         handles.MLIdata = mli;   
+        handles.MLIapp = 0;
     end
     
     

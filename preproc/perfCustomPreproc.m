@@ -1,5 +1,3 @@
-
-
 function [sY, IN] = perfCustomPreproc(Y, IN)
 % =========================================================================
 
@@ -20,7 +18,10 @@ function [Y, IN] = PerfCustomPreprocFunc(Y, IN)
     
     if isfield(IN, 'ParamCombos')
         curParams = IN.ParamCombos(IN.p,:);
-    end
         Y = eval(sprintf("%s(Y, curParams);", IN.filename));
+    else
+        Y = eval(sprintf("%s(Y);",IN.filename));
+    end
+        
     
 end
