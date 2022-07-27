@@ -803,7 +803,7 @@ for ii = valid_handles(handles),
 	for i=1:3,
 		set(stMLI.vols{ii}.ax{i}.ax,'UIcontextmenu',[]);
 		stMLI.vols{ii}.ax{i} = rmfield(stMLI.vols{ii}.ax{i},'cm');
-	end;
+    end;
 end;
 return;
 %_______________________________________________________________________

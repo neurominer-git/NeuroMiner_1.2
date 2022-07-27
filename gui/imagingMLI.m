@@ -1,6 +1,7 @@
-function imagingMLI(casenum, MLIcont)
+function imagingMLI(casenum, MLIcont, APPstMLI)
 %global stMLI
-
+global stMLI
+stMLI = APPstMLI;
 y = MLIcont.Y_mapped(casenum,:)';
 %y_ciu = MLIcont.Y_mapped_ciu(casenum,:);
 %y_cil = MLIcont.Y_mapped_cil(casenum,:);
