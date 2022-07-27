@@ -695,11 +695,17 @@ for f=1:ix % Loop through CV2 permutations
             for nx = 1 : nM
                 switch MODEFL
                     case 'classification'
+                        Results.BinResults(h).Modality(nx).modality_num = inp.tF(nx); 
+                        Results.BinResults(h).Modality(nx).modality_type = inp.X(nx).datatype;
+                        Results.BinResults(h).Modality(nx).modality_featnames = inp.featnames{nx};
                         Results.BinResults(h).Modality(nx).Y_mapped(tInd,:,f) = mapInterp{h,nx};
                         Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:,f) = mapInterp_ciu{h,nx};
                         Results.BinResults(h).Modality(nx).Y_mapped_cil(tInd,:,f) = mapInterp_cil{h,nx};
                         Results.BinResults(h).Modality(nx).Y_mapped_std(tInd,:,f) = mapInterp_std{h,nx};
                     case 'regression'
+                        Results.RegrResults.Modality(nx).modality_num = inp.tF(nx);
+                        Results.RegrResults.Modality(nx).modality_type = inp.X(nx).datatype;
+                        Results.RegrResults.Modality(nx).modality_featnames = inp.featnames{nx};
                         Results.RegrResults.Modality(nx).Y_mapped(tInd,:,f) = mapInterp{h,nx};
                         Results.RegrResults.Modality(nx).Y_mapped_ciu(tInd,:,f) = mapInterp_ciu{h,nx};
                         Results.RegrResults.Modality(nx).Y_mapped_cil(tInd,:,f) = mapInterp_cil{h,nx};
