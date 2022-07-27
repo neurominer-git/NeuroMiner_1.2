@@ -349,6 +349,9 @@ try
             
         case 'loadmat'
             NM = loadmat(NM);
+            NMx = NM;
+            assignin('base', 'NM', NMx)
+            clear NMx
             
         case 'savemat'
             savemat(NM);

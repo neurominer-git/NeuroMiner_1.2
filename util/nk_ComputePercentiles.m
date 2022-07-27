@@ -1,6 +1,6 @@
-function centiles = nk_ComputePercentiles(refdata, values, direction, groupnames)
+function centiles = nk_ComputePercentiles(refdata, values, direction)
 % =========================================================================
-% FORMAT centiles = nk_ComputePercentiles(data, values)
+% FORMAT centiles = nk_ComputePercentiles(data, values, direction)
 % =========================================================================
 % computes the percentile
 nd = size(refdata,2);
