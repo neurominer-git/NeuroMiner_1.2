@@ -1053,6 +1053,7 @@ if isfield(handles, 'MLIdata')
     handles.thisMLIresult.Visible = 'on';
     handles.curCase = str2num(selCase);
 end
+handles.axes.Legend.String{end} = selCase;
 guidata(handles.figure1,handles);
 
 % --- Executes during object creation, after setting all properties.
