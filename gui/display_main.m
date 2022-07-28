@@ -74,6 +74,9 @@ switch h_list{h_val}
         load_selModality(handles)
         
         handles.MLIapp = appMLI(handles);
+        handles.selModelMeasures.Value = 1;
+        display_main(handles);
+
 
     otherwise
       

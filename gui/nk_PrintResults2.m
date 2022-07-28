@@ -1323,7 +1323,12 @@ function thisMLIresult_Callback(hObject, eventdata, handles)
         %handles.visdata{1,1}.params.features, ...
         %handles.NM.Y{1}, ...
         %0);
- appMLI(handles, handles.curCase);
+        if ~isfield(handles, 'appMLI')
+            handles.appMLI = appMLI(handles);
+        else
+            updateFcn(handles.MLIapp, handles);
+        end
+
 
 % --- Executes on button press in tglClrSwp.
 function tglClrSwp_Callback(hObject, eventdata, handles)
