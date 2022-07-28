@@ -609,11 +609,6 @@ for f=1:ix % Loop through CV2 permutations
                             inp.X = rmfield(inp.X,'Yocv');
                         end
                     end
-                    fprintf('\nSaving %s', oMLIpath); 
-                    save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
-                    if saveparam 
-                        fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
-                    end
                 end
 
                 %% Step 5: Evaluate impact of input data modifications using obtained predictions
@@ -644,6 +639,12 @@ for f=1:ix % Loop through CV2 permutations
                             end
                         end
                     end
+                end
+
+                fprintf('\nSaving %s', oMLIpath); 
+                save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
+                if saveparam 
+                    fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
                 end
                 
             case 1

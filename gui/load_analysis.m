@@ -42,8 +42,11 @@ for i = 1:nVarIn
         if ~isfield(handles, 'MLIapp')
             handles.MLIapp = 0;
         else
+            try
             handles.MLIapp.delete;
             handles.MLIapp = 1;
+            catch
+            end
         end
     end
     
