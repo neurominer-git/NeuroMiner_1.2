@@ -32,13 +32,20 @@ switch handles.modeflag
                 end
                 labelh = handles.BinClass{h_class}.labelh;
             end
-            cl1 = handles.colptin(handles.BinClass{h_class}.groupind(1),:);
-           
-            if ~handles.BinClass{h_class}.one_vs_all
-                cl2 = handles.colptin(handles.BinClass{h_class}.groupind(2),:);
+
+            clrswp = handles.tglClrSwp.Value;
+            if clrswp
+                g1 = 2; g2 = 1;
             else
-                cl2= rgb('DarkGrey');
+                g1 = 1; g2 = 2;
             end
+            CLR1 = handles.colptin(handles.BinClass{h_class}.groupind(g1),:);
+            if ~handles.BinClass{h_class}.one_vs_all
+                CLR2 = handles.colptin(handles.BinClass{h_class}.groupind(g2),:);
+            else
+                CLR2 = rgb('DarkGrey');
+            end
+            
         end
     case 'regression'
         set(handles.txtPretestProb,'visible','on');
@@ -57,11 +64,11 @@ end
 
 % Display pie charts
 LR1     = contigmat.pLR;
-h1pie = display_pie(handles.axes3, handles.cmdExportPies, Pre1, LR1 , groupnames{1}, cl1);
+h1pie = display_pie(handles.axes3, handles.cmdExportPies, Pre1, LR1 , groupnames{1}, CLR1);
 
 Pre2    = 1-Pre1;
 LR2     = (contigmat.spec/100) / (1-(contigmat.sens/100));
-h2pie = display_pie(handles.axes4, handles.cmdExportPies, Pre2, LR2 , groupnames{2}, cl2);
+h2pie = display_pie(handles.axes4, handles.cmdExportPies, Pre2, LR2 , groupnames{2}, CLR2);
 
 if isempty(h1pie) || isempty(h2pie)
     set(handles.txtPretestProb,'Visible','off')

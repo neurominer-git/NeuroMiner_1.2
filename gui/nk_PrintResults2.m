@@ -22,7 +22,7 @@ function varargout = nk_PrintResults2(varargin)
 
 % Edit the above text to modify the response to help nk_PrintResults2
 
-% Last Modified by GUIDE v2.5 27-Jul-2022 13:04:34
+% Last Modified by GUIDE v2.5 27-Jul-2022 20:01:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1053,7 +1053,7 @@ if isfield(handles, 'MLIdata')
     handles.thisMLIresult.Visible = 'on';
     handles.curCase = str2num(selCase);
 end
-handles.axes.Legend.String{end} = selCase;
+handles.axes1.Legend.String{end} = selCase;
 guidata(handles.figure1,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -1325,3 +1325,12 @@ function thisMLIresult_Callback(hObject, eventdata, handles)
         %0);
  appMLI(handles, handles.curCase);
 
+% --- Executes on button press in tglClrSwp.
+function tglClrSwp_Callback(hObject, eventdata, handles)
+% hObject    handle to tglClrSwp (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of tglClrSwp
+handles = perf_display(handles);
+guidata(handles.figure1,handles);
