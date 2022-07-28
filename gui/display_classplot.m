@@ -11,6 +11,21 @@ switch handles.tglSort.Value
     case 1
         MS = 6; SrtStr = 'Sorted ';
 end
+%% Define colors
+clrswp = handles.tglClrSwp.Value;
+if clrswp
+    g1 = 2; g2 = 1;
+else
+    g1 = 1; g2 = 2;
+end
+CLR1 = handles.colptin(handles.BinClass{h}.groupind(g1),:);
+if ~handles.BinClass{h}.one_vs_all
+    CLP = handles.colpt;
+    CLR2 = handles.colptin(handles.BinClass{h}.groupind(g2),:);
+else
+    CLP = 'o';
+    CLR2 = rgb('DarkGrey');
+end
 
 %% Display classification plot
 % Define X axis data
@@ -256,36 +271,29 @@ if sum(idx1)
     if ~AltAx && ~handles.tglSort.Value
         fIdx1 = find(id1);
         v = [ [0 offy]; [0 YLIMS(2)]; [lxL(fIdx1(end))+r YLIMS(2)]; [lxL(fIdx1(end))+r offy] ];             
-        patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', handles.colptin(handles.BinClass{h}.groupind(1),:), 'EdgeColor', 'none', 'FaceAlpha', 0.15)
+        patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR1, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
     end
-    b(1) = plot(lxL(idx1),predh(idx1),handles.colpt,...
-        'MarkerSize',MS,...
-        'Color',handles.colptin(handles.BinClass{h}.groupind(1),:),...
-        'MarkerFaceColor',handles.colptin(handles.BinClass{h}.groupind(1),:),...
-        'LineWidth',handles.DataMarkerWidth,...
-        'LineStyle','none');    
+    b(1) = plot(lxL(idx1),predh(idx1), handles.colpt,...
+        'MarkerSize', MS,...
+        'Color', CLR1,...
+        'MarkerFaceColor', CLR1,...
+        'LineWidth', handles.DataMarkerWidth,...
+        'LineStyle', 'none');    
 else
     b(1) = plot(1,NaN,'LineStyle','none');
 end
 
 % Plot Group B results
 if sum(idx2)
-    if ~handles.BinClass{h}.one_vs_all
-        CLP = handles.colpt;
-        CLR = handles.colptin(handles.BinClass{h}.groupind(2),:);
-    else
-        CLP = 'o';
-        CLR = rgb('DarkGrey');
-    end
     if ~AltAx && ~handles.tglSort.Value
         fIdx2 = find(id2);
         v = [ [lxL(fIdx2(1)) offy]; [lxL(fIdx2(1)) YLIMS(1)]; [XLIMS(2) YLIMS(1)]; [XLIMS(2) offy] ];             
-        patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
+        patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR2, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
     end
     b(2) = plot(lxL(idx2),predh(idx2),CLP,...
         'MarkerSize',MS,...
-        'Color',CLR,...
-        'MarkerFaceColor', CLR,...
+        'Color',CLR2,...
+        'MarkerFaceColor', CLR2,...
         'LineWidth',handles.DataMarkerWidth,...
         'LineStyle','none');
 else
@@ -319,15 +327,10 @@ end
 % Error plotting
 ide1 = id1 & err; ide2 = id2 & err;
 % Mark errors in Group A
-x1 = plot(lxL(ide1),predh(ide1), '*', 'Color', handles.colptin(handles.BinClass{h}.groupind(1),:),'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);
-if handles.BinClass{h}.one_vs_all 
-    Color2 = rgb('DarkGrey');
-else
-    Color2 = handles.colptin(handles.BinClass{h}.groupind(2),:);
-end
+x1 = plot(lxL(ide1),predh(ide1), '*', 'Color', CLR1,'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);
 
 % Mark errors in Group B
-x2 = plot(lxL(ide2),predh(ide2), '*', 'Color', Color2,'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);  
+x2 = plot(lxL(ide2),predh(ide2), '*', 'Color', CLR2,'MarkerSize',handles.DataMissMarkerSize,'LineWidth',handles.DataMissMarkerWidth);  
 
 % Create legend
 switch GraphType
@@ -348,17 +351,17 @@ handles.axes1.XTickMode='auto';
 handles.axes1.YGrid='off'; 
 handles.axes1.XGrid='off'; 
 
-if AltAx,
+if AltAx
     % Display regression lines for alternative X Axis
     xl      = get(gca,'Xlim');
     p       = polyfit(lxL(id1),predh(id1),1);     % p returns 2 coefficients fitting r = a_1 * x + a_2
     [ rho(1), pval(1) ]  = corr(lxL(id1),predh(id1));
     r       = p(1) .* xl + p(2);                   % compute a new vector r that has matching datapoints in x
-    hl(1)   = plot(xl,r, '-', 'LineWidth', 2, 'Color', [ handles.colptin(handles.BinClass{h}.groupind(1),:) .5]);
+    hl(1)   = plot(xl,r, '-', 'LineWidth', 2, 'Color', [ CLR1 .5]);
     p       = polyfit(lxL(id2),predh(id2),1);     % p returns 2 coefficients fitting r = a_1 * x + a_2
     [ rho(2), pval(2) ]  = corr(lxL(id2),predh(id2));
     r       = p(1) .* xl + p(2);                   % compute a new vector r that has matching datapoints in x
-    hl(2)   = plot(xl,r, '-', 'LineWidth', 2, 'Color', [ handles.colptin(handles.BinClass{h}.groupind(2),:) .5]);
+    hl(2)   = plot(xl,r, '-', 'LineWidth', 2, 'Color', [ CLR2 .5]);
     handlevec = [handlevec hl];
     legendvec = [legendvec, {sprintf('r=%1.2f | p=%.3f', rho(1), pval(1))}, {sprintf('r=%1.2f | p=%.3f', rho(2), pval(2))} ];
     % Display misclassification histogram analysis 
@@ -369,7 +372,7 @@ if AltAx,
     err_hist2 = hist3([lxL(id2) err(id2)], Bins1); 
     perr_hist2 = err_hist2(:,2) ./ sum(err_hist2,2);
     axes(handles.axes38); 
-    bar(handles.axes38, Bins1{1}, perr_hist1,'BarWidth',1,'FaceColor', handles.colptin(handles.BinClass{h}.groupind(1),:),'FaceAlpha',0.5); 
+    bar(handles.axes38, Bins1{1}, perr_hist1,'BarWidth',1, 'FaceColor', CLR1,'FaceAlpha',0.5); 
     xlim(handles.axes38, XLIMS);
     ylim(handles.axes38, [0 1]);
     set(handles.axes38, ...%'FontSize', handles.AxisTickSize, ...
@@ -377,20 +380,13 @@ if AltAx,
         'LineWidth', handles.AxisLineWidth);
     ylabel(handles.axes38,'% Misclassified / Bin');
     hold(handles.axes38,'on'); 
-    if handles.BinClass{h}.one_vs_all 
-        Color2 = rgb('DarkGrey');
-    else
-        Color2 = handles.colptin(handles.BinClass{h}.groupind(2),:);
-    end
-    bar(handles.axes38, Bins1{1}, perr_hist2,'BarWidth',1,'FaceColor', Color2,'FaceAlpha',0.5); 
+    bar(handles.axes38, Bins1{1}, perr_hist2,'BarWidth',1,'FaceColor', CLR2,'FaceAlpha',0.5); 
     hold(handles.axes38,'off'); 
     axes(handles.axes1);
 end
 
 plot(xLimitsVec,zeroline,'LineWidth',handles.ZeroLineWidth,'Color',rgb('Grey'))
-if handles.BinClass{h}.CoxMode
-    %plotshaded(lxL,[(zeroline+(offs/2-zeroline))'; (zeroline-(offs/2-zeroline))'], 'k')
-end
+
 switch GraphType
 
     case {1,2,3}
