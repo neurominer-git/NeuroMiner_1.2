@@ -442,6 +442,11 @@ function clickCallback(src, evt)
             if isfield(handles, 'MLIdata')
                 handles.thisMLIresult.Visible = 'on';
                 handles.curCase = indpat;
+                if ~isnumeric(handles.MLIapp)
+                    updateFcn(handles.MLIapp, handles)
+                end
+
+
             end
             axesHdl.Legend.String{end} = selCase;
         end
@@ -1051,7 +1056,7 @@ if isfield(handles,'caseplot'), delete(handles.caseplot); end
 handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
 if isfield(handles, 'MLIdata')
     handles.thisMLIresult.Visible = 'on';
-    handles.curCase = str2num(selCase);
+    handles.curCase = handles.selCase.Value;
 end
 handles.axes1.Legend.String{end} = selCase;
 guidata(handles.figure1,handles);
@@ -1323,9 +1328,9 @@ function thisMLIresult_Callback(hObject, eventdata, handles)
         %handles.visdata{1,1}.params.features, ...
         %handles.NM.Y{1}, ...
         %0);
-        if ~isfield(handles, 'appMLI')
+        if ~isfield(handles, 'MLIapp')
             handles.appMLI = appMLI(handles);
-        else
+        elseif isfield(handles, 'MLIapp') && ~isnumeric(handles.MLIapp)
             updateFcn(handles.MLIapp, handles);
         end
 
@@ -1339,3 +1344,6 @@ function tglClrSwp_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of tglClrSwp
 handles = perf_display(handles);
 guidata(handles.figure1,handles);
+%if isfield(handles, 'MLIapp') && ~isnumeric(handles.MLIapp)
+%    updateFcn(handles.MLIapp,handles);
+%end
