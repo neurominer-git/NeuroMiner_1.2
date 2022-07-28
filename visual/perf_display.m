@@ -37,14 +37,19 @@ if handles.multilabel
         handles.curlabel= get(handles.selLabel,'Value');
     end
 end
+
+
+[handles, visdata, oocvdata, mlidata] = switch_analysis(handles);
+
 if isfield(handles,'MLIapp') && ~isfield(handles.NM.analysis{analind},'MLI')
     handles.MLIapp.delete;
     handles = rmfield(handles,'MLIapp');
 elseif isfield(handles,'MLIapp') && ~isnumeric(handles.MLIapp) && isfield(handles.NM.analysis{analind},'MLI')
-    appmli.updateFcn(appmli,handles);
+    updateFcn(handles.MLIapp,handles);
+elseif isfield(handles,'MLIapp') && isnumeric(handles.MLIapp) && handles.MLIapp == 1 
+    
+    handles.MLIapp = appMLI(handles);
 end
-
-[handles, visdata, oocvdata, mlidata] = switch_analysis(handles);
 
 handles.lbStartup.String = 'Customize menus ...';
 set_panel_visibility(handles,'on')

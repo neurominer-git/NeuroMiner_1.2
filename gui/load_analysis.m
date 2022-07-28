@@ -38,8 +38,13 @@ for i = 1:nVarIn
     elseif strcmpi(varargin{i}, 'MLIdata')
     
         mli = varargin{i+1};
-        handles.MLIdata = mli;   
-        handles.MLIapp = 0;
+        handles.MLIdata = mli; 
+        if ~isfield(handles, 'MLIapp')
+            handles.MLIapp = 0;
+        else
+            handles.MLIapp.delete;
+            handles.MLIapp = 1;
+        end
     end
     
     
