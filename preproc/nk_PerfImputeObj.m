@@ -28,8 +28,14 @@ function [sY, IN] = nk_PerfImputeObj(Y, IN)
 % 25/03/2022        : Improved the selection of training subjects for
 %                     imputation by sorting the training matrix and
 %                     identifying observation without NaNs. 
+% 28/07/2022        : Further changes introduced to avoid imputation errors
+%                     when no columns can be found without missings to 
+%                     establish similarity. Then, cases are iteratively 
+%                     removed from the imputation learning sample until the 
+%                     criterion minnumcols (currently fixed at 0.5) is 
+%                     fulfilled.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2022
+% (c) Nikolaos Koutsouleris, 07/2022
 
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) 
@@ -53,6 +59,7 @@ global VERBOSE
 if ~isfield(IN,'method') || isempty(IN.method), IN.method = 'euclidean'; end
 if ~isfield(IN,'k') || isempty(IN.k), IN.k = 7; end
 if ~isfield(IN,'blockind') || isempty(IN.blockind), IN.blockind = 1:n; end
+if ~isfield(IN,'minnumcols') || isempty(IN.minnumcols), IN.minnumcols = 0.75; end
 if ~isfield(IN,'X') && ~strcmp(IN.method,'singlemean'), ...
         error('The training data matrix is missing from the input parameters!'); end
 sY      = Y;
@@ -60,7 +67,7 @@ tY      = Y(:,IN.blockind);
 stY     = tY;
 indnan  = isnan(tY);
 snan    = sum(indnan,2)==0;
-
+minnumcols = ceil(n * IN.minnumcols);
 if VERBOSE, fprintf('\tImpute missing values');end
 ll=0; 
 switch IN.method
@@ -89,8 +96,8 @@ switch IN.method
             indNom = (R.U <= IN.hybrid.cutoff)';
         end
         for i = 1:m
-            if snan(i), %if VERBOSE,fprintf('.'); end; 
-                continue; end
+            if snan(i), continue; end
+            fprintf('.'); 
             % Find which features are NaN in the given case i
             ind_Yi = find(indnan(i,:)); 
             n_ind_Yi = numel(ind_Yi);
@@ -107,9 +114,19 @@ switch IN.method
                 % Find cases without missings 
                 indnan_Xj = isnan(tX(indnan_Xi, indi_Yi));
                 [~, ind_c]  = sort(sum(indnan_Xj),'ascend');
+                [~, ind_r] = sort(sum(isnan(tX(indnan_Xi,indi_Yi)), 2),'ascend');
                 idx_c = sum(isnan(tX(indnan_Xi, indi_Yi(ind_c))))==0;
+                while sum(idx_c) < minnumcols
+                    % if there is no column without missings start removing
+                    % cases from the imputation training sample
+                    ind_r(end)=[];
+                    idx_c = sum(isnan(tX(indnan_Xi(ind_r), indi_Yi(ind_c))))==0;
+                    if numel(indnan_Xi)<IN.k
+                        warning('Remaining samples in training data < k ');
+                    end
+                end
                 indi_Yi = indi_Yi(ind_c(idx_c));
-                
+                indnan_Xi = indnan_Xi(ind_r);
                 Xj = tX(indnan_Xi, indi_Yi);
     
                 % Compute distance metric
@@ -121,7 +138,8 @@ switch IN.method
                         %C = nancov(Xj(:,indi_Yi)); C(C==0) = min(C(C~=0));
                         D = pdist2(Xj, tY(i,indi_Yi), 'mahalanobis')';
                     case 'hybrid'
-                        % Identify nominal features using predefined cutoff
+                        % Identify nominal features using predefined
+                        % variable
                         % Compute distances in nominal features
                         indZ1 = indi_Yi & indNom;
                         indZ2 = indi_Yi & ~indNom; 

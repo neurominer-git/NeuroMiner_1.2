@@ -41,13 +41,11 @@ end
 
 [handles, visdata, oocvdata, mlidata] = switch_analysis(handles);
 
-if isfield(handles,'MLIapp') && ~isfield(handles.NM.analysis{analind},'MLI')
+if isfield(handles,'MLIapp') && ~isfield(handles.NM.analysis{analind},'MLI') && ~isempty(handles.MLIapp) && handles.MLIapp ~=0
     handles.MLIapp.delete;
     handles = rmfield(handles,'MLIapp');
 elseif isfield(handles,'MLIapp') && ~isnumeric(handles.MLIapp) && isfield(handles.NM.analysis{analind},'MLI')
     updateFcn(handles.MLIapp,handles);
-% elseif isfield(handles,'MLIapp') && isnumeric(handles.MLIapp) && handles.MLIapp == 1 
-%     handles.MLIapp = appMLI(handles);
 end
 
 handles.lbStartup.String = 'Customize menus ...';

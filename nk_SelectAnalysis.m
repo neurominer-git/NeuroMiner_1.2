@@ -1,8 +1,9 @@
 function [act, analdim, dat, showmodalvec, brief] = nk_SelectAnalysis(dat, newflag, ...
-    titlestr, analind, modflag, complflag, showmodalvec, brief, stackmin)
+    titlestr, analind, modflag, complflag, showmodalvec, brief, stackmin, nondeterministic)
 % =========================================================================
 % [act, analdim, dim, showmodalvec] = nk_SelectAnalysis(dat, newflag, ...
-%                     titlestr, analind, modflag, complflag, showmodalflag)
+%                     titlestr, analind, modflag, complflag, showmodalflag, 
+%                     brief, stackmin, nondeterministic)
 % =========================================================================
 % Helper function to select an analysis for classification, permutation,
 % visualization ...
@@ -32,6 +33,7 @@ if ~exist('modflag','var')  || isempty(modflag),     modflag = false; end
 if ~exist('complflag','var')|| isempty(complflag),   complflag = false; end
 if ~exist('brief','var')    || isempty(brief),       brief = true; end
 if ~exist('stackmin','var') || isempty(stackmin),    stackmin = 0; end
+if ~exist('nondeterministic','var') || isempty(nondeterministic),    nondeterministic = 0; end
 if ~exist('titlestr','var') || isempty(titlestr),    titlestr='Select'; end
 
 if iscell(dat.Y), nvar = length(dat.Y); else, nvar = 1; end
@@ -40,7 +42,7 @@ analdim = []; act = 0;
 
 % Select analysis 
 if isfield(dat,'analysis')
-    
+    indanal = 1:numel(dat.analysis);
     if complflag
         analstatus = nk_GetAnalysisStatus(dat);
         if stackmin > 0 && ~isempty(analstatus.stacking_analyses)
@@ -52,12 +54,18 @@ if isfield(dat,'analysis')
             complstr = 'COMPLETED ';
             indanal = analstatus.completed_analyses;
         end
-        analyses = dat.analysis(indanal);
     else
         complstr = '';
-        analyses = dat.analysis;
     end
-    
+
+    if nondeterministic
+        for i=1:numel(analstatus.analyses_nondeterministic)
+            indanal(i) = sum(any(analstatus.analyses_nondeterministic(i).modality))==0;
+        end
+    end
+
+    analyses = dat.analysis(indanal);
+
     n = length(analyses);
     if brief
         analsel = print_analysis_quickselector(analyses);

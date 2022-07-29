@@ -71,8 +71,7 @@ switch h_list{h_val}
         %handles.pnModelPerf.Visible         ='off';
         %handles.pnBinary.Visible            ='off';
         %handles.pnVisual.Visible            ='on';
-        load_selModality(handles)
-        
+        %load_selModality(handles)
         handles.MLIapp = appMLI(handles);
         handles.selModelMeasures.Value = 1;
         display_main(handles);

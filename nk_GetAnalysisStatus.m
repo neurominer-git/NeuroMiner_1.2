@@ -37,6 +37,29 @@ if isfield(NM,'analysis')
         if strcmp(NM.analysis{i}.params.TrainParam.SVM.prog,'SEQOPT')
             Status.sequence_analyses(i) = true;
         end
+        if isfield(NM.analysis{i}.params.TrainParam.SVM,'ADASYN') && NM.analysis{i}.params.TrainParam.SVM.ADASYN.flag
+            FUSION = NM.analysis{i}.params.TrainParam.FUSION;
+            Modality = FUSION.M;
+            switch FUSION.flag
+                case {0, 2, 3}
+                    nM = numel(Modality);
+                case 1
+                    nM = 1;
+            end
+            for j=1:nM
+                PREPROC = NM.analysis{i}.params.TrainParam.PREPROC{Modality(j)};
+                Status.analyses_nondeterministic(i).modality(j) = false;
+                if isfield(PREPROC,'ACTPARAM')
+                    for q=numel(PREPROC.ACTPARAM):-1:1
+                        if strcmp(PREPROC.ACTPARAM{q}.cmd,'reducedim') 
+                            if strcmp(PREPROC.ACTPARAM{q}.DR.RedMode,'PCA') && PREPROC.ACTPARAM{q}.DR.PercMode == 3
+                                Status.analyses_nondeterministic(i).modality(j) = true;
+                            end
+                        end
+                    end
+                end
+            end
+        end
     end
 end
 

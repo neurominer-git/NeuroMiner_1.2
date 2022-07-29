@@ -1,8 +1,9 @@
 function [act, analdim, dat, showmodalvec, brief] = nk_SelectAnalysis(dat, newflag, ...
-    titlestr, analind, modflag, complflag, showmodalvec, brief, stackmin)
+    titlestr, analind, modflag, complflag, showmodalvec, brief, stackmin, nondeterministic)
 % =========================================================================
 % [act, analdim, dim, showmodalvec] = nk_SelectAnalysis(dat, newflag, ...
-%                     titlestr, analind, modflag, complflag, showmodalflag)
+%                     titlestr, analind, modflag, complflag, showmodalflag, 
+%                     brief, stackmin, nondeterministic)
 % =========================================================================
 % Helper function to select an analysis for classification, permutation,
 % visualization ...
@@ -32,6 +33,7 @@ if ~exist('modflag','var')  || isempty(modflag),     modflag = false; end
 if ~exist('complflag','var')|| isempty(complflag),   complflag = false; end
 if ~exist('brief','var')    || isempty(brief),       brief = true; end
 if ~exist('stackmin','var') || isempty(stackmin),    stackmin = 0; end
+if ~exist('nondeterministic','var') || isempty(nondeterministic),    nondeterministic = 0; end
 if ~exist('titlestr','var') || isempty(titlestr),    titlestr='Select'; end
 
 if iscell(dat.Y), nvar = length(dat.Y); else, nvar = 1; end
@@ -46,7 +48,7 @@ if isfield(dat,'analysis')
         if stackmin > 0 && ~isempty(analstatus.stacking_analyses)
             complstr = sprintf('COMPLETED and no. of inputs for stacking >= %g',stackmin);
             analstacked = true(1, numel(dat.analysis));
-            analstacked(analstatus.n_inputanalyses < stackmin & analstatus.stacking_analyses) = false;
+            analstacked((analstatus.n_inputanalyses < stackmin & analstatus.stacking_analyses) | analstatus.sequence_analyses) = false;
             indanal = find(analstatus.completed_analyses & analstacked);
         else    
             complstr = 'COMPLETED ';
@@ -55,9 +57,13 @@ if isfield(dat,'analysis')
         analyses = dat.analysis(indanal);
     else
         complstr = '';
-        analyses = dat.analysis;
     end
-    
+
+    if nondeterministic
+        indanal = find(~analstatus.analyses_nondeterministic)    
+    end
+    analyses = dat.analysis(indanal);
+
     n = length(analyses);
     if brief
         analsel = print_analysis_quickselector(analyses);
@@ -65,7 +71,7 @@ if isfield(dat,'analysis')
             return; 
         elseif analsel > 0
             if complflag
-                if stackmin > 0 && ~isempty(analstatus.stacking_analyses)
+                if stackmin > 0 && ~any(analstatus.stacking_analyses)
                     analstacked = analstatus.n_inputanalyses >= stackmin;
                     analselcompl = find(analstatus.completed_analyses & analstacked);
                 else    

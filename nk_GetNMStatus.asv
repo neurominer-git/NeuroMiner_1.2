@@ -35,12 +35,8 @@ if isfield(NM,'Y')
         status.oocv_data_ready = true;
         if isfield(NM.TrainParam,'OOCV'), status.oocv_anal_ready = true; end
     end
-    status.analyses_nondeterministic = true;
-    for i=1:numel(AS.analyses_nondeterministic) 
-        if sum(AS.analyses_nondeterministic(i).modality) ~= numel(AS.analyses_nondeterministic(i).modality); 
-            status.analyses_nondeterministic = false;
-            break
-        end
+    for if sum(~AS.analyses_nondeterministic)==0
+       status.analysis_nondeterministic = true;  
     end
 else
     status.import_finished = false;
