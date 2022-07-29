@@ -1,4 +1,4 @@
-function [f, ax] = barMLI(casenum, MLIcont, feats, refdata, sortfl, uiaxes, uiaxes2) %newdata
+function [f, ax, ax2] = barMLI(casenum, MLIcont, feats, refdata, sortfl, uiaxes, uiaxes2, col1, col2) %newdata
 
 if exist('uiaxes','var')
     ax = uiaxes;
@@ -99,8 +99,8 @@ if exist('refdata','var') && ~isempty(refdata)
     
     bar(ax2, centiles(idx),'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
     hold(ax2,'on');
-    plot(ax2, av_centiles_group1(idx), 'LineWidth', 3, 'color', rgb('blue'));%,'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
-    plot(ax2, av_centiles_group2(idx), 'LineWidth', 3, 'color', rgb('orange'));
+    plot(ax2, av_centiles_group1(idx), 'LineWidth', 3, 'color', col1);%,'FaceColor',rgb('SlateGray'),'EdgeColor',rgb("Black"));
+    plot(ax2, av_centiles_group2(idx), 'LineWidth', 3, 'color', col2);
     hold(ax2, 'off');
 
     groupnames = evalin('base', 'NM.groupnames');

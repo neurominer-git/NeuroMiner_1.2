@@ -319,7 +319,9 @@ try
             delete(findobj('Name','NM Optimization Status Viewer'));
             
         case 'disptrain'
-            if isfield(NM,'analysis'), nk_PrintResults2('AnalysisIndex',1, 'NM',NM); end
+            if isfield(NM,'analysis')
+                nk_PrintResults2('AnalysisIndex',1, 'NM',NM); 
+            end
             
         case 'lock'
             NM.defs.analyses_locked = nk_input('Do you want to finish the model discovery phase',0,'yes|no',[1,0],2);
@@ -456,5 +458,9 @@ NMx = NM;
 clearvars -global NM st
 assignin('base', 'NM', NMx)
 if exist('temp.nii','file'); delete('temp.nii'); end
-end
+% this does not work, but I wanted to implement sth that closes the 
+% Result Viewer as well as the MLI Viewer when NM is closed 
 
+%if isfield(handles,'figure1'); handles.figure1.delete; end 
+%if isfield(handles, 'MLIapp'); handles.MLIapp.delete; end
+end

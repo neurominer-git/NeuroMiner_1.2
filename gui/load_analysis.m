@@ -39,15 +39,13 @@ for i = 1:nVarIn
     
         mli = varargin{i+1};
         handles.MLIdata = mli; 
-        if ~isfield(handles, 'MLIapp')
-            handles.MLIapp = 0;
-        else
-            try
-            handles.MLIapp.delete;
-            handles.MLIapp = 1;
-            catch
-            end
+        if ~isfield(handles, 'MLIapp') %&& ~isnumeric(handles.MLIapp)
+            %handles.MLIapp.delete;
+            %handles = rmfield(handles,'MLIapp');
+            handles.MLIapp = 0; 
         end
+        %handles.MLIapp = 0;
+        
     end
     
     

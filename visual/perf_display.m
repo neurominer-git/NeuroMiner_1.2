@@ -46,9 +46,8 @@ if isfield(handles,'MLIapp') && ~isfield(handles.NM.analysis{analind},'MLI')
     handles = rmfield(handles,'MLIapp');
 elseif isfield(handles,'MLIapp') && ~isnumeric(handles.MLIapp) && isfield(handles.NM.analysis{analind},'MLI')
     updateFcn(handles.MLIapp,handles);
-elseif isfield(handles,'MLIapp') && isnumeric(handles.MLIapp) && handles.MLIapp == 1 
-    
-    handles.MLIapp = appMLI(handles);
+% elseif isfield(handles,'MLIapp') && isnumeric(handles.MLIapp) && handles.MLIapp == 1 
+%     handles.MLIapp = appMLI(handles);
 end
 
 handles.lbStartup.String = 'Customize menus ...';
