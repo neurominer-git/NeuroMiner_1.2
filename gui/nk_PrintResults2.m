@@ -432,21 +432,24 @@ function clickCallback(src, evt)
                 
             handles.selCase.Value = indpat;
             selCase = handles.selCase.String{handles.selCase.Value};
-            I = find(~cellfun(@isempty,strfind(figdata.cases,selCase)));
-            x1 = figdata.x(I);
-            y1 = figdata.y(I);
-            figpos = dsxy2figxy(handles.axes1,x1,y1);
-            axes(handles.axes1); 
-            if isfield(handles,'caseplot'), delete(handles.caseplot); end
-            handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
-            if isfield(handles, 'MLIdata')
-                handles.thisMLIresult.Visible = 'on';
-                handles.curCase = indpat;
-                if ~isnumeric(handles.MLIapp) && isvalid(handles.MLIapp)
-                    updateFcn(handles.MLIapp, handles)
+            try
+                I = find(~cellfun(@isempty,strfind(figdata.cases,selCase)));
+                x1 = figdata.x(I);
+                y1 = figdata.y(I);
+                figpos = dsxy2figxy(handles.axes1,x1,y1);
+                axes(handles.axes1); 
+                if isfield(handles,'caseplot'), delete(handles.caseplot); end
+                handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
+                if isfield(handles, 'MLIdata')
+                    handles.thisMLIresult.Visible = 'on';
+                    handles.curCase = indpat;
+                    if ~isnumeric(handles.MLIapp) && isvalid(handles.MLIapp)
+                        updateFcn(handles.MLIapp, handles)
+                    end
                 end
+                axesHdl.Legend.String{end} = selCase;
+            catch
             end
-            axesHdl.Legend.String{end} = selCase;
         end
         set(axesHdl,'UserData',figdata);
         guidata(handles.figure1,handles);

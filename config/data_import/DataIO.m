@@ -1130,9 +1130,11 @@ switch act
                 mode = 'all'; 
             end
         end
-        
-        [t_selFeats,t_selCases] = nk_ItemSelectorApp('List', F, 'Matrix', M, 'Cases',ID, 'selFeats', selFeats, 'selCases', selCases, 'mode', mode);
-        
+        try
+            [t_selFeats,t_selCases] = nk_ItemSelectorApp('List', F, 'Matrix', M, 'Cases',ID, 'selFeats', selFeats, 'selCases', selCases, 'mode', mode);
+        catch
+            t_selFeats = []; t_selCases=[];
+        end
         if ~isempty(t_selFeats), IO.selFeats = t_selFeats; end
         if ~isempty(t_selCases), IO.selCases = t_selCases; end
         

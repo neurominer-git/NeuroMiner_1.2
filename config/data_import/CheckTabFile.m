@@ -37,12 +37,12 @@ if ~isfield(IO,'t_Y') || isempty(IO.t_Y) || IO.reread_mat
     try
         switch IO.groupmode
             case 1
-                if ~strcmp(IO.M_edit,na_str), 
+                if ~strcmp(IO.M_edit,na_str)
                     IO.t_Y = evalin('base', IO.M_edit);
                 else
                     return
                 end
-                if ~strcmp(IO.col_edit,na_str), 
+                if ~strcmp(IO.col_edit,na_str)
                     try
                         s_featnames = evalin('base',IO.col_edit); 
                     catch
@@ -54,6 +54,7 @@ if ~isfield(IO,'t_Y') || isempty(IO.t_Y) || IO.reread_mat
                 load(IO.M_edit, IO.matrix_edit); 
                 IO.t_Y = eval(IO.matrix_edit);
                 try
+                    load(IO.M_edit, IO.col_edit); 
                     if ~strcmp(IO.col_edit,na_str), s_featnames = eval(IO.col_edit); end
                 catch
                     mess = GenerateMessageEntry(mess, sprintf('ERROR in %s: Feature name vector ''%s'' not found in %s!', act, IO.col_edit, source));
