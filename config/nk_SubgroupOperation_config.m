@@ -1,5 +1,9 @@
 function SUBGROUP = nk_SubgroupOperation_config( NM, SUBGROUP )
 
+if ~isfield(SUBGROUP,'indperc') || isempty(SUBGROUP.indperc)
+    SUBGROUP.indperc = 50;
+end
+
 if isfield(NM,'C')
     menustr = ['Entire training set|' ...
                'User-defined subset of training partition|' ...
@@ -15,10 +19,10 @@ switch SUBGROUP.flag
     case 2
         SUBGROUP.ind = logical(nk_input('Define index vector (ones = used / zeros = unused) for subset computation',0,'e',[],[numel(NM.label),1]));
     case 3
-        SUBGROUP.indperc = nk_input('Define percentage of population to be randomly selected',0,'i1',SUBGROUP.indperc) ;
+        SUBGROUP.indperc = nk_input('Define percentage of population to be randomly selected',0,'i',SUBGROUP.indperc) ;
     case 5
         SUBGROUP.ind = logical(nk_input('Define index vector (ones = used / zeros = unused) for subset computation',0,'e',[],[numel(NM.label),1]));
     case 6
-        SUBGROUP.indperc = nk_input('Define percentage of population to be randomly selected',0,'i1',SUBGROUP.indperc) ;
+        SUBGROUP.indperc = nk_input('Define percentage of population to be randomly selected',0,'i',SUBGROUP.indperc) ;
 end
 

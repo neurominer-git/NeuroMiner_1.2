@@ -94,6 +94,11 @@ switch IN.method
         if strcmp(IN.method,'hybrid')
             R = nk_CountUniques(tX);
             indNom = (R.U <= IN.hybrid.cutoff)';
+            %if there are no categorical columns according to
+            %IN.hybrid.cutoff change to euclidean distance mode
+            if ~any(indNom)
+                IN.method = 'euclidean';
+            end 
         end
         for i = 1:m
             if snan(i), continue; end
