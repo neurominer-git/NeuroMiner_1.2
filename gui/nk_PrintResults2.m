@@ -442,11 +442,9 @@ function clickCallback(src, evt)
             if isfield(handles, 'MLIdata')
                 handles.thisMLIresult.Visible = 'on';
                 handles.curCase = indpat;
-                if ~isnumeric(handles.MLIapp)
+                if ~isnumeric(handles.MLIapp) && isvalid(handles.MLIapp)
                     updateFcn(handles.MLIapp, handles)
                 end
-
-
             end
             axesHdl.Legend.String{end} = selCase;
         end

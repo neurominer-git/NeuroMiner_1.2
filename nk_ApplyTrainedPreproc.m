@@ -105,8 +105,8 @@ else
         end
         
         % ... and modality-specific preprocessing params?
-        if iscell(PREPROC)
-             PREPROC = inp.PREPROC{n};
+        if iscell(inp.PREPROC)
+            PREPROC = inp.PREPROC{n};
         else
             PREPROC = inp.PREPROC;
         end

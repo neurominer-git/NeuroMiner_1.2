@@ -11,6 +11,7 @@ Status.oocvappflag         = false;
 Status.stacking_analyses   = [];
 Status.n_inputanalyses     = [];
 Status.sequence_analyses   = [];
+Status.analyses_nondeterministic = [];
 
 if isfield(NM,'analysis')
     n_anal = numel(NM.analysis);
@@ -37,15 +38,16 @@ if isfield(NM,'analysis')
         if strcmp(NM.analysis{i}.params.TrainParam.SVM.prog,'SEQOPT')
             Status.sequence_analyses(i) = true;
         end
+        FUSION = NM.analysis{i}.params.TrainParam.FUSION;
+        Modality = FUSION.M;
+        switch FUSION.flag
+            case {0, 2, 3}
+                nM = numel(Modality);
+            case 1
+                nM = 1;
+        end
         if isfield(NM.analysis{i}.params.TrainParam.SVM,'ADASYN') && NM.analysis{i}.params.TrainParam.SVM.ADASYN.flag
-            FUSION = NM.analysis{i}.params.TrainParam.FUSION;
-            Modality = FUSION.M;
-            switch FUSION.flag
-                case {0, 2, 3}
-                    nM = numel(Modality);
-                case 1
-                    nM = 1;
-            end
+           
             for j=1:nM
                 PREPROC = NM.analysis{i}.params.TrainParam.PREPROC{Modality(j)};
                 Status.analyses_nondeterministic(i).modality(j) = false;
@@ -59,6 +61,10 @@ if isfield(NM,'analysis')
                     end
                 end
             end
+        else
+           for j=1:nM
+               Status.analyses_nondeterministic(i).modality = false(1,nM);
+           end
         end
     end
 end
