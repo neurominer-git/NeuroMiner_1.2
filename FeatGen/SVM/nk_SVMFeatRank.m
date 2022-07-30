@@ -8,7 +8,7 @@ else
 end
 
 CMDSTR = nk_DefineCmdStr(SVM, modeflag);
-[~,~,EVALFUNC] = nk_GetScaleYAxisLabel(SVM.evalfunc);
+[~,~,EVALFUNC,~] = nk_GetScaleYAxisLabel(SVM.evalfunc);
 if strcmp(SVM.prog,'LIBSVM') 
     [LIBSVMTRAIN, LIBSVMPREDICT] = nk_DefineLIBSVMfun(SVM);
 end
@@ -26,7 +26,7 @@ end
 
 P = nk_CreateSVMParamArray(SVM);
 Ps = allcomb(P.Params,'matlab');
-[nP, nPsDim] = size(Ps);
+[nP, ~] = size(Ps);
 
 R = zeros(size(Y,2),nP);
 if size(label,1) ~= size(Y,1), label = label'; end
@@ -41,10 +41,10 @@ for i = 1:nP
         case 'LIBSVM'
             %% Give verbose info regarding training parameters
             % Slack parameter (either C or Nu)
-            if strcmp(P.Params_desc{1},'SlackParam'), 
+            if strcmp(P.Params_desc{1},'SlackParam')
                 Pt.SlackParam = num2str(Ps(i,1),'%1.5f');
                 SlackStr = sprintf('Slack parameter: %s', Pt.SlackParam);
-            elseif strcmp(P.Params_desc{1},'NuCParam'),
+            elseif strcmp(P.Params_desc{1},'NuCParam')
                 Pt.NuCParam = num2str(Ps(i,1),'%1.5f');
                 SlackStr = sprintf('NuC parameter: %s', Pt.NuCParam);
             end
@@ -59,14 +59,14 @@ for i = 1:nP
                 end
             end
             fprintf('\nTraining linear LIBSVM model with %s%s%s', SlackStr, RStr);
-            [param, model] = nk_GetParamSVM(Y, label, CMDSTR, SVM, LIBSVMTRAIN, LIBSVMPREDICT, EVALFUNC, Pt, ModelOnly);
+            [~, model] = nk_GetParamSVM(Y, label, CMDSTR, SVM, LIBSVMTRAIN, LIBSVMPREDICT, EVALFUNC, Pt, ModelOnly);
             fprintf(' => Model complexity = %g%%',model.totalSV*100/numel(label));
     
             %% Print performance
             %fprintf(' ==> %s = %g', EVALFUNC, param.val);
 
             %% Get weight vector
-            if nu < 3, % binary
+            if nu < 3 % binary
                 % Compute primal variable w
                 R(:,i) = model.SVs' * model.sv_coef;
 
@@ -89,7 +89,7 @@ for i = 1:nP
                     %+-+-+--------------------+
 
                     % Get SV index of positive class
-                    if j == 1,
+                    if j == 1
                         indP = 1:model.nSV(j);
                     else
                         indP = sum(model.nSV(1:j-1))+1 : sum(model.nSV(1:j)) ;
@@ -113,7 +113,7 @@ for i = 1:nP
             end
             
         case 'LIBLIN'
-            if strcmp(P.Params_desc{1},'SlackParam'), 
+            if strcmp(P.Params_desc{1},'SlackParam')
                 SlackParam = sprintf( ' -c %1.3f', Ps(i,1));
             else
                 SlackParam = ' -c 1';

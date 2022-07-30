@@ -49,7 +49,7 @@ switch OPTCRIT
     case 21
          yl = [0 1]; ylb = 'Expected Calibration Error';                    yfun = @ECE; ylbshort = 'ECE'; 
     case 18
-        if iscell(PREPROC),
+        if iscell(PREPROC)
             iPREPROC = PREPROC{1}; else, iPREPROC = PREPROC;
         end
         if isfield(iPREPROC,'LABELMOD') && ...

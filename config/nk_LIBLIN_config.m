@@ -7,7 +7,7 @@ weighting = 0;
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl),  defaultsfl = 0; end;
 
-if ~exist('param','var') || ~isfield(param,'LIBLIN'), 
+if ~exist('param','var') || ~isfield(param,'LIBLIN') 
     param.LIBLIN = []; 
 else
     if isfield(param.LIBLIN,'classifier')

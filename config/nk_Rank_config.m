@@ -1,6 +1,6 @@
 function [RANK, PX] = nk_Rank_config(RANK, PX, NM, varind, defaultsfl, parentstr)
 
-if ~exist('defaultsfl','var') || isempty(defaultsfl),  defaultsfl = 0; end;
+if ~exist('defaultsfl','var') || isempty(defaultsfl),  defaultsfl = 0; end
 ranktype            = 1;
 weightmethod        = 1;
 label               = NM.label;
@@ -16,7 +16,7 @@ if ~defaultsfl
     if ~isfield(RANK,'label');          RANK.label = label; RANK.labeldesc = labeldesc;end
     if ~isfield(RANK,'algostr'),        RANK.algostr = algostr; RANK.Pearson = 1; end
     if ~exist('PX','var'),              PX = []; end
-    if RANK.weightmethod == 1,          weightstr = 'upweight features'; else weightstr = 'downweight features'; end
+    if RANK.weightmethod == 1,          weightstr = 'upweight features'; else, weightstr = 'downweight features'; end
     
     nk_PrintLogo
     
@@ -138,12 +138,12 @@ if ~defaultsfl
                     PX = nk_AddParam(RANK.imrelief.sigma, 'Sigma',1 ,PX, 'replace'); PX = nk_AddParam(RANK.imrelief.lambda, 'Lambda',1, PX); 
                     
                 case {'libsvm','liblin'}
-                    if ~isfield(RANK,'SVM'), RANK.SVM = []; end;
+                    if ~isfield(RANK,'SVM'), RANK.SVM = []; end
                     RANK.SVM.prog = upper(RANK.algostr); 
                     switch RANK.ranktype
                         case 1
                             RANK.SVM.modeflag = NM.modeflag;
-                            RANK.SVM.evalfunc = 8;
+                            RANK.SVM.evalfunc = NM.TrainParam.SVM.GridParam;
                         case 2
                             RANK.SVM.modeflag = 'classification'; 
                             RANK.SVM.evalfunc = 14;
@@ -166,28 +166,28 @@ if ~defaultsfl
                     rtype = nk_GetLIBSVMRegrType(RANK.SVM);
                     switch rtype
                         case 1
-                            if isfield(RANK.SVM,'EpsParam'), EpsParam = RANK.SVM.EpsParam; else EpsParam = 0.1; end
+                            if isfield(RANK.SVM,'EpsParam'), EpsParam = RANK.SVM.EpsParam; else, EpsParam = 0.1; end
                             RANK.SVM.EpsParam = nk_input('Define Epsilon parameter(s)',0,'e',EpsParam);     PX = nk_AddParam(RANK.SVM.EpsParam, 'Epsilon', 1, PX, 'replace');
                             
                         case 2
-                            if isfield(RANK.SVM,'NuParam'), NuParam = RANK.SVM.NuParam; else NuParam = 0.5; end
+                            if isfield(RANK.SVM,'NuParam'), NuParam = RANK.SVM.NuParam; else, NuParam = 0.5; end
                             RANK.SVM.NuParam = nk_input('Define Nu parameter(s)',0,'e',NuParam);            PX = nk_AddParam(RANK.SVM.NuParam, 'Nu', 1, PX, 'replace');
                             
                     end
                     % This is the slack / nu-SVC parameter of the SVM
-                    if ~ctype || rtype, Slackdesc = 'Slack'; else Slackdesc = 'Nu (SVC)';end
-                    if isfield(RANK.SVM,'SlackParam'), SlackParam = RANK.SVM.SlackParam; else SlackParam = 1; end
+                    if ~ctype || rtype, Slackdesc = 'Slack'; else, Slackdesc = 'Nu (SVC)';end
+                    if isfield(RANK.SVM,'SlackParam'), SlackParam = RANK.SVM.SlackParam; else, SlackParam = 1; end
                     RANK.SVM.SlackParam = nk_input(['Define ' Slackdesc ' parameter(s)'],0,'e', SlackParam);PX = nk_AddParam(RANK.SVM.SlackParam, Slackdesc, 1, PX);
                    
                 case 'rgs'
                     if ~isfield(RANK,'RGS'), RANK = nk_RGS_config(RANK, true); end
                     RANK = nk_RGS_config(RANK);                                                     
-                    if isfield(RANK.RGS.extra_param,'k') && isnumeric(RANK.RGS.extra_param.k), 
+                    if isfield(RANK.RGS.extra_param,'k') && isnumeric(RANK.RGS.extra_param.k)
                         PX = nk_AddParam(RANK.RGS.extra_param.k, 'K', 1, PX, 'replace'); 
                     else
                         PX = nk_AddParam([], [], [], [], 'reset');
                     end
-                    if isfield(RANK.RGS.extra_param,'beta') && isnumeric(RANK.RGS.extra_param.beta), 
+                    if isfield(RANK.RGS.extra_param,'beta') && isnumeric(RANK.RGS.extra_param.beta)
                         PX = nk_AddParam(RANK.RGS.extra_param.beta, 'Beta', 1, PX); 
                     end
                 case 'feast'
@@ -267,7 +267,7 @@ if ~defaultsfl
                         flg = true;
                     end
 
-                    if flg, 
+                    if flg 
                         RANK.ranktype = nk_input('Define target labels',0,'m', ...
                                             ['NM target labels|'...
                                              'Categorical data|' ...
@@ -291,7 +291,7 @@ if ~defaultsfl
             
             if RANK.ranktype == 3
                 flg = nk_input('Weight feature using only one specific subgroup?',0,'yes|no',[1,0],0);
-                if flg, 
+                if flg 
                     RANK.glabel = nk_input('Define index vector for subgroup idenitification (ones = use / zeros = not use)',0,'e',[],[numel(NM.label),1]);
                 else
                     if isfield(RANK,'glabel'), RANK= rmfield(RANK,'glabel'); end
