@@ -258,10 +258,9 @@ switch OptimFlag
                                         eval(sprintf('[%s, n_pars(end+1)] = nk_ConcatParamstr(%s)', argStr, arg));
                                         eval(sprintf("PX = nk_AddParam(%s, ['ML-' %s], 2, PX)", arg, argParstr)); 
                                         eval(sprintf('X = %s; Y = %s', argParstr, argStr)); 
-                                        eval(sprintf("menustr = '%s|Define %s [ %s ]'", menustr, X, Y));           
+                                        eval(sprintf("menustr = '%s|Define %s [ %s ]'", menustr, X, Y));            menuact = [ menuact 101];
                                     end
-                                 end
-                                 menuact = [ menuact 101];
+                                end
                              end
 
                         case {' -t 6', ...
@@ -272,9 +271,6 @@ switch OptimFlag
                             'cubic', ...
                             'tps', ...
                             'r'}
-                            Gparstr = sprintf('%s parameter(s)', SVM.kernel.kernstr ); [Gstr, n_pars(end+1)] = nk_ConcatParamstr(Gdefs);
-                            PX = nk_AddParam(Gdefs, ['ML-' Gparstr], 2, PX);
-                            menustr = sprintf('%s|Define %s [ %s ]', menustr, Gparstr, Gstr);                       menuact = [ menuact 50 ];
                      end             
             end
             
@@ -349,15 +345,15 @@ switch OptimFlag
                     
                     ClassWeightparstr = 'Class weights'; ; [ClassWeightstr, n_pars(end+1)] = nk_ConcatParamstr( ClassWeightdefs );
                     PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightstr], 2, PX);
-                    menustr = sprintf('%s|Define %s [ %s ]', menustr, ClassWeightparstr, ClassWeightstr);                                 menuact = [ menuact 40 ];
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, ClassWeightparstr, ClassWeightstr);                                 menuact = [ menuact 42 ];
                     
                     CcpAlphaparstr = 'Complexity parameter for Minimal Cost-Complexity Pruning'; ; [CcpAlphastr, n_pars(end+1)] = nk_ConcatParamstr( CcpAlphadefs );
                     PX = nk_AddParam(CcpAlphadefs, ['ML-' CcpAlphastr], 2, PX);
-                    menustr = sprintf('%s|Define %s [ %s ]', menustr, CcpAlphaparstr, CcpAlphastr);                                 menuact = [ menuact 41 ];
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, CcpAlphaparstr, CcpAlphastr);                                 menuact = [ menuact 43 ];
                     
                     MaxSampparstr = 'Number of samples to draw from X to train base estimators (if bootstrap)'; ; [MaxSampstr, n_pars(end+1)] = nk_ConcatParamstr( MaxSampdefs );
                     PX = nk_AddParam(MaxSampdefs, ['ML-' MaxSampstr], 2, PX);
-                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MaxSampparstr, MaxSampstr);                                 menuact = [ menuact 42 ];
+                    menustr = sprintf('%s|Define %s [ %s ]', menustr, MaxSampparstr, MaxSampstr);                                 menuact = [ menuact 44 ];
    
                     ClassWeightdefs                 = "None";
                     CcpAlphadefs                    = 0.0;
@@ -438,7 +434,7 @@ switch OptimFlag
                     Epsdefs       = nk_input([Rparstr ' range'],0,'e',Epsdefs);                         PX = nk_AddParam(Epsdefs, ['ML-' Rparstr], 2, PX);
                 case 3
                     Nudefs        = nk_input([Rparstr ' range [0 ... 1]'],0,'e',Nudefs);                PX = nk_AddParam(Nudefs, ['ML-' Rparstr], 2, PX);
-                case {4,50}
+                case 4
                     Gdefs         = nk_input([Gparstr ' range'],0,'e',Gdefs);                           PX = nk_AddParam(Gdefs, ['ML-' Gparstr], 2, PX);
                 case 5
                     PolyCoefdefs  = nk_input([Pcparstr ' for polynomial kernels'],0,'e',PolyCoefdefs);  PX = nk_AddParam(PolyCoefdefs, ['ML-' Pcparstr], 2, PX);
@@ -508,6 +504,7 @@ switch OptimFlag
                                                 'Fraction|' ...
                                                 'Absolute N|' ...
                                                 'N features'], [-1,-2, -3, -3, 0], NumDdefs);
+                   
                     switch NumDdefs
                         case -3
                             NumDdefs    =  nk_input([Dnparstr ' range'],0,'e',NumDdefs); 
@@ -550,25 +547,34 @@ switch OptimFlag
                                                 'No'], [1,0], Bootstrapdefs);
                     PX = nk_AddParam(Bootstrapdefs, ['ML-' Bootstrapparstr], 2, PX);
                
+                    
                 case 39
                     OobScoredefs    = nk_input('Out-of-bag yes or no', 0, 'mq', ...
                                                ['Yes|' ...
                                                 'No'], [1,0], OobScoredefs);
                     PX = nk_AddParam(OobScoredefs, ['ML-' OobScoreparstr], 2, PX);
-
-                case 40
+               
+%                 case 40
+%                     NJobsdefs    = nk_input([MinSSplitparstr ' range'], 'e', NJobsdefs);
+%                     PX = nk_AddParam(NJobsdefs, ['ML-' NJobsparstr], 2, PX);
+               
+%                 case 41
+%                     RandomStatedefs    = nk_input([RandomStateparstr ' range'], 'e', RandomStatedefs);
+%                     PX = nk_AddParam(NJobsdefs, ['ML-' NJobsparstr], 2, PX);
+                case 42
                     ClassWeightdefs    = nk_input('Class weights', 0, 'mq', ...
                                                ['All equal (default)|' ...
                                                 'Balanced|' ...
                                                 'Balanced subsample|'...
                                                 'Define yourself (will be added in the future)'], [0,1,2,3], ClassWeightdefs);
                     PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightparstr], 2, PX);
-                case 41
+                case 43
                     CcpAlphadefs    = nk_input([CcpAlphaparstr ' range'], 'e', CcpAlphadefs);
                     PX = nk_AddParam(CcpAlphadefs, ['ML-' CcpAlphaparstr], 2, PX);
-                case 42
+                case 44
                     MaxSampdefs    = nk_input([MMaxSampparstr ' range'], 'e', MaxSampdefs);
                     PX = nk_AddParam(MaxSampdefs, ['ML-' MaxSampparstr], 2, PX);
+
                 case 20
                     GRD.matLearn = nk_matLearn_config(GRD.matLearn,SVM.matLRN.learner.framework,2);
                     if isfield(GRD.matLearn,'Params')
