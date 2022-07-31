@@ -1,12 +1,12 @@
 function [opt_hE, opt_E, opt_F, opt_D] = nk_DiversityMax(E, L, EnsStrat)
 
-global BATCH VERBOSE
+global VERBOSE
 
 ind0 = L~=0; E = E(ind0,:); L=L(ind0);
 [m,k] = size(E);
 
 % Compute initial ensemble performance
-if EnsStrat.Metric == 2, T = sign(E); else T = E; end
+if EnsStrat.Metric == 2, T = sign(E); else, T = E; end
 opt_hE = nk_EnsPerf(E, L); orig_hE = opt_hE;
 opt_D = nk_Entropy(T,[-1 1], m, k); orig_D = opt_D; 
 orig_F = 1:k;

@@ -9,8 +9,12 @@ indP = L==ix(1); indM = L==ix(2);
 YP = Y(indP,:); YM = Y(indM,:);
 D = zeros(1,n);
 warning off
+try
 for i=1:size(Y,2)
    ind = true(1,n); ind(i)=false;
    D(i) = bhattacharyya(YP(:,ind),YM(:,ind));
+end
+catch
+    fprintf('problem')
 end
 D=1./D';

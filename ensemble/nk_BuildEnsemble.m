@@ -10,7 +10,7 @@ function [opt_F, opt_hE, opt_E, opt_D, opt_Fcat, opt_mPred] = nk_BuildEnsemble(C
 %
 %
 global MULTI
-if ~exist('Classes','var'), Classes=[]; end;
+if ~exist('Classes','var'), Classes=[]; end
 
 if MULTI.flag && MULTI.train
     funcname = ['nk_Multi' EnsStrat.OptFunc];
