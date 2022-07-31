@@ -35,16 +35,16 @@ function K = SB1_KernelFunction(X1,X2,kernel_,lengthScale)
 [N1 ]		= size(X1);
 [N2 ]		= size(X2);
 
-if length(kernel_)>=4 && strcmp(kernel_(1:4),'poly')
-  p		= str2double(kernel_(5:end));
-  kernel_	= 'poly';
-end
-if length(kernel_)>=5 && strcmp(kernel_(1:5),'hpoly')
-  p		= str2double(kernel_(6:end));
-  kernel_	= 'hpoly';
-end
+% if length(kernel_)>=4 && strcmp(kernel_(1:4),'poly')
+%   p		= str2double(kernel_(5:end));
+%   kernel_	= 'poly';
+% end
+% if length(kernel_)>=5 && strcmp(kernel_(1:5),'hpoly')
+%   p		= str2double(kernel_(6:end));
+%   kernel_	= 'hpoly';
+% end
 if isempty(lengthScale), lengthScale=1;end
-eta	= 1/lengthScale^2;
+
 
 switch lower(kernel_)
  
@@ -53,43 +53,61 @@ switch lower(kernel_)
      K = X2*X1';
      
  case 'expo'
-  
+     
+     eta	= 1/lengthScale^2;
      K = exp(-eta*sqrt(distSqrd(X1,X2)));
      
  case 'rbf'
-  
+    
+     eta	= 1/lengthScale^2;
      K	= exp(-eta*distSqrd(X1,X2));
   
  case 'tps'
-  
+     
+     eta	= 1/lengthScale^2;
      r2	= eta*distSqrd(X1,X2);
      K	= 0.5 * r2.*log(r2+(r2==0));
   
  case 'cauchy'
-    r2	= eta*distSqrd(X1,X2);
-    K	= 1./(1+r2);
+    
+     eta	= 1/lengthScale^2;
+     r2	= eta*distSqrd(X1,X2);
+     K	= 1./(1+r2);
   
  case 'cubic'
-    r2	= eta*distSqrd(X1,X2);
-    K	= r2.*sqrt(r2);
+    
+     eta	= 1/lengthScale^2;
+     r2	= eta*distSqrd(X1,X2);
+     K	= r2.*sqrt(r2);
   
  case 'r'
-    K	= sqrt(eta)*sqrt(distSqrd(X1,X2));
+    
+     eta	= 1/lengthScale^2;
+     K	= sqrt(eta)*sqrt(distSqrd(X1,X2));
   
  case 'bubble'
-    K	= eta*distSqrd(X1,X2);
-    K	= K<1;
+    
+     eta	= 1/lengthScale^2;
+     K	= eta*distSqrd(X1,X2);
+     K	= K<1;
   
  case 'laplace'
-    K	= exp(-sqrt(eta*distSqrd(X1,X2)));
-  
- case 'poly'
-    K	= (X1*(eta*X2)' + 1).^p;
 
- case 'hpoly'
-    K	= (eta*X1*X2').^p;
+     eta	= 1/lengthScale^2;
+     K	= exp(-sqrt(eta*distSqrd(X1,X2)));
+  
+ case {'poly','polynomial','polyn'}
+     
+     eta	= 1/lengthScale(1)^2;
+     K	= (eta*X1*X2' + lengthScale(2)).^ lengthScale(3);
+
+ case {'hpoly', 'hpolyn'}
+     
+     eta	= 1/lengthScale(1)^2;
+     K	= (eta*X1*X2').^ lengthScale(2);
 
  case 'spline'
+
     K	= 1;
     X1	= X1/lengthScale;
     X2	= X2/lengthScale;
@@ -98,12 +116,11 @@ switch lower(kernel_)
         Xx1		= X1(:,i)*ones(1,N2);
         Xx2		= ones(N1,1)*X2(:,i)';
         minXX	= min(Xx1,Xx2);
-
         K	= K .* (1 + XX + XX.*minXX-(Xx1+Xx2)/2.*(minXX.^2) + (minXX.^3)/3);
     end
   
-    otherwise
-  error('Unrecognised kernel function type: %s', kernel_)
+ otherwise
+    error('Unrecognised kernel function type: %s', kernel_)
 end
 
 %%

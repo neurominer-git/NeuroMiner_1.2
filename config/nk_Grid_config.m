@@ -225,8 +225,13 @@ switch OptimFlag
                     switch SVM.kernel.kernstr
                         
                         case {' -t 1', 'poly', 'polynomial', 'Polynomial', 'hpolyN', 'polyN'}
-                            Pcparstr = 'Polynomial coefficients'; [Pcstr, n_pars(end+1)] = nk_ConcatParamstr(PolyCoefdefs);
-                            PX = nk_AddParam(PolyCoefdefs, ['ML-' Pcparstr], 2, PX);
+                            Gparstr = 'RBF/Gaussian kernel parameter(s)'; [Gstr, n_pars(end+1)] = nk_ConcatParamstr(Gdefs);
+                            PX = nk_AddParam(Gdefs, ['ML-' Gparstr], 2, PX);
+                            menustr = sprintf('%s|Define %s [ %s ]', menustr, Gparstr, Gstr);                       menuact = [ menuact 4 ];
+                            if ~strcmp(SVM.kernel.kernstr, 'hpolyN') 
+                                Pcparstr = 'Polynomial coefficients'; [Pcstr, n_pars(end+1)] = nk_ConcatParamstr(PolyCoefdefs);
+                                PX = nk_AddParam(PolyCoefdefs, ['ML-' Pcparstr], 2, PX);
+                            end
                             menustr = sprintf('%s|Define %s [ %s ]', menustr, Pcparstr, Pcstr);                     menuact = [ menuact 5 ];
                             Pdparstr = 'Polynomial degree'; [Pdstr, n_pars(end+1)] = nk_ConcatParamstr(PolyDegrdefs);
                             PX = nk_AddParam(PolyDegrdefs, ['ML-' Pdparstr], 2, PX);

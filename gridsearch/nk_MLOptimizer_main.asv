@@ -127,10 +127,10 @@ for i=1:inparams.nclass
         case {' -t 1', 'poly', 'polynomial', 'Polynomial', 'polyN', 'hpolyN'}
             inparams.Params{i}{end+1} = GRD.Gparams;
             inparams.Params_desc{i}{end+1} = 'Kernel';
-            inparams.Params{i}{end+1} = GRD.PolyCoefparams;
-            inparams.Params_desc{i}{end+1} = 'Poly coef';
             inparams.Params{i}{end+1} = GRD.PolyDegrparams;
             inparams.Params_desc{i}{end+1} = 'Poly Degree';
+            inparams.Params{i}{end+1} = GRD.PolyCoefparams;
+            inparams.Params_desc{i}{end+1} = 'Poly coef';
         case ' -t 2'
             inparams.Params{i}{end+1} = GRD.Gparams;
             inparams.Params_desc{i}{end+1} = 'Kernel';

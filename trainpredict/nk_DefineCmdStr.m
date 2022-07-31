@@ -50,7 +50,7 @@ switch SVM.prog
                     case ' -t 0'
                         vargout.ParamStr = vargout.ParamStr ;
                     case ' -t 1'
-                        vargout.ParamStr = [vargout.ParamStr 'g', 'd', 'r'];
+                        vargout.ParamStr = [vargout.ParamStr 'g', 'r', 'd'];
                     case ' -t 2'
                         vargout.ParamStr = [vargout.ParamStr 'g'];
                     case ' -t 3'

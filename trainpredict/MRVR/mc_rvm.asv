@@ -71,9 +71,11 @@ for p=1:P
     weights{p}=zeros(1,1);
 end
 
-
-[weights, used, alphas] = UpdateParams(PHI,tdata,weights,alphas,maxIts);
-   
+try
+    [weights, used, alphas] = UpdateParams(PHI,tdata,weights,alphas,maxIts);
+catch ERR
+    fprintf('something went wrong.')
+end
 PHI2=cell(P,1);
 
 for p=1:P
@@ -421,10 +423,9 @@ end
 P=poly(-s);
 PP=n*conv(P,P)';
 CC0=conv(P,C)';
-%CC=[0; CC];
-nx = numel(CC0) - numel(CC);
+CC=[0
+    CC];
 
-CC=[zeros(nx,1); CC];
 CCC=[CC+CC0; 0];
 
 r=roots(PP-CCC);
