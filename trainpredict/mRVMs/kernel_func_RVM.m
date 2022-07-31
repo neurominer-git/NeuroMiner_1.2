@@ -5,14 +5,14 @@
 %    agreed to when this code was downloaded, and a copy of which is available at 
 %    http://www.dcs.gla.ac.uk/inference/pMKL/Terms_and_Conditions.html.
 
-function K = kernel_function(X,Y,type,param)
+function K = kernel_func_RVM(X,Y,type,param)
 %disp('---Kernel function---')
 
 if strcmp(type,'linear') || strcmp(type,'lin') || strcmp(type,' -t 0')
    
     K=X*Y'; 
     
-elseif strcmp(type,'gaussian')
+elseif strcmp(type,'gaussian') || strcmp(type,'rbf') || strcmp(type,'gauss')
     N = size(X,1);
     M = size(Y,1);
     D = size(X,2);
@@ -28,21 +28,8 @@ elseif strcmp(type,'gaussian')
     T=diag(-param);% The diagonal matrix DxD with D parameters
     K=exp(repmat(diag(X*T*X'),1,M)+repmat(diag(Y*T*Y')',N,1)-2*X*T*Y');
   
-elseif strcmp(type,'polynomial')
-    %     if(size(x)==size(y))
-    %         %         pol=1;
-    %         %         for i=1:max(size(x))
-    %         %             pol = pol * (1 + x(i)*y(i))^param;
-    %         %         end
-    %         %
-    %         %         k=pol;
-    %         %
-    %         k = prod( ones(1,length(x(1,:))) + x.*y)^param;
-    %         %  ok=1;
-    %     else
-    %         k=NaN;
-    %         % ok=0;
-    %     end
+elseif strcmp(type,'polynomial') || strcmp(type,'polyN') || strcmp(type,'poly')
+  
     if ~exist('param','var')
         param = 2;
     end

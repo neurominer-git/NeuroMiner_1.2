@@ -22,7 +22,7 @@ if isfield(NM,'Y')
     AS = nk_GetAnalysisStatus(NM);
     if AS.analexistflag, status.analyses_exist = true; end
     if AS.analreadyflag, status.analyses_ready = true; end
-    if AS.analcompleteflag, 
+    if AS.analcompleteflag
         status.analyses_completed = true; 
     end
     status.completed_analyses = AS.completed_analyses; 
@@ -31,13 +31,13 @@ if isfield(NM,'Y')
     if isfield(NM.defs,'analyses_locked') && NM.defs.analyses_locked
         status.analyses_locked = true;
     end
-    if AS.oocvreadyflag, 
+    if AS.oocvreadyflag
         status.oocv_data_ready = true;
         if isfield(NM.TrainParam,'OOCV'), status.oocv_anal_ready = true; end
     end
     status.analyses_nondeterministic = true;
     for i=1:numel(AS.analyses_nondeterministic) 
-        if sum(AS.analyses_nondeterministic(i).modality) ~= numel(AS.analyses_nondeterministic(i).modality); 
+        if sum(AS.analyses_nondeterministic(i).modality) ~= numel(AS.analyses_nondeterministic(i).modality)
             status.analyses_nondeterministic = false;
             break
         end

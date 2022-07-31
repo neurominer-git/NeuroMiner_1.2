@@ -196,7 +196,7 @@ switch OptimFlag
                         return
                     end
                 case {'GLMNET','GRDBST','ROBSVM','ELASVM'}
-                    if isfield(GRD,SVM.prog) && ~isempty(GRD.(SVM.prog).Params)
+                    if isfield(GRD,SVM.prog) && isfield(GRD.(SVM.prog),'Params') && ~isempty(GRD.(SVM.prog).Params)
                         for i=1:numel(GRD.(SVM.prog).Params)
                             parstr = GRD.(SVM.prog).Params(i).name; [~, n_pars(end+1)] = nk_ConcatParamstr(  GRD.(SVM.prog).Params(i).range );
                             PX = nk_AddParam(GRD.(SVM.prog).Params(i).range, ['ML-' parstr], 2, PX);

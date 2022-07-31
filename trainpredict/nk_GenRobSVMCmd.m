@@ -13,13 +13,15 @@ switch options.learner
     case '-s 4'
         cmd = sprintf('-c %g -nu %g, %s', options.cost, options.nu, cmd);
 end
-switch options.kernelFunc
-    case '-t 1'
-        cmd = sprintf('%s -r %g -d %g', options.coef0, options.degree);
-    case '-t 2'
-        cmd = sprintf('%s -g %g', options.gamma);
-    case '-t 4'
-        cmd = sprintf('%s -k %s', options.kernel);
+if isfield(options,'kernelFunc')
+    switch options.kernelFunc
+        case '-t 1'
+            cmd = sprintf('%s -r %g -d %g', options.coef0, options.degree);
+        case '-t 2'
+            cmd = sprintf('%s -g %g', options.gamma);
+        case '-t 4'
+            cmd = sprintf('%s -k %s', options.kernel);
+    end
 end
 
 cmd = sprintf('%s -m %g -e %g -h %g -b %g', cmd, ...

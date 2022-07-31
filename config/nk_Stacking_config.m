@@ -123,7 +123,7 @@ if ~isempty(mess)
 end
 
 fprintf('\n'); mestr = 'Configure stacking options';  
-navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); cprintf('*blue','You are here: %s >>> ',parentstr); 
+navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('You are here: %s >>> ',parentstr); 
 act = char(nk_input(mestr,0,'mq', mn_str, mn_act));
 
 switch act

@@ -51,7 +51,7 @@ switch param.prog
                     'bubble'};      % Neighbourhood indicato}
         progstr = 'Mike Tipping''s RVM';
                 
-    case 'LIBSVM'
+    case {'LIBSVM','ROBSVM'}
                 
         switch param.LIBSVM.LIBSVMver
             case {0,1,2}

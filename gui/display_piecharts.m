@@ -18,8 +18,8 @@ switch handles.modeflag
                     contigmat = handles.MultiClass.class{colind};
                     labelh = handles.MultiClass.onevsall_labels(:,colind);
                 end
-                cl1 = handles.colptin(colind,:);
-                cl2 = [0.6 0.6 0.6];
+                CLR1 = handles.colptin(colind,:);
+                CLR2 = [0.6 0.6 0.6];
             end
         else
             groupnames = handles.BinClass{h_class}.groupnames;
@@ -56,9 +56,9 @@ switch handles.modeflag
             contigmat = handles.Regr.contigmat;
             labelh = handles.Regr.b_label;
         end
-        cl1 = [0.5 0.5 0.5]; cl2 = [0.5 0.5 0.5];
+        CLR1 = [0.5 0.5 0.5]; CLR2 = [0.5 0.5 0.5];
 end
-if ~exist('Pre1','var') || isempty(Pre1),
+if ~exist('Pre1','var') || isempty(Pre1)
     Pre1    = sum(labelh==1)/numel(labelh);
 end
 
