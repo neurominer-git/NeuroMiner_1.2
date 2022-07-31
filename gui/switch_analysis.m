@@ -1,6 +1,7 @@
 function [handles, visdata, oocvdata, mlidata] = switch_analysis(handles)
 
 visdata = []; oocvdata = []; mlidata = [];
+handles.thisMLIresult.Visible = 'off';
 analind = handles.curranal;
 handles.curmodal = 1; if strcmp(handles.selModal.Enable,'on'), handles.curmodal = handles.selModal.Value; end
 

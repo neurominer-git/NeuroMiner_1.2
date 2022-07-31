@@ -440,12 +440,14 @@ function clickCallback(src, evt)
                 axes(handles.axes1); 
                 if isfield(handles,'caseplot'), delete(handles.caseplot); end
                 handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
-                if isfield(handles, 'MLIdata')
+                if isfield(handles, 'MLIdata') && ~isempty(handles.MLIdata)
                     handles.thisMLIresult.Visible = 'on';
                     handles.curCase = indpat;
                     if ~isnumeric(handles.MLIapp) && isvalid(handles.MLIapp)
                         updateFcn(handles.MLIapp, handles)
                     end
+                else 
+                    handles.thisMLIresult.Visible = 'off';
                 end
                 axesHdl.Legend.String{end} = selCase;
             catch
@@ -1055,9 +1057,16 @@ axes(handles.axes1);
 %[figx,figy] = dsxy2figxy(handles.axes1,[x1 y1],[x2 y2]);
 if isfield(handles,'caseplot'), delete(handles.caseplot); end
 handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
-if isfield(handles, 'MLIdata')
+if isfield(handles, 'MLIdata') && ~isempty(handles.MLIdata)
     handles.thisMLIresult.Visible = 'on';
     handles.curCase = handles.selCase.Value;
+
+    if ~isnumeric(handles.MLIapp) && isvalid(handles.MLIapp)
+        updateFcn(handles.MLIapp, handles)
+    end
+
+else 
+    handles.thisMLIresult.Visible = 'off';
 end
 handles.axes1.Legend.String{end} = selCase;
 guidata(handles.figure1,handles);
@@ -1329,12 +1338,15 @@ function thisMLIresult_Callback(hObject, eventdata, handles)
         %handles.visdata{1,1}.params.features, ...
         %handles.NM.Y{1}, ...
         %0);
-        if ~isfield(handles, 'MLIapp')
-            handles.appMLI = appMLI(handles);
-        elseif isfield(handles, 'MLIapp') && ~isnumeric(handles.MLIapp)
+        if isnumeric(handles.MLIapp)
+            handles.MLIapp = appMLI(handles);
+        elseif ~isvalid(handles.MLIapp)
+            handles.MLIapp.delete; 
+            handles.MLIapp  = appMLI(handles);
+        elseif ~isnumeric(handles.MLIapp) && isvalid(handles.MLIapp)
             updateFcn(handles.MLIapp, handles);
         end
-
+    guidata(handles.figure1,handles);
 
 % --- Executes on button press in tglClrSwp.
 function tglClrSwp_Callback(hObject, eventdata, handles)

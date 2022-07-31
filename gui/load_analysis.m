@@ -36,7 +36,7 @@ for i = 1:nVarIn
         handles = load_OOCV(handles, varargin{i+1});
 
     elseif strcmpi(varargin{i}, 'MLIdata')
-    
+        
         mli = varargin{i+1};
         handles.MLIdata = mli; 
         if ~isfield(handles, 'MLIapp') %&& ~isnumeric(handles.MLIapp)
@@ -45,6 +45,7 @@ for i = 1:nVarIn
             handles.MLIapp = 0; 
         end
         %handles.MLIapp = 0;
+        handles.thisMLIresult.Visible = 'on';
         
     end
     
