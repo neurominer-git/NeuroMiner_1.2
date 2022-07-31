@@ -43,6 +43,7 @@ end
 
 if isfield(handles,'MLIapp') && ~isfield(handles.NM.analysis{analind},'MLI') && ~isempty(handles.MLIapp) && handles.MLIapp ~=0
     handles.MLIapp.delete;
+    handles.thisMLIresult.Visible = 'off';
     handles = rmfield(handles,'MLIapp');
 elseif isfield(handles,'MLIapp') && ~isnumeric(handles.MLIapp) && isfield(handles.NM.analysis{analind},'MLI')
     updateFcn(handles.MLIapp,handles);
