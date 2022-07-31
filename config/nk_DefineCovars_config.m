@@ -1,6 +1,6 @@
 function [G, Gnames] = nk_DefineCovars_config(n_subjects_all, covars)
 
-if exist('covars','var') && ~isempty(covars),
+if exist('covars','var') && ~isempty(covars)
     ncov = size(covars,2);
 else
     ncov = Inf;

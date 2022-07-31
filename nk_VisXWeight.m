@@ -43,9 +43,6 @@ mPA = []; PA = []; warning off
 W       = zeros(size(F,1),1);
 W(F)    = xV;
 W(~Fadd)= 0;
-if ~any(W), 
-    fprintf('?'); 
-end
 
 % Process analytical P values
 if ~isempty(AnalP)

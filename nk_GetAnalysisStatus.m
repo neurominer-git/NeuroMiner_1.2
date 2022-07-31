@@ -46,7 +46,7 @@ if isfield(NM,'analysis')
             case 1
                 nM = 1;
         end
-        if isfield(NM.analysis{i}.params.TrainParam.SVM,'ADASYN') && NM.analysis{i}.params.TrainParam.SVM.ADASYN.flag
+        if isfield(NM.analysis{i}.params.TrainParam.SVM,'ADASYN') && NM.analysis{i}.params.TrainParam.SVM.ADASYN.flag==1
            
             for j=1:nM
                 PREPROC = NM.analysis{i}.params.TrainParam.PREPROC{Modality(j)};

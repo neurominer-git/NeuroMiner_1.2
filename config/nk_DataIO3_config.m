@@ -2,8 +2,8 @@ function  [NM, act] = nk_DataIO3_config( NM, parentstr, act, varind, IO )
 
 mn_str=[];
 nk_PrintLogo
-if isfield(NM,'Y') && ~isempty(NM.Y), Yfl = 1; else Yfl = 0; end
-if isfield(NM,'covars') && ~isempty(NM.covars), covfl = 1; else covfl = 0; end
+if isfield(NM,'Y') && ~isempty(NM.Y), Yfl = 1; else, Yfl = 0; end
+if isfield(NM,'covars') && ~isempty(NM.covars), covfl = 1; else, covfl = 0; end
 mestr = 'NM data workspace manager'; navistr = [parentstr ' >>> ' mestr];
 if ~exist('act','var') || isempty(act)
     if ~Yfl
@@ -17,7 +17,7 @@ if ~exist('act','var') || isempty(act)
         mn_act = [ 2 3 4 5 ];
         if ~covfl 
             fprintf('\n\n');
-            cprintf('*black','--- No covariates found in NM workspace.')
+            fprintf('--- No covariates found in NM workspace.');
             mn_str = [mn_str '|Add covariate(s) to NM workspace' ];
             mn_act = [mn_act 6];
         else

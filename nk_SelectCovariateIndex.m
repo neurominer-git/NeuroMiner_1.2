@@ -4,7 +4,7 @@ if ~exist('varind','var') || isempty(varind), varind = 1; end
 if ~exist('askfl','var') || isempty(askfl), askfl = 1; end
 
 nD = size(dat.covars,2);
-if askfl && nD == 1, 
+if askfl && nD == 1
     varind = 1;
 else
     fprintf('\n******************************')

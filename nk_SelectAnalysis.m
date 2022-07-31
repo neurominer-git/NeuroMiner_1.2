@@ -42,7 +42,7 @@ analdim = []; act = 0;
 
 % Select analysis 
 if isfield(dat,'analysis')
-    indanal = 1:numel(dat.analysis);
+    indanal = true(1,numel(dat.analysis));
     if complflag
         analstatus = nk_GetAnalysisStatus(dat);
         if stackmin > 0 && ~isempty(analstatus.stacking_analyses)
@@ -60,7 +60,9 @@ if isfield(dat,'analysis')
 
     if nondeterministic
         for i=1:numel(analstatus.analyses_nondeterministic)
-            indanal(i) = sum(any(analstatus.analyses_nondeterministic(i).modality))==0;
+            if indanal(i)
+                indanal(i) = sum(any(analstatus.analyses_nondeterministic(i).modality))==0;
+            end
         end
     end
 

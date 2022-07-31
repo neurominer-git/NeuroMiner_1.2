@@ -18,7 +18,7 @@ switch SVM.prog
                 xV = nk_VisSV(MD, Y, L);
         end
     case 'MEXELM'
-        xV = MD.outW;
+        xV = nm_nanmean(MD.inW)';
     case  'GLMFIT'
         xV = MD.beta(2:end);
     case 'matLRN'
@@ -55,4 +55,7 @@ switch SVM.prog
         if errorflag
             error(['Vizualisation for ' SVM.prog ' not supported yet. Please consult the NM Manual for more information']);
         end
+end
+if ~any(xV)
+    error('The feature weight vector contains only 0. Check your settings'); 
 end

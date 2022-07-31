@@ -1050,9 +1050,12 @@ switch act
                 case 3
                     t_Y = readtable(IO.M_edit,'delimiter',IO.delimit);  
                     t_label = table2array(t_Y(:,{IO.label_edit}));
+                case 4
+                    t_Y = readtable(IO.M_edit);  
+                    t_label = table2array(t_Y(:,{IO.label_edit}));
             end
         end
-        figure;hist(t_label); 
+        figure;histogram(t_label); 
         ylabel('# of measurements in bins'); 
         xlabel('Label measurements'); 
         title(sprintf('Histogram analysis of target label (in %s) for regression',groupmode_str)); 
