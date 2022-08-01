@@ -457,35 +457,33 @@ switch OptimFlag
             GRD.GridMaxType = GridMaxType;
             if prod(n_pars) * nP > 1
                 if strcmp(SVM.prog,'LIBSVM') && strcmp(SVM.prog,'MikRVM') && strcmp(SVM.prog,'MVTRVR')
-                    if OptRegul.flag, regstr = 'Yes'; else, regstr = 'No'; end
-                    menustr = sprintf('%s|Enable regularization of model selection [ %s ]', menustr, regstr);               menuact = [ menuact 7 ];
-                    if OptRegul.flag
-                        if isfield(TrainParam,'RFE') && ...
-                                (isfield(TrainParam.RFE,'Filter') && ...
-                                isfield(TrainParam.RFE.Filter,'EnsembleStrategy') && ...
-                                isfield(TrainParam.RFE.Filter.EnsembleStrategy,'type') && ...
-                                TrainParam.RFE.Filter.EnsembleStrategy.type ~= 9 || ...
-                            isfield(TrainParam.RFE,'Wrapper') && ...
-                                isfield(TrainParam.RFE.Wrapper,'EnsembleStrategy') && ...
-                                isfield(TrainParam.RFE.Wrapper.EnsembleStrategy,'type') && ...
-                                TrainParam.RFE.Wrapper.EnsembleStrategy.type ~= 9)
-                            switch OptRegul.flag
-                                case 1
-                                    crossstr = 'Model complexity';
-                                case 2
-                                    crossstr = 'Ensemble diversity';
-                                case 3
-                                    crossstr = 'Mixed Criterion (Model Complexity & Ensemble diversity)';
-                            end
-                            menustr = sprintf('%s|Criterion for cross-parameter model selection [ %s ]', menustr, crossstr);  menuact = [ menuact 8 ];
-                        else
-                            GRD.OptRegul.type = OptRegul.type;
+                if OptRegul.flag, regstr = 'Yes'; else, regstr = 'No'; end
+                menustr = sprintf('%s|Enable regularization of model selection [ %s ]', menustr, regstr);               menuact = [ menuact 7 ];
+                if OptRegul.flag
+                    if isfield(TrainParam,'RFE') && ...
+                            (isfield(TrainParam.RFE,'Filter') && ...
+                            isfield(TrainParam.RFE.Filter,'EnsembleStrategy') && ...
+                            isfield(TrainParam.RFE.Filter.EnsembleStrategy,'type') && ...
+                            TrainParam.RFE.Filter.EnsembleStrategy.type ~= 9 || ...
+                        isfield(TrainParam.RFE,'Wrapper') && ...
+                            isfield(TrainParam.RFE.Wrapper,'EnsembleStrategy') && ...
+                            isfield(TrainParam.RFE.Wrapper.EnsembleStrategy,'type') && ...
+                            TrainParam.RFE.Wrapper.EnsembleStrategy.type ~= 9)
+                        switch OptRegul.flag
+                            case 1
+                                crossstr = 'Model complexity';
+                            case 2
+                                crossstr = 'Ensemble diversity';
+                            case 3
+                                crossstr = 'Mixed Criterion (Model Complexity & Ensemble diversity)';
                         end
-                        menustr = sprintf('%s|Define weight (lambda) of SV ratio [ %g ]', menustr, OptRegul.lambda);           menuact = [ menuact 9 ];
-                        menustr = sprintf('%s|Define non-linearity (big gamma) of SV ratio [ %g ]', menustr, OptRegul.big_gamma);  menuact = [ menuact 10 ];
+                        menustr = sprintf('%s|Criterion for cross-parameter model selection [ %s ]', menustr, crossstr);  menuact = [ menuact 8 ];
+                    else
+                        GRD.OptRegul.type = OptRegul.type;
                     end
-                else
-                    OptRegul.flag = 2;
+                    menustr = sprintf('%s|Define weight (lambda) of SV ratio [ %g ]', menustr, OptRegul.lambda);           menuact = [ menuact 9 ];
+                    menustr = sprintf('%s|Define non-linearity (big gamma) of SV ratio [ %g ]', menustr, OptRegul.big_gamma);  menuact = [ menuact 10 ];
+
                 end
                 switch NodeSelect.mode
                     case 1

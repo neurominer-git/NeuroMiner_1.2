@@ -1,4 +1,4 @@
-function [act, param] = nk_GA_config(param, defaultsfl)
+function [act, param] = nk_GA_config(param, defaultsfl, parentstr)
 
 GA.N                = 10;   % Number of chromosomes
 GA.max_Iter         = 100;  % Number of iterations
@@ -15,6 +15,8 @@ if ~defaultsfl
         if isfield(param.GA,'MR') && ~isempty( param.GA.MR ), GA.MR = param.GA.MR; end
     end
     nk_PrintLogo
+    mestr = 'Genetic algorithm setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
+
     act = nk_input('Define Genetic Algorithm (GA) parameters',0,'mq', ...
                     [sprintf('Number of chromosomes [ %g ]|', GA.N) ...
                      sprintf('Number of iterations [ %g ]|', GA.max_Iter) ...

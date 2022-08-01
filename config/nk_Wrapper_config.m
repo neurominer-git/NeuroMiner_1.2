@@ -102,21 +102,21 @@ if ~isempty(act) || ~defaultsfl
                 'Simulated Annealing|' ...
                 'Genetic algorithm|' ...
                 'Particle swarm optimization|' ...
-                'Path finder algorithm|' ...
-                'Tree seed algorithm'],1:6, Wrapper.type);
+                'Path finder algorithm'],1:5, Wrapper.type);
+                %'Tree seed algorithm]',1:5, Wrapper.type);
             switch Wrapper.type
                 case 1
                     t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_GreedySearch_config(Wrapper, SVM, MULTI, 0, navistr); end
                 case 2
-                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_SA_config(Wrapper); end
+                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_SA_config(Wrapper, 0, navistr); end
                 case 3
-                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_GA_config(Wrapper); end
+                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_GA_config(Wrapper, 0, navistr); end
                 case 4
-                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_PSO_config(Wrapper); end
+                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_PSO_config(Wrapper, 0, navistr); end
                 case 5
-                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_PFA_config(Wrapper); end
-                case 6
-                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_PFA_config(Wrapper); end
+                    t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_PFA_config(Wrapper, 0, navistr); end
+%                 case 6
+%                     t_act = 1; while t_act>0, [ t_act , Wrapper ] = nk_TSA_config(Wrapper); end
             end
         case 5
             Wrapper.datamode = nk_input('Samples for optimization',0,'m','CV1 training data|CV1 test data|CV1 training & test data',[1,2,3], Wrapper.datamode);

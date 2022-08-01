@@ -2,7 +2,7 @@
 
 % (9/12/2020)
 
-function [Sf, curve] = jTreeSeedAlgorithm(rx, Ps, N, max_Iter, lb, ub, thres, ST)
+function [Sf, curve] = jTSA(rx, Ps, N, max_Iter, lb, ub, thres, ST)
 
 % Objective function
 fun = @jFitness; 
