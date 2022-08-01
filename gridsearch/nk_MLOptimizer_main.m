@@ -224,30 +224,32 @@ for i=1:inparams.nclass
             inparams.Params_desc{i}{1} = 'Decision Trees';
             inparams.Params{i}{2} = GRD.NumDparams;
             inparams.Params_desc{i}{2} = 'Num Feats';
-            inparams.Params{i}{3} = GRD.NumDparams;
+            inparams.Params{i}{3} = GRD.RFMaxDparams;
             inparams.Params_desc{i}{3} = 'Criterion';
-            inparams.Params{i}{4} = GRD.NumDparams;
+            inparams.Params{i}{4} = GRD.RFCritdefsparams;
             inparams.Params_desc{i}{4} = 'Max Depth';
-            inparams.Params{i}{5} = GRD.NumDparams;
+            inparams.Params{i}{5} = GRD.RFMinSSplitparams;
             inparams.Params_desc{i}{5} = 'Min Samples Split';
-            inparams.Params{i}{6} = GRD.NumDparams;
+            inparams.Params{i}{6} = GRD.RFMinSLeafparams;
             inparams.Params_desc{i}{6} = 'Min Samples Leaf';
-            inparams.Params{i}{7} = GRD.NumDparams;
+            inparams.Params{i}{7} = GRD.RFMinWFLeafparams;
             inparams.Params_desc{i}{7} = 'Min Weight Fract Leaf';
-            inparams.Params{i}{8} = GRD.NumDparams;
+            inparams.Params{i}{8} = GRD.RFMaxLeafNparams;
             inparams.Params_desc{i}{8} = 'Max Leaf Nodes';
-            inparams.Params{i}{9} = GRD.NumDparams;
+            inparams.Params{i}{9} = GRD.RFMinImpDecrparams;
             inparams.Params_desc{i}{9} = 'Min Impurity Decrease';
-            inparams.Params{i}{10} = GRD.NumDparams;
+            inparams.Params{i}{10} = GRD.RFBootstrapparams;
             inparams.Params_desc{i}{10} = 'Bootstrap';
-            inparams.Params{i}{11} = GRD.NumDparams;
+            inparams.Params{i}{11} = GRD.RFOobScoreparams;
             inparams.Params_desc{i}{11} = 'Out-Of-Bag Score';
-            inparams.Params{i}{12} = GRD.NumDparams;
-            inparams.Params_desc{i}{12} = 'Class Weigths';
-            inparams.Params{i}{13} = GRD.NumDparams;
-            inparams.Params_desc{i}{13} = 'CCP Alpha';
-            inparams.Params{i}{14} = GRD.NumDparams;
-            inparams.Params_desc{i}{14} = 'Max Sample';
+            inparams.Params{i}{12} = GRD.RFCcpAlphaparams;
+            inparams.Params_desc{i}{12} = 'CCP Alpha';
+            inparams.Params{i}{13} = GRD.RFMaxSampparams;
+            inparams.Params_desc{i}{13} = 'Max Sample';
+            if strcmp(MODEFL, 'classification')
+                inparams.Params{i}{14} = GRD.RFClassWeightparams;
+                inparams.Params_desc{i}{14} = 'Class Weigths';
+            end
 
         case 'SEQOPT'
             inparams.Params{i}{1} = 1:size(SVM.SEQOPT.C,1);

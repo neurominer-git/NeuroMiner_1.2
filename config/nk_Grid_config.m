@@ -37,10 +37,17 @@ switch OptimFlag
         Neurondefs                      = [25 50 75 100];
         Leafdefs                        = logspace(1,2,10);
         % Random Forest
-        Treedefs                        = [25 50 75 100 150 200];
+
+        
+        Treedefs                        = 100;
         NumDdefs                        = -1; % = "sqrt";
-        Critdefs                        = 1; % = "gini";
-        MaxDdefs                        = 0; % = "None";
+        Critdefs                        = 1; % in case of classification = "gini"; in case of regression = "squared_error
+        switch NM.modeflag
+            case 'classification'
+                MaxDdefs                = 0; % = "None";
+            case 'regression'
+                MaxDdefs                = 1.0;
+        end
         MinSSplitdefs                   = 2;
         MinSLeafdefs                    = 1;
         MinWeightFractLeafdefs          = 0.0;
@@ -51,7 +58,10 @@ switch OptimFlag
         %NJobsdefs                       = "None";
         %RandomStatedefs                 = "None";
         %WarmStartdefs                   = "False";
-        ClassWeightdefs                 = 0; % = "None";
+
+        if strcmp(NM.modeflag,'classification') 
+            ClassWeightdefs             = 0; % = "None";
+        end
         CcpAlphadefs                    = 0.0;
         MaxSampdefs                     = 0; % = "None";
 
@@ -120,7 +130,10 @@ switch OptimFlag
             if isfield(GRD,'RFMinImpDecrparams'),               MinImpDecrdefs = GRD.RFMinImpDecrparams; end
             if isfield(GRD,'RFBootstrapparams'),               Bootstrapdefs = GRD.RFBootstrapparams; end
             if isfield(GRD,'RFOobScoreparams'),               OobScoredefs = GRD.RFOobScoreparams; end
-            if isfield(GRD,'RFClassWeightparams'),               ClassWeightdefs = GRD.RFClassWeightparams; end
+            
+            if strcmp(NM.modeflag,'classification') 
+                if isfield(GRD,'RFClassWeightparams'),               ClassWeightdefs = GRD.RFClassWeightparams; end
+            end
             if isfield(GRD,'RFCcpAlphaparams'),               CcpAlphadefs = GRD.RFCcpAlphaparams; end
             if isfield(GRD,'MaxSampparams'),               MaxSampdefs = GRD.MaxSampparams; end
 
@@ -314,18 +327,39 @@ switch OptimFlag
                     
                     Dnparstr = 'Maximum number of features'; [Dnstr, n_pars(end+1)] = nk_ConcatParamstr( NumDdefs );
                     PX = nk_AddParam(NumDdefs, ['ML-' Dnstr], 2, PX);
+                    switch NumDdefs
+                        case 0
+                            Dnstr = 'None';
+                        case -1
+                            Dnstr = 'sqrt';
+                        case -2
+                            Dnstr = 'log2';
+                    end
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Dnparstr, Dnstr);                                 menuact = [ menuact 18 ];
           
                     Critparstr = 'Function to measure the quality of a split'; [Critstr, n_pars(end+1)] = nk_ConcatParamstr( Critdefs );
                     PX = nk_AddParam(Critdefs, ['ML-' Critstr], 2, PX);
-                    switch Critdefs
-                        case 1
-                            Critstr = 'Gini impurtiy';
-                        case 2
-                            Critstr = 'Log loss';
-                        case 3
-                            Critstr = 'Entropy';
-                    end   
+                    switch NM.modeflag
+                        case 'classification'
+                            switch Critdefs
+                                case 1
+                                    Critstr = 'Gini impurity';
+                                case 2
+                                    Critstr = 'Log loss';
+                                case 3
+                                    Critstr = 'Entropy';
+                            end
+                        case 'regression'
+                            switch Critdefs
+                                case 1
+                                    Critstr = 'Squared error';
+                                case 2
+                                    Critstr = 'Absolute error';
+                                case 3
+                                    Critstr = 'Poisson';
+                            end
+                    end
+
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Critparstr, Critstr);                                 menuact = [ menuact 31 ];
                     
                     MaxDparstr = 'Maximum depth of the tree'; [MaxDstr, n_pars(end+1)] = nk_ConcatParamstr( MaxDdefs );
@@ -377,20 +411,21 @@ switch OptimFlag
                     end
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, OobScoreparstr, OobScorestr);                                 menuact = [ menuact 39 ];
                     
-                    ClassWeightparstr = 'Class weights'; [ClassWeightstr, n_pars(end+1)] = nk_ConcatParamstr( ClassWeightdefs );
-                    PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightstr], 2, PX);
-                    switch  ClassWeightdefs
-                        case 0
-                            ClassWeightstr = 'All equal';
-                        case 1
-                            ClassWeightstr = 'Balanced'; 
-                        case 2
-                            ClassWeightstr = 'Balanced subsample';
-                        case 3
-                            ClassWeightstr = 'User-defined';
+                    if strcmp(NM.modeflag,'classification')
+                        ClassWeightparstr = 'Class weights'; [ClassWeightstr, n_pars(end+1)] = nk_ConcatParamstr(  );
+                        PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightstr], 2, PX);
+                        switch  ClassWeightdefs
+                            case 0
+                                ClassWeightstr = 'All equal';
+                            case 1
+                                ClassWeightstr = 'Balanced';
+                            case 2
+                                ClassWeightstr = 'Balanced subsample';
+                            case 3
+                                ClassWeightstr = 'User-defined';
+                        end
+                        menustr = sprintf('%s|Define %s [ %s ]', menustr, ClassWeightparstr, ClassWeightstr);                                 menuact = [ menuact 40 ];
                     end
-                    menustr = sprintf('%s|Define %s [ %s ]', menustr, ClassWeightparstr, ClassWeightstr);                                 menuact = [ menuact 40 ];
-                    
                     CcpAlphaparstr = 'Complexity parameter for Minimal Cost-Complexity Pruning'; ; [CcpAlphastr, n_pars(end+1)] = nk_ConcatParamstr( CcpAlphadefs );
                     PX = nk_AddParam(CcpAlphadefs, ['ML-' CcpAlphastr], 2, PX);
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, CcpAlphaparstr, CcpAlphastr);                                 menuact = [ menuact 41 ];
@@ -546,11 +581,8 @@ switch OptimFlag
                                                 'Fraction|' ...
                                                 'Absolute N|' ...
                                                 'N features'], [-1,-2, -3, -3, 0], NumDdefs);
-                    switch NumDdefs
-                        case -3
-                            NumDdefs    =  nk_input([Dnparstr ' range'],0,'e',NumDdefs); 
-                        case 0
-                            
+                    if NumDdefs == -3
+                            NumDdefs    =  nk_input([Dnparstr ' range'],0,'e',NumDdefs);       
                     end
                             PX = nk_AddParam(NumDdefs, ['ML-' Dnparstr], 2, PX);
                 case 31
@@ -663,7 +695,7 @@ switch OptimFlag
         % random forest
         GRD.Treeparams          = Treedefs;
         GRD.NumDparams          = NumDdefs;
-        GRD.RFMaxDparams     = MaxDdefs;
+        GRD.RFMaxDparams        = MaxDdefs;
         GRD.RFCritdefsparams    = Critdefs;
         GRD.RFMinSSplitparams   = MinSSplitdefs;
         GRD.RFMinSLeafparams    = MinSLeafdefs;
@@ -673,7 +705,9 @@ switch OptimFlag
         GRD.RFBootstrapparams   = Bootstrapdefs;
         GRD.RFOobScoreparams    = OobScoredefs;
         %GRD.RFNJobsparams       = NJobsdefs;
-        GRD.RFClassWeightparams = ClassWeightdefs;
+        if strcmp(NM.modeflag,'classification') 
+            GRD.RFClassWeightparams = ClassWeightdefs;
+        end
         GRD.RFCcpAlphaparams    = CcpAlphadefs;
         GRD.RFMaxSampparams     = MaxSampdefs;
      
