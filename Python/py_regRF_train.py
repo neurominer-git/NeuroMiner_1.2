@@ -6,7 +6,7 @@ import pickle
 
 # criterion
 if crit == 1:
-    crit = 'squared_error'
+    crit = 'squared_error' # if scikit-learn version <v1.0, then crit = 'mse'
 elif crit == 2:
     crit = 'absolute_error'
 elif crit == 3:
