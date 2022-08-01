@@ -472,6 +472,7 @@ axes_shaded_limits = axes_limits;
 axes_shaded_color = 'g';
 axes_shaded_transparency = 0.2;
 axes_labels_rotate = 'off';
+axes_object = 0;
 axfl = false;
 
 % Check if optional arguments were specified
@@ -579,8 +580,6 @@ if numvarargs > 1
             case 'axesobject'
                 axes_object = value_arguments{ii};
                 axfl = true;
-            %case 'axesfigure'
-             %   axes_figure = value_arguments{ii};
             otherwise
                 error('Error: Please enter in a valid name-value pair.');
         end

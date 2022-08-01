@@ -22,7 +22,7 @@ function varargout = nk_PrintResults2(varargin)
 
 % Edit the above text to modify the response to help nk_PrintResults2
 
-% Last Modified by GUIDE v2.5 27-Jul-2022 20:01:19
+% Last Modified by GUIDE v2.5 01-Aug-2022 13:35:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1360,3 +1360,12 @@ guidata(handles.figure1,handles);
 %if isfield(handles, 'MLIapp') && ~isnumeric(handles.MLIapp)
 %    updateFcn(handles.MLIapp,handles);
 %end
+
+
+% --- Executes on button press in spiderPlotButton.
+function spiderPlotButton_Callback(hObject, eventdata, handles)
+% hObject    handle to spiderPlotButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+appSpiderPlot(handles);
