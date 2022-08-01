@@ -132,9 +132,11 @@ else
     sprintf('Generating random feature subspaces ... \n\n\n');
     for h=1:nclass
         if strcmp(MODEFL,'classification') && nclass >1, fprintf('\n\tBinary classifier #%g', h); end
+        nperms = zeros(1,nx);
         for nx=1:nM
             % Compute subspace size of current modality
             nYmap = sum(inp.MLI.Modality{nx}.MAP.mapidx{h});
+            nperms(nx) = inp.MLI.nperms;
             if nM > 1, fprintf('\n\t\tModality #%g', nx); end
 
             % Create random feature indices within (selected subspace of) the
@@ -150,10 +152,10 @@ else
                         % Fraction of unique atlas values to be selected => nfrac 
                         nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique) * inp.MLI.Modality{nx}.frac );
                         % Create permutations of atlas indices => tI
-                        [ tI, inp.MLI.nperms ] = uperms( inp.MLI.Modality{nx}.imgops.atlasvec_unique, inp.MLI.nperms, nfrac ); 
+                        [ tI, nperms(nx) ] = uperms( inp.MLI.Modality{nx}.imgops.atlasvec_unique, inp.MLI.nperms, nfrac ); 
                         % Initialize logical index vector to map selected predictors within the space of MapIdx
-                        RandFeats(h, nx).I = false(inp.MLI.nperms, nYmap);
-                        for nq=1:inp.MLI.nperms
+                        RandFeats(h, nx).I = false(nperms(nx), nYmap);
+                        for nq=1:nperms(nx)
                             % Find permuted atlas indices in masked atlas
                             % file (e.g. masked using CVR, sign-based )
                             RandFeats(h, nx).I(nq,:) = ismember(inp.MLI.Modality{nx}.imgops.atlasvec(inp.MLI.Modality{nx}.MAP.mapidx{h}), ...
@@ -164,27 +166,35 @@ else
                         nfrac = ceil( nYmap * inp.MLI.Modality{nx}.frac );
                         % return logical vector to permuted indices in
                         % (thresholded) image space.
-                        [ RandFeats(h, nx).I, inp.MLI.nperms ] = uperms( inp.MLI.Modality{nx}.MAP.mapidx{h}, inp.MLI.nperms, nfrac ); 
+                        [ RandFeats(h, nx).I, nperms(nx) ] = uperms( inp.MLI.Modality{nx}.MAP.mapidx{h}, inp.MLI.nperms, nfrac ); 
                     end
                      
                 case {'random'}
                     % non-ordered permutations without replacement,
                     % repetitions are allowed.
-                    RandFeats(h, nx).I = false(1, ceil(inp.MLI.nperms, nYmap * inp.MLI.Modality{nx}.frac ));
                     if ~isempty(inp.MLI.Modality{nx}.imgops)
                         nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique) * inp.MLI.Modality{nx}.frac );
-                        for nq = 1:inp.MLI{nx}.nperms
+                        RandFeats(h, nx).I = false(nperms(nx), nYmap);
+                        for nq = 1:nperms(nx)
                             tI = randperm( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique), nfrac); 
                             RandFeats(h, nx).I(nq,:) = ismember(inp.MLI.Modality{nx}.imgops.atlasvec(inp.MLI.Modality{nx}.MAP.mapidx{h}), ...
                                                                 inp.MLI.Modality{nx}.imgops.atlasvec_unique(tI));   
                         end
                     else
-                        for nq = 1:inp.MLI{nx}.nperms
+                        nfrac = ceil( nYmap * inp.MLI.Modality{nx}.frac );
+                        RandFeats(h, nx).I = false(nperms(nx),nfrac);
+                        for nq = 1:nperms(nx)
                             RandFeats(h, nx).I(nq, randperm( nYmap, nfrac )) = true ;   
                         end
                     end
             end
             Dx = ~any(RandFeats(h,nx).I,2); RandFeats(h,nx).I(Dx,:) = [];
+        end
+        if nM>1
+            if numel(unique(nperms))>1
+                inp.MLI.nperms = min(nperms);
+                warning('\nNo of permutations unequal across modalities. Using the minimum number (#%g) of permutations.', inp.MLI.nperms )
+            end
         end
     end 
     fprintf('\nSaving to %s', permfile);

@@ -10,8 +10,7 @@ function [act, inp] = nk_VisModelsPrep(act, inp, parentstr)
 global MULTI CV NM
 
 %% Setup defaults
-complvec = []; for z=1:numel(NM.analysis), if NM.analysis{z}.status, complvec = [ complvec z ]; end; end
-
+as = nk_GetAnalysisStatus(NM); complvec = find(as.completed_analyses);
 if ~exist('inp','var') || isempty(inp)
     inp = struct( 'analind', complvec(1), ...  % Index to analysis
                     'lfl', 1, ...              % 1 = compute from scratch 
@@ -37,7 +36,7 @@ OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; L
 
 %% Configure menu
 if numel(NM.analysis)>1
-    if numel(inp.analind)<2,
+    if numel(inp.analind)<2
         AnalSelStr = sprintf('Analysis %g', inp.analind);   
     else
         AnalSelStr = sprintf('%g Analyses: %s',numel(inp.analind), strjoin(cellstr(num2str(inp.analind'))',', '));
@@ -61,7 +60,7 @@ if ~isempty(analysis)
     LFL_opts        = {'Compute from scratch',sprintf('Use precomputed %s',inp.datatype)};                                      
     ModeStr         = sprintf('Operation mode of visualization module [ %s ]|',LFL_opts{inp.lfl});                          ModeAct = 2;
     
-    if inp.lfl == 1,
+    if inp.lfl == 1
         % from scratch
         OVRWRT_opts     = {'Overwrite existing','Do not overwrite'};       
         OverWriteStr = sprintf('Overwrite existing %s files [ %s ]|', inp.datatype, OVRWRT_opts{inp.ovrwrt}) ;              OverWriteAct = 3; 
@@ -103,14 +102,14 @@ if ~isempty(analysis)
             if isfield(inp,'optpreprocmat'), 
                 selGridPreproc = ~cellfun(@isempty,inp.optpreprocmat);
                 nParamFiles = sprintf('%g files selected', sum(selGridPreproc(:))); 
-            else, 
+            else
                 nParamFiles = na_str; 
             end
             LoadParamsStr = sprintf('Select preprocessing parameter files [ %s ]|' ,nParamFiles);                           LoadParamsAct = 8;
-            if isfield(inp,'optmodelmat'), 
+            if isfield(inp,'optmodelmat')
                 selGridModel = ~cellfun(@isempty,inp.optmodelmat);
                 nModelFiles = sprintf('%g files selected', sum(selGridModel(:))); 
-            else, 
+            else
                 nModelFiles = na_str; 
             end
             LoadModelsStr = sprintf('Select model files [ %s ]|',nModelFiles);                                              LoadModelsAct = 9;
@@ -179,10 +178,10 @@ switch act
     case 1
         showmodalvec = []; analind = inp.analind; 
         if length(NM.analysis)>1, t_act = 1; brief = 1;
-            while t_act>0, 
-                [t_act, analind, ~, showmodalvec, brief ] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief, [], 1); 
+            while t_act>0
+                [t_act, analind, ~, showmodalvec, brief, indanal ] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief, [], 1); 
             end
-            if ~isempty(analind), inp.analind = analind ; end
+            if ~isempty(analind), inp.analind = indanal(analind) ; end
         end
         inp.GridAct = NM.analysis{inp.analind(1)}.GDdims{1}.GridAct;
         

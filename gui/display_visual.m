@@ -14,7 +14,6 @@ pagemanual      = handles.txtPager.String;
 sortfl          = handles.tglSortFeat.Value;
 filterfl        = handles.tglVisMeas2.Value;
 filterthr       = handles.txtThrVisMeas2.String;
-modalitytype    = handles.NM.analysis{handles.curranal}.params.datadescriptor{handles.curmodal}.type;
 
 axes(handles.axes33); cla; hold on
 set(handles.axes33,'TickLabelInterpreter','none')
@@ -670,12 +669,24 @@ switch meas{measind}
                 st.NMaxes = [ handles.axes26 handles.axes27 handles.axes28];
                 set(handles.pn3DView,'Visible','on'); set(handles.axes33,'Visible','off');
                 nk_WriteVol(y,'temp',2,v.params.brainmask,[],0,'gt');
-                if ~isfield(handles,'orthviews'), 
+                if ~isfield(handles,'orthviews')
                     handles.orthviews = nk_orthviews('Image','temp.nii'); 
-                    %colormap(jet);
                 else
                     nk_orthviews('Redraw')
                 end
+                st.NMaxes(3).CLim=[min(y) max(y)];
+                st.NMaxes(2).CLim=[min(y) max(y)];
+                st.NMaxes(1).CLim=[min(y) max(y)];
+                colormap(st.NMaxes(3), jet);
+                colormap(st.NMaxes(2), jet);
+                colormap(st.NMaxes(1), jet);
+                pos = st.NMaxes(3).Position;
+                cl = colorbar(st.NMaxes(3));
+                cl.TickLabels=linspace(min(y),max(y),6);
+                cl.Label.String = meas{measind};
+                cl.Label.FontWeight = 'bold';
+                cl.Label.FontSize = 11;
+                st.NMaxes(3).Position = pos;
                 handles.axes33.XLabel.String='';
                 handles.axes33.YLabel.String='';
         end

@@ -13,8 +13,7 @@ OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; L
 OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = []; SaveCV1Act = [];
 DATASCRAM = false; if isfield(NM.defs,'data_scrambled') && ~isempty(NM.defs.data_scrambled), DATASCRAM = NM.defs.data_scrambled; end
 
-% Detect completed analyses
-complvec = []; for z=1:numel(NM.analysis), if NM.analysis{z}.status, complvec = [ complvec z ]; end; end
+as = nk_GetAnalysisStatus(NM); complvec = find(as.completed_analyses);
 
 % Initialize runtime parameters 
 if ~exist('inp','var') || isempty(inp)
@@ -199,9 +198,9 @@ switch act
         showmodalvec = []; analind = inp.analind; 
         if length(NM.analysis)>1, t_act = 1; brief = 1;
             while t_act>0
-                [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief, 7); 
+                [t_act, analind, ~, showmodalvec , brief, indanal] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief, 7); 
             end
-            if ~isempty(analind), inp.analind = complvec(analind) ; end
+            if ~isempty(analind), inp.analind = indanal(analind) ; end
         end
         inp.GridAct = NM.analysis{inp.analind(1)}.GDdims{1}.GridAct;
     % Select OOCV data if in OOCV mode

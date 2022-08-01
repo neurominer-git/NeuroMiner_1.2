@@ -669,6 +669,7 @@ function selModality_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from selModality
 
 handles.curmodal = hObject.Value;
+load_selModality(handles)
 handles = display_visual(handles);
 guidata(handles.figure1,handles);
 
