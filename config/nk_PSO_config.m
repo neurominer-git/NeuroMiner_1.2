@@ -1,4 +1,4 @@
-function [act, param] = nk_PSO_config(param, defaultsfl)
+function [act, param] = nk_PSO_config(param, defaultsfl, parentstr)
 
 PSO.N                = 10;   % Number of particles
 PSO.max_Iter         = 100;  % Number of iterations
@@ -23,6 +23,7 @@ if ~defaultsfl
         if isfield(param.PSO,'thres') && ~isempty( param.PSO.thres ), PSO.thres = param.PSO.thres; end
     end
     nk_PrintLogo
+    mestr = 'Particle swarm optimization setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
     act = nk_input('Define Particle Swarm Optimization (PSO) parameters',0,'mq', ...
                     [sprintf('Number of particles [ %g ]|', PSO.N) ...
                      sprintf('Number of iterations [ %g ]|', PSO.max_Iter) ...

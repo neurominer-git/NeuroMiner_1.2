@@ -23,7 +23,7 @@ function [ts, rs, ds, Model] = nk_GetTestPerf(Xtest, Ytest, Features, Model, X, 
 %                   in regression:      rs = ds;
 % ds :          Prediction scores
 % =====================================================================================
-% (c) Nikolaos Koutsouleris, 12/2019
+% (c) Nikolaos Koutsouleris, 08/2022
 
 global PREDICTFUNC EVALFUNC SVM MODEFL 
 
@@ -76,6 +76,11 @@ for k=1:s % Loop through all feature subspaces
             if ~nonevalflag, ts(k) = EVALFUNC(Ytest, ds(:,k)); end
     end
 end
+
+% Sanity checks
+if ~any(ds), error('The prediction algorithm returned only 0''s! Check your learning parameters.'); end
+if sum(isnan(ds)), error('The prediction algorithm returned scores with nonfinite values! Check your learning parameters.'); end
+if numel(unique(ds))==1, error('The prediction algorithm returned all non-unique scores! Check your learning parameters.'); end
 
 % Check and add-back Nan cases
 [rs, ds] = nk_ManageNanCases(rs, ds, I);

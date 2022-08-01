@@ -47,7 +47,7 @@ for i = 1:N
 end
 % Fitness
 fit  = zeros(1,N); 
-fitP = inf;
+fitP = rx.optparam;
 for i = 1:N
   fit(i) = fun(rx , X(i,:) > thres, Ps);
   % Pathfinder update
