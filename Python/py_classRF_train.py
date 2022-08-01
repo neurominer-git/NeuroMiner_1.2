@@ -16,25 +16,38 @@ elif crit == 3:
 # max_features
 if n_maxfeat == -1:
     n_maxfeat = 'sqrt'
-elif nmaxfeat == -2:
+elif n_maxfeat == -2:
     n_maxfeat = 'log2'
-elif n_maxfeat = 0
+elif n_maxfeat == 0:
     n_maxfeat = None
 
 # max_depth
-if maxd == 0
+if maxd == 0:
     maxd = None
 
+# min_samples_leaf
+if minsl >= 1.0:
+    minsl = int(minsl)
+
+# min_samples_split
+if minss > 1.0:
+    minss = int(minss)
+
 # max_leaf_nodes
-if maxln == 0
+if maxln == 0:
     maxln = None
 
 # class_weight
-if classw == 0
+if classw == 0:
     classw = None
+elif classw == 1:
+    classw = 'balanced'
+elif classw == 2:
+    classw = 'balanced_subsample'
+
 
 # max_samples
-if maxs == 0
+if maxs == 0:
     maxs = None
 
 rf = RandomForestClassifier(n_estimators = n_est,
