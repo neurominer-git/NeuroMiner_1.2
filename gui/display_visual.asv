@@ -76,15 +76,13 @@ end
 
 switch v.params.visflag
     case 1
-        handles.selPager.Enable = "off";
-        handles.txtPager.Enable = "off";
-        handles.tglSortFeat.Enable = "off";
-        handles.cmdExportFeats.Enable = "off";
-        handles.selVisMeas2.Enable = "off";
-        handles.txtThrVisMeas2.Enable = "off";
-        handles.tglVisMeas2.Enable = "off";
-        handles.txtAlterFeats.Enable = "off";
-        handles.cmdExportFeatFig.Enable = "off";
+        handles.selPager.Enable = ;
+        handles.txtPager.Enable = fl;
+        handles.tglSortFeat.Enable = fl;
+        handles.cmdExportFeats.Enable = fl;
+        handles.selVisMeas2.Enable = fl2;
+        handles.txtThrVisMeas2.Enable = fl2;
+        handles.tglVisMeas2.Enable = fl2;
     otherwise
         handles.selPager.Enable = fl;
         handles.txtPager.Enable = fl;
@@ -93,16 +91,15 @@ switch v.params.visflag
         handles.selVisMeas2.Enable = fl2;
         handles.txtThrVisMeas2.Enable = fl2;
         handles.tglVisMeas2.Enable = fl2;
-        handles.txtAlterFeats.Enable = fl;
-        handles.cmdExportFeatFig.Enable = fl;
         vlineval = [];
-        if strcmp(fl,'on')
-            if ~isempty(pagemanual) 
-                handles.selPager.Enable = 'off';
-            else
-                handles.selPager.Enable = 'on';
-            end
-        end
+end
+
+if strcmp(fl,'on')
+    if ~isempty(pagemanual) 
+        handles.selPager.Enable = 'off';
+    else
+        handles.selPager.Enable = 'on';
+    end
 end
 
 switch meas{measind}
@@ -676,8 +673,7 @@ switch meas{measind}
                 else
                     nk_orthviews('Redraw')
                 end
-                handles.axes33.XLabel.String='';
-                handles.axes33.YLabel.String='';
+
         end
 
 

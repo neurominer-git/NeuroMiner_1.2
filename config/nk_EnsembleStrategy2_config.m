@@ -141,9 +141,9 @@ switch Ensemble.ConstructMode
     case 0
        Ensemble.type = 0;
     case 1
-        if Ensemble.DivCrit == 5, Ensemble.type = 2; else Ensemble.type = Ensemble.DivCrit; end
+        if Ensemble.DivCrit == 5, Ensemble.type = 2; else, Ensemble.type = Ensemble.DivCrit; end
     case 2
-        if Ensemble.DivCrit == 5, Ensemble.type = 6; else Ensemble.type = Ensemble.DivCrit + 4; end
+        if Ensemble.DivCrit == 5, Ensemble.type = 6; else, Ensemble.type = Ensemble.DivCrit + 4; end
     case 4
         Ensemble.type = 9;
     case 5

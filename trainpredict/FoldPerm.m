@@ -154,7 +154,7 @@ for ii=1:PermNum % Loop through CV1 permutations
             tTrL{curclass}(TrInd) = IN.Y.TrL{i,j}{curclass}(:,MULTILABEL.curdim);
             tCVL{curclass} = zeros(size(tCV{1},1),1); 
             tCVL{curclass}(CVInd) = IN.Y.CVL{i,j}{curclass}(:,MULTILABEL.curdim);
-            if fFull, 
+            if fFull
                 modelTrL{curclass} = [modelTrL{curclass}; IN.Y.CVL{i,j}{curclass}(:,MULTILABEL.curdim)]; 
             end
             
@@ -171,9 +171,9 @@ for ii=1:PermNum % Loop through CV1 permutations
             if isempty(OUT.kxVec{i,j,curclass})
                 OUT.kxVec{i,j,curclass} = 1;
             else
-                if OUT.kxVec{i,j,curclass}(end) < lFea(curclass), 
+                if OUT.kxVec{i,j,curclass}(end) < lFea(curclass)
                     OUT.kxVec{i,j,curclass} = [ OUT.kxVec{i,j,curclass} lFea(curclass) ]; 
-                end; 
+                end 
             end
             kFea(curclass) = length(OUT.kxVec{i,j,curclass});
             cvts_fl(curclass) = kFea(curclass) ~= size(OUT.ts{i,j,curclass},1);
@@ -284,9 +284,11 @@ for ii=1:PermNum % Loop through CV1 permutations
                 indkX = 1;
 
                 for kT=1:kFea(curclass)
-
-                    nfeats = sum(any(Fk{1}(:,k),2));
-                    if VERBOSE, 
+                    
+                    k(curclass) = OUT.kxVec{i,j,curclass}(kT);
+                    nfeats = sum(any(Fk{1}(:,k(curclass)),2));
+                    
+                    if VERBOSE 
                         switch MODEFL
                             case 'classification'
                                if RAND.Decompose ~= 9
@@ -313,7 +315,7 @@ for ii=1:PermNum % Loop through CV1 permutations
                         
                         % use wrapper-based optimization (binary models / regression)
                         if IN.nvar < 2 % Univariate case
-                            OUT.featout{i,j,curclass} = zeros(size(IN.F{i,j,curclass},1),kFea(curclass)); 
+                            OUT.featout{i,j,curclass} = zeros(size(IN.F{i,j,curclass},1), kFea(curclass)); 
                         else % Multiple variate case
                             OUT.featout = cell(IN.nvar,1);
                             for v=1:IN.nvar 

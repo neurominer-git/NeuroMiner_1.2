@@ -154,9 +154,9 @@ else
 
     % Transfer mapped data to appropriate container
     if nM > 1
-       mapY = nk_mapY2Struct(mapY, false);
+       mapY = nk_mapY2Struct(mapY, true);
        if (iscell(mapYocv) && ~sum(cellfun(@isempty,mapYocv))) || ( ~iscell(mapYocv) && ~isempty(mapYocv))
-           mapYocv = nk_mapY2Struct(mapYocv, false); 
+           mapYocv = nk_mapY2Struct(mapYocv, true); 
        end
     else
         mapY = mapY{n};

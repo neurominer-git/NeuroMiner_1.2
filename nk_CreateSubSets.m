@@ -240,10 +240,13 @@ else
     S = uint8(S);
 end
 
-function [weights, ind, S] = apply_filter(Y,label, k, Ynew, labelnew, aMx, curclass)
+function [weights, ind, S] = apply_filter(Y, label, k, Ynew, labelnew, aMx, curclass)
 global VERBOSE RFE
 
 weights=[]; ind = []; S=[]; 
+if size(Y,1) < 5
+    error(sprintf('\nYour training matrix contains less than 4 subjects. Please make sure you have enough data for NM!'))
+end
 
 switch RFE.Filter.type
 
@@ -358,8 +361,6 @@ switch RFE.Filter.type
         else
             [~, ind] = sort(weights,'descend');
         end
-
-    case 8
 
     case 9 % Increasing subspace cardinality
 

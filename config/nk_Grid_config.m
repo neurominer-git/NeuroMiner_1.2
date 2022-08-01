@@ -385,7 +385,7 @@ switch OptimFlag
                     end
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, OobScoreparstr, OobScorestr);                                 menuact = [ menuact 39 ];
                     
-                    ClassWeightparstr = 'Class weights'; ; [ClassWeightstr, n_pars(end+1)] = nk_ConcatParamstr( ClassWeightdefs );
+                    ClassWeightparstr = 'Class weights'; [ClassWeightstr, n_pars(end+1)] = nk_ConcatParamstr( ClassWeightdefs );
                     PX = nk_AddParam(ClassWeightdefs, ['ML-' ClassWeightstr], 2, PX);
                     switch  ClassWeightdefs
                         case 0

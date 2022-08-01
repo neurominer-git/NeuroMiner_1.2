@@ -64,7 +64,7 @@ switch FUSION.flag
                                     out.Ts{k,l}{j} = tOut.Ts;
                                     clear tOut;
                                 else
-                                    if nZp ~= nZo, 
+                                    if nZp ~= nZo
                                         error('Modalities do not have the equal number of data shelves'); 
                                     end
                                     for zp=1:nZp
@@ -109,7 +109,7 @@ switch FUSION.flag
                                     out.Ts{k,l}{j} = tOut.Ts;
                                     clear tOut;
                                 else
-                                    if nZp ~= nZo, 
+                                    if nZp ~= nZo 
                                         error('Modalities do not have the equal number of data shelves'); 
                                     end
                                     for zp=1:nZp

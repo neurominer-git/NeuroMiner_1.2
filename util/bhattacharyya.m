@@ -39,12 +39,16 @@ assert(size(X2,2)==m,'Dimension of X1 and X2 mismatch.');
 
 mu1=mean(X1);
 C1 = cov(X1);
-C1 = nearestSPD(C1);
 mu2 =mean(X2);
 C2  =cov(X2);
-C2  = nearestSPD(C2);
 C=(C1+C2)/2;
-dmu=(mu1-mu2)/chol(C);
+if ~det(C)
+    % Do we need to render the matrix SPD?
+    Cu = nearestSPD(C);
+else
+    Cu = C;
+end
+dmu=(mu1-mu2)/chol(Cu);
 try
     d=0.125*dmu*dmu'+0.5*log(det(C/chol(C1*C2)));
 catch
