@@ -674,9 +674,6 @@ switch meas{measind}
                 else
                     nk_orthviews('Redraw')
                 end
-                st.NMaxes(3).CLim=[min(y) max(y)];
-                st.NMaxes(2).CLim=[min(y) max(y)];
-                st.NMaxes(1).CLim=[min(y) max(y)];
                 colormap(st.NMaxes(3), jet);
                 colormap(st.NMaxes(2), jet);
                 colormap(st.NMaxes(1), jet);
