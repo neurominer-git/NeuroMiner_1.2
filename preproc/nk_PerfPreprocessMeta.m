@@ -37,7 +37,7 @@ if isfield(PREPROC,'CV2flag') && (PREPROC.CV2flag - 1) == 1; cv2flag = true; end
 BINMOD = 1;
 
 % Pointers
-[iy,jy]     = size(CV.cvin{1,1}.TrainInd); 
+[iy,jy]     = size(CV.cvin{i,j}.TrainInd);  
 TrInd       = CV.TrainInd{i,j}; 
 TsInd       = CV.TestInd{i,j}; 
 

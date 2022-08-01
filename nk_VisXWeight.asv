@@ -186,8 +186,8 @@ for n=1:nM
                             case {'optNMF','NeNMF','NNMF','PLS','LPP', 'NPE', 'LLTSA', 'SPCA', 'PPCA', 'FA', 'FactorAnalysis', 'NCA', 'MCML', 'LMNN'}
                                  nmW = mpp.vec * nmW;
                                  nmP = logical(mpp.vec * nmP);
-                                 if ~isempty(PA), nmPA = mpp.vec * nmPA; end
-                            
+                            case {'Autoencoder','AutoEncoder'}
+
                             otherwise
                                  error('Reconstruction of data is not supported for this technique.');
                         end
@@ -195,9 +195,8 @@ for n=1:nM
                         % If features had been removed prior to dimensionality
                         % reduction take care that you recover the original space
                         if isfield(naPX,'indNonRem') && ~isempty(naPX.indNonRem) && sum(~naPX.indNonRem) > 0
-                            tmW = zeros(size(naPX.indNonRem')); tmP = tmW; 
+                            tmW = zeros(size(naPX.indNonRem')); tmP = zeros(size(naPX.indNonRem'));
                             tmW(naPX.indNonRem) = nmW; nmW = tmW; tmP(naPX.indNonRem) = nmP; nmP = tmP;  
-                            if ~isempty(PA), tmPA = tmW; tmPA(naPX.indNonRem) = nmPA; nmPA = tmPA; end
                             % Don't forget to adjust the feature masks and the
                             % indices to modalities in case of fused feature spaces
                             %tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(naPX.indNonRem) = lFuVI; lFuVI = tlFuVI;
@@ -227,7 +226,13 @@ for n=1:nM
                     tmW = zeros(length(pIND),1); tmW(pIND) = nmW; nmW = tmW;   
                     tmP = false(length(pIND),1); tmP(pIND) = nmP; nmP = tmP;
                     if ~isempty(PA)
-                         tmPA = tmW; tmPA(naPX.(IND)) = nmPA; nmPA = tmPA; 
+                        try
+                            tmPA = zeros(length(pIND),1);
+                            tmPA(naPX.(IND)) = nmPA; nmPA = tmPA;
+                        catch
+                            disp(sum(naPX.(IND)))
+                            disp(numel(nmPA))
+                        end
                     end 
                     % Don't forget to adjust the feature masks and the
                     % indices to modalities in case of fused feature spaces

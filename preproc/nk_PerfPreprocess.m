@@ -65,7 +65,7 @@ else
 end
 
 if VERBOSE
-    if iscell(Y),
+    if iscell(Y)
         fprintf('\nMultiple shelfs of input data detected')
         for ii=1:size(Y,1)
             fprintf('\nShelf [ %2g ]: Original dimensionality: %g', ii, size(Y{ii},2)); 
@@ -92,7 +92,7 @@ multoocv = false; if iscell(Yocv) && numel(Yocv)>1, multoocv = true; end
 [sY, sYocv, sCocv, inp, optfl, ukbin, uBINMOD, BINMOD] = ...
     nk_PerfPreprocessSpatial( Y, Yocv, Cocv, inp, paramfl, BINMOD, kbin, ukbin);
 
-if ~BINMOD && isfield(paramfl,'PXopt') && numel(paramfl.PXopt)>1,
+if ~BINMOD && isfield(paramfl,'PXopt') && numel(paramfl.PXopt)>1
     % Here, we force a multi-group processing mode but map the multi-group processed data into binary containers
     uBINMOD = 0; 
     ukbin = 1; 
@@ -285,6 +285,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         % containers)
                         if ~isempty(Yocv)
                              if multoocv
+                                 iOCV = cell(1,numel(usYocv));
                                  for n=1:numel(usYocv)
                                      [vTs{pu,3+n}, ~, iOCV{n}] = nk_ManageNanCases(usYocv{n,pu});
                                  end
@@ -310,6 +311,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                     % Independent test data
                     if ~isempty(Yocv)
                         if multoocv
+                             iOCV = cell(1,numel(usYocv));
                              for n=1:numel(usYocv)
                                  [vTs{3+n}, ~, iOCV{n}] = nk_ManageNanCases(usYocv{n});
                              end

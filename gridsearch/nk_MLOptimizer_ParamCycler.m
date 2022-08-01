@@ -166,7 +166,7 @@ for curlabel=1:nl
         % Create variate mask according to selected features
         if isfield(mapYi,'VI')
 
-            [iy,jy] = size(CV(1).cvin{1,1}.TrainInd);
+            [iy,jy] = size(CV(1).cvin{f,d}.TrainInd);
             
             GD.VI{i,curlabel} = cell(iy,jy,nclass);
             for k=1:iy
