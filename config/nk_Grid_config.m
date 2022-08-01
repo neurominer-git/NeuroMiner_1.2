@@ -314,13 +314,21 @@ switch OptimFlag
                     
                     Dnparstr = 'Maximum number of features'; [Dnstr, n_pars(end+1)] = nk_ConcatParamstr( NumDdefs );
                     PX = nk_AddParam(NumDdefs, ['ML-' Dnstr], 2, PX);
+                    switch NumDdefs
+                        case 0
+                            Dnstr = 'None';
+                        case -1
+                            Dnstr = 'sqrt';
+                        case -2
+                            Dnstr = 'log2';
+                    end
                     menustr = sprintf('%s|Define %s [ %s ]', menustr, Dnparstr, Dnstr);                                 menuact = [ menuact 18 ];
           
                     Critparstr = 'Function to measure the quality of a split'; [Critstr, n_pars(end+1)] = nk_ConcatParamstr( Critdefs );
                     PX = nk_AddParam(Critdefs, ['ML-' Critstr], 2, PX);
                     switch Critdefs
                         case 1
-                            Critstr = 'Gini impurtiy';
+                            Critstr = 'Gini impurity';
                         case 2
                             Critstr = 'Log loss';
                         case 3
@@ -546,11 +554,8 @@ switch OptimFlag
                                                 'Fraction|' ...
                                                 'Absolute N|' ...
                                                 'N features'], [-1,-2, -3, -3, 0], NumDdefs);
-                    switch NumDdefs
-                        case -3
-                            NumDdefs    =  nk_input([Dnparstr ' range'],0,'e',NumDdefs); 
-                        case 0
-                            
+                    if NumDdefs == -3
+                            NumDdefs    =  nk_input([Dnparstr ' range'],0,'e',NumDdefs);       
                     end
                             PX = nk_AddParam(NumDdefs, ['ML-' Dnparstr], 2, PX);
                 case 31
@@ -663,7 +668,7 @@ switch OptimFlag
         % random forest
         GRD.Treeparams          = Treedefs;
         GRD.NumDparams          = NumDdefs;
-        GRD.RFMaxDparams     = MaxDdefs;
+        GRD.RFMaxDparams        = MaxDdefs;
         GRD.RFCritdefsparams    = Critdefs;
         GRD.RFMinSSplitparams   = MinSSplitdefs;
         GRD.RFMinSLeafparams    = MinSLeafdefs;
