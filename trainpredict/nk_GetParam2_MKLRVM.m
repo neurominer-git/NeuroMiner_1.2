@@ -20,11 +20,11 @@ end
 
 t = nk_MakeRVMTargetMatrix(tlabel)';
 
-if iscell(Y), 
+if iscell(Y)
     funcname = [MKLRVM.funcname_learn '_MKL']; 
 else
     funcname = MKLRVM.funcname_learn;
-end;
+end
 
 model = feval(funcname, '-p', Y, t, MKLRVM.standardize_flag, ...
     MKLRVM.converg, MKLRVM.nmax, SVM.kernel.kernstr, KernParam, ...
