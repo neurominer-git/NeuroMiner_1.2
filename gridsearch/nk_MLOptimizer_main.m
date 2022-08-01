@@ -242,12 +242,14 @@ for i=1:inparams.nclass
             inparams.Params_desc{i}{10} = 'Bootstrap';
             inparams.Params{i}{11} = GRD.RFOobScoreparams;
             inparams.Params_desc{i}{11} = 'Out-Of-Bag Score';
-            inparams.Params{i}{12} = GRD.RFClassWeightparams;
-            inparams.Params_desc{i}{12} = 'Class Weigths';
-            inparams.Params{i}{13} = GRD.RFCcpAlphaparams;
-            inparams.Params_desc{i}{13} = 'CCP Alpha';
-            inparams.Params{i}{14} = GRD.RFMaxSampparams;
-            inparams.Params_desc{i}{14} = 'Max Sample';
+            inparams.Params{i}{12} = GRD.RFCcpAlphaparams;
+            inparams.Params_desc{i}{12} = 'CCP Alpha';
+            inparams.Params{i}{13} = GRD.RFMaxSampparams;
+            inparams.Params_desc{i}{13} = 'Max Sample';
+            if strcmp(MODEFL, 'classification')
+                inparams.Params{i}{14} = GRD.RFClassWeightparams;
+                inparams.Params_desc{i}{14} = 'Class Weigths';
+            end
 
         case 'SEQOPT'
             inparams.Params{i}{1} = 1:size(SVM.SEQOPT.C,1);
