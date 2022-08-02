@@ -75,7 +75,7 @@ else
     Constraint = [];
 end
 ulb = unique(label,'rows');
-if any(~isfinite(ulb)), 
+if any(~isfinite(ulb)) 
     NaNflag = true; ind = logical(sum(isfinite(ulb),2));
     ulb = ulb(ind,:);
 else
@@ -106,17 +106,17 @@ if strcmp(modeflag,'classification') && decomposeflag ~= 9
             groupsstr = regexp(oldcv.class{1,1}{i}.groupdesc, ' vs ','split');
             b = [b groupsstr]; 
         end
-        [dum, i] = unique(b);
+        [~, i] = unique(b);
         g = b(sort(i));
     end
     Label = label;
 else
     if exist('groups','var')
-        if ~isempty(groups), 
+        if ~isempty(groups)
             Label = groups; 
         else
             Label = ones(size(label,1),1);
-        end;
+        end
     else
         Label = ones(length(label),1);
     end
@@ -170,17 +170,17 @@ end
 if isfield(RAND,'Eq') && RAND.Eq.enabled
     Eq = RAND.Eq;
     Eq.AddRemoved2Test = RAND.Eq.addremoved2test;
-    if isfield(RAND.Eq,'maxcount'), 
+    if isfield(RAND.Eq,'maxcount')
         Eq.MaxCount = RAND.Eq.maxcount;
     else
         Eq.MaxCount = ceil(numel(Eq.Covar)/40);
     end
-    if isfield(RAND.Eq,'mincount'), 
+    if isfield(RAND.Eq,'mincount') 
         Eq.MinCount = RAND.Eq.mincount;
     else
         Eq.MinCount = ceil(numel(Eq.Covar)/40);
     end
-    if isfield(RAND.Eq,'bincount'), 
+    if isfield(RAND.Eq,'bincount') 
         Eq.BinCount = RAND.Eq.bincount;
     else
         Eq.BinCount = 7;
