@@ -465,6 +465,7 @@ NMx = NM;
 clearvars -global NM st
 assignin('base', 'NM', NMx)
 if exist('temp.nii','file'); delete('temp.nii'); end
+if exist('tempMLI.nii','file'); delete('tempMLI.nii'); end
 % this does not work, but I wanted to implement sth that closes the 
 % Result Viewer as well as the MLI Viewer when NM is closed 
 
