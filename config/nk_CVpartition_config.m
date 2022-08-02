@@ -17,6 +17,7 @@ if ~defaultsfl
     CV2frm = 1;
     CV1ps = 'not defined'; CV1fs = CV1ps; CV2ps = CV1fs; CV2fs = CV2ps; 
     CV1pn = 10; CV1fn = 10; CV2pn = 10; CV2fn = 10; 
+    Eq.enabled = false;
     Eq.bincount = 10;
     Eq.mincount = 10;
     Eq.maxcount = 10;
@@ -88,6 +89,8 @@ if ~defaultsfl
     end
     if isfield(NM.TrainParam.RAND,'Eq')
         Eq = NM.TrainParam.RAND.Eq;
+    else
+        NM.TrainParam.RAND.Eq = Eq;
     end
     buildstr = ''; savestr = ''; loadstr = ''; MenuRem = []; CV2prx = '' ; CV1prx = ''; 
     EQstr = ''; EQcovstr = ''; EQminstr = ''; EQmaxstr = ''; EQbinstr = ''; EQshufflestr = ''; EQposnegstr=''; EQorigstr = ''; EQeqstr = '';
@@ -195,7 +198,7 @@ if ~defaultsfl
                 addremoved2test = 2; addremoved2teststr = ''; shufflestr={'yes','no'};
                 if isfield(NM.TrainParam,'RAND') && isfield(NM.TrainParam.RAND,'Eq') 
                     if isfield(NM.TrainParam.RAND.Eq,'enabled') && NM.TrainParam.RAND.Eq.enabled ==1, enabled = 1; enabledstr = 'yes'; end
-                    if enabled == 1 && (isfield(NM.TrainParam.RAND.Eq,'addremoved2test') && NM.TrainParam.RAND.Eq.addremoved2test==1), 
+                    if enabled == 1 && (isfield(NM.TrainParam.RAND.Eq,'addremoved2test') && NM.TrainParam.RAND.Eq.addremoved2test==1)
                         addremoved2test = 1; addremoved2teststr = ', shuffle to CV1 test data'; 
                     end
                 end
@@ -216,8 +219,8 @@ if ~defaultsfl
                     case 'classification'
                         EQstr = ['Equalize class sizes at the CV1 cycle by undersampling [ ' enabledstr addremoved2teststr ' ]|']; 
                         if isfield(NM.TrainParam.RAND,'Eq') && NM.TrainParam.RAND.Eq.enabled
-                            EQposnegstr  = sprintf('Define positive/negative ratio after equalization (1=>same amount of positive/negative cases) [ %g ]', EQ.posnegrat);
-                            EQshufflestr = sprintf('Shuffle removed observations to CV1 test data [ %s ]', shufflestr{addremoved2test});
+                            EQposnegstr  = sprintf('Define positive/negative ratio after equalization (1=>same amount of positive/negative cases) [ %g ]|', Eq.posnegrat);
+                            EQshufflestr = sprintf('Shuffle removed observations to CV1 test data [ %s ]|', shufflestr{addremoved2test});
                             MenuVec = [MenuVec 17 18 ];
                         end
                 end
@@ -395,6 +398,9 @@ if ~defaultsfl
          case 12
              NM.TrainParam.RAND.OuterPerm = nk_input('Number of repetitions for Outer (CV2) cross-validation',0,'w1',CV2pn);
          case 13
+             if ~isfield(NM.TrainParam.RAND,'Eq')
+                 NM.TrainParam.RAND.Eq.enabled = false;
+             end
              NM.TrainParam.RAND.Eq.enabled = ~NM.TrainParam.RAND.Eq.enabled ;
          case 14
              if isfield(NM,'covars') && ~isempty(NM.covars)

@@ -198,7 +198,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 % Binary label
                 TrX = TrInd(tCV.class{i,j}{u}.TrainInd{k,l});
             end
-        
+            TrLX = labels(TrX,lb);
             % Assign data to containers
             mult_contain = false; iOCV=[]; 
             if oocvonly
@@ -213,7 +213,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         vTr{pu} = usY{pu}(TrX,:); 
                         if pu == 1
                             % Remove cases which are completely NaN
-                            [vTr{pu}, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr{pu}, TrL);
+                            [vTr{pu}, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr{pu}, TrLX);
                             if multoocv
                                 for n=1:numel(usYocv)
                                     [vTs{pu,n}, ~, SrcParam.iOCV{n}] = nk_ManageNanCases(usYocv{n}{pu});
@@ -239,7 +239,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 else
                     vTr = usY(TrX,:); 
                     % Remove cases which are completely NaN
-                    [vTr, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr, TrL);
+                    [vTr, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr, TrLX);
                     if multoocv
                         for n=1:numel(usYocv)
                             [vTs{n}, ~, SrcParam.iOCV{n}] = nk_ManageNanCases(usYocv{n});
@@ -271,7 +271,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         
                         if pu == 1
                             % Remove cases which are completely NaN
-                            [vTr{pu}, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr{pu}, TrL);
+                            [vTr{pu}, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr{pu}, TrLX);
                             [vTs{pu,1}, TrL, SrcParam.iTr] = nk_ManageNanCases(vTs{pu,1}, TrL);
                             [vTs{pu,2}, CVL, SrcParam.iCV] = nk_ManageNanCases(vTs{pu,2}, CVL);
                            
@@ -303,7 +303,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                     vTr = usY(TrX,:); vTs{1} = usY(TrI,:); vTs{2} = usY(CVI,:); vTs{3} = usY(TsI{u},:);
                     
                     % Remove cases which are completely NaN
-                    [vTr, ~,SrcParam.iTrX] = nk_ManageNanCases(vTr, TrL);
+                    [vTr, ~,SrcParam.iTrX] = nk_ManageNanCases(vTr, TrLX);
                     [vTs{1}, TrL, SrcParam.iTr] = nk_ManageNanCases(vTs{1}, TrL);
                     [vTs{2}, CVL, SrcParam.iCV] = nk_ManageNanCases(vTs{2}, CVL);
                     [vTs{3}, ~, SrcParam.iTs] = nk_ManageNanCases(vTs{3});
@@ -382,11 +382,11 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 if mult_contain
                     vTrSyn = cell(n_usY,1); LabelSyn = cell(n_usY,1); CovarsSyn = cell(n_usY,1); 
                     for pu=1:n_usY
-                        [ vTrSyn{pu}, LabelSyn{pu}, CovarsSyn{pu}, SrcParam.adasynused(pu) ] = nk_PerfADASYN( vTr{pu}, TrL, SVM.ADASYN, Covs, true );
+                        [ vTrSyn{pu}, LabelSyn{pu}, CovarsSyn{pu}, SrcParam.adasynused(pu) ] = nk_PerfADASYN( vTr{pu}, TrLX, SVM.ADASYN, Covs, true );
                     end
                 else
-                   [ vTrSyn, LabelSyn, CovarsSyn, SrcParam.adasynused ] = nk_PerfADASYN( vTr, TrL, SVM.ADASYN, Covs, true);
-                end
+                   [ vTrSyn, LabelSyn, CovarsSyn, SrcParam.adasynused ] = nk_PerfADASYN( vTr, TrLX, SVM.ADASYN, Covs, true);
+                end 
                 InputParam.TrSyn = vTrSyn;
                 SrcParam.TrainLabelSyn = LabelSyn;
                 if ~isempty(SrcParam.covars), SrcParam.covarsSyn = CovarsSyn; end
@@ -410,11 +410,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
             end
 
             %% Generate and execute for given CV1 partition preprocessing sequence
-            try
             [InputParam, oTrainedParam, SrcParam] = nk_GenPreprocSequence(InputParam, PREPROC, SrcParam, oTrainedParam);
-            catch
-                fprintf('problem')
-            end
+            
             %% Write preprocessed data to mapY structure
             if isfield(paramfl,'PREPROC') && isfield(paramfl,'PXfull') && ~isempty(paramfl.PXopt{u})
                 % Here an optimized parameter space exists that has

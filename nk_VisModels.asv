@@ -39,8 +39,6 @@ permfl          = false(1,nM);                      % flag for permutation mode
 sigfl           = false(1,nM);                      % flag for significance estimation mode
 nperms          = ones(1,nM);                       % number of permuations per modality
 pmode           = ones(1,nM);                       % Permutation mode
-memorytested    = false;
-memoryprob      = false;
 CVRnorm         = 1;
 if strcmp(MODEFL,'classification') && nclass > 1
     ngroups     = numel(unique(inp.labels(~isnan(inp.labels)))); % Number of classes in the label
@@ -335,9 +333,8 @@ for f=1:ix % Loop through CV2 permutations
                         I1.VCV1SQ{h,n}             = I1.VCV1SUM{n};
                         I1.VCV1MEAN{h,n}           = I1.VCV1SUM{n};
                         I1.VCV1STD{h,n}            = I1.VCV1SUM{n};
-                        if ~memorytested
-                            memoryprob          = false;
-                        end
+                        memo
+                        memoryprob(n)                 = false;
                         % Prepare for analysis without factorization
                         if ~decompfl(n) && ~memoryprob
                             try
@@ -351,16 +348,14 @@ for f=1:ix % Loop through CV2 permutations
                                 I1.VCV1CORRMAT{h, n}                = nan(D, D, iy*jy*nP,'single');           
                                 I1.VCV1CORRMAT_UNCORR_PVAL{h, n}    = nan(D, D, iy*jy*nP,'single');
                                 I1.VCV1CORRMAT_FDR_PVAL{h, n}       = nan(D, D, iy*jy*nP,'single'); 
-                            catch ERR
-                                memoryprob=true; warning on;
-                                warning(ERR.identifier, '\nEncountered problems creating variables:\n%s\nSkipping cross-correlation computations.',ERR.message);
+                            catch 
+                                memoryprob=true;
                                 if isfield(I1,'VCV1CORRMAT'), I1 = rmfield(I1,'VCV1CORRMAT'); end
                                 if isfield(I1,'VCV1CORRMAT_UNCORR_PVAL'), I1 = rmfield(I1,'VCV1CORRMAT_UNCORR_PVAL'); end
                                 if isfield(I1,'VCV1CORRMAT_FDR_PVAL'), I1 = rmfield(I1,'VCV1CORRMAT_FDR_PVAL'); end
-                                warning off
                             end
                         end
-                        memorytested         = true;
+                        
                         % Prepare for permutation analysis
                         if permfl
                             nTs                 = size(TsInd2,1);
@@ -1302,16 +1297,16 @@ if ~batchflag
                 visdata{n}.Analytical_p = I.VCV2PVAL_ANALYTICAL(:,n);
                 visdata{n}.Analyitcal_p_fdr = I.VCV2PVAL_ANALYTICAL_FDR(:,n);
             end
-            if ~isempty(I.VCV2CORRMAT{n})
-                visdata{n}.CorrMat_CV2              = I.VCV2CORRMAT(:,n);
-                visdata{n}.CorrMat_CV2_p_uncorr     = I.VCV2CORRMAT_UNCORR_PVAL(:,n);
-                visdata{n}.CorrMat_CV2_p_fdr        = I.VCV2CORRMAT_FDR_PVAL(:,n);
-                if isfield(I,'VCV2CORRMAT_STD')
-                    visdata{n}.CorrMat_CV2_STD          = I.VCV2CORRMAT_STD(:,n);
-                    visdata{n}.CorrMat_CV2_p_uncorr_STD = I.VCV2CORRMAT_UNCORR_PVAL_STD(:,n);
-                    visdata{n}.CorrMat_CV2_p_fdr_STD    = I.VCV2CORRMAT_FDR_PVAL_STD(:,n);
-                end
+            
+            visdata{n}.CorrMat_CV2              = I.VCV2CORRMAT(:,n);
+            visdata{n}.CorrMat_CV2_p_uncorr     = I.VCV2CORRMAT_UNCORR_PVAL(:,n);
+            visdata{n}.CorrMat_CV2_p_fdr        = I.VCV2CORRMAT_FDR_PVAL(:,n);
+            if isfield(I,'VCV2CORRMAT_STD')
+                visdata{n}.CorrMat_CV2_STD          = I.VCV2CORRMAT_STD(:,n);
+                visdata{n}.CorrMat_CV2_p_uncorr_STD = I.VCV2CORRMAT_UNCORR_PVAL_STD(:,n);
+                visdata{n}.CorrMat_CV2_p_fdr_STD    = I.VCV2CORRMAT_FDR_PVAL_STD(:,n);
             end
+        
         end
         if any(permfl)
             visdata{n}.PermProb_CV2             = I.VCV2PERM(:,n);

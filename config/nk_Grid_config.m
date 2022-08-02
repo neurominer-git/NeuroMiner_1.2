@@ -36,9 +36,7 @@ switch OptimFlag
         WLiters                         = [2 4 6 8 10];
         Neurondefs                      = [25 50 75 100];
         Leafdefs                        = logspace(1,2,10);
-        % Random Forest
-
-        
+        % Random Forest        
         Treedefs                        = 100;
         NumDdefs                        = -1; % = "sqrt";
         Critdefs                        = 1; % in case of classification = "gini"; in case of regression = "squared_error
@@ -55,9 +53,6 @@ switch OptimFlag
         MinImpDecrdefs                  = 0.0;
         Bootstrapdefs                   = 1;
         OobScoredefs                    = 0;
-        %NJobsdefs                       = "None";
-        %RandomStatedefs                 = "None";
-        %WarmStartdefs                   = "False";
 
         if strcmp(NM.modeflag,'classification') 
             ClassWeightdefs             = 0; % = "None";
@@ -67,7 +62,7 @@ switch OptimFlag
 
         Kdefs                           = 7;
         Weightdefs                      = 1;
-        CoxCutoffsdefs                  = [20:10:80];
+        CoxCutoffsdefs                  = 20:10:80;
         SEQOPTstepsdefs                 = 10;
         SEQOPTlimsLdefs                 = 50;
         SEQOPTlimsUdefs                 = 50;
@@ -87,8 +82,6 @@ switch OptimFlag
                 end
             end
         end
-        
-
         
         switch CompStr
             case 'above'
@@ -578,14 +571,14 @@ switch OptimFlag
                 case 18
                     NumDdefs    = nk_input('Specify maximum number of features to consider', 0, 'mq', ...
                                                ['Square root (default)|' ...
-                                                'Logarithm (log2)|' ... %'Generate cross-node ensemble by applying ensemble strategy on base learners above predefined threshold|' ...
+                                                'Logarithm (log2)|' ... 
                                                 'Fraction|' ...
                                                 'Absolute N|' ...
-                                                'N features'], [-1,-2, -3, -3, 0], NumDdefs);
+                                                'N features'], [-1,-2, -3,-3, 0], NumDdefs);
                     if NumDdefs == -3
                             NumDdefs    =  nk_input([Dnparstr ' range'],0,'e',NumDdefs);       
                     end
-                            PX = nk_AddParam(NumDdefs, ['ML-' Dnparstr], 2, PX);
+                    PX = nk_AddParam(NumDdefs, ['ML-' Dnparstr], 2, PX);
                 case 31
                     Critdefs    = nk_input('Specify function to measure quality of split', 0, 'mq', ...
                                                ['Gini impurity (default)|' ...
