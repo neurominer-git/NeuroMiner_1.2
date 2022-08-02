@@ -353,7 +353,7 @@ for f=1:ix % Loop through CV2 permutations
                                 I1.VCV1CORRMAT_FDR_PVAL{h, n}       = nan(D, D, iy*jy*nP,'single'); 
                             catch ERR
                                 memoryprob=true; warning on;
-                                warning(ERR.identifier, 'Encountered memory problems:\n%s ',ERR.message);
+                                warning(ERR.identifier, '\nEncountered problems creating variables:\n%s\nSkipping cross-correlation computations.',ERR.message);
                                 if isfield(I1,'VCV1CORRMAT'), I1 = rmfield(I1,'VCV1CORRMAT'); end
                                 if isfield(I1,'VCV1CORRMAT_UNCORR_PVAL'), I1 = rmfield(I1,'VCV1CORRMAT_UNCORR_PVAL'); end
                                 if isfield(I1,'VCV1CORRMAT_FDR_PVAL'), I1 = rmfield(I1,'VCV1CORRMAT_FDR_PVAL'); end
