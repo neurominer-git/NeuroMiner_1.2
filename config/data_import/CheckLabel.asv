@@ -5,7 +5,7 @@ t_label = [];
 if ~isfield(IO,'label_edit') || any(strcmp(IO.label_edit,na_str)), return, end
 if ~exist('mess','var'), mess=[]; end
 if ~exist('Mx','var') || isempty(Mx), Mx = 'unknown matrix source'; end
-if ~exist('t_Y','var') || isempty(t_Y) 
+if ~exist('t_Y','var') || isempty(t_Y), 
     mess = GenerateMessageEntry(mess, sprintf('ERROR in %s: Input data is missing!', act)); 
     return
 else
@@ -56,12 +56,12 @@ try
 
         switch IO.modeflag
             case 'classification'
-                if ~iscell(t_label) 
+                if ~iscell(t_label), 
                     mess = GenerateMessageEntry(mess, sprintf('ERROR in %s: Var ''%s'' is not a cell array of strings!', act, IO.label_edit));
                     return; 
                 end    
             case 'regression'
-                if ~isnumeric(t_label) 
+                if ~isnumeric(t_label), 
                     mess = GenerateMessageEntry(mess, sprintf('ERROR in %s: Var ''%s'' is not a numeric array!', act, IO.label_edit)); 
                     return; 
                 end
@@ -99,15 +99,19 @@ try
              return;  
            end
            flg = false;
-
            % Check whether label names and sample sizes match by looping through each sample
            for i=1:n_samples
-               
+               %jdesc_groups_i = find(strcmp(jdesc_groups, desc_groups{i}));
                if ~any(strcmp(jdesc_groups, desc_groups{i}))
                     mess = GenerateMessageEntry(mess, sprintf('ERROR in %s: Name (%s) of group %g does not match any group name in pre-existing label!', ...
                         act, desc_groups{i}, i)); 
                     flg = true;
                end
+%                if n_subjects(i) ~= jn_subjects(i) 
+%                    mess = GenerateMessageEntry(mess, sprintf('ERROR in %s: Number of cases (%g) assigned to label ''%s'' does not match the pre-existing number of cases for this label (%g)!', ...
+%                         act, n_subjects(i), jdesc_groups{i}, jn_subjects(i))); 
+%                     flg = true;
+%                end
                % Check whether the cases of group i in previous modality
                % match cases of group i in current modality
                if strcmp(IO.modeflag,'classification') && ~strcmp(IO.case_edit,na_str)
@@ -118,7 +122,7 @@ try
                            curr_iID = curr_iID(II); 
                        case 2
                            curr_iID = load(IO.M_edit, IO.case_edit); 
-                           curr_iID = curr_iID.(IO.case_edit)(II); 
+                           curr_iID = curr_iID.(IO(II); 
                        case {3,4}
                            IDcol = strcmp(t_Y.Properties.VariableNames, IO.case_edit);
                            if isnumeric(t_Y{II,IDcol})
@@ -127,7 +131,7 @@ try
                                curr_iID = cellstr(t_Y{II,IDcol}) ;
                            end
                    end
-                   if numel(IO.ID) == size(t_label,1)
+                   if numel(IO.ID) == size(t_label,1),
                        prev_iID = IO.ID(IO.label==find(strcmp(jdesc_groups,desc_groups{i})));
                        MIS = setdiff(curr_iID, prev_iID);
                        if ~isempty(MIS)
@@ -177,7 +181,7 @@ else
     end
 end
 
-if any(~IO.nonnan_label) 
+if any(~IO.nonnan_label), 
     check_str = sprintf('%s; %g undefined label values(s)',check_str, sum(~IO.nonnan_label)); 
 end
 

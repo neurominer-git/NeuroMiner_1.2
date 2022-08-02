@@ -110,7 +110,6 @@ if isfield(TemplParam,'ACTPARAM')
                             for n=1:numel(SrcParam.covars_oocv)
                                 InputParam.P{ac}.TsCovars{tscnt+n} = SrcParam.covars_oocv{n}( :, TemplParam.ACTPARAM{ac}.COVAR );
                                 if iscell(SrcParam.iOCV)
-                                    InputParam.P{ac}.TsCovars{tscnt+n}(SrcParam.iOCV{n},:)=[]; 
                                 else
                                     InputParam.P{ac}.TsCovars{tscnt+n}(SrcParam.iOCV,:)=[]; 
                                 end

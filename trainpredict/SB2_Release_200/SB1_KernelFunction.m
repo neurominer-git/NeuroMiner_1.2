@@ -35,16 +35,7 @@ function K = SB1_KernelFunction(X1,X2,kernel_,lengthScale)
 [N1 ]		= size(X1);
 [N2 ]		= size(X2);
 
-% if length(kernel_)>=4 && strcmp(kernel_(1:4),'poly')
-%   p		= str2double(kernel_(5:end));
-%   kernel_	= 'poly';
-% end
-% if length(kernel_)>=5 && strcmp(kernel_(1:5),'hpoly')
-%   p		= str2double(kernel_(6:end));
-%   kernel_	= 'hpoly';
-% end
 if isempty(lengthScale), lengthScale=1;end
-
 
 switch lower(kernel_)
  
@@ -57,7 +48,7 @@ switch lower(kernel_)
      eta	= 1/lengthScale^2;
      K = exp(-eta*sqrt(distSqrd(X1,X2)));
      
- case 'rbf'
+ case {'rbf', 'gauss', 'gaussian'}
     
      eta	= 1/lengthScale^2;
      K	= exp(-eta*distSqrd(X1,X2));
@@ -121,7 +112,7 @@ switch lower(kernel_)
   
  otherwise
     error('Unrecognised kernel function type: %s', kernel_)
-end
+end 
 
 %%
 %% Support function: squared distance
