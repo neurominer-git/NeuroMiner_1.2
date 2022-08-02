@@ -402,7 +402,7 @@ try
             else
                 
                 
-                simSample_App(NM.Y, NM.label);
+                simSample_App2(NM);
                 %simulationRes = simulate_sampleSize();
             end
     end
