@@ -67,7 +67,7 @@ if isfield(dat,'analysis')
     end
 
     analyses = dat.analysis(indanal);
-
+    if islogical(indanal), indanal=find(indanal); end
     n = length(analyses);
     if brief
         analsel = print_analysis_quickselector(analyses);

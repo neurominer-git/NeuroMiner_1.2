@@ -236,7 +236,7 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
 else
     switch IN.DR.RedMode
         case 'PLS'
-            [pY,pX] = nk_PLS(Y, [], IN);
+            [pY, pX] = nk_PLS(Y, [], IN);
         case {'PCA','SparsePCA'}
             switch IN.DR.DRsoft
                 case 0
@@ -255,6 +255,11 @@ else
 %         case 'LMNN2.5'
 %             pY = (IN.mpp.L * Y')';
         otherwise
-            pY = out_of_sample(Y, IN.mpp);
+            try
+                pY = out_of_sample(Y, IN.mpp);
+            catch
+                warning('deterministic out of sample extension does not exist! Trying out-of-sample estimation procedure')
+                pY = out_of_sample_est(Y, IN.TrX, IN.mpp);
+            end
     end
 end

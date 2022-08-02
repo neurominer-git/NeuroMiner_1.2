@@ -93,8 +93,11 @@ function [mappedX, mapping] = laplacian_eigen(X, no_dims, k, sigma, eig_impl)
     % Sort eigenvectors in ascending order
     lambda = diag(lambda);
     [lambda, ind] = sort(lambda, 'ascend');
-    lambda = lambda(2:no_dims + 1);
-    
+    try
+        lambda = lambda(2:no_dims + 1);
+    catch
+        error('\nThe number of user-defined dimensions (%g) exceeds the number of dimensions (%g) returned by the function.', no_dims, size(lambda,1));
+    end
     % Final embedding
 	mappedX = mappedX(:,ind(2:no_dims + 1));
 
