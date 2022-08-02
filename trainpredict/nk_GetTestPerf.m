@@ -80,7 +80,7 @@ end
 % Sanity checks
 if ~any(ds), error('The prediction algorithm returned only 0''s! Check your learning parameters.'); end
 if sum(isnan(ds)), error('The prediction algorithm returned scores with nonfinite values! Check your learning parameters.'); end
-if numel(unique(ds))==1, error('The prediction algorithm returned all non-unique scores! Check your learning parameters.'); end
+%if numel(ds)>1 && numel(unique(ds))==1, error('The prediction algorithm returned all non-unique scores! Check your learning parameters.'); end
 
 % Check and add-back Nan cases
 [rs, ds] = nk_ManageNanCases(rs, ds, I);

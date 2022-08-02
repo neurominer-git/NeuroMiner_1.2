@@ -33,11 +33,19 @@ elseif isfield(handles,'OOCV')
     handles = rmfield(handles,'OOCV');
 end
 
-% Check whether selected analysis has MLI data 
-if isfield(handles.NM.analysis{analind},'MLI') 
-    mlidata = handles.NM.analysis{analind}.MLI; 
-elseif isfield(handles,'MLI')
-    handles = rmfield(handles,'MLI');
+% Check whether selected analysis has MLI data
+if handles.oocvview
+    if isfield(handles.NM.analysis{analind}.OOCV{handles.oocvind},'MLI')
+        mlidata = handles.NM.analysis{analind}.OOCV{handles.oocvind}.MLI; 
+    elseif isfield(handles,'MLI')
+        handles = rmfield(handles,'MLI');
+    end
+else
+    if isfield(handles.NM.analysis{analind},'MLI')
+        mlidata = handles.NM.analysis{analind}.MLI; 
+    elseif isfield(handles,'MLI')
+        handles = rmfield(handles,'MLI');
+    end
 end
 
 handles = load_analysis(handles, ...
