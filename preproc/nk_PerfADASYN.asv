@@ -28,65 +28,52 @@ end
 U = nk_CountUniques(L(~isnan(L)));
 [~,maxLidx] = max(U.UN{1});
 refcl = U.UX{1}(maxLidx);
-uL = U.UX{1}; uL(uL==refcl) = []; nL = numel(uL);
+uL = U.UX{1}; uL(U.UX{1}(maxLidx)) = []; nL = numel(uL);
     
 if iscell(Y)
     
     N = numel(Y);
-    LLL = cell(N,1);
-    YYY = cell(N,1);
-    if cfl, CCC = cell(N,1); end
+    LL = cell(N,1);
+    YY = cell(N,1);
+    if cfl, CC = cell(N,1); end
+    
     % Loop through training data shelves
     for i=1:N
         
-        YY = []; LL = []; 
-        if cfl, CC=[]; end
-    
-        for cl = 1:nL
-        
-            idx1 = L==uL(cl);
-            idx2 = L==refcl;
-                
-            % If covariates are available add them to training matrix
-            if cfl
-                nY = size(Y{i},2); tY = [ [Y{i}(idx1,:) C(idx1,:)]; [Y{i}(idx2,:) C(idx2,:)] ];
-            else
-                tY = [Y{i}(idx1,:); Y{i}(idx2,:)];
-            end
-            
-            % Perform ADASYN
-            [ tYsyn, Lsyn ] = ADASYN(tY, L, adasyn_beta, adasyn_kDensity, adasyn_kSMOTE, adasyn_normalized); 
-            
-            % Check whether covariates were integrated in training data and
-            % split synthetic data into synthetic training and covariate matrices
-            if ~isempty(tYsyn)
-                if cfl 
-                    Ysyn = tYsyn(:,1:nY); Csyn = tYsyn(:,nY+1:nY+nC);
-                    CC  = [CC Csyn];
-                else
-                    Ysyn = tYsyn;
-                end
-                Lsyn(Lsyn==1) = uL(cl);
-                Lsyn(Lsyn==0) = refcl;
-    
-                YY = [YY; Ysyn]; LL = [LL; Lsyn]; 
-                fl = true;
-            end
-        end
-        if ~noconcatfl
-            YYY{i} = [Y; YY];
-            LLL{i} = [L; LL];
-            if cfl, CCC{i} = [C; CC]; end
+        % If covariates are available add them to training matrix
+        if cfl,
+            nY = size(Y{i},2); tY = [Y{i} C];
         else
-            YYY{i} = YY;
-            LLL{i} = LL;
-            if cfl, CCC{i} = CC; end
+            tY = Y{i};
         end
-    end
+        
+        % Perform ADASYN
+        [ tYsyn, Lsyn ] = ADASYN(tY, L, adasyn_beta, adasyn_kDensity, adasyn_kSMOTE, adasyn_normalized); 
+        
+        % Check whether covariates were integrated in training data and
+        % split synthetic data into synthetic training and covariate matrices
+        if cfl 
+            Ysyn = tYsyn(:,1:nY); Csyn = tYsyn(:,nY+1:nY+nC);
+            if ~noconcatfl
+                CC{i} = [C; Csyn];
+            else
+                CC{i} = Csyn;
+            end
+        else
+            Ysyn = tYsyn;
+        end
+        
+        % Add synthetic training data to original training data
+        if ~noconcatfl,
+            YY{i} = [Y{i}; Ysyn]; LL{i}=[L; Lsyn]; 
+        else
+            YY{i} = Ysyn; LL{i}= double(Lsyn); 
+        end
+        LL{i}(~LL{i})=-1;
 
+    end
 else
-    
-    YY = []; LL = []; CCC=[]; 
+    YY = []; LL = [];
     for cl=1:nL
         
         idx1 = L==uL(cl);
@@ -108,11 +95,11 @@ else
         if ~isempty(tYsyn)
             if cfl 
                 Ysyn = tYsyn(:,1:nY); Csyn = tYsyn(:,nY+1:nY+nC);
-                CC  = [CC; Csyn];
+                CC  = [C; Csyn];
             else
                 Ysyn = tYsyn;
             end
-            Lsyn(Lsyn==1) = uL(cl);
+            Lsyn(Lsyn==1) = ul(cl);
             Lsyn(Lsyn==0) = refcl;
 
             YY = [YY; Ysyn]; LL = [LL; Lsyn]; 
@@ -122,10 +109,7 @@ else
     if ~noconcatfl
         YYY = [Y; YY];
         LLL = [L; LL];
-        if cfl, CCC = [C; CC]; end
+        if c
     else
-        YYY = YY;
-        LLL = LL;
-        if cfl, CCC = CC; end
     end
 end
