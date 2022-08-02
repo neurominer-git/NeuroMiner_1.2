@@ -29,16 +29,15 @@ if OUT.detrend.flag
             for ccurclass=1:ClassNum % Loop through dichotomizers
 
                 curclass = ClassVec(ccurclass);
-                %CVInd = IN.Y.CVInd{i,j}{curclass};
-                %TrInd = IN.Y.TrInd{i,j}{curclass};
+                CVInd = IN.Y.CVInd{i,j}{curclass};
                 zu = size(OUT.Trtargs{i,j,curclass},2);
                 
                 P = []; D = []; L = [];
 
                 for z = 1 : zu
                     
-                    D = [ D; OUT.CVdecs{i,j,curclass}(:,z) ] ;
-                    P = [ P; OUT.CVtargs{i,j,curclass}(:,z) ] ;
+                    D = [ D; OUT.CVdecs{i,j,curclass}(CVInd,z) ] ;
+                    P = [ P; OUT.CVtargs{i,j,curclass}(CVInd,z) ] ;
                     L = [ L; IN.Y.CVL{i,j}{curclass} ] ; 
                     
                 end
@@ -71,13 +70,15 @@ if OUT.detrend.flag
                     for ccurclass=1:ClassNum % Loop through dichotomizers
                         curclass = ClassVec(ccurclass);
                         zu = size(OUT.Trtargs{i,j,curclass},2);
+                        TrInd = IN.Y.TrInd{i,j}{curclass};
+                        CVInd = IN.Y.CVInd{i,j}{curclass};
                         for z = 1 : zu
                             OUT.Trdecs{i,j,curclass}(:,z) =  OUT.Trdecs{i,j,curclass}(:,z) - OUT.detrend.thresh(curclass) ;
                             OUT.Trtargs{i,j,curclass}(:,z) = sign( OUT.Trdecs{i,j,curclass}(:,z) );
                             OUT.CVdecs{i,j,curclass}(:,z) =  OUT.CVdecs{i,j,curclass}(:,z) - OUT.detrend.thresh(curclass) ;
                             OUT.CVtargs{i,j,curclass}(:,z) = sign( OUT.CVdecs{i,j,curclass}(:,z) );
-                            OUT.tr{i,j,curclass}(:,z) = EVALFUNC( IN.Y.TrL{i,j}{curclass}, OUT.Trdecs{i,j,curclass}(:,z) );
-                            OUT.ts{i,j,curclass}(:,z) = EVALFUNC( IN.Y.CVL{i,j}{curclass}, OUT.CVdecs{i,j,curclass}(:,z) );
+                            OUT.tr{i,j,curclass}(:,z) = EVALFUNC( IN.Y.TrL{i,j}{curclass}, OUT.Trdecs{i,j,curclass}(TrInd,z) );
+                            OUT.ts{i,j,curclass}(:,z) = EVALFUNC( IN.Y.CVL{i,j}{curclass}, OUT.CVdecs{i,j,curclass}(CVInd,z) );
                         end
                     end
                 end
