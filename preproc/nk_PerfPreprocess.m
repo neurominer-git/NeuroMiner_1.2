@@ -410,11 +410,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
             end
 
             %% Generate and execute for given CV1 partition preprocessing sequence
-            try
             [InputParam, oTrainedParam, SrcParam] = nk_GenPreprocSequence(InputParam, PREPROC, SrcParam, oTrainedParam);
-            catch
-                fprintf('problem')
-            end
+            
             %% Write preprocessed data to mapY structure
             if isfield(paramfl,'PREPROC') && isfield(paramfl,'PXfull') && ~isempty(paramfl.PXopt{u})
                 % Here an optimized parameter space exists that has

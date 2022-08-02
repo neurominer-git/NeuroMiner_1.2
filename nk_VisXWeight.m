@@ -1,4 +1,4 @@
-function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P, F, VI, decompfl, procfl, Fadd)
+function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P, F, VI, decompfl, memprob, procfl, Fadd)
 % =========================================================================
 % [mW, mP, mR, mSR, mC, W, mPA] = nk_VisXWeight(inp, MD, Y, L, varind, ...
 %                                          P, F, VI, decompfl, procfl, Fadd)
@@ -75,7 +75,7 @@ end
 % Loop through modalities
 for n=1:nM
     
-    if iscell(inp.PREPROC), 
+    if iscell(inp.PREPROC)
         nPREPROC = inp.PREPROC{n};
         nPX      = P{n};
     else
@@ -129,7 +129,7 @@ for n=1:nM
                     % Very frequently users opt to scale features after
                     % factorization/dimensionality reduction. In these cases
                     % scaling has to be reverted prior to back-projection
-                    if ~reducedimfl && decompfl(n),
+                    if ~reducedimfl && decompfl(n)
                         IN = nPREPROC.ACTPARAM{a}.SCALE;
                         IN.minY = naPX.minY; IN.maxY = naPX.maxY; 
                         IN.revertflag = true;
@@ -167,7 +167,7 @@ for n=1:nM
 
                         switch DR.RedMode                                        
                             case {'PCA','RobPCA','SparsePCA'}
-                                if strcmp(DR.RedMode,'RobPCA'), 
+                                if strcmp(DR.RedMode,'RobPCA') 
                                     DRsoft = 1; 
                                 else
                                     DRsoft = DR.DRsoft;
@@ -206,7 +206,6 @@ for n=1:nM
                         end
                         reducedimfl = true;
                     end
-                        
 
                 case {'elimzero','extfeat','extdim'}
                     % Find eliminated feature vector
@@ -258,7 +257,9 @@ for n=1:nM
             tY = nk_PerfZeroOut(tY, IN);
             nmR  =   nk_CorrMat(L, tY,'pearson'); 
             nmSR =   nk_CorrMat(L, tY,'spearman');
-            nmC  =   corrcoef(tY); %nmC = nmC(:);
+            if ~memprob
+                nmC  =   corrcoef(tY);
+            end
         else
             nmR  =  nan(size(nmW)); nmSR = nmR; nmC = nmR;
         end
@@ -272,7 +273,7 @@ for n=1:nM
                     mP{m} = nmP(indX);
                     mR{m} = nmR(indX);
                     mSR{m} = nmSR(indX);
-                    if ~decompfl(n)
+                    if ~decompfl(n) && ~memprob
                         mC{m} = nmC(indX, indX);
                     end
                     if ~isempty(PA), mPA{m} = nmPA(indX); end
@@ -281,7 +282,7 @@ for n=1:nM
                     mP{m} = nmP;
                     mR{m} = nmR;
                     mSR{m} = nmSR;
-                    if ~decompfl(n)
+                    if ~decompfl(n) && ~memprob
                         mC{m} = nmC;
                     end
                     if ~isempty(PA), mPA{m} = nmPA; end
@@ -295,11 +296,15 @@ for n=1:nM
                 if isempty(mR{n})
                     mR{n} = zeros(size(nmW,1),1);
                     mSR{n} = zeros(size(nmW,1),1);
-                    mC{n} = zeros(size(nmW,1),size(nmW,1));
+                    if ~memprob
+                        mC{n} = zeros(size(nmW,1),size(nmW,1));
+                    end
                 end
                 mR{n}(lFuVI) = nmR(lFuVI);
                 mSR{n}(lFuVI) = nmSR(lFuVI); 
-                mC{n}(lFuVI,lFuVI) = nmC(lFuVI,lFuVI);
+                if ~memprob
+                    mC{n}(lFuVI,lFuVI) = nmC(lFuVI,lFuVI);
+                end
             else
                 mR{n} = nmR;
                 mSR{n} = nmSR; 
@@ -313,7 +318,7 @@ for n=1:nM
         end
         if mM>1 % intermediate / late fusion
             mW{n} = nmW;
-             if ~isempty(PA), mPA{n} = nmPA; end
+            if ~isempty(PA), mPA{n} = nmPA; end
         else % Concatenate weight vectors (early fusion)
             mW = [mW; nmW]; 
             if ~isempty(PA), mPA = [mPA; nmPA]; end

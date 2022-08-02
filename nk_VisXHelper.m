@@ -117,9 +117,11 @@ switch act
                         I2.VCV2PVAL_ANALYTICAL{h, n}    = [ I2.VCV2PVAL_ANALYTICAL{h, n}        nm_nanmean(-log10(I1.VCV1PVAL_ANALYTICAL{h,n}),2) ];
                         I2.VCV2PVAL_ANALYTICAL_FDR{h, n}= [ I2.VCV2PVAL_ANALYTICAL_FDR{h, n}    nm_nanmean(-log10(I1.VCV1PVAL_ANALYTICAL_FDR{h,n}),2) ];
                     end
-                    I2.VCV2CORRMAT{h,n}(:,:,ll)      = nm_nanmean(I1.VCV1CORRMAT{h,n},3) ;
-                    I2.VCV2CORRMAT_UNCORR_PVAL{h,n}(:,:,ll) = nm_nanmean(-log10(I1.VCV1CORRMAT_UNCORR_PVAL{h,n}),3) ;     
-                    I2.VCV2CORRMAT_FDR_PVAL{h,n}(:,:,ll) = nm_nanmean(-log10(I1.VCV1CORRMAT_FDR_PVAL{h,n}),3) ;
+                    if isfield(I1,"VCV1CORRMAT") && ~isempty(I1.VCV1CORRMAT{h,n})
+                        I2.VCV2CORRMAT{h,n}(:,:,ll)      = nm_nanmean(I1.VCV1CORRMAT{h,n},3) ;
+                        I2.VCV2CORRMAT_UNCORR_PVAL{h,n}(:,:,ll) = nm_nanmean(-log10(I1.VCV1CORRMAT_UNCORR_PVAL{h,n}),3) ;     
+                        I2.VCV2CORRMAT_FDR_PVAL{h,n}(:,:,ll) = nm_nanmean(-log10(I1.VCV1CORRMAT_FDR_PVAL{h,n}),3) ;
+                    end
                 end
                 if any(permfl)
                     % Changed from median to mean computation for P values (30.12.2018)
