@@ -181,7 +181,7 @@ switch act
             while t_act>0
                 [t_act, analind, ~, showmodalvec, brief, indanal ] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief, [], 1); 
             end
-            if ~isempty(analind), inp.analind = indanal(analind) ; end
+            if ~isempty(analind), inp.analind = analind ; end
         end
         inp.GridAct = NM.analysis{inp.analind(1)}.GDdims{1}.GridAct;
         

@@ -6,7 +6,6 @@ adasyn_kSMOTE                   = [];   %let ADASYN choose default
 adasyn_normalized               = false;%false lets ADASYN handle normalization
 cfl                             = false;
 fl                              = false;
-L(L==-1)=0;
 
 if exist('IN','var') && ~isempty('IN')
     if isfield(IN,'beta') && ~isempty(IN.beta), adasyn_beta = IN.beta; end
@@ -86,9 +85,9 @@ if iscell(Y)
 
 else
     
-    YY = []; LL = []; 
-    if cvfl, CC=[]; CCC=[]; end
-    
+    YY = []; LL = []; CCC=[];
+    if cfl, CC=[];  end
+
     for cl=1:nL
         
         idx1 = L==uL(cl);
