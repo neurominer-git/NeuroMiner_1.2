@@ -15,6 +15,8 @@ sortfl          = handles.tglSortFeat.Value;
 filterfl        = handles.tglVisMeas2.Value;
 filterthr       = handles.txtThrVisMeas2.String;
 
+handles.spiderPlotButton.Visible = "on";
+
 axes(handles.axes33); cla; hold on
 set(handles.axes33,'TickLabelInterpreter','none')
 
@@ -84,6 +86,7 @@ switch v.params.visflag
         handles.tglVisMeas2.Enable = "off";
         handles.txtAlterFeats.Enable = "off";
         handles.cmdExportFeatFig.Enable = "off";
+        handles.spiderPlotButton.Visible = "on";
     otherwise
         handles.selPager.Enable = fl;
         handles.txtPager.Enable = fl;
@@ -102,6 +105,7 @@ switch v.params.visflag
                 handles.selPager.Enable = 'on';
             end
         end
+        handles.spiderPlotButton.Visible = "off";
 end
 
 switch meas{measind}
