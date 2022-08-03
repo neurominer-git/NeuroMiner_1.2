@@ -7,7 +7,7 @@ function [act, inp, NMo] = nk_MLOptimizerPrep(act, inp, parentstr)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris 10/2018
 
-global CV NM xNM %xNM for simulation
+global CV NM xNM simFlag %xNM for simulation 
 
 na_str = '?';
 if ~exist('inp','var') || isempty(inp),
@@ -22,13 +22,16 @@ if ~exist('inp','var') || isempty(inp),
         'update', true, ...
         'batchflag', false);
     if act == 999
+        inp.analind = xNM.analind;
         inp.simFlag =true;
         inp.batchflag = true;
         inp = nk_GetAnalModalInfo_config(xNM, inp);
         [ ix, jx ] = size(xNM.cv(1).TrainInd);
+        simFlag = 1;
     else
         inp = nk_GetAnalModalInfo_config(NM, inp);
         [ ix, jx ] = size(CV(1).TrainInd);
+        simFlag = 0; 
     end
     
     inp.GridAct = false(ix,jx);
@@ -58,7 +61,7 @@ else
 end
 % Initialize analysis with current training parameters
 if isfield(inp,'simFlag') && inp.simFlag
-    analysis = xNM.analysis{inp.analind}
+    analysis = xNM.analysis{inp.analind};
 else
     analysis = NM.analysis{inp.analind};
 end

@@ -1,6 +1,6 @@
 function varargout = mli_orthviews(action,varargin)
 % Display Orthogonal Views of a Normalized Image
-% FORMAT H = nk_orthviews('Image',filename[,position])
+% FORMAT H = mli_orthviews('Image',filename[,position])
 % filename - name of image to display
 % area     - position of image
 %            -  area(1) - position x
@@ -8,53 +8,53 @@ function varargout = mli_orthviews(action,varargin)
 %            -  area(3) - size x
 %            -  area(4) - size y
 % H        - handle for ortho sections
-% FORMAT nk_orthviews('BB',bb)
+% FORMAT mli_orthviews('BB',bb)
 % bb       - bounding box
 %            [loX loY loZ
 %             hiX hiY hiZ]
 %
-% FORMAT nk_orthviews('Redraw')
+% FORMAT mli_orthviews('Redraw')
 % Redraws the images
 %
-% FORMAT nk_orthviews('Reposition',centre)
+% FORMAT mli_orthviews('Reposition',centre)
 % centre   - X, Y & Z coordinates of centre voxel
 %
-% FORMAT nk_orthviews('Space'[,handle[,M,dim]])
+% FORMAT mli_orthviews('Space'[,handle[,M,dim]])
 % handle   - the view to define the space by, optionally with extra
 %            transformation matrix and dimensions (e.g. one of the blobs
 %            of a view)
 % with no arguments - puts things into mm space
 %
-% FORMAT nk_orthviews('MaxBB')
+% FORMAT mli_orthviews('MaxBB')
 % sets the bounding box big enough display the whole of all images
 %
-% FORMAT nk_orthviews('Resolution',res)
+% FORMAT mli_orthviews('Resolution',res)
 % res      - resolution (mm)
 %
-% FORMAT nk_orthviews('Delete', handle)
+% FORMAT mli_orthviews('Delete', handle)
 % handle   - image number to delete
 %
-% FORMAT nk_orthviews('Reset')
+% FORMAT mli_orthviews('Reset')
 % clears the orthogonal views
 %
-% FORMAT nk_orthviews('Pos')
+% FORMAT mli_orthviews('Pos')
 % returns the co-ordinate of the crosshairs in millimetres in the
 % standard space.
 %
-% FORMAT nk_orthviews('Pos', i)
+% FORMAT mli_orthviews('Pos', i)
 % returns the voxel co-ordinate of the crosshairs in the image in the
 % ith orthogonal section.
 %
-% FORMAT nk_orthviews('Xhairs','off') OR nk_orthviews('Xhairs')
+% FORMAT mli_orthviews('Xhairs','off') OR mli_orthviews('Xhairs')
 % disables the cross-hairs on the display.
 %
-% FORMAT nk_orthviews('Xhairs','on')
+% FORMAT mli_orthviews('Xhairs','on')
 % enables the cross-hairs.
 %
-% FORMAT nk_orthviews('Interp',hld)
+% FORMAT mli_orthviews('Interp',hld)
 % sets the hold value to hld (see spm_slice_vol).
 %
-% FORMAT nk_orthviews('AddBlobs',handle,XYZ,Z,mat)
+% FORMAT mli_orthviews('AddBlobs',handle,XYZ,Z,mat)
 % Adds blobs from a pointlist to the image specified by the handle(s).
 % handle   - image number to add blobs to
 % XYZ      - blob voxel locations (currently in millimeters)
@@ -64,7 +64,7 @@ function varargout = mli_orthviews(action,varargin)
 % This method only adds one set of blobs, and displays them using a
 % split colour table.
 %
-% FORMAT nk_orthviews('AddColouredBlobs',handle,XYZ,Z,mat,colour,name)
+% FORMAT mli_orthviews('AddColouredBlobs',handle,XYZ,Z,mat,colour,name)
 % Adds blobs from a pointlist to the image specified by the handle(s).
 % handle   - image number to add blobs to
 % XYZ      - blob voxel locations (currently in millimeters)
@@ -76,47 +76,47 @@ function varargout = mli_orthviews(action,varargin)
 % Although it may not be particularly attractive on the screen, the colour
 % blobs print well.
 %
-% FORMAT nk_orthviews('AddColourBar',handle,blobno)
+% FORMAT mli_orthviews('AddColourBar',handle,blobno)
 % Adds colourbar for a specified blob set
 % handle   - image number
 % blobno   - blob number
 %
-% FORMAT nk_orthviews('Register',hReg)
+% FORMAT mli_orthviews('Register',hReg)
 % See spm_XYZreg for more information.
 %
-% FORMAT nk_orthviews('RemoveBlobs',handle)
+% FORMAT mli_orthviews('RemoveBlobs',handle)
 % Removes all blobs from the image specified by the handle(s).
 %
-% nk_orthviews('Register',hReg)
+% mli_orthviews('Register',hReg)
 % hReg      - Handle of HandleGraphics object to build registry in.
 % See spm_XYZreg for more information.
 %
-% nk_orthviews('AddContext',handle)
+% mli_orthviews('AddContext',handle)
 % handle   - image number to add context menu to
 %
-% nk_orthviews('RemoveContext',handle)
+% mli_orthviews('RemoveContext',handle)
 % handle   - image number to remove context menu from
 %
 % CONTEXT MENU
-% nk_orthviews offers many of its features in a context menu, which is
+% mli_orthviews offers many of its features in a context menu, which is
 % accessible via the right mouse button in each displayed image.
 %
 % PLUGINS
-% The display capabilities of nk_orthviews can be extended with
-% plugins. These are located in the nk_orthviews subdirectory of the SPM
+% The display capabilities of mli_orthviews can be extended with
+% plugins. These are located in the mli_orthviews subdirectory of the SPM
 % distribution. Currently there are 3 plugins available:
 % quiver    Add Quiver plots to a displayed image
 % quiver3d  Add 3D Quiver plots to a displayed image
 % roi       ROI creation and modification
 % The functionality of plugins can be accessed via calls to
-% nk_orthviews('plugin_name', plugin_arguments). For detailed descriptions
-% of each plugin see help nk_orthviews/spm_ov_'plugin_name'.
+% mli_orthviews('plugin_name', plugin_arguments). For detailed descriptions
+% of each plugin see help mli_orthviews/spm_ov_'plugin_name'.
 %
 %_______________________________________________________________________
 % Copyright (C) 2005 Wellcome Department of Imaging Neuroscience
 
 % John Ashburner, Matthew Brett, Tom Nichols and Volkmar Glauche
-% $Id: nk_orthviews.m 2946 2009-03-25 11:17:36Z volkmar $
+% $Id: mli_orthviews.m 2946 2009-03-25 11:17:36Z volkmar $
 
 
 
@@ -139,7 +139,7 @@ function varargout = mli_orthviews(action,varargin)
 %         stMLI.registry.hMe  /
 % 
 % For each of the displayed images, there is a non-empty entry in the
-% vols cell array.  Handles returned by "nk_orthviews('Image',.....)"
+% vols cell array.  Handles returned by "mli_orthviews('Image',.....)"
 % indicate the position in the cell array of the newly created ortho-view.
 % Operations on each ortho-view require the handle to be passed.
 % 
@@ -181,10 +181,10 @@ function varargout = mli_orthviews(action,varargin)
 %
 % PLUGINS
 % The plugin concept has been developed to extend the display capabilities
-% of nk_orthviews without the need to rewrite parts of it. Interaction
-% between nk_orthviews and plugins takes place
+% of mli_orthviews without the need to rewrite parts of it. Interaction
+% between mli_orthviews and plugins takes place
 % a) at startup: The subfunction 'reset_st' looks for files with a name
-%                spm_ov_PLUGINNAME.m in the directory 'SWD/nk_orthviews'.
+%                spm_ov_PLUGINNAME.m in the directory 'SWD/mli_orthviews'.
 %                For each such file, PLUGINNAME will be added to the list
 %                stMLI.plugins{:}.
 %                The subfunction 'add_context' calls each plugin with
@@ -199,7 +199,7 @@ function varargout = mli_orthviews(action,varargin)
 %                feval(['spm_ov_', stMLI.plugins{k}], ...
 %			  'redraw', i, TM0, TD, CM0, CD, SM0, SD);
 %                The values of TM0, TD, CM0, CD, SM0, SD are defined in the
-%                same way as in the redraw subfunction of nk_orthviews.
+%                same way as in the redraw subfunction of mli_orthviews.
 %                It is up to the plugin to do all necessary redraw
 %                operations for its display contents. Each displayed item
 %                must have set its property 'HitTest' to 'off' to let events
@@ -350,7 +350,7 @@ case 'addcolouredimage',
 	% redraw(varargin{1});
 
 case 'addtruecolourimage',
-	% nk_orthviews('Addtruecolourimage',handle,filename,colourmap,prop,mx,mn)
+	% mli_orthviews('Addtruecolourimage',handle,filename,colourmap,prop,mx,mn)
 	% Adds blobs from an image in true colour
 	% handle   - image number to add blobs to [default 1]
 	% filename of image containing blob data [default - request via GUI]
@@ -588,7 +588,7 @@ h   = valid_handles(1:24);
 if ~isempty(h),
 	tmp = stMLI.vols{h(1)}.ax{1}.ax;
 	stMLI.registry = struct('hReg',hreg,'hMe', tmp);
-	spm_XYZreg('Add2Reg',stMLI.registry.hReg,stMLI.registry.hMe, 'nk_orthviews');
+	spm_XYZreg('Add2Reg',stMLI.registry.hReg,stMLI.registry.hMe, 'mli_orthviews');
 else
 	warning('Nothing to register with');
 end;
@@ -610,6 +610,7 @@ for i=valid_handles(1:24),
 	for j=1:3,
 		set(stMLI.vols{i}.ax{j}.lx,'Visible',opt);
 		set(stMLI.vols{i}.ax{j}.ly,'Visible',opt);  
+        %set(stMLI.vols{i}.ax{j}.ch,'Visible',opt);
 	end; 
 end;
 return;
@@ -747,37 +748,40 @@ end;
 ii = 1;
 while ~isempty(stMLI.vols{ii}), ii = ii + 1; end;
 
-DeleteFcn = ['nk_orthviews(''Delete'',' num2str(ii) ');'];
+DeleteFcn = ['mli_orthviews(''Delete'',' num2str(ii) ');'];
 V.ax = cell(3,1);
 for i=1:3,
     if isfield(stMLI,'NMaxes')
         ax = stMLI.NMaxes(i);
         set(ax,'Visible','off','SortMethod','childorder','Parent',stMLI.fig,'DeleteFcn',DeleteFcn, ...
              'YDir','normal','ButtonDownFcn',...
-            ['if strcmp(get(gcf,''SelectionType''),''normal''),nk_orthviews(''Reposition'');',...
-            'elseif strcmp(get(gcf,''SelectionType''),''extend''),nk_orthviews(''Reposition'');',...
-            'nk_orthviews(''context_menu'',''ts'',1);end;']);
+            ['if strcmp(get(gcf,''SelectionType''),''normal''),mli_orthviews(''Reposition'');',...
+            'elseif strcmp(get(gcf,''SelectionType''),''extend''),mli_orthviews(''Reposition'');',...
+            'mli_orthviews(''context_menu'',''ts'',1);end;']);
     else
         ax = axes('Visible','off','SortMethod','childorder','Parent',stMLI.fig,'DeleteFcn',DeleteFcn,...
             'YDir','normal','ButtonDownFcn',...
-            ['if strcmp(get(gcf,''SelectionType''),''normal''),nk_orthviews(''Reposition'');',...
-            'elseif strcmp(get(gcf,''SelectionType''),''extend''),nk_orthviews(''Reposition'');',...
-            'nk_orthviews(''context_menu'',''ts'',1);end;']);
+            ['if strcmp(get(gcf,''SelectionType''),''normal''),mli_orthviews(''Reposition'');',...
+            'elseif strcmp(get(gcf,''SelectionType''),''extend''),mli_orthviews(''Reposition'');',...
+            'mli_orthviews(''context_menu'',''ts'',1);end;']);
     end
 	d  = image(0,'Tag','Transverse','Parent',ax,...
 		'DeleteFcn',DeleteFcn);
 	set(ax,'Ydir','normal','ButtonDownFcn',...
-		['if strcmp(get(gcf,''SelectionType''),''normal''),nk_orthviews(''Reposition'');',...
-		'elseif strcmp(get(gcf,''SelectionType''),''extend''),nk_orthviews(''reposition'');',...
-		'nk_orthviews(''context_menu'',''ts'',1);end;']);
+		['if strcmp(get(gcf,''SelectionType''),''normal''),mli_orthviews(''Reposition'');',...
+		'elseif strcmp(get(gcf,''SelectionType''),''extend''),mli_orthviews(''reposition'');',...
+		'mli_orthviews(''context_menu'',''ts'',1);end;']);
 
 	lx = line(0,0,'Parent',ax,'DeleteFcn',DeleteFcn);
 	ly = line(0,0,'Parent',ax,'DeleteFcn',DeleteFcn);
+    %ch = drawcrosshair('Parent',ax,'Position',[0,0], 'DeleteFcn', DeleteFcn);
 	if ~stMLI.xhairs,
 		set(lx,'Visible','off');
 		set(ly,'Visible','off');
+        %set(ch,'Visible','off');
 	end;
 	V.ax{i} = struct('ax',ax,'d',d,'lx',lx,'ly',ly);
+    %V.ax{i} = struct('ax',ax,'d',d,'ch',ch);
 end;
 V.premul    = eye(4);
 V.window    = 'auto';
@@ -793,7 +797,7 @@ global stMLI
 for ii = valid_handles(handles),
 	cm_handle = addcontext(ii);
 end;
-nk_orthviews('reposition',nk_orthviews('pos'));
+mli_orthviews('reposition',mli_orthviews('pos'));
 return;
 %_______________________________________________________________________
 %_______________________________________________________________________
@@ -841,7 +845,7 @@ for i=valid_handles(1:24),
 		skx = s*(Dims(1)+Dims(2))*0.02;
 	end;
 
-	DeleteFcn = ['nk_orthviews(''Delete'',' num2str(i) ');'];
+	DeleteFcn = ['mli_orthviews(''Delete'',' num2str(i) ');'];
 
 	% Transverse
 	set(stMLI.vols{i}.ax{1}.ax,'Units','pixels', ...
@@ -1230,6 +1234,8 @@ for i = valid_handles(arg1),
 			'Xdata',[0 TD(1)]+0.5,'Ydata',[1 1]*(cent(2)-bb(1,2)+1));
 		set(stMLI.vols{i}.ax{1}.ly,'HitTest','off',...
 			'Ydata',[0 TD(2)]+0.5,'Xdata',[1 1]*(cent(1)-bb(1,1)+1));
+%         set(stMLI.vols{i}.ax{1}.ch,'HitTest','off',...
+% 			'Ydata',[0 TD(2)]+0.5,'Xdata',[1 1]*(cent(1)-bb(1,1)+1));
 
 		set(stMLI.vols{i}.ax{2}.d,'HitTest','off', 'Cdata',imgc);
 		set(stMLI.vols{i}.ax{2}.lx,'HitTest','off',...
@@ -1350,12 +1356,12 @@ else
 end
 stMLI.vols = cell(24,1);
 
-pluginpath = fullfile(spm('Dir'),'nk_orthviews');
+pluginpath = fullfile(spm('Dir'),'mli_orthviews');
 if isdir(pluginpath)
 	pluginfiles = dir(fullfile(pluginpath,'spm_ov_*.m'));
 	if ~isempty(pluginfiles)
 		addpath(pluginpath);
-		% fprintf('nk_orthviews: Using Plugins in %s\n', pluginpath);
+		% fprintf('mli_orthviews: Using Plugins in %s\n', pluginpath);
 		for k = 1:length(pluginfiles)
 			[p, pluginname] = fileparts(pluginfiles(k).name);
 			stMLI.plugins{k} = strrep(pluginname, 'spm_ov_','');
@@ -1406,26 +1412,26 @@ item_parent = uicontextmenu;
 
 %contextsubmenu 0
 item00  = uimenu(item_parent, 'Label','unknown image', 'Separator','on');
-nk_orthviews('context_menu','image_info',item00,volhandle);
-item0a    = uimenu(item_parent, 'UserData','pos_mm',     'Callback','nk_orthviews(''context_menu'',''repos_mm'');','Separator','on');
-item0b    = uimenu(item_parent, 'UserData','pos_vx',     'Callback','nk_orthviews(''context_menu'',''repos_vx'');');
+mli_orthviews('context_menu','image_info',item00,volhandle);
+item0a    = uimenu(item_parent, 'UserData','pos_mm',     'Callback','mli_orthviews(''context_menu'',''repos_mm'');','Separator','on');
+item0b    = uimenu(item_parent, 'UserData','pos_vx',     'Callback','mli_orthviews(''context_menu'',''repos_vx'');');
 item0c    = uimenu(item_parent, 'UserData','v_value');
 
 %contextsubmenu 1
 item1     = uimenu(item_parent,'Label','Zoom');
-item1_1   = uimenu(item1,      'Label','Full Volume',   'Callback','nk_orthviews(''context_menu'',''zoom'',6);', 'Checked','on');
-item1_2   = uimenu(item1,      'Label','160x160x160mm', 'Callback','nk_orthviews(''context_menu'',''zoom'',5);');
-item1_3   = uimenu(item1,      'Label','80x80x80mm',    'Callback','nk_orthviews(''context_menu'',''zoom'',4);');
-item1_4   = uimenu(item1,      'Label','40x40x40mm',    'Callback','nk_orthviews(''context_menu'',''zoom'',3);');
-item1_5   = uimenu(item1,      'Label','20x20x20mm',    'Callback','nk_orthviews(''context_menu'',''zoom'',2);');
-item1_6   = uimenu(item1,      'Label','10x10x10mm',    'Callback','nk_orthviews(''context_menu'',''zoom'',1);');
+item1_1   = uimenu(item1,      'Label','Full Volume',   'Callback','mli_orthviews(''context_menu'',''zoom'',6);', 'Checked','on');
+item1_2   = uimenu(item1,      'Label','160x160x160mm', 'Callback','mli_orthviews(''context_menu'',''zoom'',5);');
+item1_3   = uimenu(item1,      'Label','80x80x80mm',    'Callback','mli_orthviews(''context_menu'',''zoom'',4);');
+item1_4   = uimenu(item1,      'Label','40x40x40mm',    'Callback','mli_orthviews(''context_menu'',''zoom'',3);');
+item1_5   = uimenu(item1,      'Label','20x20x20mm',    'Callback','mli_orthviews(''context_menu'',''zoom'',2);');
+item1_6   = uimenu(item1,      'Label','10x10x10mm',    'Callback','mli_orthviews(''context_menu'',''zoom'',1);');
 
 %contextsubmenu 2
 checked={'off','off'};
 checked{stMLI.xhairs+1} = 'on';
 item2     = uimenu(item_parent,'Label','Crosshairs');
-item2_1   = uimenu(item2,      'Label','on',  'Callback','nk_orthviews(''context_menu'',''Xhair'',''on'');','Checked',checked{2});
-item2_2   = uimenu(item2,      'Label','off', 'Callback','nk_orthviews(''context_menu'',''Xhair'',''off'');','Checked',checked{1});
+item2_1   = uimenu(item2,      'Label','on',  'Callback','mli_orthviews(''context_menu'',''Xhair'',''on'');','Checked',checked{2});
+item2_2   = uimenu(item2,      'Label','off', 'Callback','mli_orthviews(''context_menu'',''Xhair'',''off'');','Checked',checked{1});
 
 %contextsubmenu 3
 if stMLI.Space == eye(4)
@@ -1434,9 +1440,9 @@ else
 	checked = {'on', 'off'};
 end;
 item3     = uimenu(item_parent,'Label','Orientation');
-item3_1   = uimenu(item3,      'Label','World space', 'Callback','nk_orthviews(''context_menu'',''orientation'',3);','Checked',checked{2});
-item3_2   = uimenu(item3,      'Label','Voxel space (1st image)', 'Callback','nk_orthviews(''context_menu'',''orientation'',2);','Checked',checked{1});
-item3_3   = uimenu(item3,      'Label','Voxel space (this image)', 'Callback','nk_orthviews(''context_menu'',''orientation'',1);','Checked','off');
+item3_1   = uimenu(item3,      'Label','World space', 'Callback','mli_orthviews(''context_menu'',''orientation'',3);','Checked',checked{2});
+item3_2   = uimenu(item3,      'Label','Voxel space (1st image)', 'Callback','mli_orthviews(''context_menu'',''orientation'',2);','Checked',checked{1});
+item3_3   = uimenu(item3,      'Label','Voxel space (this image)', 'Callback','mli_orthviews(''context_menu'',''orientation'',1);','Checked','off');
 
 %contextsubmenu 3
 if isempty(stMLI.snap)
@@ -1445,9 +1451,9 @@ else
 	checked = {'on', 'off'};
 end;
 item3     = uimenu(item_parent,'Label','Snap to Grid');
-item3_1   = uimenu(item3,      'Label','Don''t snap', 'Callback','nk_orthviews(''context_menu'',''snap'',3);','Checked',checked{2});
-item3_2   = uimenu(item3,      'Label','Snap to 1st image', 'Callback','nk_orthviews(''context_menu'',''snap'',2);','Checked',checked{1});
-item3_3   = uimenu(item3,      'Label','Snap to this image', 'Callback','nk_orthviews(''context_menu'',''snap'',1);','Checked','off');
+item3_1   = uimenu(item3,      'Label','Don''t snap', 'Callback','mli_orthviews(''context_menu'',''snap'',3);','Checked',checked{2});
+item3_2   = uimenu(item3,      'Label','Snap to 1st image', 'Callback','mli_orthviews(''context_menu'',''snap'',2);','Checked',checked{1});
+item3_3   = uimenu(item3,      'Label','Snap to this image', 'Callback','mli_orthviews(''context_menu'',''snap'',1);','Checked','off');
 
 %contextsubmenu 4
 if stMLI.hld == 0,
@@ -1458,22 +1464,22 @@ else
 	checked = {'on', 'off', 'off'};
 end;
 item4     = uimenu(item_parent,'Label','Interpolation');
-item4_1   = uimenu(item4,      'Label','NN',    'Callback','nk_orthviews(''context_menu'',''interpolation'',3);', 'Checked',checked{3});
-item4_2   = uimenu(item4,      'Label','Bilin', 'Callback','nk_orthviews(''context_menu'',''interpolation'',2);','Checked',checked{2});
-item4_3   = uimenu(item4,      'Label','Sinc',  'Callback','nk_orthviews(''context_menu'',''interpolation'',1);','Checked',checked{1});
+item4_1   = uimenu(item4,      'Label','NN',    'Callback','mli_orthviews(''context_menu'',''interpolation'',3);', 'Checked',checked{3});
+item4_2   = uimenu(item4,      'Label','Bilin', 'Callback','mli_orthviews(''context_menu'',''interpolation'',2);','Checked',checked{2});
+item4_3   = uimenu(item4,      'Label','Sinc',  'Callback','mli_orthviews(''context_menu'',''interpolation'',1);','Checked',checked{1});
 
 %contextsubmenu 5
-% item5     = uimenu(item_parent,'Label','Position', 'Callback','nk_orthviews(''context_menu'',''position'');');
+% item5     = uimenu(item_parent,'Label','Position', 'Callback','mli_orthviews(''context_menu'',''position'');');
 
 %contextsubmenu 6
 item6       = uimenu(item_parent,'Label','Image','Separator','on');
 item6_1     = uimenu(item6,      'Label','Window');
 item6_1_1   = uimenu(item6_1,    'Label','local');
-item6_1_1_1 = uimenu(item6_1_1,  'Label','auto',       'Callback','nk_orthviews(''context_menu'',''window'',2);');
-item6_1_1_2 = uimenu(item6_1_1,  'Label','manual',     'Callback','nk_orthviews(''context_menu'',''window'',1);');
+item6_1_1_1 = uimenu(item6_1_1,  'Label','auto',       'Callback','mli_orthviews(''context_menu'',''window'',2);');
+item6_1_1_2 = uimenu(item6_1_1,  'Label','manual',     'Callback','mli_orthviews(''context_menu'',''window'',1);');
 item6_1_2   = uimenu(item6_1,    'Label','global');
-item6_1_2_1 = uimenu(item6_1_2,  'Label','auto',       'Callback','nk_orthviews(''context_menu'',''window_gl'',2);');
-item6_1_2_2 = uimenu(item6_1_2,  'Label','manual',     'Callback','nk_orthviews(''context_menu'',''window_gl'',1);');
+item6_1_2_1 = uimenu(item6_1_2,  'Label','auto',       'Callback','mli_orthviews(''context_menu'',''window_gl'',2);');
+item6_1_2_2 = uimenu(item6_1_2,  'Label','manual',     'Callback','mli_orthviews(''context_menu'',''window_gl'',1);');
 if license('test','image_toolbox') == 1
     offon = {'off', 'on'};
     checked = offon(strcmp(stMLI.vols{volhandle}.mapping, ...
@@ -1481,37 +1487,37 @@ if license('test','image_toolbox') == 1
     item6_2     = uimenu(item6,      'Label','Intensity mapping');
     item6_2_1   = uimenu(item6_2,    'Label','local');
     item6_2_1_1 = uimenu(item6_2_1,  'Label','Linear', 'Checked',checked{1}, ...
-                         'Callback','nk_orthviews(''context_menu'',''mapping'',''linear'');');
+                         'Callback','mli_orthviews(''context_menu'',''mapping'',''linear'');');
     item6_2_1_2 = uimenu(item6_2_1,  'Label','Equalised histogram', 'Checked',checked{2}, ...
-                         'Callback','nk_orthviews(''context_menu'',''mapping'',''histeq'');');
+                         'Callback','mli_orthviews(''context_menu'',''mapping'',''histeq'');');
     item6_2_1_3 = uimenu(item6_2_1,  'Label','Equalised log-histogram', 'Checked',checked{3}, ...
-                         'Callback','nk_orthviews(''context_menu'',''mapping'',''loghisteq'');');
+                         'Callback','mli_orthviews(''context_menu'',''mapping'',''loghisteq'');');
     item6_2_1_4 = uimenu(item6_2_1,  'Label','Equalised squared-histogram', 'Checked',checked{4}, ...
-                         'Callback','nk_orthviews(''context_menu'',''mapping'',''quadhisteq'');');
+                         'Callback','mli_orthviews(''context_menu'',''mapping'',''quadhisteq'');');
     item6_2_2   = uimenu(item6_2,    'Label','global');
     item6_2_2_1 = uimenu(item6_2_2,  'Label','Linear', 'Checked',checked{1}, ...
-                         'Callback','nk_orthviews(''context_menu'',''mapping_gl'',''linear'');');
+                         'Callback','mli_orthviews(''context_menu'',''mapping_gl'',''linear'');');
     item6_2_2_2 = uimenu(item6_2_2,  'Label','Equalised histogram', 'Checked',checked{2}, ...
-                         'Callback','nk_orthviews(''context_menu'',''mapping_gl'',''histeq'');');
+                         'Callback','mli_orthviews(''context_menu'',''mapping_gl'',''histeq'');');
     item6_2_2_3 = uimenu(item6_2_2,  'Label','Equalised log-histogram', 'Checked',checked{3}, ...
-                         'Callback','nk_orthviews(''context_menu'',''mapping_gl'',''loghisteq'');');
+                         'Callback','mli_orthviews(''context_menu'',''mapping_gl'',''loghisteq'');');
     item6_2_2_4 = uimenu(item6_2_2,  'Label','Equalised squared-histogram', 'Checked',checked{4}, ...
-                         'Callback','nk_orthviews(''context_menu'',''mapping_gl'',''quadhisteq'');');
+                         'Callback','mli_orthviews(''context_menu'',''mapping_gl'',''quadhisteq'');');
 end;
 %contextsubmenu 7
 item7     = uimenu(item_parent,'Label','Blobs');
 item7_1   = uimenu(item7,      'Label','Add blobs');
-item7_1_1 = uimenu(item7_1,    'Label','local',  'Callback','nk_orthviews(''context_menu'',''add_blobs'',2);');
-item7_1_2 = uimenu(item7_1,    'Label','global', 'Callback','nk_orthviews(''context_menu'',''add_blobs'',1);');
+item7_1_1 = uimenu(item7_1,    'Label','local',  'Callback','mli_orthviews(''context_menu'',''add_blobs'',2);');
+item7_1_2 = uimenu(item7_1,    'Label','global', 'Callback','mli_orthviews(''context_menu'',''add_blobs'',1);');
 item7_2   = uimenu(item7,      'Label','Add image');
-item7_2_1 = uimenu(item7_2,    'Label','local',  'Callback','nk_orthviews(''context_menu'',''add_image'',2);');
-item7_2_2 = uimenu(item7_2,    'Label','global', 'Callback','nk_orthviews(''context_menu'',''add_image'',1);');
+item7_2_1 = uimenu(item7_2,    'Label','local',  'Callback','mli_orthviews(''context_menu'',''add_image'',2);');
+item7_2_2 = uimenu(item7_2,    'Label','global', 'Callback','mli_orthviews(''context_menu'',''add_image'',1);');
 item7_3   = uimenu(item7,      'Label','Add colored blobs','Separator','on');
-item7_3_1 = uimenu(item7_3,    'Label','local',  'Callback','nk_orthviews(''context_menu'',''add_c_blobs'',2);');
-item7_3_2 = uimenu(item7_3,    'Label','global', 'Callback','nk_orthviews(''context_menu'',''add_c_blobs'',1);');
+item7_3_1 = uimenu(item7_3,    'Label','local',  'Callback','mli_orthviews(''context_menu'',''add_c_blobs'',2);');
+item7_3_2 = uimenu(item7_3,    'Label','global', 'Callback','mli_orthviews(''context_menu'',''add_c_blobs'',1);');
 item7_4   = uimenu(item7,      'Label','Add colored image');
-item7_4_1 = uimenu(item7_4,    'Label','local',  'Callback','nk_orthviews(''context_menu'',''add_c_image'',2);');
-item7_4_2 = uimenu(item7_4,    'Label','global', 'Callback','nk_orthviews(''context_menu'',''add_c_image'',1);');
+item7_4_1 = uimenu(item7_4,    'Label','local',  'Callback','mli_orthviews(''context_menu'',''add_c_image'',2);');
+item7_4_2 = uimenu(item7_4,    'Label','global', 'Callback','mli_orthviews(''context_menu'',''add_c_image'',1);');
 item7_5   = uimenu(item7,      'Label','Remove blobs',        'Visible','off','Separator','on');
 item7_6   = uimenu(item7,      'Label','Remove colored blobs','Visible','off');
 item7_6_1 = uimenu(item7_6,    'Label','local', 'Visible','on');
@@ -1584,20 +1590,20 @@ case 'image_info',
 	item83 = uimenu(varargin{2}, 'Label', sprintf('%.2f %.2f %.2f', R(3,1:3)));
 	item9  = uimenu(varargin{2},...
 		'Label','Specify other image...',...
-		'Callback','nk_orthviews(''context_menu'',''swap_img'');',...
+		'Callback','mli_orthviews(''context_menu'',''swap_img'');',...
 		'Separator','on');
 
 case 'repos_mm',
-	oldpos_mm = nk_orthviews('pos');
+	oldpos_mm = mli_orthviews('pos');
 	newpos_mm = spm_input('New Position (mm)','+1','r',sprintf('%.2f %.2f %.2f',oldpos_mm),3);
-	nk_orthviews('reposition',newpos_mm);
+	mli_orthviews('reposition',newpos_mm);
 
 case 'repos_vx'
 	current_handle = get_current_handle;
-	oldpos_vx = nk_orthviews('pos', current_handle);
+	oldpos_vx = mli_orthviews('pos', current_handle);
 	newpos_vx = spm_input('New Position (voxels)','+1','r',sprintf('%.2f %.2f %.2f',oldpos_vx),3);
 	newpos_mm = stMLI.vols{current_handle}.mat*[newpos_vx;1];
-	nk_orthviews('reposition',newpos_mm(1:3));
+	mli_orthviews('reposition',newpos_mm(1:3));
 
 case 'zoom'
 	zoom_all(varargin{2});
@@ -1605,7 +1611,7 @@ case 'zoom'
 	redraw_all;
 
 case 'xhair',
-	nk_orthviews('Xhairs',varargin{2});
+	mli_orthviews('Xhairs',varargin{2});
 	cm_handles = get_cm_handles;
 	for i = 1:length(cm_handles),
 		z_handle = get(findobj(cm_handles(i),'label','Crosshairs'),'Children');
@@ -1621,20 +1627,20 @@ case 'orientation',
 		set(z_handle,'Checked','off');
 	end;
 	if varargin{2} == 3,
-		nk_orthviews('Space');
+		mli_orthviews('Space');
 		for i = 1:length(cm_handles),
 		    z_handle = findobj(cm_handles(i),'label','World space');
 		    set(z_handle,'Checked','on');
 		end;
 	elseif varargin{2} == 2,
-		nk_orthviews('Space',1);
+		mli_orthviews('Space',1);
 		for i = 1:length(cm_handles),
 		    z_handle = findobj(cm_handles(i),'label',...
 				       'Voxel space (1st image)');
 		    set(z_handle,'Checked','on');
 		end;
 	else
-		nk_orthviews('Space',get_current_handle);
+		mli_orthviews('Space',get_current_handle);
 		z_handle = findobj(stMLI.vols{get_current_handle}.ax{1}.cm, ...
 				       'label','Voxel space (this image)');
 		set(z_handle,'Checked','on');
@@ -1676,14 +1682,14 @@ case 'interpolation',
 case 'window',
 	current_handle = get_current_handle;
 	if varargin{2} == 2,
-		nk_orthviews('window',current_handle);
+		mli_orthviews('window',current_handle);
 	else
 		if isnumeric(stMLI.vols{current_handle}.window)
 			defstr = sprintf('%.2f %.2f', stMLI.vols{current_handle}.window);
 		else
 			defstr = '';
 		end;
-		nk_orthviews('window',current_handle,spm_input('Range','+1','e',defstr,2));
+		mli_orthviews('window',current_handle,spm_input('Range','+1','e',defstr,2));
 	end;
 
 case 'window_gl',
@@ -1749,7 +1755,7 @@ case 'swap_img',
         for k=1:numel(fn)
                 stMLI.vols{current_handle}.(fn{k}) = new_info.(fn{k});
         end;
-	nk_orthviews('context_menu','image_info',get(gcbo, 'parent'));
+	mli_orthviews('context_menu','image_info',get(gcbo, 'parent'));
 	redraw_all;
     end
 
@@ -1764,9 +1770,9 @@ case 'add_blobs',
 		c_handle = findobj(findobj(stMLI.vols{cm_handles(i)}.ax{1}.cm,'label','Blobs'),'Label','Remove blobs');
 		set(c_handle,'Visible','on');
 		delete(get(c_handle,'Children'));
-		item7_3_1 = uimenu(c_handle,'Label','local','Callback','nk_orthviews(''context_menu'',''remove_blobs'',2);');
+		item7_3_1 = uimenu(c_handle,'Label','local','Callback','mli_orthviews(''context_menu'',''remove_blobs'',2);');
 		if varargin{2} == 1,
-			item7_3_2 = uimenu(c_handle,'Label','global','Callback','nk_orthviews(''context_menu'',''remove_blobs'',1);');
+			item7_3_2 = uimenu(c_handle,'Label','global','Callback','mli_orthviews(''context_menu'',''remove_blobs'',1);');
 		end;
 	end;
 	redraw_all;
@@ -1793,9 +1799,9 @@ case 'add_image',
 		c_handle = findobj(findobj(stMLI.vols{cm_handles(i)}.ax{1}.cm,'label','Blobs'),'Label','Remove blobs');
 		set(c_handle,'Visible','on');
 		delete(get(c_handle,'Children'));
-		item7_3_1 = uimenu(c_handle,'Label','local','Callback','nk_orthviews(''context_menu'',''remove_blobs'',2);');
+		item7_3_1 = uimenu(c_handle,'Label','local','Callback','mli_orthviews(''context_menu'',''remove_blobs'',2);');
 		if varargin{2} == 1,
-			item7_3_2 = uimenu(c_handle,'Label','global','Callback','nk_orthviews(''context_menu'',''remove_blobs'',1);');
+			item7_3_2 = uimenu(c_handle,'Label','global','Callback','mli_orthviews(''context_menu'',''remove_blobs'',1);');
 		end;
 	end;
 	redraw_all;
@@ -1819,11 +1825,11 @@ case 'add_c_blobs',
 		set(c_handle,'Visible','on');
 		%set(ch_c_handle,'Visible',on');
 		item7_4_1   = uimenu(ch_c_handle(2),'Label',hlabel,'ForegroundColor',colours(c,:),...
-			'Callback','c = get(gcbo,''UserData'');nk_orthviews(''context_menu'',''remove_c_blobs'',2,c);',...
+			'Callback','c = get(gcbo,''UserData'');mli_orthviews(''context_menu'',''remove_c_blobs'',2,c);',...
 			'UserData',c);
 		if varargin{2} == 1,
 			item7_4_2 = uimenu(ch_c_handle(1),'Label',hlabel,'ForegroundColor',colours(c,:),...
-				'Callback','c = get(gcbo,''UserData'');nk_orthviews(''context_menu'',''remove_c_blobs'',1,c);',...
+				'Callback','c = get(gcbo,''UserData'');mli_orthviews(''context_menu'',''remove_c_blobs'',1,c);',...
 				'UserData',c);
 		end;
 	end;
@@ -1873,10 +1879,10 @@ case 'add_c_image',
 		set(c_handle,'Visible','on');
 		%set(ch_c_handle,'Visible',on');
 		item7_4_1 = uimenu(ch_c_handle(2),'Label',hlabel,'ForegroundColor',colours(c,:),...
-			'Callback','c = get(gcbo,''UserData'');nk_orthviews(''context_menu'',''remove_c_blobs'',2,c);','UserData',c);
+			'Callback','c = get(gcbo,''UserData'');mli_orthviews(''context_menu'',''remove_c_blobs'',2,c);','UserData',c);
 		if varargin{2} == 1
 			item7_4_2 = uimenu(ch_c_handle(1),'Label',hlabel,'ForegroundColor',colours(c,:),...
-				'Callback','c = get(gcbo,''UserData'');nk_orthviews(''context_menu'',''remove_c_blobs'',1,c);',...
+				'Callback','c = get(gcbo,''UserData'');mli_orthviews(''context_menu'',''remove_c_blobs'',1,c);',...
 				'UserData',c);
 		end
 	end
@@ -1896,8 +1902,8 @@ global stMLI
 for i = 1:length(valid_handles(1:24)),
 	if isfield(stMLI.vols{i}.ax{1},'cm')
 		set(findobj(stMLI.vols{i}.ax{1}.cm,'UserData','pos_mm'),...
-			'Label',sprintf('mm:  %.1f %.1f %.1f',nk_orthviews('pos')));
-		pos = nk_orthviews('pos',i);
+			'Label',sprintf('mm:  %.1f %.1f %.1f',mli_orthviews('pos')));
+		pos = mli_orthviews('pos',i);
 		set(findobj(stMLI.vols{i}.ax{1}.cm,'UserData','pos_vx'),...
 			'Label',sprintf('vx:  %.1f %.1f %.1f',pos));
 		set(findobj(stMLI.vols{i}.ax{1}.cm,'UserData','v_value'),...
@@ -1925,7 +1931,7 @@ if op==6,
 else
 	vx = sqrt(sum(stMLI.Space(1:3,1:3).^2));
 	vx = vx.^(-1);
-	pos = nk_orthviews('pos');
+	pos = mli_orthviews('pos');
 	pos = stMLI.Space\[pos ; 1];
 	pos = pos(1:3)';
 	if     op == 5, stMLI.bb = [pos-80*vx ; pos+80*vx] ;

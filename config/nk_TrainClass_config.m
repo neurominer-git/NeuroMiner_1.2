@@ -521,7 +521,8 @@ switch act
                         mess{1+end} = 'CV already existed, not overwritten!'; 
                     end
                 case 1
-                    analind = nk_SelectAnalysis(NM); mess=[];
+                    %[~,analind] = nk_SelectAnalysis(NM); mess=[];
+                    t_act = 1; brief = 1; while t_act>0, [t_act, analind, NM, ~, brief ]= nk_SelectAnalysis(NM, 0, 'MAIN >>> Select Analysis', 1, 1,0,[],brief); end
                     if isfield(NM.analysis{analind}.params,'TrainParam')
                         mess{1} = 'TrainParam';
                         NM.TrainParam = NM.analysis{analind}.params.TrainParam;
