@@ -53,7 +53,7 @@ if iscell(dat.Y),
             if nvar < 10
                 fprintf('\n');
                 switch dat.datadescriptor{i}.input_settings.datasource
-                    case 'matrix'
+                    case {'matrix','networks'}
                         switch dat.datadescriptor{i}.input_settings.groupmode
                             case 1
                                 fprintf('\t\t* Source: MATLAB workspace\n')
