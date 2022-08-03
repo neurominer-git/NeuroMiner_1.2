@@ -402,8 +402,8 @@ try
             else
                 
                 
-                simSample_App2(NM);
-                %simulationRes = simulate_sampleSize();
+                %simSample_App2(NM);
+                simulationRes = simulate_sampleSize();
             end
     end
 
