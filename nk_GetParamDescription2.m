@@ -525,15 +525,15 @@ switch action
 %                             preprocact{i} = sprintf('%s ]', preprocact{i});
                         case 'customPreproc'
                             preprocact{i} = sprintf('Perform custom preprocessing step. Function: %s', params.ACTPARAM{i}.CUSTOMPREPROC.filename); 
+                        
                         case 'JuSpace'
-                            
                             actparamAUX = params.ACTPARAM{i};
                             if ~isempty(actparamAUX.JUSPACE.petList) 
-                                for i= 1:size(actparamAUX.JUSPACE.petList,2) 
-                                    if i == 1
-                                        PETLISTSTR = actparamAUX.JUSPACE.petList{i}.id;
+                                for j= 1:size(actparamAUX.JUSPACE.petList,2) 
+                                    if j == 1
+                                        PETLISTSTR = actparamAUX.JUSPACE.petList{j}.id;
                                     else
-                                        PETLISTSTR = sprintf('%s, %s', PETLISTSTR, actparamAUX.JUSPACE.petList{i}.id);
+                                        PETLISTSTR = sprintf('%s, %s', PETLISTSTR, actparamAUX.JUSPACE.petList{j}.id);
 
                                     end
                                 end
