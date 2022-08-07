@@ -110,6 +110,7 @@ if isfield(TemplParam,'ACTPARAM')
                             for n=1:numel(SrcParam.covars_oocv)
                                 InputParam.P{ac}.TsCovars{tscnt+n} = SrcParam.covars_oocv{n}( :, TemplParam.ACTPARAM{ac}.COVAR );
                                 if iscell(SrcParam.iOCV)
+                                    InputParam.P{ac}.TsCovars{tscnt+n}(SrcParam.iOCV{n},:)=[]; 
                                 else
                                     InputParam.P{ac}.TsCovars{tscnt+n}(SrcParam.iOCV,:)=[]; 
                                 end
@@ -563,6 +564,12 @@ if isfield(TemplParam,'ACTPARAM')
                 end
             case 'customPreproc'
                 if VERBOSE, fprintf('\n* APPLY CUSTOM PREPROCESSING STEP'); end
+                InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+                if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
+                    InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
+                end
+            case 'JuSpace'
+                if VERBOSE, fprintf('\n* JUSPACE COMPUTATION'); end
                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;

@@ -1005,6 +1005,31 @@ end
 if tsproc, InputParam.Ts = perfCustomPreproc(InputParam.Ts, TrParami); end
 end
 % =========================================================================
+
+function [SrcParam, InputParam, TrParami, actparam ] = act_JuSpace(SrcParam, InputParam, ~, TrParami, actparam)
+global VERBOSE
+trfl    = actparam.trfl;
+tsfl    = actparam.tsfl;
+paramfl = actparam.paramfl;
+i       = actparam.i;
+tsproc  = false;  
+
+if isfield(actparam,'opt')
+    InputParam.P{i}.JUSPACE.p = actparam.opt;
+end
+
+if paramfl && tsfl 
+     tsproc = true;
+elseif trfl
+    if VERBOSE;fprintf('\tJuSpace function ...'); end
+    [InputParam.Tr, TrParami] = perfJuSpace(InputParam.Tr, InputParam.P{i}.JUSPACE);
+
+    if tsfl, tsproc = true; end
+end
+
+if tsproc, InputParam.Ts = perfJuSpace(InputParam.Ts, TrParami); end
+end
+% =========================================================================
 function [InputParam, SrcParam] = perform_adasyn(InputParam, SrcParam)
 global SVM MODEFL
 

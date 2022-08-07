@@ -568,6 +568,12 @@ if isfield(TemplParam,'ACTPARAM')
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
                 end
+            case 'JuSpace'
+                if VERBOSE, fprintf('\n* JUSPACE COMPUTATION'); end
+                InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+                if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
+                    InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
+                end
        end
     end
     if VERBOSE, fprintf('\nPreprocessing sequence setup completed. Executing ...'); end
