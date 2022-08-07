@@ -906,10 +906,10 @@ end
 function CURACT = config_JuSpace(NM, varind, CURACT, navistr)
 
 if ~isfield(CURACT,'JUSPACE'), CURACT.JUSPACE=[]; end
-if ~isfield(CURACT,'PX'), CURACT.PX = []; end
+%if ~isfield(CURACT,'PX'), CURACT.PX = []; end
 datadesc = NM.datadescriptor{varind}; brainmask = [];
 if datadesc.type, brainmask = NM.brainmask{varind}; end
-act = 1; while act >0, [ CURACT.JUSPACE, CURACT.PX, act ] = JuSpace_config(CURACT.JUSPACE, CURACT.PX, brainmask, navistr); end
+act = 1; while act >0, [ CURACT.JUSPACE, act ] = JuSpace_config(CURACT.JUSPACE, brainmask, navistr); end
 CURACT.cmd = 'JuSpace';
 
 end
