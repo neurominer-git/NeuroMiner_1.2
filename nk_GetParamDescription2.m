@@ -539,6 +539,9 @@ switch action
                                 end
                                 preprocact{i} = sprintf('Compute correlations with neurotransmitter maps: %s (JuSpace Toolbox)', PETLISTSTR);
                             end
+                        case 'ROImeans'
+                            preprocact{i} = sprintf('Compute ROI mean values. Atlas: %s', params.ACTPARAM{i}.ROIMEANS.atlas); 
+                        
                     end
                     
                 else

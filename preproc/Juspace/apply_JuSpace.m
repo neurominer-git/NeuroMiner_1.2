@@ -1,6 +1,7 @@
 function Ypet = apply_JuSpace(Yimg, brainmask, atlas, cortype, autocorcorrect, petlist)
-    
-S.Vm                         = spm_vol(brainmask);
+
+S.brainmask                  = brainmask;
+S.Vm                         = spm_vol(S.brainmask);
 
 [S.dims, S.indvol, ~, S.vox] = nk_ReadMaskIndVol(S.Vm, []);
 % for now, you cannot prune any columns before! (add later --> similar to
@@ -26,9 +27,9 @@ for i = 1:numel(petlist)
     petvec(i) = petlist{i}.listidx; 
 end
 
-image_for_size = string(S.brainmask{1,1});
+image_for_size = string(S.brainmask);
 %image_for_size = '/volume/projects/LH_BEST/Data/BEST/MRI/ResCov/ResCov_mwp1368_MRI_sMRI_400096.nii';
-Ypet = JuSpace_noGUI_2D(C,atlas,options,PET_list,image_for_size);
+Ypet = JuSpace_noGUI_2D(C,atlas,options,petvec,image_for_size);
 clear ttY
 clear C
     

@@ -398,6 +398,7 @@ for f=1:ix % Loop through CV2 permutations
                         if isfield(inp,'CV1') && inp.CV1 == 1
                             inp.CV1p = [k,k]; inp.CV1f = [l,l];
                             fprintf('\nPreprocessing data at selected parameter combination(s) ');
+                            
                             [ ~, ~, analysis, mapY, ~, ~, Param, paramfl ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
                         end
                         
