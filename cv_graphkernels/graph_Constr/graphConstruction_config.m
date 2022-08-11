@@ -25,16 +25,16 @@ if ~defaultsfl
         GCSTR_METHOD = ConstructionMethod;
     end
 
-%     if strcmp(GCSTR_METHOD,'KL divergence')
-%         if isempty(ParcellationAtlas)
-%             GCSTR_PARC = '(undefined)';
-%         else
-%             GCSTR_PARC = ParcellationAtlas;
-%         end
-%         menustr = ['Select graph construction method [ ' GCSTR_METHOD ' ]|', ...
-%             'Define parcellation atlas [ ' GCSTR_PARC ' ]'];
-%         menuact = 1:2;
-%     end
+    if strcmp(GCSTR_METHOD,'KL divergence')
+        if ~exist('ParcellationAtlas', 'var') || isempty(ParcellationAtlas)
+            GCSTR_PARC = '(undefined)';
+        else
+            GCSTR_PARC = ParcellationAtlas;
+        end
+        menustr = ['Select graph construction method [ ' GCSTR_METHOD ' ]|', ...
+            'Define parcellation atlas [ ' GCSTR_PARC ' ]'];
+        menuact = [1,4];
+    end
 
     if strcmp(GCSTR_METHOD, 'Normative network + 1')
         if isempty(SimilarityMeasure)
@@ -103,35 +103,35 @@ if ~defaultsfl
                 case 1
                     GRAPHCONSTRUCTION.refGroup = nk_FileSelector(1,0,'Select file with reference group data (in the same format as main data, incl. group and ID column)','.*\.txt$|.*\.csv');
             end
-%         case 4
-%             switch GCSTR_METHOD
-%                 %                 case 'KL divergence'
-%                 %                     readParcA = nk_input('Read in parcellation atlas externally', 0, 'mq', ...
-%                 %                         ['From MATLAB workspace |' ...
-%                 %                         'From file |'], [0,1], 0);
-%                 %
-%                 %                     switch readParcA
-%                 %                         case 0
-%                 %                             GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas variable name in Matlab workspace',0,'e');
-%                 %                         case 1
-%                 %                             GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
-%                 %                     end
+        case 4
+            %             switch GCSTR_METHOD
+            %                 %                 case 'KL divergence'
+%             readParcA = nk_input('Read in parcellation atlas externally', 0, 'mq', ...
+%                 ['From MATLAB workspace |' ...
+%                 'From file |'], [0,1], 0);
 % 
-%                 case 'Normative network + 1'
-% %                     readVarT = nk_input('Read in variable types externally', 0, 'mq', ...
-% %                         ['From MATLAB workspace |' ...
-% %                         'From file |'], [0,1], 0);
-% 
-% %                     switch readVarT
-% %                         case 0
-% %                             GRAPHCONSTRUCTION.variableTypes = nk_input('Define variable types vector',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
-% %                         case 1
-% %                             GRAPHCONSTRUCTION.variableTypes = nk_FileSelector(1,0,'Select file containing variable types vector','.*\.txt$|.*\.csv');
-% %                     end
-% 
-%                     %GRAPHCONSTRUCTION.refGroup = nk_input('Reference group name (as defined in dataset)', 0, 's');
-% 
-%             end
+%             switch readParcA
+%                 case 0
+%                     GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas variable name in Matlab workspace',0,'e');
+%                 case 1
+            GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
+            
+            %
+            %                 case 'Normative network + 1'
+            % %                     readVarT = nk_input('Read in variable types externally', 0, 'mq', ...
+            % %                         ['From MATLAB workspace |' ...
+            % %                         'From file |'], [0,1], 0);
+            %
+            % %                     switch readVarT
+            % %                         case 0
+            % %                             GRAPHCONSTRUCTION.variableTypes = nk_input('Define variable types vector',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
+            % %                         case 1
+            % %                             GRAPHCONSTRUCTION.variableTypes = nk_FileSelector(1,0,'Select file containing variable types vector','.*\.txt$|.*\.csv');
+            % %                     end
+            %
+            %                     %GRAPHCONSTRUCTION.refGroup = nk_input('Reference group name (as defined in dataset)', 0, 's');
+            %
+            %             end
     end
 
     %ParcellationAtlas = 'Hammers.nii';
@@ -178,8 +178,10 @@ global NM
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
-    menustr = ['Normative network + 1 (e.g., Drenthen et al., 2018)                (Normative network + 1)']; % 'KL divergence (Kong et al., 2014)               (KL divergence)|' ...
-    menuact = {'Normative network + 1'}; %'KL divergence', ...
+    menustr = ['Normative network + 1 (e.g., Drenthen et al., 2018)                (Normative network + 1)|', ... 
+        'KL divergence of ROI voxel density distributions (Kong et al., 2014)               (KL divergence)' ];
+    menuact = {'Normative network + 1', ...
+        'KL divergence'};
         
 if isfield(GRAPHCONSTRUCTION,'method'), def = find(strcmp(menuact,GRAPHCONSTRUCTION.method)); else, def = 1; end %what does this line do?
 
@@ -192,32 +194,32 @@ if ~strcmp(act,'BACK'), GRAPHCONSTRUCTION.method = act; end
 if ~exist('PX','var'), PX = []; end
 
 switch act{1}
-%     case 'KL divergence'
-%         GRAPHCONSTRUCTION.method = 'KL divergence';
-%         PX = nk_AddParam([], [], [], PX,'reset');
-%         if isfield(GRAPHCONSTRUCTION,'KL divergence')
-%             ParcellationAtlas = GRAPHCONSTRUCTION.parcellation;
-%             
-%         else
-%             ParcellationAtlas = 'Hammers.nii';
-%         end
-%         GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas (incl. path to file)', 0, 's');
+    case 'KL divergence'
+        GRAPHCONSTRUCTION.method = 'KL divergence';
+        PX = nk_AddParam([], [], [], PX,'reset');
+        if isfield(GRAPHCONSTRUCTION,'KL divergence')
+            ParcellationAtlas = GRAPHCONSTRUCTION.parcellation;
+            
+        else
+            ParcellationAtlas = '(undefined)';
+        end
+        %GRAPHCONSTRUCTION.parcellation = %nk_input('Parcellation atlas (incl. path to file)', 0, 's');
     case 'Normative network + 1'
         GRAPHCONSTRUCTION.method = 'Normative network + 1';
         PX = nk_AddParam([], [], [], PX,'reset');
         
         GRAPHCONSTRUCTION.simMeasure = 'Mutual information';
 
-        readVarT = nk_input('Read in variable types externally', 0, 'mq', ...
-            ['From MATLAB workspace |' ...
-            'From file |'], [0,1], 0);
-
-        switch readVarT
-            case 0
-                GRAPHCONSTRUCTION.variableTypes = nk_input('Define variable types vector',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
-            case 1
-                GRAPHCONSTRUCTION.variableTypes = nk_input('Define path to file with variable types vector',0,'s');
-        end
+%         readVarT = nk_input('Read in variable types externally', 0, 'mq', ...
+%             ['From MATLAB workspace |' ...
+%             'From file |'], [0,1], 0);
+% 
+%         switch readVarT
+%             case 0
+%                 GRAPHCONSTRUCTION.variableTypes = nk_input('Define variable types vector',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
+%             case 1
+%                 GRAPHCONSTRUCTION.variableTypes = nk_input('Define path to file with variable types vector',0,'s');
+%         end
 end
 else
     GRAPHCONSTRUCTION.method = 'Normative network + 1'; 

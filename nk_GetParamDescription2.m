@@ -517,7 +517,7 @@ switch action
                         case 'graphMetrics'
                             preprocact{i} = 'Compute graph metrics from connectivity matrices';
                             
-                        case 'graphConstruction'
+                        case 'graphComputation'
                             preprocact{i} = 'Construct individual networks';
                             if isfield(params.ACTPARAM{i}.GRAPHCONSTRUCTION,'method') && ~isempty(params.ACTPARAM{i}.GRAPHCONSTRUCTION.method)
                                 preprocact{i} = sprintf('%s, Method: %s', preprocact{i}, params.ACTPARAM{i}.GRAPHCONSTRUCTION.method);

@@ -957,7 +957,7 @@ end
 
 
 
-function [SrcParam, InputParam, TrParami, actparam ] = act_graphConstruction(SrcParam, InputParam, ~, TrParami, actparam)
+function [SrcParam, InputParam, TrParami, actparam ] = act_graphComputation(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
