@@ -46,8 +46,11 @@ if ~defaultsfl
         if isempty(ReferenceGroup)
             GCSTR_REFG = '(undefined)';
         else
-            GCSTR_REFG = ReferenceGroup;
-
+            if size(ReferenceGroup,1) >1
+                GCSTR_REFG = 'from Matlab workspace';
+            else
+                GCSTR_REFG = ReferenceGroup;
+            end
         end
         
 %         if isempty(VariableTypesVec)
@@ -98,7 +101,7 @@ if ~defaultsfl
 
             switch readRefG
                 case 0
-                    GRAPHCONSTRUCTION.refGroup = nk_input('Define reference group dataset (as named in MATLAB workspace)',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
+                    GRAPHCONSTRUCTION.refGroup = nk_input('Define reference group dataset (as named in MATLAB workspace)',0,'e',[]);
           
                 case 1
                     GRAPHCONSTRUCTION.refGroup = nk_FileSelector(1,0,'Select file with reference group data (in the same format as main data, incl. group and ID column)','.*\.txt$|.*\.csv');

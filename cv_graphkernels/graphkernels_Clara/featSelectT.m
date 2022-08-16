@@ -20,7 +20,7 @@ function selectedY = featSelectT(X1, X2, y, train) % y = labels
     else
         selectedY = X2;
         for i = 1:size(X2,2)
-            if sum(X1(:,i) == 0
+            if sum(X1(:,i)) == 0
                 selectedY(:,i) = 0;
             end
         end

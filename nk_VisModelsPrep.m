@@ -297,7 +297,7 @@ end
 
 inp1.nclass = 1;if strcmp(MODEFL,'classification'), inp1.nclass = numel(CV.class{1,1}); end
 if inp1.permfl
-    permmodestr = {'L','F','LF'};
+    permmodestr = {'L','F','LF','COVAR'};
     permstr = sprintf('VISUAL_%s',permmodestr{inp1.permmode});
 else
     permstr = 'VISUAL';

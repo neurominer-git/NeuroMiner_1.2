@@ -31,12 +31,21 @@ function CM = graph_constructionREFPLUSP(A, method, referenceGroup, similarityMe
 % OUTPUT: matrix format, dimensions: n people x (m/2-m) edges 
 global NM
 % % read in reference group data 
-RG = readtable(referenceGroup);
+if size(referenceGroup,1) >1
+    RG = referenceGroup;
+else 
+    RG = readtable(referenceGroup);
+    RG = table2array(RG);
+end
 
-% remove case and label variable 
-label_var = NM.datadescriptor{1,1}.input_settings.label_edit;
-case_var = NM.datadescriptor{1,1}.input_settings.case_edit;
-RG = table2array(removevars(RG, {label_var, case_var}));
+% if size(RG,2) == size(A,2) % check whether ID and case label are columns 
+
+% else
+%     % remove case and label variable 
+%     label_var = NM.datadescriptor{1,1}.input_settings.label_edit;
+%     case_var = NM.datadescriptor{1,1}.input_settings.case_edit;
+%     RG = table2array(removevars(RG, {label_var, case_var}));
+% end
 % RG = referenceGroup;
 % read in variable types vector
 %varTypes = readtable(variableTypesVec);

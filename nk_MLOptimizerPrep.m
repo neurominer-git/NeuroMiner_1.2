@@ -7,7 +7,9 @@ function [act, inp, NMo] = nk_MLOptimizerPrep(act, inp, parentstr)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris 10/2018
 
-global CV NM xNM simFlag %xNM for simulation 
+global CV NM xNM simFlag JSMEM %xNM for simulation 
+
+JSMEM = [];
 
 na_str = '?';
 if ~exist('inp','var') || isempty(inp),

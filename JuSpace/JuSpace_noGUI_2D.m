@@ -1,7 +1,7 @@
 function res = JuSpace_noGUI_2D(list1,atlas,options,PET_list,image_for_size)
 
 
-%addpath(genpath('/opt/matlab/JuSpace_v1.3/'));
+addpath(genpath('/opt/matlab/JuSpace_v1.3/'));
 
 list2 = [];
 

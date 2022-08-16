@@ -40,6 +40,7 @@ function [res,p_all,stats,data, D1,D2,data_PET,Resh,T1] = compute_DomainGauges_2
 % D2 --> data matrix for list 2 (if not empty)
 % data_PET --> PET data matrix
 % Resh --> Reshaped results matrix [file_index PET_map Correlation_result p-value file_path]
+global JSMEM
 
 atlas_hdr = spm_vol(atlas);
 atlas1 = spm_read_vols(atlas_hdr);
@@ -47,19 +48,34 @@ atlas1 = spm_read_vols(atlas_hdr);
 a = a(a~=0);
 atlas_vals = a(~isnan(a));
 
-D1 = mean_time_course_2D_images(list1,atlas,atlas_vals,image_for_size);
-
+%D1 = mean_time_course_2D_images(list1,atlas,atlas_vals,image_for_size);
+%D1 = mean_time_course_NM(list1,atlas,atlas_vals,image_for_size);
+D1 = list1;
 if ~isemptycell(list2)
-    D2 = mean_time_course_2D_images(list2,atlas,atlas_vals,image_for_size); 
+    %D2 = mean_time_course_2D_images(list2,atlas,atlas_vals,image_for_size); 
+    %D2 = mean_time_course_NM(list2,atlas,atlas_vals,image_for_size); 
+    D2 = list2;
 else
     D2 = [];
 end
 
-data_PET = mean_time_course_2D(files_PET,atlas,atlas_vals,image_for_size);
+%data_PET = mean_time_course_2D(files_PET,atlas,atlas_vals,image_for_size);
+if isfield(JSMEM,"data_PET") && ~isempty(JSMEM.data_PET) 
+    data_PET = JSMEM.data_PET;
+else 
+    data_PET = mean_time_course_NM(files_PET,atlas,atlas_vals,image_for_size);
+    JSMEM.data_PET = data_PET;
+end
 
 if options(4)==1 % adjust for structural correlation
-    path_T1 = fullfile(fileparts(which('spm')),'tpm','TPM.nii,1');
-    T1 =  mean_time_course_2D({path_T1},atlas, atlas_vals,image_for_size); 
+    if isfield(JSMEM,"T1") && ~isempty(JSMEM.T1) 
+        T1 = JSMEM.T1;
+    else 
+        path_T1 = fullfile(fileparts(which('spm')),'tpm','TPM.nii,1');
+        %T1 =  mean_time_course_2D({path_T1},atlas, atlas_vals,image_for_size);
+        T1 =  mean_time_course_NM({path_T1},atlas, atlas_vals,image_for_size);
+    end
+    
 else
     T1 = '';
 end
