@@ -637,7 +637,7 @@ for f=1:ix % Loop through CV2 permutations
                                         for perms = 1:nperms(1)
                                             if ~sigfl 
                                                 % Train permuted model
-                                                [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms);
+                                                [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms, analysis, inp, paramfl, BINMOD, n, h, k, l, pnt, FullPartFlag, F, u);
                                                   if isfield(mapY,'VI')
                                                       [~, MDs] = nk_GetParam2(Ymodel_perm, L_perm, sPs, 1, mapY.VI{k,l}{hix}{u} );
                                                   else
