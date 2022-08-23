@@ -19,7 +19,7 @@ function [PREPROC, act, stepind] = nk_Preproc_config(PREPROC, varind, parentstr,
 % of the pre-processing pipeline in the respective CV1 partition (currently
 % only label imputation in the training samples).
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2022
+% (c) Nikolaos Koutsouleris, 08/2022
 
 % Defaults:
 % ---------
@@ -43,7 +43,7 @@ if ~exist('enind','var'), enind = []; end
 if ~isstruct(enind)
     fl = true;
     if EXPERT
-        EF = struct('correctnuis',       fl, ...
+        EF = struct('correctnuis', fl, ...
             'reducedim',     fl, ...
             'extdim',        fl, ...
             'standardize',   fl, ...
@@ -62,10 +62,10 @@ if ~isstruct(enind)
             'graphComputation', fl, ...
             'graphSparsity', fl, ...
             'graphMetrics', fl, ...
-            'customPreproc', fl, ...
-            'JuSpace', fl);
+            'JuSpace', fl, ...
+            'customPreproc', fl);
     else 
-        EF = struct('correctnuis',       fl, ...
+        EF = struct('correctnuis', fl, ...
             'reducedim',     fl, ...
             'extdim',        fl, ...
             'standardize',   fl, ...
@@ -473,12 +473,12 @@ if modflag && ~replflag
             cmd = 18;
         case 'graphComputation'
             cmd = 19;
-        case 'customPreproc'
-            cmd = 20;
         case 'JuSpace'
-            cmd = 21;
+            cmd = 20;
         case 'ROImeans'
-            cmd = 22; 
+            cmd = 21;
+        case 'customPreproc'
+            cmd = 22;
     end
    
 else    
@@ -558,12 +558,13 @@ else
                     cmdstr = 'Compute network metrics from connectivity matrices';                  cmdmnu = 18;
                 case 'graphComputation'
                     cmdstr = 'Compute individual networks from input data';                         cmdmnu = 19;
-                case 'customPreproc'
-                    cmdstr = 'Add a custom preproc function (from .m-Flie)';                        cmdmnu = 20;
                 case 'JuSpace'
-                    cmdstr = 'Correlation with neurotransmitter systems (PET oder SPECT maps; JuSpace Toolbox)';                cmdmnu = 21; 
+                    cmdstr = 'Correlation with neurotransmitter systems (PET oder SPECT maps; JuSpace Toolbox)';                cmdmnu = 20; 
                 case 'ROImeans'
-                    cmdstr = 'Compute ROI mean values';                                             cmdmnu = 22; 
+                    cmdstr = 'Compute ROI mean values';                                             cmdmnu = 21; 
+                case 'customPreproc'
+                    cmdstr = 'Add a custom preproc function (from .m-file)';                        cmdmnu = 22;
+
             end
             [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu);
             cmdstr =[]; cmdmnu=[];
@@ -616,11 +617,12 @@ switch cmd
     case 19
         CURACT = config_graphConstruction(CURACT, navistr);
     case 20
-        CURACT = config_customPreproc(CURACT, navistr);
-    case 21
         CURACT = config_JuSpace(NM, varind, CURACT, navistr);
-    case 22
+    case 21
         CURACT = config_ROImeans(NM, varind, CURACT, navistr);
+    case 22
+        CURACT = config_customPreproc(CURACT, navistr);
+    
 end
 
 switch replflag
@@ -901,15 +903,7 @@ CURACT.cmd = 'graphComputation';
 
 end
 
-function CURACT = config_customPreproc(CURACT, navistr)
-
-if ~isfield(CURACT,'CUSTOMPREPROC'), CURACT.CUSTOMPREPROC=[]; end
-if ~isfield(CURACT,'PX'), CURACT.PX = []; end
-act = 1; while act >0, [ CURACT.CUSTOMPREPROC, CURACT.PX, act ] = customPreproc_config(CURACT.CUSTOMPREPROC, CURACT.PX, navistr); end
-CURACT.cmd = 'customPreproc';
-
-end
-
+% -------------------------------------------------------------------------
 function CURACT = config_JuSpace(NM, varind, CURACT, navistr)
 
 if ~isfield(CURACT,'JUSPACE'), CURACT.JUSPACE=[]; end
@@ -932,6 +926,17 @@ act = 1; while act >0, [ CURACT.ROIMEANS, act ] = ROImeans_config(CURACT.ROIMEAN
 CURACT.cmd = 'ROImeans';
 
 end
+
+% -------------------------------------------------------------------------
+function CURACT = config_customPreproc(CURACT, navistr)
+
+if ~isfield(CURACT,'CUSTOMPREPROC'), CURACT.CUSTOMPREPROC=[]; end
+if ~isfield(CURACT,'PX'), CURACT.PX = []; end
+act = 1; while act >0, [ CURACT.CUSTOMPREPROC, CURACT.PX, act ] = customPreproc_config(CURACT.CUSTOMPREPROC, CURACT.PX, navistr); end
+CURACT.cmd = 'customPreproc';
+
+end
+
 
 % -------------------------------------------------------------------------
 function [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu)
