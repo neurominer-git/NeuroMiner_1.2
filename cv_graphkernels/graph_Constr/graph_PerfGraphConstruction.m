@@ -22,10 +22,10 @@ function [Y, IN] = PerfGraphConstruction(Y, IN)
 
     if ~isempty(IN.method) 
         switch IN.method 
-%             case "KL divergence" 
-%                  if ~isempty(IN.parcellation) %&& (IN.parcellation == "Hammers.nii") 
-%                     R = graph_constructionKLS(Y, IN.method, IN.parcellation); % KLS = symmetric KL divergence method
-%                  end
+            case "KL divergence" 
+                 if ~isempty(IN.parcellation) %&& (IN.parcellation == "Hammers.nii") 
+                    R = graph_constructionKLS(Y, IN.method, IN.parcellation); % KLS = symmetric KL divergence method
+                 end
             case "Normative network + 1"
                 if ~isempty(IN.refGroup)
                     R = graph_constructionREFPLUSP(Y, IN.method, IN.refGroup, IN.simMeasure) %JBE = jackknife bias estimation method

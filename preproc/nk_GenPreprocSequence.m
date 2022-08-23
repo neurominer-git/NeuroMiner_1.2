@@ -556,7 +556,7 @@ if isfield(TemplParam,'ACTPARAM')
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
                 end
-            case 'graphConstruction'
+            case 'graphComputation'
                 if VERBOSE, fprintf('\n* COMPUTE CONNECTIVITY MATRICES OF INDIVIDUAL NETWORKS'); end
                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
@@ -564,6 +564,18 @@ if isfield(TemplParam,'ACTPARAM')
                 end
             case 'customPreproc'
                 if VERBOSE, fprintf('\n* APPLY CUSTOM PREPROCESSING STEP'); end
+                InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+                if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
+                    InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
+                end
+            case 'JuSpace'
+                if VERBOSE, fprintf('\n* JUSPACE COMPUTATION'); end
+                InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+                if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
+                    InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
+                end
+            case 'ROImeans'
+                if VERBOSE, fprintf('\n* ROI MEANS COMPUTATION'); end
                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;

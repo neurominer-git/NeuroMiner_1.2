@@ -58,10 +58,12 @@ if ~isstruct(enind)
             'rankfeat',      fl, ...
             'remvarcomp',    fl, ...
             'devmap',        fl, ...
+            'ROImeans',      fl, ...
+            'graphComputation', fl, ...
             'graphSparsity', fl, ...
             'graphMetrics', fl, ...
-            'graphComputation', fl, ...
-            'customPreproc', fl);
+            'customPreproc', fl, ...
+            'JuSpace', fl);
     else 
         EF = struct('correctnuis',       fl, ...
             'reducedim',     fl, ...
@@ -77,7 +79,8 @@ if ~isstruct(enind)
             'remmeandiff',   fl, ...
             'rankfeat',      fl, ...
             'remvarcomp',    fl, ...
-            'devmap',        fl);
+            'devmap',        fl, ...
+            'JuSpace', fl);
     end
 
 else
@@ -472,6 +475,10 @@ if modflag && ~replflag
             cmd = 19;
         case 'customPreproc'
             cmd = 20;
+        case 'JuSpace'
+            cmd = 21;
+        case 'ROImeans'
+            cmd = 22; 
     end
    
 else    
@@ -553,6 +560,10 @@ else
                     cmdstr = 'Compute individual networks from input data';                         cmdmnu = 19;
                 case 'customPreproc'
                     cmdstr = 'Add a custom preproc function (from .m-Flie)';                        cmdmnu = 20;
+                case 'JuSpace'
+                    cmdstr = 'Correlation with neurotransmitter systems (PET oder SPECT maps; JuSpace Toolbox)';                cmdmnu = 21; 
+                case 'ROImeans'
+                    cmdstr = 'Compute ROI mean values';                                             cmdmnu = 22; 
             end
             [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu);
             cmdstr =[]; cmdmnu=[];
@@ -606,6 +617,10 @@ switch cmd
         CURACT = config_graphConstruction(CURACT, navistr);
     case 20
         CURACT = config_customPreproc(CURACT, navistr);
+    case 21
+        CURACT = config_JuSpace(NM, varind, CURACT, navistr);
+    case 22
+        CURACT = config_ROImeans(NM, varind, CURACT, navistr);
 end
 
 switch replflag
@@ -882,15 +897,39 @@ function CURACT = config_graphConstruction(CURACT, navistr)
 if ~isfield(CURACT,'GRAPHCONSTRUCTION'), CURACT.GRAPHCONSTRUCTION=[]; end
 if ~isfield(CURACT,'PX'), CURACT.PX = []; end
 act = 1; while act >0, [ CURACT.GRAPHCONSTRUCTION, CURACT.PX, act ] = graphConstruction_config(CURACT.GRAPHCONSTRUCTION, CURACT.PX, navistr); end
-CURACT.cmd = 'graphConstruction';
+CURACT.cmd = 'graphComputation';
 
 end
+
 function CURACT = config_customPreproc(CURACT, navistr)
 
 if ~isfield(CURACT,'CUSTOMPREPROC'), CURACT.CUSTOMPREPROC=[]; end
 if ~isfield(CURACT,'PX'), CURACT.PX = []; end
 act = 1; while act >0, [ CURACT.CUSTOMPREPROC, CURACT.PX, act ] = customPreproc_config(CURACT.CUSTOMPREPROC, CURACT.PX, navistr); end
 CURACT.cmd = 'customPreproc';
+
+end
+
+function CURACT = config_JuSpace(NM, varind, CURACT, navistr)
+
+if ~isfield(CURACT,'JUSPACE'), CURACT.JUSPACE=[]; end
+%if ~isfield(CURACT,'PX'), CURACT.PX = []; end
+datadesc = NM.datadescriptor{varind}; brainmask = [];
+if datadesc.type, brainmask = NM.brainmask{varind}; end
+act = 1; while act >0, [ CURACT.JUSPACE, act ] = JuSpace_config(CURACT.JUSPACE, brainmask, navistr); end
+CURACT.cmd = 'JuSpace';
+
+end
+
+% -------------------------------------------------------------------------
+function CURACT = config_ROImeans(NM, varind, CURACT, navistr)
+
+if ~isfield(CURACT,'ROIMEANS'), CURACT.ROIMEANS=[]; end
+%if ~isfield(CURACT,'PX'), CURACT.PX = []; end
+datadesc = NM.datadescriptor{varind}; brainmask = [];
+if datadesc.type, brainmask = NM.brainmask{varind}; end
+act = 1; while act >0, [ CURACT.ROIMEANS, act ] = ROImeans_config(CURACT.ROIMEANS, brainmask, navistr); end
+CURACT.cmd = 'ROImeans';
 
 end
 

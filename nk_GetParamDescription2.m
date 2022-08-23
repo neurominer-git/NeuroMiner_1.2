@@ -517,7 +517,7 @@ switch action
                         case 'graphMetrics'
                             preprocact{i} = 'Compute graph metrics from connectivity matrices';
                             
-                        case 'graphConstruction'
+                        case 'graphComputation'
                             preprocact{i} = 'Construct individual networks';
                             if isfield(params.ACTPARAM{i}.GRAPHCONSTRUCTION,'method') && ~isempty(params.ACTPARAM{i}.GRAPHCONSTRUCTION.method)
                                 preprocact{i} = sprintf('%s, Method: %s', preprocact{i}, params.ACTPARAM{i}.GRAPHCONSTRUCTION.method);
@@ -525,6 +525,23 @@ switch action
 %                             preprocact{i} = sprintf('%s ]', preprocact{i});
                         case 'customPreproc'
                             preprocact{i} = sprintf('Perform custom preprocessing step. Function: %s', params.ACTPARAM{i}.CUSTOMPREPROC.filename); 
+                        
+                        case 'JuSpace'
+                            actparamAUX = params.ACTPARAM{i};
+                            if ~isempty(actparamAUX.JUSPACE.petList) 
+                                for j= 1:size(actparamAUX.JUSPACE.petList,2) 
+                                    if j == 1
+                                        PETLISTSTR = actparamAUX.JUSPACE.petList{j}.id;
+                                    else
+                                        PETLISTSTR = sprintf('%s, %s', PETLISTSTR, actparamAUX.JUSPACE.petList{j}.id);
+
+                                    end
+                                end
+                                preprocact{i} = sprintf('Compute correlations with neurotransmitter maps: %s (JuSpace Toolbox)', PETLISTSTR);
+                            end
+                        case 'ROImeans'
+                            preprocact{i} = sprintf('Compute ROI mean values. Atlas: %s', params.ACTPARAM{i}.ROIMEANS.atlas); 
+                        
                     end
                     
                 else
