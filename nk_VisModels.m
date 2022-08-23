@@ -103,6 +103,12 @@ for i = 1 : nM
         else
             pmode(i) = iVis.PERM.mode;
         end
+        if isfield(iVis.PERM,'covars_idx')
+            covidx(i) = iVis.PERM.covars_idx;
+        else
+            covidx = [];
+        end
+
         permfl(i)      = true; 
         nperms(i)      = iVis.PERM.nperms;
         compfun        = nk_ReturnEvalOperator(SVM.GridParam);
@@ -398,6 +404,7 @@ for f=1:ix % Loop through CV2 permutations
                         if isfield(inp,'CV1') && inp.CV1 == 1
                             inp.CV1p = [k,k]; inp.CV1f = [l,l];
                             fprintf('\nPreprocessing data at selected parameter combination(s) ');
+                            
                             [ ~, ~, analysis, mapY, ~, ~, Param, paramfl ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
                         end
                         
@@ -591,7 +598,7 @@ for f=1:ix % Loop through CV2 permutations
                                             for perms = 1:nperms(1)
                                                 fprintf('+');
                                                 % Train permuted model
-                                                [L_perm, Ymodel_perm]       = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms);
+                                                [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms, analysis, inp, paramfl, BINMOD, n, h, k, l, pnt, FullPartFlag, F, u);
                                                 if isfield(mapY,'VI')
                                                     [~, MD_perm{perms}]     = nk_GetParam2(Ymodel_perm, L_perm, sPs, 1, mapY.VI{k,l}{hix}{u});
                                                 else
@@ -599,7 +606,7 @@ for f=1:ix % Loop through CV2 permutations
                                                 end
                                                 % Compute permuted weight vector in feature space
                                                 [~,~,~,~,~,Vx_perm(:, perms)] = nk_VisXWeight(inp, MD_perm{perms}, Ymodel_perm, ...
-                                                                                L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, false);
+                                                    L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, false);
                                             end
                                             % Determine significance by comparing observed weight vector
                                             % against null distribution of permuted models' weight vectors
@@ -630,7 +637,7 @@ for f=1:ix % Loop through CV2 permutations
                                         for perms = 1:nperms(1)
                                             if ~sigfl 
                                                 % Train permuted model
-                                                [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms);
+                                                [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms, analysis, inp, paramfl, BINMOD, n, h, k, l, pnt, FullPartFlag, F, u);
                                                   if isfield(mapY,'VI')
                                                       [~, MDs] = nk_GetParam2(Ymodel_perm, L_perm, sPs, 1, mapY.VI{k,l}{hix}{u} );
                                                   else

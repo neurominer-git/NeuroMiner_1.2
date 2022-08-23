@@ -67,6 +67,8 @@ if ~defaultsfl
                         permmodestr = ': features';
                     case 3
                         permmodestr = ': labels && features';
+                    case 4
+                        permmodestr = ': covariate(s)';
                 end
             else
                 VIS.PERM.mode = 3;  permmodestr = ': labels && features';
@@ -133,7 +135,16 @@ if ~defaultsfl
                 else
                     VIS.PERM.sigflag = 0; 
                 end
-                VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features',1:3,VIS.PERM.mode);
+                if isfield(NM,'covars') && ~isempty(NM.covars)
+                    VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features|Covariate(s)',1:4,VIS.PERM.mode);
+                else 
+                    VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features',1:3,VIS.PERM.mode);
+                end
+
+                if VIS.PERM.mode == 4
+                    if ~isfield(VIS.PERM, 'covars_idx') || isempty(VIS.PERM.covars_idx), VIS.PERM.covars_idx = 1; end;
+                    VIS.PERM.covars_idx = nk_SelectCovariateIndex(NM,VIS.PERM.covars_idx,1);
+                end
             end
         case 8
             if VIS.norm == 1, VIS.norm = 2; else, VIS.norm = 1; end

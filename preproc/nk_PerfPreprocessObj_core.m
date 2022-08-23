@@ -217,6 +217,7 @@ for i=1:nact
                         ActParam = rmfield(ActParam,'opt');
                     end
                     if paramfl, llTrParam = TrParami{kl,nl}; else, llTrParam = []; end
+                    
                     [ SrcParam, Out, TrParamij{kl,nl}, ActParam ] = feval( funcstr, SrcParam, InputParamj, TrParam, llTrParam, ActParam );
                     Tr{kl,nl} = Out.Tr;
                     if adasynfl, TrainLabelSyn{kl,nl} = SrcParam.TrainLabelSyn{ActParam.j}; CovarSyn{kl,nl} = SrcParam.covarsSyn{ActParam.j}; end
@@ -956,7 +957,7 @@ end
 
 
 
-function [SrcParam, InputParam, TrParami, actparam ] = act_graphConstruction(SrcParam, InputParam, ~, TrParami, actparam)
+function [SrcParam, InputParam, TrParami, actparam ] = act_graphComputation(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -1003,6 +1004,55 @@ elseif trfl
 end
 
 if tsproc, InputParam.Ts = perfCustomPreproc(InputParam.Ts, TrParami); end
+end
+% =========================================================================
+
+function [SrcParam, InputParam, TrParami, actparam ] = act_JuSpace(SrcParam, InputParam, ~, TrParami, actparam)
+global VERBOSE
+trfl    = actparam.trfl;
+tsfl    = actparam.tsfl;
+paramfl = actparam.paramfl;
+i       = actparam.i;
+tsproc  = false;  
+
+if isfield(actparam,'opt')
+    InputParam.P{i}.JUSPACE.p = actparam.opt;
+end
+
+if paramfl && tsfl 
+     tsproc = true;
+elseif trfl
+    if VERBOSE;fprintf('\tJuSpace function ...'); end
+    [InputParam.Tr, TrParami] = perfJuSpace(InputParam.Tr, InputParam.P{i}.JUSPACE);
+
+    if tsfl, tsproc = true; end
+end
+
+if tsproc, InputParam.Ts = perfJuSpace(InputParam.Ts, TrParami); end
+end
+% =========================================================================
+function [SrcParam, InputParam, TrParami, actparam ] = act_ROImeans(SrcParam, InputParam, ~, TrParami, actparam)
+global VERBOSE
+trfl    = actparam.trfl;
+tsfl    = actparam.tsfl;
+paramfl = actparam.paramfl;
+i       = actparam.i;
+tsproc  = false;  
+
+if isfield(actparam,'opt')
+    InputParam.P{i}.ROIMEANS.p = actparam.opt;
+end
+
+if paramfl && tsfl 
+     tsproc = true;
+elseif trfl
+    if VERBOSE;fprintf('\tROI means computation ...'); end
+    [InputParam.Tr, TrParami] = perfROImeans(InputParam.Tr, InputParam.P{i}.ROIMEANS);
+
+    if tsfl, tsproc = true; end
+end
+
+if tsproc, InputParam.Ts = perfROImeans(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 function [InputParam, SrcParam] = perform_adasyn(InputParam, SrcParam)

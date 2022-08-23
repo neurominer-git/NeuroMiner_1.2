@@ -34,7 +34,7 @@ function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P
 % (c) Nikolaos Koutsouleris, 05/2022
 
 global SVM %TEMPL
-
+if ~exist('memprob','var') || isempty(memprob), memprob = false; end % to fix bug report
 if ~exist('procfl','var') || isempty(procfl), procfl = true; end
 if ~exist('Fadd','var') || isempty(Fadd), Fadd = true(size(F)); end
 mPA = []; PA = []; warning off

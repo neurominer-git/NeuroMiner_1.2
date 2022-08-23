@@ -224,6 +224,90 @@ if fromData
         xNM.Y{1,1} = M;
         xNM.analysis{1,varargin{1,4}}.params.TrainParam.FUSION.M = 1;
         xNM.label = L;
+        origCV2LCO = []; 
+        if isfield(RAND,'CV2LCO')
+            origCV2LCO = sort(RAND.CV2LCO.ind); 
+            groups = unique(origCV2LCO);
+            nGroups = length(groups);
+            origN = length(origCV2LCO);
+            simCV2LCO = [];
+            for i=1:nGroups
+                groupN = sum(origCV2LCO == groups(i));
+                propGroup = groupN/origN;
+                simGroupN = round(nc*propGroup);
+                simGroupV = repelem(groups(i), simGroupN);
+                simCV2LCO = [simCV2LCO, simGroupV];
+            end
+            % check whether simCV2LCO == nc, could be slightly different
+            % due to rounding
+            if length(simCV2LCO) > nc
+                % delete one group member for as long as necessary to get
+                % the vector to the required size
+                dif = length(simCV2LCO)-nc;
+                
+                for i = 1:dif 
+                    group = groups(i);
+                    groupIDXs = find(simCV2LCO == group);
+                    rmIDX = groupIDXs(end);
+                    simCV2LCO(rmIDX) = [];
+                end
+                 
+            elseif length(simCV2LCO) < nc
+                % add one group member for as long as necessary to get
+                % the vector to the required size 
+                dif = nc-length(simCV2LCO);
+                for i = 1:dif 
+                    group = groups(i);
+                    simCV2LCO(end+1) = group;
+                end
+             
+            end
+
+        end
+        RAND.CV2LCO.ind = simCV2LCO;
+        origCV1LCO = []; 
+        if isfield(RAND,'CV1LCO')
+            origCV1LCO = sort(RAND.CV1LCO.ind); 
+            groups = unique(origCV1LCO);
+            nGroups = length(groups);
+            origN = length(origCV1LCO);
+            simCV1LCO = [];
+            for i=1:nGroups
+                groupN = sum(origCV1LCO == groups(i));
+                propGroup = groupN/origN;
+                simGroupN = round(nc*propGroup);
+                simGroupV = repelem(groups(i), simGroupN);
+                simCV1LCO = [simCV1LCO, simGroupV];
+            end
+            % check whether simCV2LCO == nc, could be slightly different
+            % due to rounding
+            if length(simCV1LCO) > nc
+                % delete one group member for as long as necessary to get
+                % the vector to the required size
+                dif = length(simCV1LCO)-nc;
+                
+                for i = 1:dif 
+                    group = groups(i);
+                    groupIDXs = find(simCV1LCO == group);
+                    rmIDX = groupIDXs(end);
+                    simCV1LCO(rmIDX) = [];
+                end
+                 
+            elseif length(simCV1LCO) < nc
+                % add one group member for as long as necessary to get
+                % the vector to the required size 
+                dif = nc-length(simCV1LCO);
+                for i = 1:dif 
+                    group = groups(i);
+                    simCV1LCO(end+1) = group;
+                end
+             
+            end
+
+        end
+        RAND.CV1LCO.ind = simCV1LCO;
+        
+       
         simCV = nk_MakeCrossFolds(L, RAND, xNM.modeflag,[], xNM.groupnames, [], 0);
         xNM.cv = simCV;
         xCV = simCV;
