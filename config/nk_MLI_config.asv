@@ -169,7 +169,6 @@ if ~defaultsfl
     OcclusionAtlasCSVID = '';
     OcclusionAtlasCSVCol = '';
     OcclusionAtlasCSVFile = '';
-    OcclusionAtlasCSVFileRead = '';
     if isimaging
         if ~MLIatlasflag
             OcclusionAtlasFlag = '|Bind data modification to neuroanatomical atlas [ no ]' ; 
@@ -187,14 +186,15 @@ if ~defaultsfl
             end
             OcclusionAtlasFlag =    '|Bind data modification to neuroanatomical atlas [ yes ]|' ;
             OcclusionAtlasImgFile =  [ 'Define & import atlas imaging file [ ' AtlasFilename Filename_ext ' ]|' ];
-            OcclusionAtlasCSVFile =  [ 'Define atlas descriptor file [ ' AtlasCSVname CSVname_ext ' ]|' ];
+            OcclusionAtlasCSVFile =  [ 'Define atlas descriptor file [ ' AtlasCSVname CSVname_ext ' ]' ];
             OcclusionAtlasCSVDelim = [ 'Define delimiter used in atlas descriptor file [ ' char(MLIcsvdelim) ' ]|' ];
-            OcclusionAtlasCSVID =    [ 'Define ID column in atlas descriptor file [ ' MLIcsvid ' ]' ];
-            OcclusionAtlasCSVCol =   [ '|Define descriptor column in atlas descriptor file [ ' MLIcsvcol ' ]' ];
+            OcclusionAtlasCSVID =    [ 'Define ID column in atlas descriptor file [ ' MLIcsvid ' ]|' ];
+            OcclusionAtlasCSVCol =   [ 'Define descriptor column in atlas descriptor file [ ' MLIcsvcol ' ]|' ];
             if ~strcmp(MLIcsvfile,'undefined')
                 OcclusionAtlasCSVFileRead = '|Import atlas descriptor file';
                 mnuact = [ mnuact 13:19 ];
             else
+                OcclusionAtlasCSVFileRead = '';
                 mnuact = [ mnuact 13:18 ];
             end
             
@@ -222,13 +222,8 @@ if ~defaultsfl
               OcclusionAtlasCSVFileRead ];
     
     nk_PrintLogo
-    if isfield(MLI.Modality{M},'imgops') && MLI.Modality{M}.imgops.flag && ~isempty(MLIcsvfile) && isfield(MLI.Modality{M}.imgops,'T') 
-        if isfield(MLI.Modality{M}.imgops,'csvnum') && ~isempty(MLI.Modality{M}.imgops.csvnum)
-            fprintf('\nFirst line of atlas descriptor file [imported]: %s\n\n', MLIcsvfile); 
-        else
-            fprintf('\nFirst line of atlas descriptor file: %s\n\n', MLIcsvfile); 
-        end
-        disp(MLI.Modality{M}.imgops.T(1,:));
+    if ~isempty(MLIcsvfile)
+        MLI.Modality{M}.imgops.T
     end
     if M>1
         mestr = sprintf('Model interpretation parameters [ Modality #%g: %s ]', M, NM.datadescriptor{M}.desc) ; 
@@ -325,12 +320,6 @@ if ~defaultsfl
             MLIcsvdelimopts = {';',',','tab','space'};
             MLIcsvdelim = spm_input('Choose the delimiter', 0, 'm', strjoin(MLIcsvdelimopts,'|'), ...
                 MLIcsvdelimopts, find(strcmp(MLIcsvdelimopts,MLIcsvdelim)));
-            try
-                 MLI.Modality{M}.imgops.T = readtable(MLIcsvfile, 'Delimiter', MLIcsvdelim);
-            catch ERR
-                errordlg(sprintf('The atlas descriptor file %s could not be read!\nError: %s\nCheck your settings!', ...
-                    MLIcsvfile, ERR.message), 'MLI configuration module');
-            end
         case 17
             MLIcsvid = spm_input('Define the name of the table column containing the ROI indices', 0,'s', MLIcsvid);
         case 18
