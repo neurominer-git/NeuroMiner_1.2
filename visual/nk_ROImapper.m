@@ -1,5 +1,5 @@
 function [vROI, tROI, yROI, yT] = ...
-    nk_aal_volume_roi(Pimg, Paddimg, ROIimg, ROIlist, MNIlist_index, MNIlist_labels, options)
+    nk_ROImapper(Pimg, Paddimg, ROIimg, ROIlist, MNIlist_index, MNIlist_labels, options)
 % =========================================================================
 % function [vROI, tROI, yROI, yT] = ...
 %                      nk_aal_volume_roi(Pimg, Paddimg, ...
@@ -59,7 +59,7 @@ function [vROI, tROI, yROI, yT] = ...
 % yROI :            the univariate analysis struct array
 % yT :              the univariate results table
 % *************************************************************************
-% (c) Nikolaos Koutsouleris, 05/2022
+% (c) Nikolaos Koutsouleris, 08/2022
 
 if ~exist("ROIimg","var") || isempty(ROIimg)
     ROIimg = spm_select(1,'image','Select labeled atlas image');
@@ -101,7 +101,6 @@ if ~exist("Paddimg","var") || isempty(Paddimg)
         end
     end
 end
-
 
 patternnames = cellstr([repmat('P', nP, 1) num2str((1:nP)')]);
 ROIsel = true(1,nROI);
@@ -313,7 +312,7 @@ if saving && nargout > 1
     end
     M(delvec,:) = [];
     tROI = cell2table(M, 'VariableNames', H);
-    writetable(tROI, options.name, 'FileType','spreadsheet', 'Sheet', 'Vol2ROIparc-Main');
+    writetable(tROI, fullfile(options.name, options.pattern_name), 'FileType', 'spreadsheet', 'Sheet', 'Vol2ROIparc-Main');
 end
 
 if nargout > 2 && isfield(options,'data') && ( numel(options.data) == nP || numel(options.data) == 1 )

@@ -22,7 +22,7 @@ function varargout = nk_PrintResults2(varargin)
 
 % Edit the above text to modify the response to help nk_PrintResults2
 
-% Last Modified by GUIDE v2.5 01-Aug-2022 13:35:07
+% Last Modified by GUIDE v2.5 25-Aug-2022 10:50:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1370,3 +1370,11 @@ function spiderPlotButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 appSpiderPlot(handles);
+
+
+% --- If Enable == 'on', executes on mouse press in 5 pixel border.
+% --- Otherwise, executes on mouse press in 5 pixel border or over spiderPlotButton.
+function spiderPlotButton_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to spiderPlotButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
