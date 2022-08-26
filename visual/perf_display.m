@@ -58,14 +58,12 @@ load_selCVoocv(handles)
 load_selModelMeasures(handles)
 load_selSubParams(handles)
 
-if ~isempty(visdata), 
+if ~isempty(visdata)
     load_selModality(handles); 
     load_selPager(handles); 
 else
     handles.selModelMeasures.Value = 1;
 end
-
-
 
 if isfield(handles,'MultiClass'), load_selOneVsAll_Info(handles); end
 handles = display_main(handles);

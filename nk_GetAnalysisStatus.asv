@@ -16,17 +16,15 @@ Status.analyses_visualized = [];
 Status.analyses_imaging    = [];
 
 if isfield(NM,'analysis')
-    
     n_anal = numel(NM.analysis);
-    Status.completed_analyses       = false(1,n_anal);
-    Status.isequal_cv               = false(1,n_anal);
-    Status.nmodal_analyses          = zeros(1,n_anal);
-    Status.sequence_analyses        = false(1,n_anal);
-    Status.stacking_analyses        = false(1,n_anal);
-    Status.n_inputanalyses          = zeros(1,n_anal);
-    Status.analyses_visualized      = false(1,n_anal);
-    Status.analyses_imaging         = cell(1,n_anal);
-
+    Status.completed_analyses = false(1,n_anal);
+    Status.isequal_cv = false(1,n_anal);
+    Status.nmodal_analyses = zeros(1,n_anal);
+    Status.sequence_analyses = false(1,n_anal);
+    Status.stacking_analyses = false(1,n_anal);
+    Status.n_inputanalyses = zeros(1,n_anal);
+    Status.analyses_visualized = false(1,n_anal);
+    Status.analyses_imaging    = cell(1,n_anal);
     for i = 1:n_anal
         % Completed analyses
         if NM.analysis{i}.status
@@ -84,8 +82,6 @@ if isfield(NM,'analysis')
         for j=1:nM
             if strcmp(NM.analysis{i}.params.datadescriptor{j}.source,'image')
                 Status.analyses_imaging{i} = [ Status.analyses_imaging{i}  Modality(j)];
-            else
-                Status.analyses_imaging{i} = [];
             end
         end
     end
