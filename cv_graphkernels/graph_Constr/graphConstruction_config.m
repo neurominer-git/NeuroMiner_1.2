@@ -12,7 +12,7 @@ if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 if ~defaultsfl
     if isempty(GRAPHCONSTRUCTION), [GRAPHCONSTRUCTION, PX] = graphConstruction_config(GRAPHCONSTRUCTION, PX, parentstr, true); end
     if isfield(GRAPHCONSTRUCTION,'method'), ConstructionMethod = GRAPHCONSTRUCTION.method; end
-    % if isfield(GRAPHCONSTRUCTION,'parcellation'), ParcellationAtlas = GRAPHCONSTRUCTION.parcellation; end
+    if isfield(GRAPHCONSTRUCTION,'parcellation'), ParcellationAtlas = GRAPHCONSTRUCTION.parcellation; end
     %if isfield(GRAPHCONSTRUCTION, 'variableTypes'), VariableTypesVec = GRAPHCONSTRUCTION.variableTypes; end
     if isfield(GRAPHCONSTRUCTION, 'refGroup'), ReferenceGroup = GRAPHCONSTRUCTION.refGroup; end
     if isfield(GRAPHCONSTRUCTION,'simMeasure'), SimilarityMeasure = GRAPHCONSTRUCTION.simMeasure; end
@@ -118,7 +118,7 @@ if ~defaultsfl
 %                     GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas variable name in Matlab workspace',0,'e');
 %                 case 1
             GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
-            
+            %ParcellationAtlas = GRAPHCONSTRUCTION.parcellation;
             %
             %                 case 'Normative network + 1'
             % %                     readVarT = nk_input('Read in variable types externally', 0, 'mq', ...

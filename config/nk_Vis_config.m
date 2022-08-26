@@ -1,5 +1,5 @@
 function [VIS, act] = nk_Vis_config(VIS, PREPROC, M, defaultsfl, parentstr)
-global NM 
+global NM EXPERT
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 if ~exist('M','var') || isempty(M), M=1; end
@@ -135,7 +135,7 @@ if ~defaultsfl
                 else
                     VIS.PERM.sigflag = 0; 
                 end
-                if isfield(NM,'covars') && ~isempty(NM.covars)
+                if isfield(NM,'covars') && ~isempty(NM.covars) && EXPERT 
                     VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features|Covariate(s)',1:4,VIS.PERM.mode);
                 else 
                     VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features',1:3,VIS.PERM.mode);

@@ -1134,7 +1134,11 @@ switch act
             end
         end
         try
-            [t_selFeats,t_selCases] = nk_ItemSelectorApp('List', F, 'Matrix', M, 'Cases',ID, 'selFeats', selFeats, 'selCases', selCases, 'mode', mode);
+            if isMATLABReleaseOlderThan("R2021a")
+                [t_selFeats,t_selCases] = nk_ItemSelector('List', F, 'Matrix', M, 'Cases',ID, 'selFeats', selFeats, 'selCases', selCases, 'mode', mode);
+            else
+                [t_selFeats,t_selCases] = nk_ItemSelectorApp('List', F, 'Matrix', M, 'Cases',ID, 'selFeats', selFeats, 'selCases', selCases, 'mode', mode);
+            end
         catch
             t_selFeats = []; t_selCases=[];
         end
