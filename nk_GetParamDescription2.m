@@ -508,7 +508,7 @@ switch action
                             preprocact{i} = sprintf('Deviation-based weighting [ %s: %s%s ]', params.ACTPARAM{i}.DEVMAP.algostr, covsizeextr, grpstr);
                         case 'graphSparsity' % CHANGE SPARSITY
                 
-                            preprocact{i} = 'Apply sparsity threshold to conenctivity matrices [';
+                            preprocact{i} = 'Apply sparsity threshold to connectivity matrices [';
                        
                             if isfield(params.ACTPARAM{i}.GRAPHSPARSITY,'perc') && ~isempty(params.ACTPARAM{i}.GRAPHSPARSITY.perc)
                                 preprocact{i} = sprintf('%s, %s ]', preprocact{i}, nk_ConcatParamstr(params.ACTPARAM{i}.GRAPHSPARSITY.perc));

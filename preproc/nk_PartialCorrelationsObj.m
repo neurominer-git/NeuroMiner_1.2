@@ -98,7 +98,7 @@ end
 
 if interceptflag
     %fprintf(' ... adding intercept to covariate matrix')
-    IN.G = [intercept IN.G];
+    IN.G = [intercept IN.];
 end
 
 if eIN || ~isfield(IN,'beta') || isempty(IN.beta), 

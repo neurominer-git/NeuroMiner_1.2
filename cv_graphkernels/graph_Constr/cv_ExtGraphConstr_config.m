@@ -10,7 +10,7 @@ if ~defaultsfl
     mn_str = []; ParcellationAtlasStr = {'Hammers','Schaeffer100'}; mn_act=[];
     switch ConstructionMethod
         case {'KL divergence'}
-            mn_str = [mn_str sprintf('Define atlas for for %s [ %s ]|',ConstructionMethod, ParcellationAtlasStr{ParcellationAtlas})]; mn_act = 1;
+            mn_str = [mn_str sprintf('Define atlas for %s [ %s ]|',ConstructionMethod, ParcellationAtlasStr{ParcellationAtlas})]; mn_act = 1;
         case {'alternative'}
             ParcellationAtlas = 1; L = NM.label; L(isnan(L))=[]; act=0; return
         otherwise

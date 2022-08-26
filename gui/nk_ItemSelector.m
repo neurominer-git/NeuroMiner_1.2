@@ -22,7 +22,7 @@ function varargout = nk_ItemSelector(varargin)
 
 % Edit the above text to modify the response to help nk_ItemSelector
 %nk_ItemSelector_OpeningFcn(nk_ItemSelector_App, varargin);
-nk_ItemSelector_App;
+%nk_ItemSelector_App;
 % Last Modified by GUIDE v2.5 02-Jun-2017 16:09:31
 
 % Begin initialization code - DO NOT EDIT
