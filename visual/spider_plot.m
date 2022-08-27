@@ -1043,9 +1043,6 @@ else
     hold(axes_object, 'on')
 end
 
-% Axis limits
-
-
 % Axis properties
 ax.XTickLabel = [];
 ax.YTickLabel = [];
@@ -1306,7 +1303,7 @@ for ii = 1:theta_end_index
             text_str = axes_tick_labels{jj-axes_offset};
         end
 
-        t = text(x_axes(jj), y_axes(jj), text_str,...
+        t = text(ax, x_axes(jj), y_axes(jj), text_str,...
             'Units', 'Data',...
             'Color', axes_font_color,...
             'FontName', axes_font,...
