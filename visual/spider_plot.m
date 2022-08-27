@@ -1,4 +1,4 @@
-function varargout = spider_plot(P, varargin)
+function [p, ps] = spider_plot(P, varargin)
 %spider_plot Create a spider or radar plot with individual axes.
 %
 % Syntax:
@@ -1335,17 +1335,17 @@ for ii = 1:num_data_groups
     y_circular = [y_points, y_points(1)];
 
     % Plot data points
-    h = plot(ax, x_circular, y_circular,...
+    p(ii) = plot(ax, x_circular, y_circular,...
         'LineStyle', line_style{ii},...
         'Color', colors(ii, :),...
         'LineWidth', line_width(ii),...
         'Visible', plot_visible);
-    h.Color(4) = line_transparency(ii);
+    p(ii).Color(4) = line_transparency(ii);
 
     % Turn off legend annotation
-    h.Annotation.LegendInformation.IconDisplayStyle = 'off';
+    p(ii).Annotation.LegendInformation.IconDisplayStyle = 'off';
 
-    h = scatter(x_circular, y_circular,...
+    ps(ii) = scatter(x_circular, y_circular,...
         'Marker', marker_type{ii},...
         'SizeData', marker_size(ii),...
         'MarkerFaceColor', colors(ii, :),...
@@ -1355,7 +1355,7 @@ for ii = 1:num_data_groups
         'Visible', plot_visible);
 
     % Turn off legend annotation
-    h.Annotation.LegendInformation.IconDisplayStyle = 'off';
+    ps(ii).Annotation.LegendInformation.IconDisplayStyle = 'off';
 
     % Plot empty line with combined attributes for legend
     plot(ax, nan, nan,...

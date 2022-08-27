@@ -98,10 +98,10 @@ end
 
 if interceptflag
     %fprintf(' ... adding intercept to covariate matrix')
-    IN.G = [intercept IN.];
+    IN.G = [intercept IN.G];
 end
 
-if eIN || ~isfield(IN,'beta') || isempty(IN.beta), 
+if eIN || ~isfield(IN,'beta') || isempty(IN.beta) 
     if ~isfield(IN,'subgroup') || isempty(IN.subgroup)
         % Compute IN.beta from entire population
         IN.beta = pinv(IN.G) * Y; 
