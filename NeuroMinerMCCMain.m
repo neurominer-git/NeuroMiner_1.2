@@ -14,6 +14,8 @@ switch action
         nk_VisModels_batch(paramfile)
     case 'oocv'
         nk_OOCV_batch(paramfile)
+	case 'mli'
+		nk_MLInterpreter_batch(paramfile)
     otherwise
-        nm nosplash 
+        error('Action not available')
 end        

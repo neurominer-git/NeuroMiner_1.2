@@ -1,16 +1,20 @@
 #!/bin/bash 
 echo
 echo '****************************************'
-echo '*** NeuroMiner 0.998 (aragorn)       ***'
+echo '*** NeuroMiner Beorn                 ***'
 echo '*** SGE joblist manager:             ***'
-echo '*** Visualize models                 ***'
-echo '*** (c) 2017 N. Koutsouleris         ***'
+echo '*** Interpret model predictions      ***'
+echo '*** (c) 2022 N. Koutsouleris         ***'
+echo '****************************************'
+echo '          NM VERSION 1.10 		      '
 echo '****************************************'
 echo   
-export JOB_DIR=$PWD
-export NEUROMINER=/opt/NM/NeuroMinerMCCMain/for_testing 
-export ACTION=visualize
 
+# matlab R2018b was used to compile which is the v95 runtime. This needs to be updated if a different compiler is used. 
+export LD_LIBRARY_PATH=/opt/matlab/v95/runtime/glnxa64:/opt/matlab/v95/bin/glnxa64:/opt/matlab/v95/sys/os/glnxa64:/opt/matlab/v95/sys/
+export JOB_DIR=$PWD
+export NEUROMINER=/opt/NM/NeuroMinerMCCMain_1.10_alpha_v95/for_testing 
+export ACTION=mli
 read -e -p 'Path to NM structure: ' datpath
 if [ ! -f $datpath ]; then
  	echo $datpath' not found.'
@@ -48,24 +52,22 @@ if [ "$analind" = '' ] ; then
 	echo 'An analysis index is mandatory! Exiting program.'
 	exit   
 fi
-read -p 'Is the selected analysis a multi-group analysis [ 1 = yes, 2 = no ] ' MULTI
-if [ "$MULTI" = '1' ] ; then
-   read -p 'Visualize at models at multi-group optima [ 1 = yes, 2 = no ] ' multiflag
-else
-   multiflag=2
+read -p 'Index to independent data container (NM.OOCV{<index>} [0 => MLI will run in the discovery data, default]): ' oocvind
+if [ "$oocvind" = '' ] ; then
+	oocvind=0
 fi
 export optmodelspath=NaN 
 export optparamspath=NaN 
-read -p 'Save optimized preprocessing parameters and models to disk for future use [ 1 = yes, 2 = no ] ' saveparam
+read -p 'Save optimized preprocessing parameters and models to disk for future use [ 1 = yes, 2 = no ]: ' saveparam
 if [ "$saveparam" = '2' ] ; then
-  read -p 'Load optimized preprocessing parameters and models from disk [ 1 = yes, 2 = no ] ' loadparam
+  read -p 'Load optimized preprocessing parameters and models from disk [ 1 = yes, 2 = no ]: ' loadparam
   if [ "$loadparam" = '1' ] ; then
-    read -e -p 'Path to OptPreprocParam master file ' optparamspath
+    read -e -p 'Path to OptPreprocParam master file: ' optparamspath
     if [ ! -f $optparamspath ] ; then
 	    echo $optparamspath' not found.'
 	    exit
     fi
-    read -e -p 'Path to OptModels master file ' optmodelspath
+    read -e -p 'Path to OptModels master file: ' optmodelspath
     if [ ! -f $optmodelspath ] ; then
 	    echo $optmodelspath' not found.'
 	    exit
@@ -74,6 +76,11 @@ if [ "$saveparam" = '2' ] ; then
 else
   loadparam=2
 fi
+read -p 'Recompute interpretations based on predictions [ 1 = yes, 2 = no, default ]: ' reestimateflag
+if [ "$reestimateflag" = '' ] ; then
+	reestimateflag=2
+fi
+
 read -p 'CV2 grid start row: ' CV2x1
 read -p 'CV2 grid end row: ' CV2x2
 read -p 'CV2 grid start column: ' CV2y1
@@ -82,28 +89,21 @@ read -p 'No. of SGE jobs: ' numCPU
 read -p 'Server to use [any=1, psy0cf20=2, mitnvp1=3]: ' sind
 if [ "$sind" = '1' ]; then
         SERVER_ID='all.q'
-        echo "WARNING: if it is a high RAM job then please use psy0cf20"
+        echo "Please estimate RAM accurately"
 elif [ "$sind" = '2' ]; then
         SERVER_ID='psy0cf20'
         echo "Please estimate RAM accurately"
 elif [ "$sind" = '3' ]; then
-        SERVER_ID='mitnvp1'
-        echo "WARNING: if it is a high RAM job then please use psy0cf20"
+        SERVER_ID='mitnvp1-2'
+        echo "Please estimate RAM accurately"
 else
         echo "Enter a number between 1-3"
 fi
-read -p 'xxxx MB RAM / SGE job: ' MB
-MB=$MB'M'
-# read -p 'Matlab version [1 = default (R2009B) | 2 = matlab/R2007B | 3 = matlab/R2008A | 4 = matlab/R2009A]: ' matl
-# if [ "$matl" = '1' ] ; then
-# 	matl=matlab/R2009B
-# elif [ "$matl" = '2' ] ; then
-# 	matl=matlab/R2007B
-# elif [ "$matl" = '3' ] ; then
-# 	matl=matlab/R2008A
-# elif [ "$matl" = '4' ] ; then
-# 	matl=matlab/R2009A
-# fi
+read -p 'Enter "Max vmem" in GB from email sent from a test run of a single fold: ' GB
+HALFGB=$(($GB / 2))
+vGB=$(($GB + $HALFGB))'G'
+mGB=$GB'G'
+
 read -p 'Use OpenMP [yes = 1 | no = 0]: ' pLibsvm
 if [ "$pLibsvm" = '1' ] ; then
 	read -p 'Specify number of CPUs assigned to MATLAB job [4, 8, 16, 32]: ' pnum
@@ -125,9 +125,10 @@ cat > $ParamFile <<EOF
 $NEUROMINER
 $datpath
 $analind
-$multiflag
+$oocvind
 $saveparam
 $loadparam
+$reestimateflag
 $optparamspath
 $optmodelspath
 $curCPU
@@ -143,10 +144,11 @@ cat > $SGEFile <<EOF
 #\$-N nm$ACTION$SD
 #\$-S /bin/bash
 #\$-M $EMAIL
-#\$-m ae
-#\$-l mem_total=$MB
+#\$-l mem_total=$mGB
+#\$-l h_vmem=$vGB
 #\$-q $SERVER_ID
 $PMODE
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 export OMP_NUM_THREADS=$pnum
 cd $NEUROMINER 
 ./NeuroMinerMCCMain $ACTION $ParamFile
@@ -154,6 +156,6 @@ EOF
 chmod u+x $SGEFile
 datum=`date +"%Y%m%d"`
 if [ "$todo" = 'y' -o "$todo" = 'Y' ] ; then
-qsub $SGEFile >> NeuroMiner_VisModels_$datum.log
+qsub $SGEFile >> NeuroMiner_MLI_$datum.log
 fi
 done

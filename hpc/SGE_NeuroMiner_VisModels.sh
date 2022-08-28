@@ -1,20 +1,17 @@
 #!/bin/bash 
 echo
 echo '****************************************'
-echo '*** NeuroMiner Elessar	           ***'
+echo '*** NeuroMiner Beorn	               ***'
 echo '*** SGE joblist manager:             ***'
 echo '*** Visualize models                 ***'
 echo '*** (c) 2021 N. Koutsouleris         ***'
 echo '****************************************'
 echo '           VERSION 1.10 Alpha	      '	
-echo '     This is the Experimental version.  '
-echo '         Expect bugs and report         '
 echo '****************************************'
 echo   
 
 # compiled with matlab R2018b so MCR main is v95. Needs to change if different MCR is used.
 export LD_LIBRARY_PATH=/opt/matlab/v95/runtime/glnxa64:/opt/matlab/v95/bin/glnxa64:/opt/matlab/v95/sys/os/glnxa64:/opt/matlab/v95/sys/opengl/lib/glnxa64
-
 export JOB_DIR=$PWD
 export NEUROMINER=/opt/NM/NeuroMinerMCCMain_1.10_alpha_v95/for_testing 
 export ACTION=visualize

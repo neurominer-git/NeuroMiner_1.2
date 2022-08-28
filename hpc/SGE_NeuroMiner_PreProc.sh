@@ -1,15 +1,12 @@
 #!/bin/bash 
 echo
 echo '****************************************'
-echo '*** NeuroMiner Elessar DEV           ***'
+echo '*** NeuroMiner Beorn           	   ***'
 echo '*** SGE joblist manager:             ***'
 echo '*** Preprocess features              ***'
-echo '*** (c) 2017 N. Koutsouleris         ***'
-echo '*** Updated Mar2021: Dom             ***'
+echo '*** (c) 2022 N. Koutsouleris         ***'
 echo '****************************************'
-echo '           VERSION 1.10 Alpha	      '	
-echo '     This is the Experimental version.  '
-echo '         Expect bugs and report         '
+echo '           VERSION 1.10 	          	  '	
 echo '****************************************'
 echo   
 
