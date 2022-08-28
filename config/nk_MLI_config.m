@@ -222,7 +222,8 @@ if ~defaultsfl
               OcclusionAtlasCSVFileRead ];
     
     nk_PrintLogo
-    if isfield(MLI.Modality{M},'imgops') && MLI.Modality{M}.imgops.flag && ~isempty(MLIcsvfile) && isfield(MLI.Modality{M}.imgops,'T') 
+    if isfield(MLI.Modality{M},'imgops') && ~isempty(MLI.Modality{M}.imgops) && ...
+            MLI.Modality{M}.imgops.flag && ~isempty(MLIcsvfile) && isfield(MLI.Modality{M}.imgops,'T') 
         if isfield(MLI.Modality{M}.imgops,'csvnum') && ~isempty(MLI.Modality{M}.imgops.csvnum)
             fprintf('\nFirst line of atlas descriptor file [imported]: %s\n\n', MLIcsvfile); 
         else

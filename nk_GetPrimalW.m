@@ -20,6 +20,7 @@ switch SVM.prog
         
     case 'LIBLIN'
         w = model.w;
+        
     case 'MSTOOL'
         w = model.w(2:end)';
 

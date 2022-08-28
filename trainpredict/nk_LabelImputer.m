@@ -7,7 +7,7 @@ if IMPUTE.flag
         if strcmp(IMPUTE.method,'ml')
             % Do ML-based label propagation by means of the user-defined
             % algo
-            indf = ~isnan(L(:,i));
+            indf = ~isnan(L(:,i)) & IND;
             X_tr = X(indf,:); L_tr = L(indf,i); X_ts = X(~indf,:); L_ts = zeros(sum(~indf),1);
             [~, model] = nk_GetParam2( X_tr, L_tr, Params, 1); 
             L(~indf,i)= PREDICTFUNC(X_tr, X_ts, L_ts, model);
