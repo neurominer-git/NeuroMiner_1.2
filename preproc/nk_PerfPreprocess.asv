@@ -178,19 +178,12 @@ for k=sta_iy:stp_iy % Inner permutation loop
 
             if optfl
                 usY = sY{u}; 
-                if ~isempty(Yocv)
+                if ~isempty(Yocv), 
                     if multoocv
-                        usYocv = cell(1,numel(sYocv));
-                        for n=1:numel(sYocv)
-                            usYocv{n} = sYocv{n}{u};
-                        end
-                    else
                         usYocv = sYocv{u}; 
-                    end
+                        
                 end
-                if ~isempty(Cocv) 
-                    usCocv = sCocv{u}; 
-                end
+                if ~isempty(Cocv), usCocv = sCocv{u}; end
                 if isfield(inp,'Yw'), InputParam.Yw = inp.Yw{u}; end
             else
                 usY = sY;
@@ -298,7 +291,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                              if multoocv
                                  iOCV = cell(1,numel(usYocv));
                                  for n=1:numel(usYocv)
-                                     [vTs{pu,3+n}, ~, iOCV{n}] = nk_ManageNanCases(usYocv{pu,2});
+                                     [vTs{pu,3+n}, ~, iOCV{n}] = nk_ManageNanCases(usYocv{n,pu});
                                  end
                              else
                                 [vTs{pu,4}, ~, iOCV] = nk_ManageNanCases(usYocv{pu});

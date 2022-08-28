@@ -172,7 +172,7 @@ else
                 case {'random'}
                     % non-ordered permutations without replacement,
                     % repetitions are allowed.
-                    if ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
+                    if ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.atlasvec)
                         nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique) * inp.MLI.Modality{nx}.frac );
                         RandFeats(h, nx).I = false(nperms(nx), nYmap);
                         for nq = 1:nperms(nx)

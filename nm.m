@@ -450,10 +450,7 @@ end
 
 function QuitNeuroMiner()
 global NM
-if isfield(NM.defs,'JTextArea')
-    NM = nk_InitNMwindowColors(NM, [1 1 1 ]);
-    NM.defs = rmfield(NM.defs,'JTextArea');
-end
+
 fprintf('\n'); %clc; 
 fprintf('Good Bye... \n');
 delete(findobj('Tag','PrintCVBarsBin'));
@@ -466,7 +463,7 @@ clearvars -global NM st
 assignin('base', 'NM', NMx)
 if exist('temp.nii','file'); delete('temp.nii'); end
 if exist('tempMLI.nii','file'); delete('tempMLI.nii'); end
-warning('off','last');
+try warning('off','last'); catch; end
 % this does not work, but I wanted to implement sth that closes the 
 % Result Viewer as well as the MLI Viewer when NM is closed 
 

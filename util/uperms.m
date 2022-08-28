@@ -89,6 +89,7 @@ end
 pInds = false(k, n);              
 % Add permutations that are unique
 u = 1; % to start with
+fprintf('Creating unique perms:    \n\n')
 while u <= k
     fprintf('\b\b\b\b\b\b%6.0f',u);
     % b=sprintf('%s', repmat('\b',numel(a),1));
