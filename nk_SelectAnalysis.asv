@@ -76,9 +76,8 @@ if isfield(dat,'analysis')
         elseif analsel > 0
             if complflag
                 if stackmin > 0 
-                    idx_stacked = analstatus.stacking_analyses & analstatus.n_inputanalyses >= stackmin & analstatus.completed_analyses ;
-                    idx_nonstacked = ~analstatus.stacking_analyses & analstatus.completed_analyses ;
-                    analselcompl = find(idx_stacked | idx_nonstacked);
+                    idx1 = analstatus.stacking_analyses & analstatus.n_inputanalyses >= stackmin;
+                    analselcompl = find(analstatus.completed_analyses & analstacked);
                 else    
                     analselcompl = find(analstatus.completed_analyses);
                 end

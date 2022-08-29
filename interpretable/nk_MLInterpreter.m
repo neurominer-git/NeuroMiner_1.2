@@ -131,13 +131,13 @@ else
     clc
     sprintf('Generating random feature subspaces ... \n\n\n');
     for h=1:nclass
-        if strcmp(MODEFL,'classification') && nclass >1, fprintf('\n\tBinary classifier #%g', h); end
+        if strcmp(MODEFL,'classification') && nclass >1, fprintf('\n\tBinary classifier #%g=> ', h); end
         nperms = zeros(1,nx);
         for nx=1:nM
             % Compute subspace size of current modality
             nYmap = sum(inp.MLI.Modality{nx}.MAP.mapidx{h});
             nperms(nx) = inp.MLI.nperms;
-            if nM > 1, fprintf('\n\t\tModality #%g', nx); end
+            if nM > 1, fprintf('\n\t\tModality #%g=> ', nx); end
 
             % Create random feature indices within (selected subspace of) the
             % original predictor space. Subspace selection can be based either 
