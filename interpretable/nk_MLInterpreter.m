@@ -471,7 +471,10 @@ for f=1:ix % Loop through CV2 permutations
                             fprintf('\nModality #%g: Creating modified version of %s', nx, cases{tInd(q)})
                             inp = nk_CreateData4MLInterpreter( inp.MLI, RandFeats(h, nx).I, Tr, Ts , covs, inp, nx, h );
                         end
-
+                        
+                        % Preprocess modified data
+                        [ inp, ~, ~, ~, ~, ~, ~, ~, mapYocv] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param);
+                        
                         if any(inp.NanModality)
                             idxNan = find(any(inp.NanModality));
                             if numel(idxNan)>1
@@ -489,26 +492,25 @@ for f=1:ix % Loop through CV2 permutations
                                     warning('\nCase %s consists only of NaNs in %s! Proceed because of early fusion mode',cases{tInd(q)}, frstr);
                             end
                         end
-
+                        
                         %% Step 4: generate predictions for artificial cases
+                        switch inp.MLI.method
+                            case 'posneg'
+                                inp.desc_oocv{1} = sprintf('%g%%-percentile modification', inp.MLI.upper_thresh);
+                                inp.desc_oocv{2} = sprintf('%g%%-percentile modification', inp.MLI.lower_thresh);
+                            case 'median'
+                                inp.desc_oocv = 'median modification';
+                            case 'medianflip'
+                                inp.desc_oocv = 'median flipped modification';
+                            case 'random'
+                                inp.desc_oocv = 'random value modification';
+                        end
+                        
                         for h=1:nclass  % Loop through binary comparisons
 
                             if nclass > 1, fprintf('\n*** %s #%g ***',algostr, h); end
     
-                            [~, ~, nP, ~] = nk_GetModelParams2(analysis, multiflag, ll, h, inp.curlabel);
-                           
-                            switch inp.MLI.method
-                                case 'posneg'
-                                    inp.desc_oocv{1} = sprintf('%g%%-percentile modification', inp.MLI.upper_thresh);
-                                    inp.desc_oocv{2} = sprintf('%g%%-percentile modification', inp.MLI.lower_thresh);
-                                case 'median'
-                                    inp.desc_oocv = 'median modification';
-                                case 'medianflip'
-                                    inp.desc_oocv = 'median flipped modification';
-                                case 'random'
-                                    inp.desc_oocv = 'random value modification';
-                            end
-                            [ inp, ~, ~, ~, ~, ~, ~, ~, mapYocv] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param);
+                             [~, Pspos, nP] = nk_GetModelParams2(analysis, multiflag, ll, h, inp.curlabel);
 
                             for m = 1 : nP      % Loop through parameter combinations
                                 for k=1:iy      % Loop through CV1 permutations
@@ -556,8 +558,11 @@ for f=1:ix % Loop through CV2 permutations
                                                 for u=1:ul
             
                                                     % Extract features according to mask
-                                                    TR_star   = nk_ExtractFeatures(TR, F, [], u);
-
+                                                    try
+                                                        TR_star   = nk_ExtractFeatures(TR, F, [], u);
+                                                    catch
+                                                        whos("TR","F");
+                                                    end
                                                     % Apply trained model to
                                                     % artificial data and generate
                                                     % predictions for later
@@ -585,7 +590,11 @@ for f=1:ix % Loop through CV2 permutations
                                                 for u=1:ul
             
                                                     % Extract features according to mask
-                                                    TR_star   = nk_ExtractFeatures(TR, F, [], u);
+                                                    try
+                                                        TR_star   = nk_ExtractFeatures(TR, F, [], u);
+                                                    catch
+                                                        whos("TR","F");
+                                                    end
 
                                                     % Apply trained model to
                                                     % artificial data and generate
