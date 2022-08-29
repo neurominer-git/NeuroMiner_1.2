@@ -37,6 +37,10 @@ if sNaN
     error('\nFound %g non-finite values in training matrix!\nThis usually happend in intermediate fusion mode when some data modalities have cases with completely missing data.\nCheck your preprocessing settings and your data!', sNaN)
 end
 
+if height(Y) ~= height(label)
+    error('\nTraining data matrix and labels must have the same number of observations!')
+end
+
 % Pass training matrix, labels, (and time vector) to used-defined training module
 switch SVM.prog
     case 'SEQOPT'

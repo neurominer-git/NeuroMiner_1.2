@@ -82,7 +82,7 @@ if isfield(NM,'analysis')
             Status.analyses_visualized(i) = true;
         end
         for j=1:nM
-            if strcmp(NM.analysis{i}.params.datadescriptor{j}.source,'image')
+            if strcmp(NM.analysis{i}.params.datadescriptor{Modality(j)}.source,'image')
                 Status.analyses_imaging{i} = [ Status.analyses_imaging{i}  Modality(j)];
             else
                 Status.analyses_imaging{i} = [];

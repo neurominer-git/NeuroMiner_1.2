@@ -500,7 +500,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                             end
                         end
                     else
-                        [tY.Tr{k,l},TrL] = nk_ManageNanCases(trd, TrL, SrcParam.iTr);
+                        tY.Tr{k,l} = nk_ManageNanCases(trd, TrL, SrcParam.iTr);
                         if ~oocvonly
                             [tY.CV{k,l},CVL] = nk_ManageNanCases(cvd, CVL, SrcParam.iCV);
                             tY.Ts{k,l} = nk_ManageNanCases(tsd, [], SrcParam.iTs);
@@ -515,20 +515,24 @@ for k=sta_iy:stp_iy % Inner permutation loop
                             end
                         end
                     end
+
+                    oTrL = labels(TrInd(tCV.cvin{i,j}.TrainInd{k,l}),lb);
+                    oCVL = labels(TrInd(tCV.cvin{i,j}.TestInd{k,l}),lb);
+
                     % Write dichotomization labels to CV1 partition
                     for zu=1:kbin % Binary loop depending on the # of binary comparisons
                         % Generate logical indices
                         if isfield(tCV,'class') && length(tCV.class{i,j}{zu}.groups) == 2
                             % One-vs-One
-                            indtr = ( TrL == tCV.class{i,j}{zu}.groups(1) | TrL == tCV.class{i,j}{zu}.groups(2) ) | isnan(TrL);
+                            indtr = ( oTrL == tCV.class{i,j}{zu}.groups(1) | oTrL == tCV.class{i,j}{zu}.groups(2) ) ;
                             if ~oocvonly
-                                indcv = ( CVL == tCV.class{i,j}{zu}.groups(1) | CVL == tCV.class{i,j}{zu}.groups(2) ) | isnan(CVL);
+                                indcv = ( oCVL == tCV.class{i,j}{zu}.groups(1) | oCVL == tCV.class{i,j}{zu}.groups(2) ) ;
                             end
                         else
                             % One-vs-All
-                            indtr = TrL~=0;
+                            indtr = oTrL~=0;
                             if ~oocvonly
-                                indcv = CVL~=0;
+                                indcv = oCVL~=0;
                             end
                         end
                         % Write indices
@@ -563,9 +567,13 @@ for k=sta_iy:stp_iy % Inner permutation loop
                             tYocv.Ts{k,l}{u} = nk_ManageNanCases(ocv, [], SrcParam.iOCV); 
                         end
                     end
+                    
+                    oTrL = labels(TrInd(tCV.cvin{i,j}.TrainInd{k,l}),lb);
+                    oCVL = labels(TrInd(tCV.cvin{i,j}.TestInd{k,l}),lb);
+
                     if ~strcmp(MODEFL,'regression') && length(tCV.class{i,j}{u}.groups) == 2
-                        indtr = ( TrL == tCV.class{i,j}{u}.groups(1) | TrL == tCV.class{i,j}{u}.groups(2) ) | isnan(TrL);
-                        if ~oocvonly, indcv = ( CVL == tCV.class{i,j}{u}.groups(1) | CVL == tCV.class{i,j}{u}.groups(2) ) | isnan(CVL); end
+                        indtr = ( oTrL == tCV.class{i,j}{u}.groups(1) | oTrL == tCV.class{i,j}{u}.groups(2) );
+                        if ~oocvonly, indcv = ( oCVL == tCV.class{i,j}{u}.groups(1) | oCVL == tCV.class{i,j}{u}.groups(2) ) ; end
                     else
                         indtr = true(size(TrI,1),1);
                         if ~oocvonly, indcv = true(size(CVI,1),1); end
@@ -576,8 +584,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
 
                     switch MODEFL
                         case 'regression' 
-                            tY.TrL{k,l}{u} = TrL;
-                            if ~oocvonly, tY.CVL{k,l}{u} = CVL; end
+                            tY.TrL{k,l}{u} = oTrL;
+                            if ~oocvonly, tY.CVL{k,l}{u} = oCVL; end
                         case 'classification'
                             if RAND.Decompose ~=9
                                 % Write labels to CV1 partition
