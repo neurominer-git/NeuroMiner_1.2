@@ -376,9 +376,9 @@ for i = 1:inp1.nF
         
         switch MODEFL
             case 'classification'
-                MLIres.Label(j) = ijMLI.BinResults;  
+                MLIres.Label(i,j) = ijMLI.BinResults;  
             case 'regression'
-                MLIres.Label(j) = ijMLI.RegrResults;
+                MLIres.Label(i,j) = ijMLI.RegrResults;
         end
         MLIres.FileNames{i,j} = ijMLI.FileNames;
     end
