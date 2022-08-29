@@ -36,7 +36,7 @@ function [X, L] = nk_CompatY2(NM, varind, oocvind, FUSION)
 % X.threshval       : Threshold (if modality is neuroimaging data)
 % X.threshop        : Threshold operation (if modality is neuroimaging data)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris 10/2020
+% (c) Nikolaos Koutsouleris 08/2022
 
 if ~exist('varind','var'), varind=1; end; nM = numel(varind);
 if ~exist('oocvind','var')
@@ -72,7 +72,7 @@ end
 
 switch FUSION.flag
 
-    case {0,3}
+    case {0,3} % [NO FUSION / LATE FUSION]
         
         X.dimvecx(1) = 0;
         X.Y = NM.Y{varind};
@@ -111,11 +111,12 @@ switch FUSION.flag
         if isempty(X.badcoords{1}), X.badcoords{1} = zeros(1,X.dimsizes); end
         X.dimvecx(2) = X.dimsizes; 
          
-    case 1 % Concatenate modalities
+    case 1 % Concatenate modalities [EARLY FUSION]
         
         X.dimvecx   = 0;
         X.Y = [];
-        
+        X.Yocv = [];
+
         for i = 1:nM
 
             % Training and CV data
@@ -160,7 +161,7 @@ switch FUSION.flag
         
         end
 
-    case 2 % store modalities in cell array
+    case 2 % store modalities in cell array [INTERMEDIATE FUSION]
         
         for i=1:nM
 

@@ -20,6 +20,7 @@ multiflag       = false; if strcmp(MODEFL,'classification'), multiflag = inp.mul
 saveparam       = inp.saveparam;
 loadparam       = inp.loadparam;
 nclass          = inp.nclass;
+nM              = numel(inp.tF);  % No. of modalities to process
 analysis        = inp.analysis;
 GridAct         = inp.GridAct;
 batchflag       = inp.batchflag;
@@ -57,8 +58,8 @@ BINMOD = iPREPROC.BINMOD;
 
 CVPOS.fFull = FullPartFlag;
 
-FileNames = cell(ix,jx); 
-nM = numel(inp.X);
+FileNames = cell(ix,jx);
+
 RandFeats = struct('I',[]);
 if inp.oocvflag
     cases  = inp.OO.cases;
@@ -73,25 +74,34 @@ for h=1:nclass
         case 'regression'
             inp.MLI.RangePred = range(analysis.Regr.mean_predictions);
     end
-    
+
+    if inp.oocvflag
+        mY2 = height(inp.X(1).Yocv);
+    else
+        mY2 = height(inp.X(1).Y);
+    end
+    nY = zeros(1,nM); nY2 = nY; datatype = zeros(1,nM);
     for nx=1:nM
-        nY = size(inp.X(nx).Y,2);
-        if inp.oocvflag
-            [mY2,nY2] = size(inp.X(nx).Yocv);
-        else
-            [mY2,nY2] = size(inp.X(nx).Y);
+        switch FUSION.flag
+            case {0, 2, 3}
+                nY(nx) = inp.X(nx).dimsizes;
+                datatype(nx) = inp.X(nx).datatype;
+            case 1
+                nY(nx) = inp.X.dimsizes(nx);
+                datatype(nx) = inp.X.datatype(nx);
         end
+        nY2(nx) = nY(nx);
         switch MODEFL
             case 'classification'
-                Results.BinResults(h).Modality(nx).Y_mapped = zeros(mY2,nY2,ix);
-                Results.BinResults(h).Modality(nx).Y_mapped_ciu = zeros(mY2,nY2,ix);
-                Results.BinResults(h).Modality(nx).Y_mapped_cil = zeros(mY2,nY2,ix);
-                Results.BinResults(h).Modality(nx).Y_mapped_std = zeros(mY2,nY2,ix);
+                Results.BinResults(h).Modality(nx).Y_mapped = zeros(mY2,nY2(nx),ix);
+                Results.BinResults(h).Modality(nx).Y_mapped_ciu = zeros(mY2,nY2(nx),ix);
+                Results.BinResults(h).Modality(nx).Y_mapped_cil = zeros(mY2,nY2(nx),ix);
+                Results.BinResults(h).Modality(nx).Y_mapped_std = zeros(mY2,nY2(nx),ix);
             case 'regression'
-                Results.RegrResults.Modality(nx).Y_mapped = zeros(mY2,nY2,ix);
-                Results.RegrResults.Modality(nx).Y_mapped_ciu = zeros(mY2,nY2,ix);
-                Results.RegrResults.Modality(nx).Y_mapped_cil = zeros(mY2,nY2,ix);
-                Results.RegrResults.Modality(nx).Y_mapped_std = zeros(mY2,nY2,ix);
+                Results.RegrResults.Modality(nx).Y_mapped = zeros(mY2,nY2(nx),ix);
+                Results.RegrResults.Modality(nx).Y_mapped_ciu = zeros(mY2,nY2(nx),ix);
+                Results.RegrResults.Modality(nx).Y_mapped_cil = zeros(mY2,nY2(nx),ix);
+                Results.RegrResults.Modality(nx).Y_mapped_std = zeros(mY2,nY2(nx),ix);
         end
         
         % If map is provided determine subspace for modification
@@ -111,15 +121,11 @@ for h=1:nclass
             end
             inp.MLI.Modality{nx}.MAP.mapidx{h} = return_imgind(inp.MLI.Modality{nx}.MAP.operator, cutoff, inp.MLI.Modality{nx}.MAP.map{h});
         else
-            inp.MLI.Modality{nx}.MAP.mapidx{h} = true(1,nY);
+            inp.MLI.Modality{nx}.MAP.mapidx{h} = true(1,nY(nx));
         end
         if ~any(inp.MLI.Modality{nx}.MAP.mapidx{h})
             error(sprintf('User-specified feature selection map ''%s'' is empty! Adapt your settings.', maptype))
         end
-        if isfield(inp.MLI.Modality{nx},'imgops') && ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag 
-            
-        end
-
     end
 end
 %% Generate, store/load permutation structure
@@ -150,16 +156,16 @@ else
                     % no repetitions
                     if ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
                         % Fraction of unique atlas values to be selected => nfrac 
-                        nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique) * inp.MLI.Modality{nx}.frac );
+                        nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.csvnum) * inp.MLI.Modality{nx}.frac );
                         % Create permutations of atlas indices => tI
-                        [ tI, nperms(nx) ] = uperms( inp.MLI.Modality{nx}.imgops.atlasvec_unique, inp.MLI.nperms, nfrac ); 
+                        [ tI, nperms(nx) ] = uperms( inp.MLI.Modality{nx}.imgops.csvnum, inp.MLI.nperms, nfrac ); 
                         % Initialize logical index vector to map selected predictors within the space of MapIdx
                         RandFeats(h, nx).I = false(nperms(nx), nYmap);
                         for nq=1:nperms(nx)
                             % Find permuted atlas indices in masked atlas
                             % file (e.g. masked using CVR, sign-based )
                             RandFeats(h, nx).I(nq,:) = ismember(inp.MLI.Modality{nx}.imgops.atlasvec(inp.MLI.Modality{nx}.MAP.mapidx{h}), ...
-                                                                inp.MLI.Modality{nx}.imgops.atlasvec_unique(tI(nq,:)));
+                                                                inp.MLI.Modality{nx}.imgops.csvnum(tI(nq,:)));
                         end
                     else
                         % Fraction of (thresholded) image space 
@@ -173,12 +179,12 @@ else
                     % non-ordered permutations without replacement,
                     % repetitions are allowed.
                     if ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
-                        nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique) * inp.MLI.Modality{nx}.frac );
+                        nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.csvnum) * inp.MLI.Modality{nx}.frac );
                         RandFeats(h, nx).I = false(nperms(nx), nYmap);
                         for nq = 1:nperms(nx)
                             tI = randperm( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique), nfrac); 
                             RandFeats(h, nx).I(nq,:) = ismember(inp.MLI.Modality{nx}.imgops.atlasvec(inp.MLI.Modality{nx}.MAP.mapidx{h}), ...
-                                                                inp.MLI.Modality{nx}.imgops.atlasvec_unique(tI));   
+                                                                inp.MLI.Modality{nx}.imgops.csvnum(tI));   
                         end
                     else
                         nfrac = ceil( nYmap * inp.MLI.Modality{nx}.frac );
@@ -431,11 +437,10 @@ for f=1:ix % Loop through CV2 permutations
                     mapInterp_std = cell(nclass, nM);
                     for h=1:nclass
                         for nx = 1:nM
-                            nY = size(inp.X(nx).Y,2);
-                            mapInterp{h,nx} = nan(nTs, nY);
-                            mapInterp_ciu{h,nx} = nan(nTs, nY);
-                            mapInterp_cil{h,nx} = nan(nTs, nY);
-                            mapInterp_std{h,nx} = nan(nTs, nY);
+                            mapInterp{h,nx} = nan(nTs, nY(nx));
+                            mapInterp_ciu{h,nx} = nan(nTs, nY(nx));
+                            mapInterp_cil{h,nx} = nan(nTs, nY(nx));
+                            mapInterp_std{h,nx} = nan(nTs, nY(nx));
                         end
                     end
 
@@ -642,7 +647,6 @@ for f=1:ix % Loop through CV2 permutations
 
                             for nx = 1:nM
                                 fMapIdx = find( inp.MLI.Modality{nx}.MAP.mapidx{h} );
-                                nY = size(inp.X(nx).Y,2);
                                 switch inp.MLI.method
                                     case 'posneg'
                                         Rh = [ nm_nanmedian(predInterp{q,h,1},2) nm_nanmedian(predInterp{q,h,2},2)]; 
@@ -652,16 +656,15 @@ for f=1:ix % Loop through CV2 permutations
                                 [mapInterp{h, nx}(q,:), ...
                                 mapInterp_ciu{h, nx}(q,:), ...
                                 mapInterp_cil{h, nx}(q,:), ...
-                                mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(nY, Oh, Rh, RandFeats(h, nx).I, ...
+                                mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(nY(nx), Oh, Rh, RandFeats(h, nx).I, ...
                                                                     fMapIdx, inp.MLI.method, ...
                                                                     inp.MLI.RangePred(h), inp.MLI.znormdata);
                             end
                         end
                     end
+                    fprintf('\nSaving %s', oMLIpath); 
+                    save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
                 end
-
-                fprintf('\nSaving %s', oMLIpath); 
-                save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
                 if saveparam 
                     fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
                 end
@@ -688,7 +691,6 @@ for f=1:ix % Loop through CV2 permutations
                             
                                 for nx = 1:nM
                                     fMapIdx = find( inp.MLI.Modality{nx}.MAP.mapidx{h} );
-                                    nY = size(inp.X(nx).Y,2);
                                     switch inp.MLI.method
                                         case 'posneg'
                                             Rh = [ nm_nanmedian(predInterp{q,h,1},2) nm_nanmedian(predInterp{q,h,2},2)]; 
@@ -698,12 +700,14 @@ for f=1:ix % Loop through CV2 permutations
                                     [mapInterp{h, nx}(q,:), ...
                                      mapInterp_ciu{h, nx}(q,:), ...
                                      mapInterp_cil{h, nx}(q,:), ...
-                                     mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(nY, Oh, Rh, RandFeats(h, nx).I, ...
+                                     mapInterp_std{h, nx}(q,:)] = nk_MapModelPredictions(nY(nx), Oh, Rh, RandFeats(h, nx).I, ...
                                                                      fMapIdx, inp.MLI.method, ...
                                                                      inp.MLI.RangePred(h), inp.MLI.znormdata);
                                 end
                             end
                         end
+                        fprintf('\nSaving %s', oMLIpath); 
+                        save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
                     end
                 end 
         end
@@ -716,7 +720,7 @@ for f=1:ix % Loop through CV2 permutations
                 switch MODEFL
                     case 'classification'
                         Results.BinResults(h).Modality(nx).modality_num = inp.tF(nx); 
-                        Results.BinResults(h).Modality(nx).modality_type = inp.X(nx).datatype;
+                        Results.BinResults(h).Modality(nx).modality_type = datatype(nx);
                         Results.BinResults(h).Modality(nx).modality_featnames = inp.featnames{nx};
                         Results.BinResults(h).Modality(nx).Y_mapped(tInd,:,f) = mapInterp{h,nx};
                         Results.BinResults(h).Modality(nx).Y_mapped_ciu(tInd,:,f) = mapInterp_ciu{h,nx};
@@ -761,14 +765,20 @@ for h = 1:nclass
         if datatype == 1 || datatype == 2
             computedCases = find(any(vols,2));
             fprintf('\Writing out %g cases.',numel(computedCases));
-            for q=1:numel(computedCases) % Loop through CV2/OOCV cases 
+            switch MODEFL
+                case 'classification'
+                    clstr = ['_cl' num2str(h)];
+                case 'regression'
+                    clstr = '';
+            end
+            for q=1:numel(computedCases) % Loop through CV2/OOCV cases
                 switch inp.MLI.znormdata
                     case 1
-                        volnam = fullfile(inp.rootdir,sprintf('mliR%s', cases{computedCases(q)}));
+                        volnam = fullfile(inp.rootdir,sprintf('mliR%s_var%g%s%s', cases{computedCases(q)}, inp.tF(nx), clstr, inp.multlabelstr));
                     case 2
-                        volnam  = fullfile(inp.rootdir,sprintf('mliMC%s', cases{computedCases(q)}));
+                        volnam  = fullfile(inp.rootdir,sprintf('mliMC%s_var%g%s%s', cases{computedCases(q)}, inp.tF(nx), clstr, inp.multlabelstr));
                     case 3
-                        volnam  = fullfile(inp.rootdir,sprintf('mliZ%s', cases{computedCases(q)}));
+                        volnam  = fullfile(inp.rootdir,sprintf('mliZ%s_var%g%s%s', cases{computedCases(q)}, inp.tF(nx), clstr, inp.multlabelstr));
                 end
                 switch datatype
                     case 1 % SPM-based NIFTI write-out

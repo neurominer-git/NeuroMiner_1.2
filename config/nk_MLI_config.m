@@ -310,9 +310,9 @@ if ~defaultsfl
                 case {'spm','nifti'}
                      Thresh = NM.datadescriptor{M}.input_settings.Thresh;
                      Vm = spm_vol(NM.brainmask{M}); 
-                     MLIatlasvec = nk_ReturnSubSpaces(Vol, Vm, 1, 1, Thresh);
+                     MLIatlasvec = round(nk_ReturnSubSpaces(Vol, Vm, 1, 1, Thresh),0);
                 case 'surf'
-                     MLIatlasvec = MRIread(MLIatlasfile);
+                     MLIatlasvec = round(MRIread(MLIatlasfile),0);
             end
         case 15
             MLIcsvfile = nk_FileSelector(1,0,'Select atlas descriptor file', '.*\.txt$|.*\.dat$|.*\.csv', MLIcsvfile);
