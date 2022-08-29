@@ -7,7 +7,7 @@ data = pd.read_csv(data_file)
 data['label'] = labels
 
 # if n_obs is an array with more than 1 element, each element specifies the amount of observations to simulate within each group (i.e. same label)
-if len(n_obs)>1:
+if type(n_obs) is not int:
     # check first whether len(n_obs) matches the number of unique labels
     if len(n_obs) != len(np.unique(labels)):
         raise ValueError('Number of observations to simulate does not match number of groups')
