@@ -19,7 +19,7 @@ colormap(stMLI.NMaxes(1), jet);
 pos = stMLI.NMaxes(3).Position;
 cl = colorbar(stMLI.NMaxes(3));
 %clim([min(y),max(y)]);
-cl.TickLabels=linspace(min(y),max(y),6);
+cl.TickLabels=round(linspace(min(y),max(y),6),2);
 %cl.Label.String = meas{measind};
 cl.Label.FontWeight = 'bold';
 cl.Label.FontSize = 10;
