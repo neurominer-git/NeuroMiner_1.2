@@ -5,6 +5,7 @@ h_classlist     = handles.popupmenu1.String;
 h_list          = handles.selModelMeasures.String;
 h_val           = handles.selModelMeasures.Value;
 if h_val>numel(h_list), h_val=1; end
+handles.curclass = h_class; 
 switch h_list{h_val}
     
     case 'Classification plot'

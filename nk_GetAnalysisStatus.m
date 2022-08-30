@@ -1,19 +1,20 @@
 function Status = nk_GetAnalysisStatus(NM)
 
-Status.completed_analyses  = [];  
-Status.isequal_cv          = []; 
-Status.nmodal_analyses     = [];
-Status.analexistflag       = false; 
-Status.analreadyflag       = false; 
-Status.analcompleteflag    = false;
-Status.oocvreadyflag       = false;
-Status.oocvappflag         = false;
-Status.stacking_analyses   = [];
-Status.n_inputanalyses     = [];
-Status.sequence_analyses   = [];
+Status.completed_analyses       = [];  
+Status.isequal_cv               = []; 
+Status.nmodal_analyses          = [];
+Status.analexistflag            = false; 
+Status.analreadyflag            = false; 
+Status.analcompleteflag         = false;
+Status.oocvreadyflag            = false;
+Status.oocvappflag              = false;
+Status.stacking_analyses        = [];
+Status.n_inputanalyses          = [];
+Status.sequence_analyses        = [];
 Status.analyses_nondeterministic = [];
-Status.analyses_visualized = [];
-Status.analyses_imaging    = [];
+Status.analyses_visualized      = [];
+Status.analyses_imaging         = [];
+Status.analyses_interpreted     = [];
 
 if isfield(NM,'analysis')
     
@@ -26,6 +27,7 @@ if isfield(NM,'analysis')
     Status.n_inputanalyses          = zeros(1,n_anal);
     Status.analyses_visualized      = false(1,n_anal);
     Status.analyses_imaging         = cell(1,n_anal);
+    Status.analyses_interpreted     = false(1,n_anal);
 
     for i = 1:n_anal
         % Completed analyses
@@ -87,6 +89,9 @@ if isfield(NM,'analysis')
             else
                 Status.analyses_imaging{i} = [];
             end
+        end
+        if isfield(NM.analysis{i},'MLI')
+            Status.analyses_interpreted(i) = true;
         end
     end
 end

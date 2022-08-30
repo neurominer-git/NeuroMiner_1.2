@@ -246,8 +246,7 @@ end
 
 function tdir = create_defpath(analysis)
  
-rootdir = analysis.rootdir;
-algostr = getAlgoStr(analysis);
+rootdir = analysis.GDdims{1}.RootPath;
 VIS = analysis.params.TrainParam.VIS{analysis.params.TrainParam.FUSION.M(1)};
         
 if VIS.PERM.flag
@@ -262,7 +261,7 @@ if VIS.PERM.flag
 else
     visdir = 'VISUAL';
 end
-tdir = fullfile(rootdir, algostr, visdir);
+tdir = fullfile(rootdir, visdir);
 
 
 function analysis = VisModelsPrep(dat, inp1, analysis)

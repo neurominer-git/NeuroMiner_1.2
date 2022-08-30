@@ -61,14 +61,14 @@ if ~isempty(analysis)
     LFL_opts        = {'Compute from scratch',sprintf('Use precomputed %s',inp.datatype)};                                      
     ModeStr         = sprintf('Operation mode of independent test module [ %s ]|',LFL_opts{inp.lfl});                       ModeAct = 3;
     
-    if inp.lfl == 1,
+    if inp.lfl == 1
         % from scratch
         OVRWRT_opts     = {'Overwrite existing','Do not overwrite'};       
         OverWriteStr = sprintf('Overwrite existing %s files [ %s ]|', inp.datatype, OVRWRT_opts{inp.ovrwrt}) ;              OverWriteAct = 4; 
     else
         % precomputed
         nOOCVFiles = na_str; 
-        if isfield(inp,'oocvmat') && ~isempty(inp.oocvmat), 
+        if isfield(inp,'oocvmat') && ~isempty(inp.oocvmat) 
             selGrid = ~cellfun(@isempty,inp.oocvmat); inp.GridAct = selGrid;
             nOOCVFiles = sprintf('%g selected', sum(selGrid(:))); 
         end     
@@ -76,7 +76,7 @@ if ~isempty(analysis)
     end
     
     % Retrieve CV2 partitions to operate on
-    if ~isfield(inp,'GridAct'), inp.GridAct = analysis.GDdims{1}.GridAct; end;                                              
+    if ~isfield(inp,'GridAct'), inp.GridAct = analysis.GDdims{1}.GridAct; end                                              
     GridSelectStr = sprintf('Select CV2 partitions to operate on [ %g selected ]|',  sum(inp.GridAct(:)));                  GridSelectAct = 5;
     
     % Configure loading of pre-existing parameters and models
@@ -86,17 +86,17 @@ if ~isempty(analysis)
             LoadStr = sprintf('Use saved pre-processing params and models [ %s ]|', LOAD_opts{inp.loadparam});              LoadAct = 7;
         end
         if inp.loadparam == 1
-            if isfield(inp,'optpreprocmat'), 
+            if isfield(inp,'optpreprocmat')
                 selGridPreproc = ~cellfun(@isempty,inp.optpreprocmat);
                 nParamFiles = sprintf('%g files selected', sum(selGridPreproc(:))); 
-            else, 
+            else
                 nParamFiles = na_str; 
             end
             LoadParamsStr = sprintf('Select preprocessing parameter files [ %s ]|' ,nParamFiles);                           LoadParamsAct = 8;
-            if isfield(inp,'optmodelmat'), 
+            if isfield(inp,'optmodelmat')
                 selGridModel = ~cellfun(@isempty,inp.optmodelmat);
                 nModelFiles = sprintf('%g files selected', sum(selGridModel(:))); 
-            else, 
+            else
                 nModelFiles = na_str; 
             end
             LoadModelsStr = sprintf('Select model files [ %s ]|',nModelFiles);                                              LoadModelsAct = 9;
@@ -217,8 +217,7 @@ end
 
 function tdir = create_defpath(analysis, oocvind)
  
-rootdir = analysis.rootdir;
-algostr = getAlgoStr(analysis);
+rootdir = analysis.GDdims{1}.RootPath;
 if isfield(analysis,'OOCV') && numel(analysis.OOCV) >= oocvind && isfield(analysis.OOCV{oocvind},'RootPath')
     if iscell(analysis.OOCV{oocvind}.RootPath)
         tdir = analysis.OOCV{oocvind}.RootPath{1};
@@ -227,7 +226,7 @@ if isfield(analysis,'OOCV') && numel(analysis.OOCV) >= oocvind && isfield(analys
     end
 else
     oocvdir = sprintf('OOCV_%g', oocvind);
-    tdir = fullfile(rootdir, algostr, oocvdir);
+    tdir = fullfile(rootdir, oocvdir);
 end
 %
 % =========================================================================
@@ -237,7 +236,7 @@ tOOCV = OOCV;
 if inp1.saveparam   == 2, inp1.saveparam    = 0; end
 if inp1.loadparam   == 2, inp1.loadparam    = 0; end
 if inp1.ovrwrt      == 2, inp1.ovrwrt       = 0; end
-if inp1.lfl         == 1, inp1.analmode     = 0; else inp1.analmode = 1; end
+if inp1.lfl         == 1, inp1.analmode     = 0; else, inp1.analmode = 1; end
 
 F = 1; nF = 1;
 if ~isempty(FUSION)        
@@ -252,7 +251,7 @@ else
     inp1.nclass = 1;
 end
 
-if isfield(inp1.OO,'label') && ~isempty(inp1.OO.label), 
+if isfield(inp1.OO,'label') && ~isempty(inp1.OO.label) 
     inp1.LabelCV     = dat.label; 
     inp1.labelOOCV   = inp1.OO.label; 
 end
@@ -278,7 +277,7 @@ if isfield(inp1.OO,'groups') && numel(inp1.OO.groups)==numel(inp1.OO.cases)
         inp1.groupnames = inp1.OO.groupnames;
     end
 end
-if isfield(inp1,'targdir'), 
+if isfield(inp1,'targdir') 
     inp1.rootdir = fullfile(inp1.targdir, inp1.oocvname);
 elseif isfield(analysis,'rootdir') && exist(analysis.rootdir,'dir')
     inp1.rootdir = fullfile(analysis.rootdir,analysis.params.TrainParam.SVM.prog, inp1.oocvname);

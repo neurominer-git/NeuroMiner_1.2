@@ -264,8 +264,7 @@ end
 
 function tdir = create_defpath(analysis, oocvind)
  
-rootdir = analysis.rootdir;
-algostr = getAlgoStr(analysis);
+rootdir = analysis.GDdims{1}.RootPath;
 if exist("oocvind","var") 
     if isfield(analysis,'OOCV') && ...
         numel(analysis.OOCV) >= oocvind && ...
@@ -277,10 +276,10 @@ if exist("oocvind","var")
         end
     else
         oocvdir = sprintf('OOCV_MLI_%g', oocvind);
-        tdir = fullfile(rootdir, algostr, oocvdir);
+        tdir = fullfile(rootdir, oocvdir);
     end
 else
-     tdir = fullfile(rootdir, algostr, 'MLI');
+     tdir = fullfile(rootdir, 'MLI');
 end
 %
 % =========================================================================
