@@ -1,9 +1,14 @@
-function imagingMLI(casenum, MLIcont, APPstMLI, brainmask, badcoords, datadescriptor)
-global stMLI
+function imagingMLI(casenum, MLIcont, APPstMLI)
 
-y = MLIcont.Y_mapped(casenum,:)';
+global stMLI
 stMLI = APPstMLI;
-nk_WriteVol(y,'tempMLI', 2, brainmask, badcoords, datadescriptor.threshval, char(datadescriptor.threshop),[],[],false);
+y = MLIcont.Y_mapped(casenum,:)';
+%y_ciu = MLIcont.Y_mapped_ciu(casenum,:);
+%y_cil = MLIcont.Y_mapped_cil(casenum,:);
+
+%brainmask = evalin('base', 'NM.brainmask{1}'); % curModal 
+
+nk_WriteVol(y,'tempMLI', 2, app.brainmask, app.badcoords, app.datadescriptor.threshval, app.datadescriptor.threshval);
 mli_orthviews('Image','tempMLI.nii'); 
 % alphamask = y ~= 0;
 % hnd = imagesc(y);
