@@ -1,12 +1,51 @@
 % =========================================================================
 % =                             REGRESSION PLOT                           =
 % =========================================================================
-function handles = display_regrplot(handles, MarkFlag)
+function handles = display_regrplot(handles, markflag, oocvflag)
+
+if ~exist("oocvflag","var") || isempty(oocvflag)
+    oocvflag = false;
+end
 
 % Get preferred figure type
 GraphType = get(handles.selYaxis,'Value');
-label     = handles.Regr.labels;
-if ~isfield(handles.Regr,'Xaxis') || isempty(handles.Regr.Xaxis),
+
+if ~exist('markflag','var') || isempty(markflag), markflag=false; end
+
+axes(handles.axes1);
+uistack(handles.axes1,'top')
+
+if ~oocvflag
+    regrplotstr = '';
+    pred    = handles.Regr.mean_predictions;
+    errbar  = handles.Regr.std_predictions;
+    errbarCI1 = handles.Regr.CI1_predictions;
+    errbarCI2 = handles.Regr.CI2_predictions;
+    ind     = handles.Regr.index_predictions;
+    label   = handles.Regr.labels;
+    regrplotcl = 'b';
+    cla
+    hold on
+else
+    [handles, oocvind] = get_oocvind(handles);
+    hold on
+    regrplotstr = '_oocv';
+    pred    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.MeanCV2PredictedValues;
+    errbar  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.StdCV2PredictedValues;
+    errbarCI1  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,1);
+    errbarCI2  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,2);
+    ind = true(1,height(pred));
+    % Check whether the labels are known
+    labels_known = handles.OOCVinfo.Analyses{handles.curranal}.labels_known(oocvind);
+    if labels_known
+        label = handles.OOCVinfo.Analyses{handles.curranal}.label{oocvind};
+    else
+        label = [];
+    end
+    regrplotcl = 'r';
+end
+
+if ~isfield(handles.Regr,'Xaxis') || isempty(handles.Regr.Xaxis)
     indnan    = ~isnan(label);
     label     = label(indnan);
     lxL = label;
@@ -18,19 +57,14 @@ else
     lxN = handles.XaxisName;
 end
 
-if ~exist('MarkFlag','var') || isempty(MarkFlag), MarkFlag=false; end
+pred = pred(indnan);
+errbar = errbar(indnan);
+errbarCI1 = errbarCI1(indnan);
+errbarCI2 = errbarCI2(indnan);
+ind = ind(indnan);
+lx = length(label);
 
-axes(handles.axes1);
-uistack(handles.axes1,'top')
-cla;
-hold on
-
-pred    = handles.Regr.mean_predictions(indnan);
-errbar  = handles.Regr.std_predictions(indnan);
-ind     = handles.Regr.index_predictions(indnan);
-lx      = length(label);
-
-if isfield(handles.Regr,'grouping') && MarkFlag
+if isfield(handles.Regr,'grouping') && markflag
     ngroups = length(unique(handles.Regr.grouping));
     grouping = handles.Regr.grouping;
     markgroups = true;
@@ -73,21 +107,19 @@ switch GraphType
     case 2
         lgstr{1} = '$\mathbf{Median_{OOT} \pm 95\%CI}$';
         % Mean predictions with [95%] confidence interval
-        errbarCI2 = handles.Regr.CI2_predictions(indnan);
-        errbarCI1 = handles.Regr.CI1_predictions(indnan);
         L = pred - errbarCI1; U = errbarCI2 - pred;
-        handles.he  = errorbar(lxL(ind),pred(ind), L(ind), U(ind),'ko','LineWidth',0.5,'MarkerSize',9);
+        handles.(['he' regplotstr])  = errorbar(lxL(ind),pred(ind), L(ind), U(ind),'ko','LineWidth',0.5,'MarkerSize',9);
     
     case 3
         lgstr{1} = '$\mathbf{Median_{OOT} \pm SD}$';
         % Mean predictions with standard deviation
-        handles.he = errorbar(lxL(ind),pred(ind),errbar(ind),'ko','LineWidth',0.5,'MarkerSize',9);
+        handles.(['he' regplotstr])  = errorbar(lxL(ind),pred(ind),errbar(ind),'ko','LineWidth',0.5,'MarkerSize',9);
 end
 
-handles.regrplot = scatter(lxL(ind),pred(ind),'Marker','o','MarkerFaceColor','b','MarkerEdgeColor',rgb('LightBlue'),'MarkerFaceAlpha',0.7, 'MarkerEdgeAlpha',0.2,'SizeData',80);
+handles.(['regrplot' regrplotstr]) = scatter(lxL(ind),pred(ind),'Marker','o','MarkerFaceColor',regrplotcl,'MarkerEdgeColor',rgb('LightBlue'),'MarkerFaceAlpha',0.7, 'MarkerEdgeAlpha',0.2,'SizeData',80);
 
 % Mark points according to "grouping"
-handles.hg = [];
+xhandles.hg = [];
 if markgroups
     for i = 1:ngroups
         indg = (ind == 1 & grouping == i);
@@ -99,34 +131,58 @@ if markgroups
         end
     end
 end
-
-xstep = nk_Range(lxL)/100;  r = (xstep)*5; 
-xLimitsVec = min(lxL):xstep:max(lxL);
-xlim([xLimitsVec(1)-r xLimitsVec(end)+r]);
-ylim('auto');
+if oocvflag
+    xrng = [handles.regrplot.XData lxL'];
+    yrng = [handles.regrplot.YData pred'];    
+else
+    xrng = lxL;
+    yrng = pred;
+end
+xstep = range(xrng)/100;
+ystep = range(yrng)/100;
+rx = (xstep)*5; ry = (ystep)*5;
+xLimitsVec = min(xrng):xstep:max(yrng);
+xlim([xLimitsVec(1)-rx xLimitsVec(end)+rx]);
+yLimitsVec = min(yrng):xstep:max(yrng);
+ylim([yLimitsVec(1)-ry yLimitsVec(end)+ry]);
 
 % Add regression line to plot
 xy = min(lxL(ind)):(max(lxL(ind))-min(lxL(ind)))/sum(ind):max(lxL(ind));
 try % Statistics toolbox available
     [p,s] = polyfit(lxL(ind),pred(ind),1);
     [yhat,dy] = polyconf(p,xy,s,'predopt','curve');
-    handles.hline = plot(xy,yhat,'k-','LineWidth',2);
-    handles.hline_CI = plotshaded(xy,[yhat+dy; yhat-dy],'b');
-    lgstr{end+1} = '$\mathbf{\hat{y}_{linear}}$';
-    lgstr{end+1} = '$\mathbf{\hat{y}_{95\%CI}}$';
+    handles.(['hline' regrplotstr]) = plot(xy,yhat,regrplotcl,'LineWidth',2);
+    handles.(['hline_CI' regrplotstr]) = plotshaded(xy,[yhat+dy; yhat-dy],regrplotcl);
+    if ~oocvflag
+        lgstr{end+1} = '$\mathbf{\hat{y}_{linear}}$';
+        lgstr{end+1} = '$\mathbf{\hat{y}_{95\%CI}}$';
+    else
+        lgstr{end+1} = '$OOCV\mathbf{\hat{y}_{linear}}$';
+        lgstr{end+1} = '$OOCV\mathbf{\hat{y}_{95\%CI}}$';
+    end
 catch % or not
-    handles.hline = lsline;
-    handles.hline_CI = [];
+    handles.(['hline' regrplotstr]) = lsline;
+    handles.(['hline_CI' regrplotstr]) = [];
     lgstr{end+1} = '$\mathbf{\hat{y}_{linear}}$';
 end
 % Prepare legend
 switch GraphType
     case 1
         hdlvec = [handles.regrplot handles.hline handles.hline_CI ];
+        if oocvflag
+            hdlvec = [hdlvec handles.regrplot_oocv handles.hline_oocv handles.hline_CI_oocv ];
+        end
     case {2,3}
         hdlvec = [handles.he handles.hg handles.hline handles.hline_CI];
+        if oocvflag
+            hdlvec = [hdlvec handles.he_oocv handles.hline_oocv handles.hline_CI_oocv ];
+        end
 end
-handles.legend_classplot = legend(hdlvec, lgstr, 'Location','southeast', 'LineWidth', 1, 'Interpreter','latex');
+if ~oocvflag
+    handles.legend_classplot = legend(hdlvec, lgstr, 'Location','southeast', 'LineWidth', 1, 'Interpreter','latex');
+else
+    handles.legend_classplot_oocv = legend(hdlvec, [handles.legend_classplot.String lgstr], 'Location','southeast', 'LineWidth', 1, 'Interpreter','latex');
+end
 
 % Set descriptions
 xlabel(lxN)

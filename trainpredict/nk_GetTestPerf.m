@@ -78,7 +78,8 @@ for k=1:s % Loop through all feature subspaces
 end
 
 % Sanity checks
-if ~any(ds), error('The prediction algorithm returned only 0''s! Check your learning parameters.'); end
+if ~any(ds), 
+    error('The prediction algorithm returned only 0''s! Check your learning parameters.'); end
 if sum(isnan(ds)), error('The prediction algorithm returned scores with nonfinite values! Check your learning parameters.'); end
 %if numel(ds)>1 && numel(unique(ds))==1, error('The prediction algorithm returned all non-unique scores! Check your learning parameters.'); end
 

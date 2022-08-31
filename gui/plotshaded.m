@@ -27,6 +27,7 @@ elseif size(y,1)==2 %plot shaded area
     px=[x,fliplr(x)]; % make closed patch
     py=[y(1,:), fliplr(y(2,:))];
     hx = patch(px,py,1,'FaceColor',fstr,'EdgeColor','none','FaceAlpha',0.25);
+    alpha(hx,0.25)
     hi=hx;
  
 elseif size(y,1)==3 % also draw mean

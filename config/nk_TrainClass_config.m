@@ -560,6 +560,9 @@ switch act
         for i=1:size(NM.label,2)
             fprintf('\n- %g -  %s',i, NM.labelnames{i})
         end
+        if ~isfield(NM.TrainParam,'MULTILABEL')
+            NM.TrainParam.MULTILABEL.sel = 1:size(NM.label,2);
+        end
         NM.TrainParam.MULTILABEL.sel = nk_input('Select labels for processing',0,'i',NM.TrainParam.MULTILABEL.sel);
         NM.TrainParam.MULTILABEL.dim = numel(NM.TrainParam.MULTILABEL.sel);
         if isfield(NM.TrainParam.RAND,'Eq') && NM.TrainParam.RAND.Eq.enabled && strcmp(NM.TrainParam.RAND.Eq.CovarName,'NM.label')

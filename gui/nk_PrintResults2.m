@@ -1167,13 +1167,6 @@ function CompModels_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % --------------------------------------------------------------------
-function CompModelsCorr_Callback(hObject, eventdata, handles)
-% hObject    handle to CompModelsCorr (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
 function CompModelsStats_Callback(hObject, eventdata, handles)
 % hObject    handle to CompModelsStats (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
