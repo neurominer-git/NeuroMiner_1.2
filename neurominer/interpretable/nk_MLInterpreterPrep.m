@@ -311,6 +311,7 @@ if inp1.oocvflag
     inp1.cases_oocv      = inp1.OO.cases;
     inp1.nOOCVsubj       = numel(inp1.OO.cases);
 end
+inp1.cases           = dat.cases;
 inp1.id              = dat.id;
 stranalysis          = SAV.matname;
 inp1.ngroups         = numel(unique(dat.label(~isnan(dat.label))));

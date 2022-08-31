@@ -25,6 +25,10 @@ analysis        = inp.analysis;
 GridAct         = inp.GridAct;
 batchflag       = inp.batchflag;
 algostr         = GetMLType(SVM);
+cases           = inp.cases;
+if inp.oocvflag
+    cases  = inp.OO.cases;
+end
 
 % Setup CV2 and CV1 counters and data containers:
 [ix, jx]        = size(CV.TrainInd);
@@ -61,11 +65,7 @@ CVPOS.fFull = FullPartFlag;
 FileNames = cell(ix,jx);
 
 RandFeats = struct('I',[]);
-if inp.oocvflag
-    cases  = inp.OO.cases;
-else
-    cases  = evalin('base','NM.cases');
-end
+
 
 for h=1:nclass
     switch MODEFL

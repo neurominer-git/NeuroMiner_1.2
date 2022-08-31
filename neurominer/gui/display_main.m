@@ -55,10 +55,21 @@ switch h_list{h_val}
         handles.pnBinary.Visible            = 'on';
         handles.cmdExportCobWeb.Visible     = 'off';
         handles.cmdMetricExport.Visible     = 'on';
-        handles                             = display_regrplot(handles);
-        handles                             = binarize_regr(handles);
-        load_selCase(handles,handles.Regr.cases)
-        
+
+        if strcmp(handles.selCVoocv.Enable,'on') && handles.selCVoocv.Value>1
+            handles  = display_regrplot(handles, [], false);
+            handles.oocvview = true;
+            handles  = display_regrplot(handles, [], handles.oocvview);
+            handles.oocvind = handles.selCVoocv.Value - 1;
+            load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
+        else
+            handles.oocvview = false;
+            handles = display_regrplot(handles);
+            handles = binarize_regr(handles);
+
+            load_selCase(handles,handles.Regr.cases)
+        end
+
     case 'Visualization results'
       
         handles.pnModelPerf.Visible         ='off';

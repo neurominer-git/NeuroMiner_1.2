@@ -14,7 +14,7 @@ if ~multiflag
     end
     handles.selModality.String = popuplist;
     if handles.curmodal<=size(handles.visdata,1)
-        v = handles.visdata{handles.curmodal,handles.curlabel};
+       v = handles.visdata{handles. curmodal,handles.curlabel};
         popuplist=[];
         if isfield(v,'MEAN'),                      popuplist{1} = 'Feature weights [Overall Mean (StErr)]';                        end
         if isfield(v,'MEAN_CV2'),                  popuplist{end+1} = 'Feature weights [Grand Mean (StErr)]';                      end
@@ -54,6 +54,7 @@ if ~multiflag
     end
     
 else
+     v = handles.visdata{handles.curmodal,handles.curlabel};
     if isfield(v,'ObsModel_Eval_Global_Multi')
         handles.selVisMeas.Enable = 'on'; 
         popuplist{1} = 'Model P value histogram [Multi-group]';

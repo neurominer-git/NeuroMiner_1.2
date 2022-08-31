@@ -3,7 +3,7 @@ function handles = load_GDdims(handles, Params, Label, GDdims)
 handles.MLparams = []; handles.grid = [];
 
 % Add binary-classification data to handles
-if isfield( GDdims,'Model'), 
+if isfield( GDdims,'Model')
     handles.MLparams = GDdims.Model;
 elseif isfield( GDdims,'MLparams' )
     handles.MLparams = GDdims.MLparams;
