@@ -1,0 +1,625 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Ensemble generation strategies {#3.2.05_ensemble_generation_strategies} &#8212; NeuroMiner Manual</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/nm_logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">NeuroMiner Manual</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="1.0_introduction.html">
+   Introduction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="1.1_prerequisites.html">
+   Suggested Prerequisites
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="1.2_gettingstarted.html">
+   Getting Started
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  NeuroMiner interface
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.0_mainmenu.html">
+   Main interface overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.1_mainmenu_input_data.html">
+   Data entry in NeuroMiner
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="3.2_mainmenu_define_parameter_template.html">
+   Define parameter template
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="3.2.01_paramtemp_cv_settings.html">
+     Cross-validation settings
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.3_mainmenu_initialize_delete_analyses.html">
+   Initialize analyses
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.9_mainmenu_OOCV_analysis.html">
+   Out of Sample Cross-Validation {#mainmenu_OOCV}
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/executablebooks/jupyter-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fdocs/3.2.05_ensemble_generation_strategies.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/docs/3.2.05_ensemble_generation_strategies.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#filter-based-ensemble-generation">
+   Filter-based ensemble generation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#wrapper-based-model-selection">
+   Wrapper-based model selection
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Ensemble generation strategies {#3.2.05_ensemble_generation_strategies}</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#filter-based-ensemble-generation">
+   Filter-based ensemble generation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#wrapper-based-model-selection">
+   Wrapper-based model selection
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="ensemble-generation-strategies-3-2-05-ensemble-generation-strategies">
+<h1>Ensemble generation strategies {#3.2.05_ensemble_generation_strategies}<a class="headerlink" href="#ensemble-generation-strategies-3-2-05-ensemble-generation-strategies" title="Permalink to this headline">#</a></h1>
+<p>NeuroMiner automatically works with ensemble learning at the CV2 level
+across the CV1 folds of a nested, repeated cross-validation design (see
+Fig. <a class="reference external" href="#fig:nested-CV">[fig:nested-CV]</a>{reference-type=”ref”
+reference=”fig:nested-CV”}), but it also includes the ability to apply
+filters and wrappers that optimise predictions by selecting features
+within these folds (for more information, see
+<a class="reference external" href="https://en.wikipedia.org/wiki/Ensemble_learning">link</a> and <span class="xref myst">Kolhavi &amp;
+John</span>).</p>
+<section id="filter-based-ensemble-generation">
+<h2>Filter-based ensemble generation<a class="headerlink" href="#filter-based-ensemble-generation" title="Permalink to this headline">#</a></h2>
+<p>NeuroMiner has two methods of applying filters: 1) as part of the
+preprocessing of features by pre-selecting variables based on their
+relationship to the target (see
+<a class="reference external" href="#3.2.02.10_preprocessing_pipeline">[3.2.02.10_preprocessing_pipeline]</a>{reference-type=”ref”
+reference=”3.2.02.10_preprocessing_pipeline”}; 2) as an ensemble method
+where different variable sets (variable subspaces) can be chosen based
+on the performance of the machine learning training algorithm. This
+latter case is known as constrained feature optimization because the
+variable sets are produced based on the performance of an algorithm
+(e.g., correlation), the sets are evaluated with the algorithm, and then
+the models corresponding to well-performing variable sets are chosen as
+an ensemble.</p>
+<p>The first step is to turn the option to yes specifying the “train
+filter methods on CV1 partitions”. This will generate a menu with the
+following:</p>
+<p>1: Train filter methods on CV1 partitions<br />
+2: Use algorithm output scores or label predictions<br />
+3: Specify filter type<br />
+4: Define minimum number of features to be selected<br />
+5: Specify subspace optimization strategy<br />
+6: Define target population for computing optimization<br />
+7: Define subspace stepping</p>
+<p><strong>1: Train filter methods on CV1 partitions</strong> Turn constrained feature
+optimization filtering on or off.</p>
+<p><strong>2: Use algorithm output scores or label predictions</strong> Choose the
+feature sets based on majority voting of the predicted labels (hard
+decision ensemble) or based on an average of the predicted probabilities
+from the machine learning algorithm (soft decision ensemble).</p>
+<p><strong>3: Specify filter type</strong> Specify what filter will be used to obtain
+the feature sets. These methods are the same as in the preprocessing
+filter outlined in section
+<a class="reference external" href="#3.2.02.10_preprocessing_pipeline">[3.2.02.10_preprocessing_pipeline]</a>{reference-type=”ref”
+reference=”3.2.02.10_preprocessing_pipeline”}.</p>
+<p><strong>4: Define minimum number of features to be selected</strong> This gives the
+option to define a minimum number of features that are retained when
+choosing feature sets.</p>
+<p><strong>5: Specify subspace optimization strategy</strong> Once the subspaces are
+defined and the models are evaluated, this section will define which
+subspaces/models are retained. There is the option to retain one model
+of the best performing subspace, or an ensemble of models across
+well-performing subspaces.</p>
+<p>1: Subspace with maximum argmax. Argmax (arguments of the maxima) are
+the points of the domain of some function at which the function values
+are maximised. This option picks the maximum argmax across the feature
+subspaces (winner-takes-all).<br />
+2: Subspace ensemble with maximum argmax Picks the X most predictive
+subspaces with reference to the argmax.<br />
+3: Subspace ensemble with maximum argmax above a percentile Picks the
+top X% of subspaces.<br />
+4: All-subspace ensemble Uses all subspaces when training the model.</p>
+<p><strong>6: Define target population for computing optimization</strong> You can
+choose the best performing models using the CV1 training data, the CV1
+test data, or the CV1 training &amp; the test data. This means that the
+subspaces will be selected on the basis of how they predict the labels
+in each of these data folds. Selection based on training and test data
+is recommended.</p>
+<p><strong>7: Define subspace stepping</strong> This option defines how the subspaces
+are formed. The features are ranked based on the association between
+them and the target variable, and then they are divided into subspaces
+based on blocks of X% of features; e.g., blocks of 10% of features would
+divide the data into the top 10% performing features, then the top 20%
+of features, then the top 30% of features, and so on.</p>
+<p>It is important to note that once the feature subspaces are defined, the
+features within the winning subspaces can then be used in a wrapper to
+further optimise performance.</p>
+</section>
+<section id="wrapper-based-model-selection">
+<h2>Wrapper-based model selection<a class="headerlink" href="#wrapper-based-model-selection" title="Permalink to this headline">#</a></h2>
+<p>The wrapper methods in NeuroMiner use either Greedy feature selection or
+simulated annealing to select feature combinations that maximise the
+predictive accuracy of a model in the CV1 data. You will see the
+following menu:</p>
+<p>1 : Deactivate wrapper methods<br />
+2 : Wrapper type [Greedy feature selection (Use CV1 test data; Stop at
+k=50% of features; Cross-CV1 PFE off)]<br />
+3 : CV1 data partitions for optimization [CV1 test data]<br />
+4 : Cross-CV1 Feature selection [Cross-CV1 PFE off]</p>
+<p><strong>2: Wrapper type</strong> Select Greedy feature selection or simulated
+annealing. Each option will lead to a new menu as follows:</p>
+<p><em>Greedy Feature Selection</em><br />
+1 : Search direction [ Forward ]<br />
+2 : Early stopping [ Stop at 50% of feature pool ]<br />
+3 : Feature stepping [ Each feature will be evaluated ]</p>
+<p>The search direction must be provided (forward or backward), which
+determines whether an empty subspace is filled with features that are
+the most predictive of the target variable (forward selection) or
+whether all the variables are entered into the subspace and then
+variables are removed until the optimal model is found (backward)</p>
+<p>Early stopping is when variables are added up to a total percentage of
+the feature pool and then no more variables are added. This feature is
+useful when you want to find parsimonious solutions and also because
+restricting the feature pool can lead to better solutions.</p>
+<p>Feature stepping can also be changed from adding/removing single
+features and then testing the model, or adding/removing percentages of
+features before testing the model. Adding percentages (e.g., 5%)
+normally results in a faster processing time.</p>
+<p><em>Simulated Annealing</em><br />
+1 : Sparsity constant [ 0.01 ]<br />
+2 : Starting temperature [ 1 ]<br />
+3 : Stopping temperature [ 0.005 ]<br />
+4 : Alpha [ 0.9 ]<br />
+5 : Maximum # of iterations [ 2000 ]<br />
+6 : Maximum # of repetitions in Temperature T [ 100 ]<br />
+7 : Minimum # of repetitions until solution is accepted in T [ 30 ]<br />
+8 : k constant (smaller k ==<span class="math notranslate nohighlight">\(&gt;\)</span> less solutions accepted) [ 10 ]</p>
+<p>Simulated annealing is a probabilistic technique for approximating the
+global maximum of a function
+<a class="reference external" href="https://en.wikipedia.org/wiki/Simulated_annealing">wiki</a>. The settings
+are standard parameters for any simulated annealing analysis.</p>
+<p><strong>3: CV1 data partitions for optimization</strong> Choose either the CV1
+training, test, or test &amp; training data to optimize the feature set.</p>
+<p><strong>4: Cross-CV1 feature selection</strong> In a nested cross-validation design,
+you will have a selection of features for each of the CV1 partitions.
+This step allows you to select features across the CV1 folds and will
+reveal another menu:</p>
+<p>1 : Optimize feature selection across CV1 partitions [ yes ]<br />
+2 : Probabilistic feature extraction mode [ % Cross-CV1 feature
+selection agreement ]<br />
+3 : Apply consistency-based ranking to [ Prune unselected features from
+each model and retrain models ]</p>
+<p><em>Probabilistic feature extraction</em><br />
+1 : % Cross-CV1 feature selection agreement<br />
+2 : Absolute number of most consistently selected features<br />
+3 : Percentage of most consistently selected features</p>
+<p>The first option allows you to select features that occur across CV1
+partitions at a certain percentage rate. For example, select only
+features that appear across CV1 folds 75% of the time or above this.
+Sometimes the threshold that is set does not return any features, and
+therefore you will also be asked to define a tolerance value for this
+circumstance. For example, if the 75% criterion is not met, then reduce
+this by 25% (i.e., so then you are effectively selecting features 50% of
+the time). You will also be asked to define a minimum number of features
+that must be selected each time (e.g., 1 feature).</p>
+<p>Option 2, “Absolute number of most consistently selected features”,
+just orders the features based on the amount of times they were selected
+across the CV1 folds. Then you can select however many features that
+occur at the top of the list (e.g., you could select the top 10 most
+consistently selected features).</p>
+<p>Option 3, “Percentage of most consistently selected features”. This
+option sorts in the same way as described for absolute number of
+consistently selected features and then establishes a cut-off. The
+features above this cut-off are kept. For example, if 90% is the cut-off
+then it will select the top 10% most consistently selected features
+across the CV1 folds.</p>
+<p><em>Apply consistency-based ranking</em></p>
+<p>1 : Retrain all CV1 models after pruning them from unselected features<br />
+2 : Retrain all CV1 models using the same selected feature space</p>
+<p>Once the features are selected, you can either “1: Retrain all CV1
+models” after pruning the unselected features. Or you can completely
+retrain the models using the single optimized feature set that was found
+in the previous steps.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./docs"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Neurodiagnostics Lab LMU Munich<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

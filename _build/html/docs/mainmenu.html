@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>5. Main Interface &#8212; NeuroMiner Manual</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6. Input data into NM {#mainmenu_3.1_input_data}" href="3.1_mainmenu_input_data.html" />
+    <link rel="prev" title="4. License" href="license.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/nm_logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">NeuroMiner Manual</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="introduction.html">
+   1. NeuroMiner
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="prerequisites.html">
+   2. Suggested Prerequisites
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="gettingstarted.html">
+   3. Getting Started
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="license.html">
+   4. License
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  NeuroMiner interface
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   5. Main Interface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.1_mainmenu_input_data.html">
+   6. Input data into NM {#mainmenu_3.1_input_data}
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/docs/mainmenu.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#load-neurominer-structure">
+   5.1. Load NeuroMiner structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#save-neurominer-structure">
+   5.2. Save NeuroMiner structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#clear-neurominer-structure">
+   5.3. Clear NeuroMiner structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#change-working-directory">
+   5.4. Change Working Directory
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#open-manual">
+   5.5. Open Manual
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#utilities">
+   5.6. Utilities
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#set-root-paths-of-neuroimaging-tools-spm-freesurfer">
+     5.6.1. 1: Set root paths of neuroimaging tools (SPM/FreeSurfer)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-preprocdata-path-master">
+     5.6.2. 2: Create PreprocData path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-cvdatamat-path-master">
+     5.6.3. 3: Create CVdatamat path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-cvresults-path-master">
+     5.6.4. 4: Create CVresults path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-visdatamat-path-master">
+     5.6.5. 5: Create VISdatamat path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-optpreprocparam-path-master">
+     5.6.6. 6: Create OptPreprocParam path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-optmodel-path-master">
+     5.6.7. 7: Create OptModel path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#update-analyses-paths-to-new-root-directory">
+     5.6.8. 8: Update analyses’ paths to new root directory
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Main Interface</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#load-neurominer-structure">
+   5.1. Load NeuroMiner structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#save-neurominer-structure">
+   5.2. Save NeuroMiner structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#clear-neurominer-structure">
+   5.3. Clear NeuroMiner structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#change-working-directory">
+   5.4. Change Working Directory
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#open-manual">
+   5.5. Open Manual
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#utilities">
+   5.6. Utilities
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#set-root-paths-of-neuroimaging-tools-spm-freesurfer">
+     5.6.1. 1: Set root paths of neuroimaging tools (SPM/FreeSurfer)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-preprocdata-path-master">
+     5.6.2. 2: Create PreprocData path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-cvdatamat-path-master">
+     5.6.3. 3: Create CVdatamat path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-cvresults-path-master">
+     5.6.4. 4: Create CVresults path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-visdatamat-path-master">
+     5.6.5. 5: Create VISdatamat path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-optpreprocparam-path-master">
+     5.6.6. 6: Create OptPreprocParam path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#create-optmodel-path-master">
+     5.6.7. 7: Create OptModel path master
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#update-analyses-paths-to-new-root-directory">
+     5.6.8. 8: Update analyses’ paths to new root directory
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="main-interface">
+<h1><span class="section-number">5. </span>Main Interface<a class="headerlink" href="#main-interface" title="Permalink to this headline">#</a></h1>
+<p>NeuroMiner is software that has a text-based interface and works from
+the MATLAB command line. This implies that all analyses are implemented
+by selecting options from text menus and entering parameters when asked
+to do so. Each of the menus share a similar format as described in the
+following example.</p>
+<p>After the neuroimaging paths have been established, the first time that
+NeuroMiner is run the user will see the <strong>MAIN INTERFACE</strong> (see
+Fig.<a class="reference external" href="#fig:NM_start-screen">1</a>{reference-type=”ref”
+reference=”fig:NM_start-screen”}) that consists of 4 different options
+that are numbered 1-4. Below these numerical options there is also an
+option to go <strong>Back/Quit (Q)</strong>.Below the dividing line (i.e.,
+==========), the user can enter their choice of option in the space
+after <strong>Menu choice (1-4/Q) (Default: Q)?</strong>.</p>
+<p><img alt="The main starting display ofNeuroMiner" src="docs/Images/NM_start-screen" />{#fig:NM_start-screen
+width=”0.8\linewidth”}</p>
+<p>In this example, the user can do one of three things:</p>
+<ul class="simple">
+<li><p>1) to select one of the 4 numerals corresponding to each option and
+press the enter key on the keyboard;</p></li>
+<li><p>2) to enter “Q” to go back to the previous menu, or if they are
+in the <strong>MAIN INTERFACE</strong> to quit the program;</p></li>
+<li><p>3) to simply press the enter key and the program will activate the
+default option–in this case, to quit the program.</p></li>
+</ul>
+<p>For example, a user could press “2” followed by the enter key to
+“Load NeuroMiner structure”. The NeuroMiner MATLAB structure (“NM”)
+is the primary variable that NeuroMiner uses to store data, settings,
+analyses, and results. For example, when a user inputs data into
+NeuroMiner it is stored in the NM structure as a data matrix. Then when
+the user chooses settings or performs an analysis, all of these inputs
+and outputs are stored in the structure as well. This means that the NM
+structure forms the core of any analysis within NeuroMiner.</p>
+<p>It is important to note that the NeuroMiner structure is not
+automatically saved during analyses in order to give the user more
+control. This means that the user must save the structure periodically
+during the analysis using the menu item <strong>10: Save NeuroMiner
+structure</strong>.</p>
+<p>NeuroMiner will <strong>automatically change</strong> the items in all menus based on
+two main criteria:</p>
+<ul class="simple">
+<li><p>1) Whether a NeuroMiner MATLAB structure storing all the
+information from a previous analysis has been loaded to the MATLAB
+workspace;</p></li>
+<li><p>2) The individual options that are selected during a NeuroMiner
+session.</p></li>
+</ul>
+<p>For example, if a NM structure is loaded prior to the start of a
+NeuroMiner session then the program will automatically detect this and
+the <strong>MAIN INTERFACE</strong> will specifically relate to the loaded analysis.
+Similarly, if specific options are chosen during the establishment of
+the analysis then the menus will adapt to the chosen settings and
+options that do not apply to the analysis will be removed.</p>
+<p><strong>The Main Interface After Data Has Been Loaded and Processed</strong></p>
+<p>Once the user has entered and processed data (see section
+<a class="reference external" href="#mainmenu_3.1_input_data">[mainmenu_3.1_input_data]</a>{reference-type=”ref”
+reference=”mainmenu_3.1_input_data”}), the <strong>MAIN INTERFACE</strong> will
+change to the following:</p>
+<p>1: Inspect data used for model discovery and cross-validation<br />
+2: Set up NM parameter workspace<br />
+3: Initialize &amp; manage analyses<br />
+4: Preprocess features<br />
+5: Train supervised classifiers<br />
+6: Visualise classifiers<br />
+7: Display training results<br />
+8: Generate master files<br />
+9: Load NeuroMiner structure<br />
+10: Save NeuroMiner structure<br />
+11: Clear NeuroMiner structure<br />
+12: Change working directory<br />
+13: Open Manual<br />
+14: Utilities<br />
+Back/Quit[Q]</p>
+<p>These options are major functional domains related to the methods and
+stages of machine learning analysis using NeuroMiner. The contents of
+each of these options are described throughout the manual, but it is
+important to understand the overall analytic workflow that the program
+uses by briefly describing each of the options above.</p>
+<p>= [diamond, draw, fill=blue!20, text width=5.5em, text badly centered,
+node distance=3cm, inner sep=0pt] = [rectangle, draw, fill=blue!20,
+text width=8em, text centered, rounded corners, minimum height=4em] =
+[rectangle, draw, fill=red!20, text width=10em, text centered, rounded
+corners, minimum height=4em] = [draw, -latex’] = [draw,
+ellipse,fill=red!20, text centered, text width=6em, node distance=3cm,
+minimum height=3em]</p>
+<p><strong>1: Input data into NM</strong> The entry of data is the most important aspect
+of any analysis. When data is entered into NeuroMiner, it is stored
+within a MATLAB structure called “NM” (i.e., “NeuroMiner”) in the
+workspace. All other analyses and results are then added to this NM
+structure as the user progresses. The contents of the structure can also
+be viewed from the MATLAB command line.</p>
+<p><strong>2: Define parameter template</strong> Once the data have been entered, the
+first step of any analysis is to define machine learning options. Within
+this menu, the user can establish the cross-validation framework (e.g.,
+nested cross-validation), perform essential preprocessing operations on
+the data (e.g., scaling), choose the machine learning algorithm (e.g.,
+SVM), define the machine learning algorithm settings (e.g., C values),
+and perform other operations on the data.</p>
+<p><strong>3: Initialize/Delete analyses</strong> After the entry of all the settings
+for an analysis, the user can then ‘initialize’ these settings in
+preparation for processing.This option saves the parameters in an
+analysis structure, which the user can then select when they go to
+process the data. This is a great feature because it means that the user
+can define multiple different analyses for the same dataset by changing
+parameters in the ‘parameter template’ and then initializing separate
+analyses.</p>
+<p><strong>4: Preprocess Features</strong> In NeuroMiner, the analysis can be split into
+two parts: preprocessing features and training supervised classifiers.
+Preprocessing in NeuroMiner can also be called ‘feature preparation and
+selection’, and involves preparing the data for machine learning
+analysis (e.g., a support vector machine). For example, the researcher
+may want to covary for age and sex, perform a Principal Components
+Analysis, and scale neuroimaging data prior to analysis. Neurominer
+performs all preprocessing steps within the cross-validation structure,
+which is recognised as the most valid approach. Allowing the user to
+preprocess their data first within the cross-validation structure can
+save a lot of computational resources and time because it means that the
+researcher can run multiple analyses from the same preprocessed data.</p>
+<p><strong>5: Train supervised classifiers</strong> This option allows the user to
+select and run the machine learning analysis. For example, the user can
+run a support vector machine across a range of C parameters. The results
+of this analysis are then stored in the NM structure.</p>
+<p><strong>6: Visualise classifiers</strong> This step is optional. In a standard
+machine learning analysis, it is often unclear how each of the features
+(e.g., imaging voxels or variables) contribute to the prediction
+accuracy and they are often not in the same space as the original
+images. For this reason, the user has the option within NeuroMiner
+calculate statistics for each feature with the ‘visualise classifiers’
+option. When using neuroimaging data, this option also projects (i.e.,
+transforms) the data into the original space so that it can be viewed in
+a similar manner as other neuroimaging results in nii files.</p>
+<p><strong>7: Display training results</strong> Based on the above essential steps, and
+the optional step to visualise the classifiers, the results of the
+analysis will be ready to be viewed with this step. For example, the
+user can view the accuracy, the frequency of model selection, the
+classifier weights that are applied to each variable, and any additional
+visualisation routines that have been run.</p>
+<p><strong>8: Generate master files</strong> As mentioned above, NeuroMiner stores
+settings and analysis results in the NM structure within MATLAB, which
+is visible in the workspace. In addition to this, NeuroMiner can also
+store individual files related to steps <strong>4: Preprocess Features</strong> and
+<strong>5: Train supervised classifiers</strong> above. When NeuroMiner does this, it
+stores a single file for each permutation within the cross-validation
+framework–as described later. These individual files can then be saved
+as “master files” using this option.</p>
+<p><strong>9 - 11: Load, save, and clear NeuroMiner structure</strong> These options
+allow the user to load the NM structure (where all the settings and
+analyses are stored) to the MATLAB workspace, to save the structure as a
+file, and to clear the structure from the workspace.</p>
+<p><strong>12: Change working directory</strong> In similarity to most neuroimaging
+software, NeuroMiner operates from a “working directory” where
+preprocessing or analysis files are saved during any analysis. The
+working directory is automatically the directory where NeuroMiner is
+started, but can be changed using this item.</p>
+<p><strong>13: Open manual</strong> This opens the manual that you are reading right
+now.</p>
+<p><strong>14: Utilities</strong> Contains functions related to FreeSurfer and ability
+to add SPM/FreeSurfer paths to the NeuroMiner environment.</p>
+<section id="load-neurominer-structure">
+<h2><span class="section-number">5.1. </span>Load NeuroMiner structure<a class="headerlink" href="#load-neurominer-structure" title="Permalink to this headline">#</a></h2>
+<p>As outlined in section <a class="reference external" href="#mainmenu">1</a>{reference-type=”ref”
+reference=”mainmenu”}, the NM structure is the core structure that
+NeuroMiner uses to store and process data. This option allows the user
+to load it from a .mat file.</p>
+</section>
+<section id="save-neurominer-structure">
+<h2><span class="section-number">5.2. </span>Save NeuroMiner structure<a class="headerlink" href="#save-neurominer-structure" title="Permalink to this headline">#</a></h2>
+<p>This option allows the user to save the NeuroMiner structure (NM) as a
+.mat file in a folder of the users choosing. Notably, any changes that
+are made to the settings of NeuroMiner during an active session are
+stored within the NM structure in the workspace. However, program
+crashes can lead to the loss of information. We recommend to save the NM
+structure at critical points of the analysis: 1) After data entry; 2)
+after structure initialization; and 3) after preprocessing or analysis.
+This ensures that no data is lost.</p>
+</section>
+<section id="clear-neurominer-structure">
+<h2><span class="section-number">5.3. </span>Clear NeuroMiner structure<a class="headerlink" href="#clear-neurominer-structure" title="Permalink to this headline">#</a></h2>
+<p>This option will clear the NeuroMiner structure <strong>from the workspace</strong>.
+This will allow the user to select another structure or enter different
+data.</p>
+</section>
+<section id="change-working-directory">
+<h2><span class="section-number">5.4. </span>Change Working Directory<a class="headerlink" href="#change-working-directory" title="Permalink to this headline">#</a></h2>
+<p>NeuroMiner will save files in the directory that it is loaded from. This
+option allows the user to change the working directory.</p>
+</section>
+<section id="open-manual">
+<h2><span class="section-number">5.5. </span>Open Manual<a class="headerlink" href="#open-manual" title="Permalink to this headline">#</a></h2>
+<p>This feature is currently not functional. Please open the manual
+normally.</p>
+</section>
+<section id="utilities">
+<h2><span class="section-number">5.6. </span>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">#</a></h2>
+<section id="set-root-paths-of-neuroimaging-tools-spm-freesurfer">
+<h3><span class="section-number">5.6.1. </span>1: Set root paths of neuroimaging tools (SPM/FreeSurfer)<a class="headerlink" href="#set-root-paths-of-neuroimaging-tools-spm-freesurfer" title="Permalink to this headline">#</a></h3>
+<p>If you want to process structural MRI (nii) or surface files from
+FreeSurfer (mgz) then the paths of these tools need to be established.
+This option will establish the paths. If the user does not establish the
+paths, then the neuroimaging functions will not be displayed.</p>
+</section>
+<section id="create-preprocdata-path-master">
+<h3><span class="section-number">5.6.2. </span>2: Create PreprocData path master<a class="headerlink" href="#create-preprocdata-path-master" title="Permalink to this headline">#</a></h3>
+<p>The option allows the user to update the existing path for only the
+pre-processed data.</p>
+</section>
+<section id="create-cvdatamat-path-master">
+<h3><span class="section-number">5.6.3. </span>3: Create CVdatamat path master<a class="headerlink" href="#create-cvdatamat-path-master" title="Permalink to this headline">#</a></h3>
+<p>This option facilitates the user to update path for the cross-validated
+data.</p>
+</section>
+<section id="create-cvresults-path-master">
+<h3><span class="section-number">5.6.4. </span>4: Create CVresults path master<a class="headerlink" href="#create-cvresults-path-master" title="Permalink to this headline">#</a></h3>
+<p>This enables to user to configure the cross-validated results in a new
+directory.</p>
+</section>
+<section id="create-visdatamat-path-master">
+<h3><span class="section-number">5.6.5. </span>5: Create VISdatamat path master<a class="headerlink" href="#create-visdatamat-path-master" title="Permalink to this headline">#</a></h3>
+<p>This option sets up the user defined-updated path after running the
+visualisation.</p>
+</section>
+<section id="create-optpreprocparam-path-master">
+<h3><span class="section-number">5.6.6. </span>6: Create OptPreprocParam path master<a class="headerlink" href="#create-optpreprocparam-path-master" title="Permalink to this headline">#</a></h3>
+<p>This is to create a master file that can be used for batch scripts or
+when repetitive actions are carried out on a set of files the user
+creates the file list once and does not waste to search specific file
+sets</p>
+</section>
+<section id="create-optmodel-path-master">
+<h3><span class="section-number">5.6.7. </span>7: Create OptModel path master<a class="headerlink" href="#create-optmodel-path-master" title="Permalink to this headline">#</a></h3>
+<p>this is to create a master file that can be used for batch scripts or
+when repetitive actions are carried out on a set of files the user
+creates the file list once and does not waste to search specific file
+sets.</p>
+</section>
+<section id="update-analyses-paths-to-new-root-directory">
+<h3><span class="section-number">5.6.8. </span>8: Update analyses’ paths to new root directory<a class="headerlink" href="#update-analyses-paths-to-new-root-directory" title="Permalink to this headline">#</a></h3>
+<p>This is an important utility option which allows the users to update the
+NM structure path, if the user wants to continue the analysis in another
+directory. By selecting this option, all the paths in the NM structure
+are updated according to the new/selected location.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./docs"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="license.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">4. </span>License</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="3.1_mainmenu_input_data.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>Input data into NM {#mainmenu_3.1_input_data}</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Neurodiagnostics Lab LMU Munich<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,794 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Example {#mainmenu_3.10_example} &#8212; NeuroMiner Manual</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/nm_logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">NeuroMiner Manual</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="1.0_introduction.html">
+   Introduction
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="1.1_prerequisites.html">
+     Suggested Prerequisites
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="1.2_gettingstarted.html">
+     Getting Started
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="license.html">
+     License
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  NeuroMiner interface
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.0_mainmenu.html">
+   1. Load NeuroMiner structure
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.1_mainmenu_input_data.html">
+   7. SPM
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/executablebooks/jupyter-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fdocs/3.10_Example.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/docs/3.10_Example.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-structural-neuroimaging-data">
+   Example: Structural NeuroImaging Data
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Example {#mainmenu_3.10_example}</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-structural-neuroimaging-data">
+   Example: Structural NeuroImaging Data
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="example-mainmenu-3-10-example">
+<h1>Example {#mainmenu_3.10_example}<a class="headerlink" href="#example-mainmenu-3-10-example" title="Permalink to this headline">#</a></h1>
+<p>For a first-time user, NeuroMiner might be best described using an
+example. This section will run through a simple example using structural
+neuroimaging data.</p>
+<section id="example-structural-neuroimaging-data">
+<h2>Example: Structural NeuroImaging Data<a class="headerlink" href="#example-structural-neuroimaging-data" title="Permalink to this headline">#</a></h2>
+<p>The sample data for this example is open source and can be found in
+(<a class="reference external" href="http://cobre.mrn.org/">link</a>). We processed the data with the Voxel
+Based Morphometry (VBM) toolbox and we’re going to use the mwrp1
+(grey-matter segmented, realigned, warped, modulated) images. Each voxel
+of these images represents the relative volume of grey matter at any
+location. The aim of the analysis is to predict who is an individual
+with a diagnosis of schizophrenia and who doesn’t have a diagnosis
+purely from the grey matter volumes. Based on previous research, the
+hypothesis is that those with schizophrenia will be able to be
+distinguished with approximately 70% accuracy.</p>
+<p>If the SPM path has been added to NeuroMiner, then the main menu will
+look like the following:</p>
+<p>1 : Load data for model discovery and cross-validation<br />
+2 : Load NeuroMiner structure<br />
+3 : Change working directory<br />
+4 : Utilities</p>
+<p>The first step is to enter the data using the first option, which will
+display the following menu:</p>
+<p>1 : Define machine learning framework [ classification ]<br />
+2 : Select data input format [ nifti ]<br />
+3 : Define no. of samples and sample identifiers [ ??? ]<br />
+4 : Involve unlabeled cases in the analyses [ no ]<br />
+5 : Select space-defining image [ ? ]<br />
+6 : Describe data [ ? ]</p>
+<p>So, we’re going to leave the machine learning framework as
+classification because this is a classification problem, and since we
+haven’t conducted an SPM analysis we will also opt to import NIFTI files
+directly. I’ll then select the third option to define the number of
+samples and will define the following:</p>
+<p>Number of groups? : 2<br />
+Define name of group number 1 : SCZ<br />
+Define name of group number 2 : CTRL</p>
+<p>I’ve entered the individuals which a schizophrenia diagnosis first
+because then the sensitivity accuracy of the analysis will be based on
+this group rather than the controls. Once this data is entered, then the
+menu changes to the following:</p>
+<p>1 : Define machine learning framework [ classification ]<br />
+2 : Select data input format [ nifti ]<br />
+3 : Modify no. samples [ N=2 ] and sample identifiers [ SCZ, CTRL ]<br />
+4 : Involve unlabeled cases in the analyses [ no ]<br />
+5 : Select space-defining image [ ? ]<br />
+6 : Map image files to samples [ ? ]<br />
+7 : Describe data [ ? ]</p>
+<p>I don’t want to “Involve unlabeled cases in the analysis”, so I’ll
+then select the space-defining image (i.e., the mask; keep in-mind that
+the images will be resliced to this). I’ll either be able to select a
+region from the WFU PickAtlas or just use my own mask. For this
+analysis, I don’t want to select individual regions, so I’m going to
+select option 2 and use a pre-prepared ICBM mask in my templates folder.
+Then because the template is not completely binary and there is a
+transition from 0 to 1 at the border of the brain, I’m going to select a
+threshold of 0.5 and then define the regions that are greater than or
+equal to this threshold (i.e., <span class="math notranslate nohighlight">\(&gt;\)</span>=).</p>
+<p>I then select option 6 to “Map image files to samples” and a file
+selector box will appear that is the same as in SPM. At the top of the
+box, you will see what the box is for: “Select nifti for sample 1:
+SCZ”. To select the images, I could navigate to the directory on the
+left and select images, but we recommend to have a file that stores the
+absolute paths of each of the images in a separate text file. This is
+because it keeps a record of what has been entered, but mainly because
+the order of the images is very important for later steps. As an
+example, my file looks like this:</p>
+<p>/NeuroDiagStor1/COBRE/Data/0040000/mwrp1mprage.nii<br />
+/NeuroDiagStor1/COBRE/Data/0040001/mwrp1mprage.nii<br />
+/NeuroDiagStor1/COBRE/Data/0040002/mwrp1mprage.nii<br />
+…</p>
+<p>Once I have this file, I then press the small button on the bottom left
+called “Ed” and an editor will appear. Then I paste the files into
+this editor, first for the SCZ group and then for the CTRL group. I then
+go back to the main menu and enter the global grey matter volumes (or
+the intracranial volume) with data that I have loaded into the MATLAB
+workspace. It is critical that these global volume data are in the same
+order as the subjects that I have just entered into NeuroMiner. If they
+are in the wrong order then the results of the analysis will be invalid.</p>
+<p>I then go back to the main menu and there will now be an option to
+“Inspect images”. I press this, check that the images have been read
+correctly and then enter a few images to visually inspect. In this case,
+1:4. This will display the space-defining mask image as well as the
+first 4 of my mwrp images. They look good, so I will then choose
+“Describe data” and enter: COBREmwrp1. After this, I will “IMPORT”
+the images and this will lead to reslicing and masking with the
+space-defining image (i.e., my ICBM template).</p>
+<p>After the data has been imported, a “MODALITIES” menu will appear with
+the analysis descriptor (i.e., COBREmwrp1) at the top, then some details
+about the images. It is important to check that these settings are
+correct, and the dimensionality of the images. NeuroMiner automatically
+reports the number of features and the percentage of zero/NaN (“not a
+number”) features. This is important for later analysis (e.g., if there
+are NaN features then they probably need to be excluded. It is also
+important to note that for this analysis, no covariates have been found
+in the NM workspace because they have not been entered yet.</p>
+<p>I want to enter covariates of age and sex, so I will choose option “5:
+Add covariate(s) to NM workspace”. These covariates must be already
+loaded prior to entering into NeuroMiner, otherwise you will have to
+exit the program, load the covariates, and then enter the program again.
+After pressing 5, I will then enter the variable that I’ve previously
+loaded “cobre_covars” and then name the covariates “one-by-one”
+because there are only two: age and sex. It’s important to note that
+these variables will just be entered to the NM structure and the <strong>will
+not be controlled for these variables</strong> until you add this as a
+preprocessing step.</p>
+<p>So now that my variables are in then I’ll choose “6: Finish data import
+for discovery &amp; cross-validation analysis”. This means that the data
+will be saved in the NeuroMiner structure and I don’t be able to modify
+it or add to it again. NeuroMiner locks the data down like this in order
+to make sure that latter analyses and organisation, relate to the same
+dataset. So, now that the data are in, I’ll be taken to the main
+NeuroMiner menu where I can set-up my analyses.</p>
+<p>1 : Inspect data used for model discovery and cross-validation<br />
+2 : Set up NM parameter workspace<br />
+3 : Initialize &amp; manage analyses<br />
+4 : Preprocess features<br />
+5 : Train supervised classifiers<br />
+6 : Load NeuroMiner structure<br />
+7 : Save NeuroMiner structure<br />
+8 : Clear NeuroMiner structure<br />
+9 : Change working directory<br />
+10 : Utilities</p>
+<p>As described in section <a class="reference external" href="#mainmenu">[mainmenu]</a>{reference-type=”ref”
+reference=”mainmenu”}, I will need to first set up a parameter template
+with the settings that I want, initialize the analysis, and then run it.
+For this reason, I’ll go to “2: Set up NM parameter workspace” and it
+will take me to the following menu (see section
+<a class="reference external" href="#3.2_define_parameter_template">[3.2_define_parameter_template]</a>{reference-type=”ref”
+reference=”3.2_define_parameter_template”}):</p>
+<p>1 : Cross-validation settings [ ??? ]<br />
+2 : Preprocessing pipeline [ … ]<br />
+3 : Classification algorithm [ … ]<br />
+4 : Learning algorithm parameters [ … ]<br />
+5 : Ensemble generation strategies [ … ]<br />
+6 : Visualization options [ … ]<br />
+7 : Model saving options [ ??? ]<br />
+8 : Save parameter template<br />
+9 : Load training template<br />
+10 : Define verbosity level [ Detailed output ]</p>
+<p>The fields with question marks “???” need to be completed before the
+analysis can be initialized or run, whereas the other sections are
+pre-set with default settings. The first thing that I need to do is to
+set-up cross-validation in step 1. Pressing this enters the
+cross-validation menu (see section
+<a class="reference external" href="#3.2.01_cross-validation_settings">[3.2.01_cross-validation_settings]</a>{reference-type=”ref”
+reference=”3.2.01_cross-validation_settings”}):</p>
+<p>1 : Select cross-validation framework [ (Pooled) cross-validation ]<br />
+2 : Define no. of CV2 permutations [ P2 = 10 ]<br />
+3 : Define no. of CV2 folds [ K2 = 10 ]<br />
+4 : Define no. of CV1 permutations [ P1 = 10 ]<br />
+5 : Define no. of CV1 folds [ K1 = 10 ]<br />
+6 : Equalize class sizes at the CV1 cycle by undersampling [no]<br />
+7 : Build CV2/CV1 structure<br />
+8 : Load CV structure<br />
+9 : Save CV structure</p>
+<p>It’s automatically set-up with repeated, nested, cross-validation, which
+is the gold standard cross-validation set-up currently (see Fig.
+<a class="reference external" href="#fig:nested-CV">[fig:nested-CV]</a>{reference-type=”ref”
+reference=”fig:nested-CV”}). I could change these settings, but in this
+case I think they’re great for my sample so I’ll just choose the option
+to “7: Build CV2/CV1 structure”. This will then build the structure
+and then I’ll go back to the paramter settings menu by simply pressing
+the enter key because here the default option is to quit the menu.</p>
+<p>I’ll then enter the pre-processing menu by typing “2” and hitting
+enter. This will show me a few default settings:</p>
+<p>=========================<br />
+CV-PREPROCESSING PIPELINE<br />
+=========================<br />
+<span class="math notranslate nohighlight">\(&gt;&gt;\)</span> Step 1: Scale [ from 0 to 1 ], zero-out completely non-finite
+features<br />
+Step 2: Prune non-informative columns from matrix [ Zero Var, Nan, Inf
+]</p>
+<p>And the other settings that I could add are:<br />
+1 : Enable spatial operations using Spatial OP Wizard<br />
+2 : Add preprocessing step<br />
+3 : Remove preprocessing step<br />
+4 : Insert preprocessing step<br />
+5 : Replace current preprocessing step<br />
+6 : Modify current preprocessing step<br />
+7 : Next step <span class="math notranslate nohighlight">\(&gt;&gt;\)</span><br />
+8 : Change order of preprocessing steps</p>
+<p>For this analysis, I don’t want to scale the data first because in
+previous tests I found that this introduced some noise in the ventrices
+and I don’t need to prune non-informative columns because I know that
+there are no NaN or Zero variance features in the data from when I did
+the import. So I’ll remove both of these by pressing “3” and then
+“3” again.</p>
+<p>Now that the CV-PREPROCESSING PIPELINE is empty, I’ll add the operations
+I want using option “2: Add preprocessing step” and will see this
+menu:</p>
+<p>1 : Correct data for nuisance covariates using partial correlations<br />
+2 : Apply dimensionality reduction method to data<br />
+3 : Standardize data<br />
+4 : Scale data<br />
+5 : Normalize to group mean<br />
+6 : Normalize data to unit vector<br />
+7 : Apply binning method to data<br />
+8 : Prune non-informative columns from data matrix<br />
+9 : Rank / Weight features<br />
+10 : Correct group offsets from global group mean<br />
+11 : Extract variance components from data</p>
+<p>Then I’ll add the option to “Correct data for nuisance covariates”
+(section
+<a class="reference external" href="#3.2.02.2_preprocessing_pipeline">[3.2.02.2_preprocessing_pipeline]</a>{reference-type=”ref”
+reference=”3.2.02.2_preprocessing_pipeline”}). I’ll then select option 1
+and select both covariates by entering “1:2”, and I’ll keep the rest
+of the default settings so that age and sex will the regressed from the
+entire sample. After I’ve set these options, I’ll then quit to go back
+to the preprocessing menu.</p>
+<p>After covarying for nuisance covariates, I now want to perform a
+dimensionality reduction so I will select “2: add preprocessing step”
+and then “Apply dimensionality reduction method to data” (section
+<a class="reference external" href="#3.2.02.3_preprocessing_pipeline">[3.2.02.3_preprocessing_pipeline]</a>{reference-type=”ref”
+reference=”3.2.02.3_preprocessing_pipeline”}). There are a lot of
+options, but basically it seems that PCA works well most of the time so
+I’ll select “1: Principal components analysis”. Then I’ll keep all the
+defaults because these work well too, and return to the main menu. In
+this step, if I had have wanted to optimise over a number of different
+component reductions, then I could have defined the energy as 1,
+returned to the preprocessing menu, added another step, and then added
+extracted component subspaces and defined something like [0.2 0.4 0.6
+0.8] to see how the algorithm performs when I retain from 20 to 80% of
+the energy.</p>
+<p>Then I want to add some scaling because I’m going to use an SVM and the
+data must be scaled for this and also because it makes the results more
+interpretable. So I’ll select “4: Scale data” and again just accept
+the defaults. Now the CV PREPROCESSING PIPELINE should include:</p>
+<p>[=========================<br />
+CV-PREPROCESSING PIPELINE<br />
+=========================]{style=”color: blue”}<br />
+<span class="math notranslate nohighlight">\(&gt;&gt;\)</span> Step 1: Correct for nuisance covariates [age,sex]<br />
+Step 2: Apply dimensionality reduction [ PCA ]<br />
+Step 3: Scale [ from 0 to 1 ], zero-out completely non-finite features</p>
+<p>And this will be applied within each of the CV1 folds.</p>
+<p>I’ll then go back to the main parameter template menu by pressing enter
+and will see this:</p>
+<p>1 : Cross-validation settings [ … ]<br />
+2 : Preprocessing pipeline [ … ]<br />
+3 : Classification algorithm [ … ]<br />
+4 : Learning algorithm parameters [ … ]<br />
+5 : Ensemble generation strategies [ … ]<br />
+6 : Visualization options [ … ]<br />
+7 : Model saving options [ ??? ]<br />
+8 : Save parameter template<br />
+9 : Load training template<br />
+10 : Define verbosity level [ Detailed output ]</p>
+<p>Then I want to define the classification algorithm by pressing “3:
+Classification algorithm” (see section
+<a class="reference external" href="#3.2.03_classification_algorithm">[3.2.03_classification_algorithm]</a>{reference-type=”ref”
+reference=”3.2.03_classification_algorithm”}). The default in NeuroMiner
+is to implement a SVM, and the only thing that I want to change is the
+performance measure to Balanced Accuracy instead of accuracy. I can do
+this by selecting the “performance criterion” and then selecting
+“Balanced accuracy: BAC…”. Then I’ll return to the parameter
+template menu by pressing enter again.</p>
+<p>Here I could change the learning algorithm parameters (see section
+<a class="reference external" href="#3.2.04_learning_algorithm_parameters">[3.2.04_learning_algorithm_parameters]</a>{reference-type=”ref”
+reference=”3.2.04_learning_algorithm_parameters”}), but I want to keep
+the defaults again. It’s important to note here that I’m keeping a range
+of C parameters that will be optimised during the nested
+cross-validation. I could also enable some filters and wrappers (see
+section
+<a class="reference external" href="#3.2.05_ensemble_generation_strategies">[3.2.05_ensemble_generation_strategies]</a>{reference-type=”ref”
+reference=”3.2.05_ensemble_generation_strategies”}), but these are more
+advanced features that can be addressed in a further tutorial. I could
+also enable visualization options (such as the derivation of Z or
+p-values; see section
+<a class="reference external" href="#3.2.06_visualization_options">[3.2.06_visualization_options]</a>{reference-type=”ref”
+reference=”3.2.06_visualization_options”}), but because I have enabled
+PCA these will be overly conservative and so I won’t use them.</p>
+<p>The final thing to do is to specify “7: Model saving options”. For
+this, I’ll choose that I don’t want to save the models because it will
+take up a lot of space (i.e., more than 10 000 models). Then I’ll define
+a name anyway because this is required in NeuroMiner. Then I’ll return
+to the MAIN INTERFACE menu of NeuroMiner by pressing the enter key until
+I get back here:</p>
+<p>1 : Inspect data used for model discovery and cross-validation<br />
+2 : Set up NM parameter workspace<br />
+3 : Initialize &amp; manage analyses<br />
+4 : Preprocess features<br />
+5 : Train supervised classifiers<br />
+6 : Load NeuroMiner structure<br />
+7 : Save NeuroMiner structure<br />
+8 : Clear NeuroMiner structure<br />
+9 : Change working directory<br />
+10 : Utilities</p>
+<p>From this menu, I’ll then need to “3: initialize &amp; manage analyses”
+(see section
+<a class="reference external" href="#3.3_initialize_delete_analyses">[3.3_initialize_delete_analyses]</a>{reference-type=”ref”
+reference=”3.3_initialize_delete_analyses”}) where I’ll see this:</p>
+<p>Define analysis identifier [ ? ]<br />
+Provide analysis description [ ? ]<br />
+Specify parent directory of the analysis [ ? ]<br />
+PROCEED <span class="math notranslate nohighlight">\(&gt;&gt;&gt;\)</span></p>
+<p>I’ll then define the identifier as “COBRE_SVM_analysis1”, provide a
+description of the analysis “This is a test analysis using the COBRE
+dataset”, and specify the parent directory of the analysis using the
+file selector box that pops up. Then I’ll “PROCEED” and a directory
+will be created in the directory. Within this directory you will find a
+log file that outlines the operating system and the settings that I have
+just defined. After assuring myself that these are ok, then I’ll go back
+to the main menu.</p>
+<p>Now I have the option to “4: preprocess features” (see section
+<a class="reference external" href="#3.4_preprocess_features">[3.4_preprocess_features]</a>{reference-type=”ref”
+reference=”3.4_preprocess_features”}) first, which will apply all the
+preprocessing steps I defined to the CV1 folds. Or alternatively, I
+could simply “5: Train supervised classifiers” (see section
+<a class="reference external" href="#3.5_train_supervised_classifiers">[3.5_train_supervised_classifiers]</a>{reference-type=”ref”
+reference=”3.5_train_supervised_classifiers”} from scratch and
+automatically preprocess the features as part of this. I want to
+preprocess first here because then I can run other parameters later with
+this preprocessed data, so I’ll select “4: Preprocess features”. Which
+will activate:</p>
+<p>1 : Overwrite existing preprocessed data files [ no ]<br />
+2 : Use existing preprocessing parameter files, if available [ no ]<br />
+3 : Write out computed parameters to disk (may require A LOT of disk
+space) [ no ]<br />
+4 : Select CV2 partitions to operate on [ 100 selected ]<br />
+5 : PROCEED <span class="math notranslate nohighlight">\(&gt;&gt;&gt;\)</span></p>
+<p>I’ll keep all the defaults here, but I’ll select “4: Select CV2
+partitions to operate on”, then hit “4: Deselect all CV2 positions”,
+and then I’ll choose “3: Select single perm / fold range” and enter
+[1,1,1,10] to select the first permutation and folds 1-10. This is
+because selecting all permutations will take a lot of time and is not
+required for this example. Then I’ll hit enter to go back to the main
+menu and then “5: PROCEED”. The analysis should run now, and I’ll go
+and get some lunch.</p>
+<p>When I get back, the analysis should have finished and NeuroMiner should
+have returned to the main menu. All the preprocessed data files should
+be stored in the subdirectory for this analysis that I activated
+previously. Now all that’s left to do is to actually train the
+classifiers. This can be done by selecting “5: Train supervised
+classifiers” then “2: Operation mode of ML training module” and
+select “2: Compute using existing preprocdata-MATs” and when the file
+selector box appears, I’ll select the preprocessed datamats from the
+previous analysis. Then I’ll select “PROCEED”, check to get an initial
+impression of the accuracy , and then I’ll go and write that fellowship
+application.</p>
+<p>When I come back again, the analysis is finished and the training
+datamats are stored in the directory as well. I can now see the results
+by going to “7: Display the training results” (see
+<a class="reference external" href="#3.7_display_training_results">[3.7_display_training_results]</a>{reference-type=”ref”
+reference=”3.7_display_training_results”}), including the accuracies
+(see
+<a class="reference external" href="#fig:Display_ClassPlot">[fig:Display_ClassPlot]</a>{reference-type=”ref”
+reference=”fig:Display_ClassPlot”}). This is interesting and so now I
+want to visualise the weights on the brain. For this, I’ll go back to
+the main menu and select “Visualise Classifiers” (see section
+<a class="reference external" href="#3.6_visualize_classifiers">[3.6_visualize_classifiers]</a>{reference-type=”ref”
+reference=”3.6_visualize_classifiers”}) and select the data that I’ve
+processed and hit proceed. This will then create some images that I can
+view with a viewer such as MRICRON, FSL, SPM, MANGO, or others.</p>
+<p>If this is your own data, hopefully then you have found out about some
+problem and you can now go and publish.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./docs"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Neurodiagnostics Lab LMU Munich<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

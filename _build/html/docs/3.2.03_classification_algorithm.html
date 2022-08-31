@@ -1,0 +1,942 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Classification algorithm {#3.2.03_classification_algorithm} &#8212; NeuroMiner Manual</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/nm_logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">NeuroMiner Manual</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    <no title>
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Getting started
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="1.0_introduction.html">
+   Introduction
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="1.1_prerequisites.html">
+   Suggested Prerequisites
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="1.2_gettingstarted.html">
+   Getting Started
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  NeuroMiner interface
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.0_mainmenu.html">
+   Main interface overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.1_mainmenu_input_data.html">
+   Data entry in NeuroMiner
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="3.2_mainmenu_define_parameter_template.html">
+   Define parameter template
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="3.2.01_paramtemp_cv_settings.html">
+     Cross-validation settings
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.3_mainmenu_initialize_delete_analyses.html">
+   Initialize analyses
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="3.9_mainmenu_OOCV_analysis.html">
+   Out of Sample Cross-Validation {#mainmenu_OOCV}
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/executablebooks/jupyter-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2Fdocs/3.2.03_classification_algorithm.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/docs/3.2.03_classification_algorithm.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#classification-mode-3-2-03-1-classification-algorithm">
+   Classification mode {#3.2.03.1_classification_algorithm}
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-prediction-performance-criterion-3-2-03-1-1-performance-criterion">
+     Define prediction performance criterion {#3.2.03.1.1_performance_criterion}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#configure-learning-algorithm-3-2-03-1-2-learning-algorithm">
+     Configure learning algorithm {#3.2.03.1.2_learning_algorithm}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-kernel-type">
+     Define kernel type
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#regression-mode-3-2-03-1-regression-algorithm">
+   Regression mode {#3.2.03.1_regression_algorithm}
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-prediction-performance-criterion-3-2-03-2-1-performance-criterion">
+     Define prediction performance criterion {#3.2.03.2.1_performance_criterion}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#select-learning-algorithm-3-2-03-2-2-learning-algorithm">
+     Select learning algorithm {#3.2.03.2.2_learning_algorithm}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-kernel-type-3-2-03-2-3-kernel-type">
+     Define kernel type {#3.2.03.2.3_kernel_type}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#optimize-decision-threshold-based-on-roc-3-2-03-2-4-optimize-decision-threshold">
+     Optimize decision threshold based on ROC {#3.2.03.2.4_optimize decision threshold}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#use-adasyn-to-adjust-for-unbalanced-class-settings-3-2-03-2-5-optimize-decision-threshold">
+     Use ADASYN to adjust for unbalanced class settings {#3.2.03.2.5_optimize decision threshold}
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sequence-optimization">
+   Sequence Optimization
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#optimization-based-on">
+     Optimization based on…
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-computation-mode-for-combining-sequential-predictions">
+     Define computation mode for combining sequential predictions
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-propagation-algorithm-s-anchor">
+     Define propagation algorithm’s anchor
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-optimisation-mode">
+     Define optimisation mode
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#sequences-to-be-tested">
+     Sequences to be tested
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Classification algorithm {#3.2.03_classification_algorithm}</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#classification-mode-3-2-03-1-classification-algorithm">
+   Classification mode {#3.2.03.1_classification_algorithm}
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-prediction-performance-criterion-3-2-03-1-1-performance-criterion">
+     Define prediction performance criterion {#3.2.03.1.1_performance_criterion}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#configure-learning-algorithm-3-2-03-1-2-learning-algorithm">
+     Configure learning algorithm {#3.2.03.1.2_learning_algorithm}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-kernel-type">
+     Define kernel type
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#regression-mode-3-2-03-1-regression-algorithm">
+   Regression mode {#3.2.03.1_regression_algorithm}
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-prediction-performance-criterion-3-2-03-2-1-performance-criterion">
+     Define prediction performance criterion {#3.2.03.2.1_performance_criterion}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#select-learning-algorithm-3-2-03-2-2-learning-algorithm">
+     Select learning algorithm {#3.2.03.2.2_learning_algorithm}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-kernel-type-3-2-03-2-3-kernel-type">
+     Define kernel type {#3.2.03.2.3_kernel_type}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#optimize-decision-threshold-based-on-roc-3-2-03-2-4-optimize-decision-threshold">
+     Optimize decision threshold based on ROC {#3.2.03.2.4_optimize decision threshold}
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#use-adasyn-to-adjust-for-unbalanced-class-settings-3-2-03-2-5-optimize-decision-threshold">
+     Use ADASYN to adjust for unbalanced class settings {#3.2.03.2.5_optimize decision threshold}
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#sequence-optimization">
+   Sequence Optimization
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#optimization-based-on">
+     Optimization based on…
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-computation-mode-for-combining-sequential-predictions">
+     Define computation mode for combining sequential predictions
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-propagation-algorithm-s-anchor">
+     Define propagation algorithm’s anchor
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#define-optimisation-mode">
+     Define optimisation mode
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#sequences-to-be-tested">
+     Sequences to be tested
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="classification-algorithm-3-2-03-classification-algorithm">
+<h1>Classification algorithm {#3.2.03_classification_algorithm}<a class="headerlink" href="#classification-algorithm-3-2-03-classification-algorithm" title="Permalink to this headline">#</a></h1>
+<p>Support Vector methodologies are the base of the evaluation core of
+NeuroMiner, other methods such as k-Nearest Neighbors and Random Forests
+are also available. In this distribution we rely on the LIBSVM
+/LIBLINEAR toolboxes for the implementation of support vector based
+classifiers and regressors. matLearn is also now introduced and requires
+the Statistics and Optimization Toolbox.</p>
+<p>NeuroMiner interface will change according to the evaluation type
+selected in the data input process, two operation modes are implemented:
+Classification and Regression. The following will refer to each of these
+separately.</p>
+<section id="classification-mode-3-2-03-1-classification-algorithm">
+<h2>Classification mode {#3.2.03.1_classification_algorithm}<a class="headerlink" href="#classification-mode-3-2-03-1-classification-algorithm" title="Permalink to this headline">#</a></h2>
+<p>In this section we will describe the set up of <strong>Classifiers</strong> in
+Neurominer.</p>
+<section id="define-prediction-performance-criterion-3-2-03-1-1-performance-criterion">
+<h3>Define prediction performance criterion {#3.2.03.1.1_performance_criterion}<a class="headerlink" href="#define-prediction-performance-criterion-3-2-03-1-1-performance-criterion" title="Permalink to this headline">#</a></h3>
+<p>During machine learning, models will be optimised and evaluated based on
+a criterion. For classification problems NeuroMiner provides the
+following performances measures:</p>
+<ol class="simple">
+<li><p>Accuracy: sum(E =P)*100/N
+<a class="reference external" href="https://en.wikipedia.org/wiki/Accuracy_and_precision">ACC</a></p></li>
+<li><p>True Positive Rate: e.g. for one-class SVM <a class="reference external" href="https://en.wikipedia.org/wiki/Sensitivity_and_specificity">True Positive Rate: e.g.
+for one-class
+SVM</a></p></li>
+<li><p>False Positive Rate: e.g. for one-class SVM <a class="reference external" href="https://en.wikipedia.org/wiki/False_positive_rate">False Positive Rate:
+e.g. for one-class
+SVM</a></p></li>
+<li><p>Positive Predictive Value: e.g. for one class SVM <a class="reference external" href="https://en.wikipedia.org/wiki/Positive_and_negative_predictive_values">Positive
+Predictive Value: e.g. for one class
+SVM</a></p></li>
+<li><p>Matthews Correlation Coefficient:<br />
+(TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))<br />
+<a class="reference external" href="https://en.wikipedia.org/wiki/Matthews_correlation_coefficient">MCC</a>Matthews
+Correlation Coefficient</p></li>
+<li><p>Area-Under-the-Curve
+<a class="reference external" href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">ROC</a>Area-Under-the-Curve</p></li>
+<li><p>Geometric Mean: sqrt(PPV*True Positive Rate) <a class="reference external" href="https://en.wikipedia.org/wiki/Geometric_mean">Geometric
+Mean</a></p></li>
+<li><p>Balanced Accuracy: (sensitivity+specificity) / 2)
+<a class="reference external" href="https://en.wikipedia.org/wiki/Accuracy_and_precision#In_binary_classification">BAC</a>Balanced
+Accuracy</p></li>
+<li><p>Enhanced Balanced Accuracy: (sensitivity*specificity)/100)</p></li>
+<li><p>F-score: (1+beta2)*precision*recall /
+(beta2*(precision+recall)) * 100
+<a class="reference external" href="https://en.wikipedia.org/wiki/F1_score">F-score</a></p></li>
+<li><p>Prognostic Summary Index: PPV+NPV-100</p></li>
+<li><p>Number Needed to Predict: 1/PPV</p></li>
+</ol>
+<p>Notes: E, expected; P, predicted; TP, true positive; TN, true negative;
+FP, false positive; FN, false negative; PPV, positive predictive value;
+NPV, negative predictive value.</p>
+<p>Each of these performance measures can have an effect on the resulting
+model and is dependent on the analysis that is being conducted. For
+example, simple accuracy is useful when it doesn’t matter if sensitivity
+and specificity needs to be balanced (e.g., if sensitivity could be very
+high and specificity very low). However, if there are unequal sample
+sizes then this can lead to very unbalanced sensitivity and specificity
+that is an artifact of sample size, which can be corrected by using
+balanced accuracy (BAC).</p>
+</section>
+<section id="configure-learning-algorithm-3-2-03-1-2-learning-algorithm">
+<h3>Configure learning algorithm {#3.2.03.1.2_learning_algorithm}<a class="headerlink" href="#configure-learning-algorithm-3-2-03-1-2-learning-algorithm" title="Permalink to this headline">#</a></h3>
+<p>Learning algorithm to be used for the <strong>classification</strong> analysis. Each
+algorithm has a particular set of parameters that are described in the
+respective distributions. In general defaults are provided.</p>
+<ol class="simple">
+<li><p>SVM – <a class="reference external" href="https://www.csie.ntu.edu.tw/~cjlin/libsvm/">LIBSVM</a></p></li>
+<li><p>SVM/LR – <a class="reference external" href="https://www.csie.ntu.edu.tw/~cjlin/liblinear/">LIBLINEAR</a></p></li>
+<li><p>RVM / BAYES – <a class="reference external" href="https://github.com/ipsorakis/mRVMs">Mike Tipping’s
+implementation</a></p></li>
+<li><p>Local Learning – <a class="reference external" href="https://de.mathworks.com/matlabcentral/fileexchange/13358-fuzzy-knn">Akbas fuzzy k-Nearest Neighbors
+(fKNN)</a></p></li>
+<li><p>Univariate – GLM Logistic Regression <a class="reference external" href="https://de.mathworks.com/help/stats/glmfit.html">MATLAB
+glmfit</a></p></li>
+<li><p>Decision Tree – <a class="reference external" href="http://de.mathworks.com/help/stats/classification-trees-and-regression-trees.html">MATLAB Statistics Toolbox implementation of the
+Decision Tree
+algorithm</a></p></li>
+<li><p>Random Forest – <a class="reference external" href="https://de.mathworks.com/matlabcentral/fileexchange/31036-random-forest">Abhishek Jaiantilal’s fast Random Forest algorithm
+for MATLAB
+</a></p></li>
+<li><p>matLearn –
+<a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Software/matLearn.html">matLearn</a>.
+This only works when users have the Statistics and Optimization
+Toolbox</p></li>
+<li><p>GLMNET – <a class="reference external" href="https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html">Hastie’s library for LASSO/Elastic-net regularized
+GLM</a></p></li>
+<li><p>Gradient Boost – <a class="reference external" href="https://sites.google.com/site/carlosbecker/resources/gradient-boosting-boosted-trees">Carlos Becker’s gradient boosting
+algorithm</a></p></li>
+</ol>
+<p>Once one of these option is selected, you will have to define a number
+of other settings that are specific to the algorithm and can be found in
+the respective references above. In the following, we present the
+options that are available for SVM.</p>
+<p><strong>SVM options</strong></p>
+<p>The following options will appear when SVM is selected:</p>
+<p>1 : LIBSVM version [ 3.12 ]<br />
+2 : Classifier type [ C-SVC (L1-regul.) ]<br />
+3 : Probability estimation using Platt’s method [ no ]<br />
+4 : Cache size [ 500 MB ]<br />
+5 : Termination criterion [ 0.001 ]<br />
+6 : Shrinking heuristics [ yes ]<br />
+7 : Weighting of hyperplane in uneven group sizes [ no ]<br />
+8 : Case-level weighting vector [ Case weighting not activated ]<br />
+Each of the first 6 options are standard options within the LIBSVM
+toolbox <a class="reference external" href="https://www.csie.ntu.edu.tw/~cjlin/libsvm/">LIBSVM</a>. However,
+NeuroMiner also offers hyperplane weighting in uneven group sizes. This
+is an important option because support vector machines work effectively
+in circumstances with balanced samples of class examples but suboptimal
+results can emerge when there are unequal class proportions; i.e., the
+hyperplane can be biased towards a correct classification of the
+majority class, thus resulting in poor classification performance in the
+minority class. This is called an imbalanced learning problem. To
+account for this problem class-weighted SVM can be used. Rather than
+having equal misclassification penalties (C values) for all individuals
+this approach corrects for imbalanced learning by increasing the
+misclassification penalty in the minority class. Specifically each C
+parameter for each class is multiplied by the inverse ratio of the
+training class sizes. To optimise the serach for optimal class weights,
+you can also introduce an additional hyperparameter that multiplies the
+inverse ratio by a scaling factor for each class prior to the
+multiplication of the C parameter. This can be defined when the learning
+algorithm parameters settings in section
+<a class="reference external" href="#3.2.04_learning_algorithm_parameters">[3.2.04_learning_algorithm_parameters]</a>{reference-type=”ref”
+reference=”3.2.04_learning_algorithm_parameters”}. Similarly, option 8
+allows you to weight the hyperplane based on a vector of weighting
+parameters that you have defined. This will work similarly to the above,
+but it will use the parameters entered rather than the group sizes.</p>
+<p>Once these options are selected, NeuroMiner will progress to the next
+menu to define the kernel type.</p>
+</section>
+<section id="define-kernel-type">
+<h3>Define kernel type<a class="headerlink" href="#define-kernel-type" title="Permalink to this headline">#</a></h3>
+<p>Define whether the algorithm will use a linear or non-linear kernel
+<a class="reference external" href="https://en.wikipedia.org/wiki/Support_vector_machine#Nonlinear_classification">Kernel</a>.
+This will display the following options:</p>
+<p>1: Linear<br />
+2: Polynomial<br />
+3: RBF (Gaussian)<br />
+4: Sigmoid</p>
+<p>Once these settings are defined, then you will be directed back to the
+main menu for this section and you can proceed to the main menu and then
+can configure the learning algorithm in section
+<a class="reference external" href="#3.2.04_learning_algorithm_parameters">[3.2.04_learning_algorithm_parameters]</a>{reference-type=”ref”
+reference=”3.2.04_learning_algorithm_parameters”}.</p>
+</section>
+</section>
+<section id="regression-mode-3-2-03-1-regression-algorithm">
+<h2>Regression mode {#3.2.03.1_regression_algorithm}<a class="headerlink" href="#regression-mode-3-2-03-1-regression-algorithm" title="Permalink to this headline">#</a></h2>
+<p>If you have defined a regression framework during data input (see
+section
+<a class="reference external" href="#mainmenu_3.1_input_data">[mainmenu_3.1_input_data]</a>{reference-type=”ref”
+reference=”mainmenu_3.1_input_data”}) then a different menu will appear
+as follows.</p>
+<section id="define-prediction-performance-criterion-3-2-03-2-1-performance-criterion">
+<h3>Define prediction performance criterion {#3.2.03.2.1_performance_criterion}<a class="headerlink" href="#define-prediction-performance-criterion-3-2-03-2-1-performance-criterion" title="Permalink to this headline">#</a></h3>
+<p>Performance criteria play a major roles in model evaluation and
+optimization, for regression NM provides 5 performances measures:</p>
+<ol class="simple">
+<li><p>Mean Squared Error
+<a class="reference external" href="https://en.wikipedia.org/wiki/Mean_squared_error">MSE</a></p></li>
+<li><p>Normalized Root of Mean Squared Deviation
+<a class="reference external" href="https://en.wikipedia.org/wiki/Root-mean-square_deviation#Normalized_root-mean-square_deviation">NRMSD</a></p></li>
+<li><p>Squared Correlation Coefficient
+<a class="reference external" href="https://en.wikipedia.org/wiki/Coefficient_of_determination#As_squared_correlation_coefficient">R^2^</a></p></li>
+<li><p>Correlation Coefficient
+<a class="reference external" href="https://en.wikipedia.org/wiki/Correlation_coefficient">CC</a></p></li>
+<li><p>Mean Average Error
+<a class="reference external" href="https://en.wikipedia.org/wiki/Mean_absolute_error">MAERR</a></p></li>
+</ol>
+</section>
+<section id="select-learning-algorithm-3-2-03-2-2-learning-algorithm">
+<h3>Select learning algorithm {#3.2.03.2.2_learning_algorithm}<a class="headerlink" href="#select-learning-algorithm-3-2-03-2-2-learning-algorithm" title="Permalink to this headline">#</a></h3>
+<p>Learning algorithm to be used for the <strong>regression</strong> analysis. Each
+algorithm has a particular set of parameters that are described in the
+respective distributions. In general defaults are provided.</p>
+<ol class="simple">
+<li><p>SVM – <a class="reference external" href="https://www.csie.ntu.edu.tw/~cjlin/libsvm/">LIBSVM</a></p></li>
+<li><p>SVM – <a class="reference external" href="https://www.csie.ntu.edu.tw/~cjlin/liblinear/">LIBLINEAR</a></p></li>
+<li><p>RVM / BAYES – <a class="reference external" href="http://www.miketipping.com/sparsebayes.htm">Mike Tipping’s
+implementation</a></p></li>
+<li><p>Multinomial relevance vector regression (MVRVR) (for multiple target
+label prediction)</p></li>
+<li><p>Univariate – GLM Linear Regression</p></li>
+</ol>
+</section>
+<section id="define-kernel-type-3-2-03-2-3-kernel-type">
+<h3>Define kernel type {#3.2.03.2.3_kernel_type}<a class="headerlink" href="#define-kernel-type-3-2-03-2-3-kernel-type" title="Permalink to this headline">#</a></h3>
+<p>Kernel to be used in the selected <strong>regressor</strong> (when applicable).</p>
+<ol class="simple">
+<li><p>Linear</p></li>
+<li><p>Polynomial</p></li>
+<li><p>RBF (Gaussian)</p></li>
+<li><p>Sigmoid</p></li>
+</ol>
+</section>
+<section id="optimize-decision-threshold-based-on-roc-3-2-03-2-4-optimize-decision-threshold">
+<h3>Optimize decision threshold based on ROC {#3.2.03.2.4_optimize decision threshold}<a class="headerlink" href="#optimize-decision-threshold-based-on-roc-3-2-03-2-4-optimize-decision-threshold" title="Permalink to this headline">#</a></h3>
+<p>This option allows to optimise the decision scores according to the
+Receiver Operator Function.The default setting enables the post-hoc
+optimisation using ROC analysis of C1 test data.</p>
+</section>
+<section id="use-adasyn-to-adjust-for-unbalanced-class-settings-3-2-03-2-5-optimize-decision-threshold">
+<h3>Use ADASYN to adjust for unbalanced class settings {#3.2.03.2.5_optimize decision threshold}<a class="headerlink" href="#use-adasyn-to-adjust-for-unbalanced-class-settings-3-2-03-2-5-optimize-decision-threshold" title="Permalink to this headline">#</a></h3>
+<p>Adaptive Synthetic (ADASYN) is primarily used to tackle the ‘Imbalanced
+Classification Problem’ prominent in Machine Learning which arises due
+to imabalanced class size. The key hindrance with an imbalanced dataset
+is that one class dominates another class resulting in a model that is
+highly underfitted as it is not able to classify the minority class
+successfully. ADASYN is an algorithm that generates synthetic data by
+generating more data for the class with lesser data.</p>
+<p>Enabling ADASYN mode opens up extra options:<br />
+<strong>7: Define beta value (defines how much balancing will be applied, 0,1)
+[k=1]</strong><br />
+<strong>8: Define k value of density algorithm (kNN looking at both classes)
+[k=5]</strong><br />
+<strong>9: Define k value of SMOTE algorithm (kNN looking only at the minority
+class) [k=5]</strong><br />
+<strong>10: Data is already normalized for kNN search [no]</strong>\</p>
+</section>
+</section>
+<section id="sequence-optimization">
+<h2>Sequence Optimization<a class="headerlink" href="#sequence-optimization" title="Permalink to this headline">#</a></h2>
+<p>When in the NeuroMiner “expert” mode (i.e., loading NeuroMiner with
+the command “nm nosplash expert”) another option in the “model
+algorithm” menu is to conduct sequence optimization. This option was
+designed to simulate the clinical decision making associated with
+additional testing. In a clinical environment, the decision to conduct
+another assessment on an individual is normally done in situations of
+uncertainty to confirm a diagnosis–e.g., coronavirus is suspected based
+on a clinical assessment and then a nasal swab is conducted to confirm
+this diagnosis. In a machine learning context, uncertainty can be
+quantified with either the distance from the decision boundary in the
+case of an SVM (i.e., with cases closest to the decision line being the
+most uncertain) or with a median using any other scores.</p>
+<p>NeuroMiner is able to test sequences of assessments (e.g., clinical,
+cognitive, imaging) based on the modalities entered during data entry or
+it is able to build optimal sequences based on different models (e.g.,
+linear and non-linear SVM). The pipelines need to have been analysed
+before sequencing can be activated. The procedure is to:</p>
+<ol class="simple">
+<li><p>Process multiple analyses as usual from different modalities or
+using different settings</p></li>
+<li><p>In the “Parameter Template” menu, activate the option to 1: Define
+meta-learning/stacking options</p></li>
+<li><p>Select the analyses that you want to define the optimal sequence for</p></li>
+<li><p>Go to the preprocessing parameters and change the set-up so that
+there is only an imputation step. If you are sequentially stacking
+different learning algorithms, then scaling may be required and this
+needs to be considered</p></li>
+<li><p>In the “Parameter Template” menu, go to the “Classification
+Algorithm” option and then the “Select learning algorithm” option</p></li>
+<li><p>Select the item “SEQOPT —&gt; Predictive sequence optimization
+algorithm (Stacking only)”</p></li>
+<li><p>To configure the sequence algorithm, then select the option to
+“Configure Sequence Optimizer”</p></li>
+</ol>
+<section id="optimization-based-on">
+<h3>Optimization based on…<a class="headerlink" href="#optimization-based-on" title="Permalink to this headline">#</a></h3>
+<ol class="simple">
+<li><p>The population to be propagated</p></li>
+<li><p>The entire population</p></li>
+</ol>
+<p>NeuroMiner will attempt to optimise two factors: 1) the criterion that
+the user decides in the previous step (e.g., BAC); 2) the least number
+of assessments necessary. These optimizations can be for only the cases
+that have uncertain decision or probability scores (option 1) or for the
+entire population.</p>
+</section>
+<section id="define-computation-mode-for-combining-sequential-predictions">
+<h3>Define computation mode for combining sequential predictions<a class="headerlink" href="#define-computation-mode-for-combining-sequential-predictions" title="Permalink to this headline">#</a></h3>
+<ol class="simple">
+<li><p>Replacement</p></li>
+<li><p>Mean across predictions</p></li>
+</ol>
+<p>When a case is propagated to another assessment because the first
+assessment was uncertain, then either their decision score can be
+replaced or a mean can be taken across the predictions in the sequence
+(i.e., this becomes bagging or “late fusion” in NeuroMiner
+terminology).</p>
+</section>
+<section id="define-propagation-algorithm-s-anchor">
+<h3>Define propagation algorithm’s anchor<a class="headerlink" href="#define-propagation-algorithm-s-anchor" title="Permalink to this headline">#</a></h3>
+<ol class="simple">
+<li><p>Decision boundary</p></li>
+<li><p>Median</p></li>
+</ol>
+<p>As mentioned above, either the decision boundary can be used to define
+uncertain cases (i.e., near the boundary) or the median of other scores
+can be taken. The first item uses the decision boundary and the second
+item uses the median to quantify the uncertainty (i.e., the median of
+scores that range from very likely group 1 to very likely group 2 is
+assumed to be uncertain here).</p>
+</section>
+<section id="define-optimisation-mode">
+<h3>Define optimisation mode<a class="headerlink" href="#define-optimisation-mode" title="Permalink to this headline">#</a></h3>
+<ol class="simple">
+<li><p>Optimization criterion</p></li>
+<li><p>Mean decision distance</p></li>
+</ol>
+<p>Here the user can select whether to optimize on the criterion previously
+selected (e.g., the BAC) or on the mean decision distance (only works
+for SVM or algorithms with decision scores). In the second case, the
+idea is that the further away from the decision boundary the better the
+optimization.</p>
+</section>
+<section id="sequences-to-be-tested">
+<h3>Sequences to be tested<a class="headerlink" href="#sequences-to-be-tested" title="Permalink to this headline">#</a></h3>
+<ol class="simple">
+<li><p>Define sequences matrix to be evaluated</p></li>
+</ol>
+<p>Here the user can define what sequences are to be evaluated. This step
+is dependent on the identification of models to be included in the “1:
+Define meta-learning/stacking options”. The idea is that rather than
+testing all combinations of the models (e.g., model 1 -&gt; model 2 -&gt;
+model 3 and then all other combinations of these), the user can specify
+the models that they want to test. This is because usually there is a
+rationale for testing model sequences based on clinical experience and
+also cost (e.g., clinical assessment, then cognitive assessment, then
+imaging if necessary).</p>
+<p>Sequences of assessments need to be specified here either directly or
+using a matlab variable. For example, if you wanted to specify a
+sequence of model 1 -&gt; model 2 -&gt; model 3 then you would enter [1 2
+3]. If you wanted to specify this and also models 2 1 3 then you would
+enter [1 2 3; 2 1 3]. If you wanted to specify more then you would
+create a matlab variable with more sequences in rows and you would enter
+the variable name into this section.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./docs"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Neurodiagnostics Lab LMU Munich<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
