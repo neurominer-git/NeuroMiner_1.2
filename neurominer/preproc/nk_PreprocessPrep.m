@@ -8,7 +8,7 @@ function [act, analdim, p, GridAct, mapY, strout] = nk_PreprocessPrep( act, anal
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris 12/2021
 
-global PREPROC MODEFL CV DR SAV RAND USEPARAMEXIST FUSION TEMPL CALIB MULTI STACKING NM OCTAVE JuSpace
+global PREPROC MODEFL CV DR SAV RAND USEPARAMEXIST FUSION TEMPL CALIB MULTI STACKING NM OCTAVE JSMEM
 clc
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% SETUP PARAMS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

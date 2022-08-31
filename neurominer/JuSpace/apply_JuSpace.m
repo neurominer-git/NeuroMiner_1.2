@@ -1,11 +1,11 @@
-function Ypet = apply_JuSpace(Yimg, brainmask, atlas, cortype, autocorcorrect, petlist)
-global JSMEM
+function Ypet = apply_JuSpace(Yimg, brainmask, atlas, cortype, autocorcorrect, petlist, dir_save)
+global JSMEM 
 S.Vm                         = spm_vol(brainmask);
 [S.dims, S.indvol, ~, S.vox] = nk_ReadMaskIndVol(S.Vm, []);
 image_for_size = string(brainmask);
 
 if ~isfield(JSMEM,'ROI_matrix') || isempty(JSMEM.ROI_matrix)
-    ROI_matrix = resize_img_useTemp_imcalc(char(atlas),char(image_for_size)); %from JuSpace Toolbox
+    ROI_matrix = resize_img_useTemp_imcalc_NM(char(atlas),char(image_for_size),dir_save); %from JuSpace Toolbox
     JSMEM.ROI_matrix = ROI_matrix;
 else
     ROI_matrix = JSMEM.ROI_matrix;
@@ -35,7 +35,7 @@ for i = 1:numel(atlas_vals)
     Ymean(:,i) = mean(C(:,indVec),2);
 end
 
-
+% save_dir = NM.
 % V = zeros(S.dims);
 % C = zeros(size(Yimg,1),numel(V));
 % V = nk_WriteVol(Yimg, 
@@ -60,7 +60,7 @@ for i = 1:numel(petlist)
     petvec(i) = petlist{i}.listidx; 
 end
 
-Ypet = JuSpace_noGUI_2D(Ymean,atlas,options,petvec,image_for_size);
+Ypet = JuSpace_noGUI_2D(Ymean,atlas,options,petvec,image_for_size,dir_save);
 
     
 end

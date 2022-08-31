@@ -1,4 +1,4 @@
-function [res,p_all,stats,data, D1,D2,data_PET,Resh,T1] = compute_DomainGauges_2D(list1,list2,files_PET,atlas,options,image_for_size,image_save)
+function [res,p_all,stats,data, D1,D2,data_PET,Resh,T1] = compute_DomainGauges_2D(list1,list2,files_PET,atlas,options,image_for_size,dir_save,image_save)
 % [res,p_all,stats,data, D1,D2,data_PET] = compute_DomainGauges(list1,list2,files_PET,atlas, options, image_save)
 % Inputs:
 % list1, list2, files_PET are cellarrays of strings containing the filepath
@@ -63,7 +63,7 @@ end
 if isfield(JSMEM,"data_PET") && ~isempty(JSMEM.data_PET) 
     data_PET = JSMEM.data_PET;
 else 
-    data_PET = mean_time_course_NM(files_PET,atlas,atlas_vals,image_for_size);
+    data_PET = mean_time_course_NM(files_PET,atlas,atlas_vals,image_for_size,dir_save);
     JSMEM.data_PET = data_PET;
 end
 
@@ -73,7 +73,8 @@ if options(4)==1 % adjust for structural correlation
     else 
         path_T1 = fullfile(fileparts(which('spm')),'tpm','TPM.nii,1');
         %T1 =  mean_time_course_2D({path_T1},atlas, atlas_vals,image_for_size);
-        T1 =  mean_time_course_NM({path_T1},atlas, atlas_vals,image_for_size);
+        T1 =  mean_time_course_NM({path_T1},atlas, atlas_vals,image_for_size,dir_save);
+        JSMEM.T1 = T1; 
     end
     
 else
