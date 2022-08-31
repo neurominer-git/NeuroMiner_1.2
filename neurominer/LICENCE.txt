@@ -1,4 +1,7 @@
 NeuroMiner is copyright, distributed under the GNU General Public License.
+
+This does not apply to any third-party software used by NeuroMiner. These 
+is subject to the original license they were first distributed under. 
 _________________________________________________________________________
 NeuroMiner is free software; you can distribute it and/or modify it under 
 the terms of the GNU General Public License as published by the Free 

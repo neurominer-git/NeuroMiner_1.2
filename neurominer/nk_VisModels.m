@@ -103,11 +103,11 @@ for i = 1 : nM
         else
             pmode(i) = iVis.PERM.mode;
         end
-        if isfield(iVis.PERM,'covars_idx')
-            covidx(i) = iVis.PERM.covars_idx;
-        else
-            covidx = [];
-        end
+%         if isfield(iVis.PERM,'covars_idx')
+%             covidx(i) = iVis.PERM.covars_idx;
+%         else
+%             covidx = [];
+%         end
 
         permfl(i)      = true; 
         nperms(i)      = iVis.PERM.nperms;
@@ -639,6 +639,7 @@ for f=1:ix % Loop through CV2 permutations
                                         Tx_perm = cell(1,nM); Px_perm = zeros(1,nperms(1));
                                         for n=1:nM, Tx_perm{n} = zeros(size(Tx{n},1),nperms(n)); end
                                         for perms = 1:nperms(1)
+                                        %% 
                                             if ~sigfl 
                                                 % Train permuted model
                                                 [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms, analysis, inp, paramfl, BINMOD, n, h, k, l, pnt, FullPartFlag, F, u);

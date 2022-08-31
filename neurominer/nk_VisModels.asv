@@ -554,10 +554,14 @@ for f=1:ix % Loop through CV2 permutations
                                     end
                                     
                                     % Model computation
+                                    try
                                     if isfield(mapY,'VI')
                                         if ~fndMD, [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(Ymodel, modelTrL, sPs, 1, mapY.VI{k,l}{hix}{u}); end
                                     else
                                         if ~fndMD, [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(Ymodel, modelTrL, sPs, 1); end
+                                    end
+                                    catch
+                                        whos("Ymodel", "modelTrL")
                                     end
                                     
 %                                     if savemodel
@@ -635,6 +639,7 @@ for f=1:ix % Loop through CV2 permutations
                                         Tx_perm = cell(1,nM); Px_perm = zeros(1,nperms(1));
                                         for n=1:nM, Tx_perm{n} = zeros(size(Tx{n},1),nperms(n)); end
                                         for perms = 1:nperms(1)
+                                        %% 
                                             if ~sigfl 
                                                 % Train permuted model
                                                 [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms, analysis, inp, paramfl, BINMOD, n, h, k, l, pnt, FullPartFlag, F, u);
