@@ -5,7 +5,7 @@ function [sY, IN] = perfROImeans(Y, IN)%, PREPROC, prevP)
     if ~exist('IN','var'), IN = []; end
     if iscell(Y) 
         sY = cell(1,numel(Y)); 
-        for i=1:numel(Y), [sY{i}, IN] =  PerfROImeans(Y{i}, IN)%, PREPROC, prevP); end
+        for i=1:numel(Y), [sY{i}, IN] =  PerfROImeans(Y{i}, IN); end %, PREPROC, prevP); end
     else
         [ sY, IN ] = PerfROImeans(Y, IN)%, PREPROC, prevP);
     end

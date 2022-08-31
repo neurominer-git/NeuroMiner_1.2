@@ -1047,7 +1047,7 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tROI means computation ...'); end
-    [InputParam.Tr, TrParami] = perfROImeans(InputParam.Tr, InputParam.P{i}.ROIMEANS)%,PREPROC,{InputParam.P{1:i-1}}); % prevPREPROC %prevP
+    [InputParam.Tr, TrParami] = perfROImeans(InputParam.Tr, InputParam.P{i}.ROIMEANS);%,PREPROC,{InputParam.P{1:i-1}}); % prevPREPROC %prevP
 
     if tsfl, tsproc = true; end
 end
