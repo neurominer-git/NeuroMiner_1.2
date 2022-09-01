@@ -1147,7 +1147,7 @@ switch action
             case 'DECTRE'
                 vargout.classifier = 'MATLAB''s fitctree / fitrtree algorithm';
             case 'RNDFOR'
-                vargout.classifier = 'MATLAB''s Random Forest algorithm';
+                vargout.classifier = "Python's sklearn.ensemble.RandomForestClassifier algorithm ";
             case 'matLRN'
                 if isfield(params.SVM,'matLRN')
                     vargout.classifier = sprintf('ml_%s_%s', params.SVM.matLRN.learner.framework, char(params.SVM.matLRN.algo));
@@ -1157,7 +1157,7 @@ switch action
             case 'GLMNET'
                 vargout.classifier = 'LASSO/Elastic-net regularized GLM';
             case 'GRDBST'
-                vargout.classifier = 'Gradient Boosting';
+                vargout.classifier = "Gradient Boosting (from Python's scikit-learn package)";
             case 'ROBSVM'
                 vargout.classifier = 'Robust LIBSVM';
             case 'SEQOPT'
