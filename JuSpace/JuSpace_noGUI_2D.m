@@ -1,4 +1,4 @@
-function res = JuSpace_noGUI_2D(list1,atlas,options,PET_list,image_for_size)
+function res = JuSpace_noGUI_2D(list1,atlas,options,PET_list,image_for_size,dir_save)
 
 
 addpath(genpath('/opt/matlab/JuSpace_v1.3/'));
@@ -93,9 +93,9 @@ time_now = datestr(datetime('now'),'ddmmmyyyy_HHMMSS');
 
 if options(1)<4
 %     image_save = fullfile(dir_save,[name_save file_part '_' time_now '.nii']);
-    [res,p_all,stats,data,D1,D2, data_PET,Resh,T1] = compute_DomainGauges_2D(list1,list2,filesPET,atlas,options,image_for_size,image_save);
+    [res,p_all,stats,data,D1,D2, data_PET,Resh,T1] = compute_DomainGauges_2D(list1,list2,filesPET,atlas,options,image_for_size,dir_save,image_save);
 else
-    [res,p_all,stats,data,D1,D2, data_PET,Resh,T1] = compute_DomainGauges_2D(list1,list2,filesPET,atlas,options,image_for_size);
+    [res,p_all,stats,data,D1,D2, data_PET,Resh,T1] = compute_DomainGauges_2D(list1,list2,filesPET,atlas,options,image_for_size,dir_save);
 end
 
 % opt_for_perm = [1,2,5,6];

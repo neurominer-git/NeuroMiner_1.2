@@ -195,30 +195,31 @@ global SVM fromData xNM xCV
 
 % check if original data was provided
 if fromData
+    labels_a = varargin{1,3};
+    if isa(labels_a, 'cell') % only binary problems
+        num_labels = double(strcmp(labels_a,labels_a(1,1)));
+        num_labels(num_labels==0) = -1;
+    else % data and labels from NM structure; binary classification
+        num_labels = labels_a;
+        num_labels= num_labels-1; % simulate function could potentially better be adjusted to fit NM strucutre of labels
+    end
+    analrootdir = xNM.analysis{1,varargin{1,4}}.rootdir;
+    origData = sprintf('%s/origData.csv',analrootdir);
+    if isa(varargin{1,2},'double')
+        varargin{1,2} = array2table(varargin{1,2});
+    end
+    writetable(varargin{1,2}, origData);
+
     reps = 10;
     R = zeros(1,reps); %adjust to sth from RAND
     for k=1:reps
-        labels_a = varargin{1,3};
-        if isa(labels_a, 'cell') % only binary problems
-            num_labels = double(strcmp(labels_a,labels_a(1,1)));
-            num_labels(num_labels==0) = -1;
-        else % data and labels from NM structure; binary classification
-            num_labels = labels_a;
-            num_labels= num_labels-1; % simulate function could potentially better be adjusted to fit NM strucutre of labels
-        end
-        analrootdir = xNM.analysis{1,varargin{1,4}}.rootdir;
-        origData = sprintf('%s/origData.csv',analrootdir);
-        if isa(varargin{1,2},'double')
-            varargin{1,2} = array2table(varargin{1,2});
-        end
-        writetable(varargin{1,2}, origData);
-        
+        tic
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
             data_file = origData, ...
             labels = int64(num_labels), ...
             n_obs = int64(nc), ... % if vector, then n observations to be simulated within each group (defined by label)
             rootdir = analrootdir);
-
+        toc
         M = readtable(py2mat(M_file));
 
         L = table2array(M(:,end));

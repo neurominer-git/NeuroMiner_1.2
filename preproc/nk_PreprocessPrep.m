@@ -8,7 +8,7 @@ function [act, analdim, p, GridAct, mapY, strout] = nk_PreprocessPrep( act, anal
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris 12/2021
 
-global PREPROC MODEFL CV DR SAV RAND USEPARAMEXIST FUSION TEMPL CALIB MULTI STACKING NM OCTAVE
+global PREPROC MODEFL CV DR SAV RAND USEPARAMEXIST FUSION TEMPL CALIB MULTI STACKING NM OCTAVE JSMEM
 clc
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% SETUP PARAMS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -200,6 +200,7 @@ switch act
                         SrcParam.u = curclass;
                         SrcParam.TrX = find(labels == CV.class{1,1}{curclass}.groups(1) | labels == CV.class{1,1}{curclass}.groups(2));
                         InputParam.Tr = Y(SrcParam.TrX,:);
+                        JSMEM = []; % reset memory for juspace 
                         [TEMPL.Tr{curclass}, TEMPL.Param{curclass}] = nk_GenPreprocSequence(InputParam, PREPROC, SrcParam);
                     end
                 end

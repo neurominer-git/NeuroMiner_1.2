@@ -571,6 +571,7 @@ if isfield(TemplParam,'ACTPARAM')
             case 'JuSpace'
                 if VERBOSE, fprintf('\n* JUSPACE COMPUTATION'); end
                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};
+                InputParam.P{ac}.JUSPACE.curanal = NM.runtime.curanal;
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX.opt)
                     InputParam.P{ac}.opt = TemplParam.ACTPARAM{ac}.PX.opt;
                 end

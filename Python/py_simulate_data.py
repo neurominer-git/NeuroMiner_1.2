@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 from sdv.tabular import GaussianCopula
+from tqdm import tqdm
 
 data = pd.read_csv(data_file)
 data['label'] = labels
@@ -14,7 +15,7 @@ if type(n_obs) is not int:
 
     # preallocate space for simulated dataset
     sim_sample = pd.DataFrame(columns = data.columns)
-    for i in range(len(np.unique(labels))):
+    for i in tqdm(range(len(np.unique(labels)))):
         # split dataset
         group_df = data[data['label'] == np.unique(labels)[i]]
         model = GaussianCopula()
@@ -26,6 +27,7 @@ else:
     model = GaussianCopula()
     # model = CopulaGAN()
     model.fit(data)
+    print('Busy sampling the data! This might take a while...')
     sim_sample = model.sample(n_obs)
 
 out_path = f'{rootdir}/simData.csv'
