@@ -99,6 +99,7 @@ switch similarityMeasure
             end
         end
     case 'Mutual information'
+        R = pyrunfile('')
         RCM = mi_mat(RG);
         for i = 1:size(A,1)
             CURSAMPLE = [RG;A(i,:)];
