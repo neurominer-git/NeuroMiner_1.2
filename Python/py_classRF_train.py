@@ -67,5 +67,5 @@ rf = RandomForestClassifier(n_estimators = n_est,
         ) # others: verbose, random_state, warm_start, n_jobs
 
 rf.fit(feat, lab)
-model_file = f'{rootdir}/RFC_model.sav'
+model_file = f'{rootdir}/RFC_model_{n_maxfeat}_{crit}_{maxd}_{minss}_{minsl}_{minwfl}_{maxln}_{minid}_{boot}_{oobs}_{classw}_{ccpa}_{maxs}.sav'
 pickle.dump(rf, open(model_file, 'wb'))
