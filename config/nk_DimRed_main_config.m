@@ -123,10 +123,10 @@ if ~defaultsfl
                 'LLE'];
     end
     nk_PrintLogo
-    mestr = 'Dimensionality reduction techniques'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Dimensionality reduction techniques'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     if isempty(def), def=1; end
     if EXPERT
-        fprintf('\n'); cprintf('red','*  No reconstruction of data in original space supported!');
+        fprintf('\n*  No reconstruction of data in original space supported!');
     end
     act = char(nk_input(mestr,0,'mq', menustr, menuact, def));
     if ~strcmp(act,'BACK'), DR.RedMode = act; end

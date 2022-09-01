@@ -93,7 +93,7 @@ if ~defaultfl
         menuact = 1:3;
     end        
     
-    mestr = 'Multi-class prediction parameters'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\n\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Multi-class prediction parameters'; navistr = [parentstr ' >>> ' mestr]; fprintf('\n\nYou are here: %s >>> ',parentstr); 
     act = nk_input(mestr,0,'mq',menustr, menuact);
     
     switch act
