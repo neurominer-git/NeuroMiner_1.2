@@ -620,7 +620,7 @@ elseif trfl,
     [InputParam.Tr, TrParami] = nk_PerfRedObj(InputParam.Tr, DIMRED); 
     if tsfl,tsproc = true; end   
 end 
-
+TrParami.mappedX = InputParam.Tr;
 if tsproc, InputParam.Ts = nk_PerfRedObj(InputParam.Ts, TrParami); end
 
 end

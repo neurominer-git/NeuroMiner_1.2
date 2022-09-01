@@ -259,7 +259,7 @@ else
                 pY = out_of_sample(Y, IN.mpp);
             catch
                 warning('deterministic out of sample extension does not exist! Trying out-of-sample estimation procedure')
-                pY = out_of_sample_est(Y, IN.TrX, IN.mpp);
+                pY = out_of_sample_est(Y, IN.TrX, IN.mappedX);
             end
     end
 end
