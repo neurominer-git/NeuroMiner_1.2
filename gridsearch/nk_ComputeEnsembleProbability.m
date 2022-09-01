@@ -84,10 +84,15 @@ for curlabel=1:nl
     std_optcutoffs = nan(lx,1);
     mean_optcutoffpercs = nan(lx,1);
     std_optcutoffpercs = nan(lx,1);
+
     %% Compute mean predictions and descriptive stats across CV2 permutations
     for i=1:lx % Loop through subjects
-
-        predi = predictions{i,1,curlabel};
+        
+        if iscell(predictions)
+            predi = predictions{i,1,curlabel};
+        else
+            predi = predictions(i,1,curlabel);
+        end
         if ~isempty(optcutoff)
             optcutoffi = optcutoff{i,1, curlabel};
             optcutoffperci = optcutoffperc{i,1, curlabel};

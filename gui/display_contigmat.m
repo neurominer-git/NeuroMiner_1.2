@@ -12,14 +12,14 @@ if ~exist('contigmat','var') || isempty(contigmat)
 
         case 'regression'
 
-            contig{end+1} = ['\bf Coefficient of determination [%]: \rm ' num2str(handles.Regr.R2(handles.curlabel),'%1.1f')];
-            contig{end+1} = ['\bf Pearson r (CI-95%): \rm' num2str(handles.Regr.r(handles.curlabel),'%1.2f') ...
-                                ' (' num2str(handles.Regr.r_95CI_low(handles.curlabel),'%1.2f') '-' num2str(handles.Regr.r_95CI_up(handles.curlabel),'%1.2f')  ')'];
-            contig{end+1} = ['\bf P(T) value: \rm' num2str(handles.Regr.p(handles.curlabel),'%g') ' (' num2str(handles.Regr.t(handles.curlabel),'%1.2f') ')' ];
-            contig{end+1} = ['\bf Mean Absolute Error: \rm' num2str(handles.Regr.MAE(handles.curlabel),'%1.1f')];
-            contig{end+1} = ['\bf Mean Squared Error: \rm' num2str(handles.Regr.MSE(handles.curlabel),'%1.1f')];
-            contig{end+1} = ['\bf NRMSD: \rm' num2str(handles.Regr.NRSMD(handles.curlabel),'%1.1f')];
-            contigmat = handles.Regr.contigmat;
+            contig{end+1} = ['\bf Coefficient of determination [%]: \rm ' num2str(handles.curRegr.R2(handles.curlabel),'%1.1f')];
+            contig{end+1} = ['\bf Pearson r (CI-95%): \rm' num2str(handles.curRegr.r(handles.curlabel),'%1.2f') ...
+                                ' (' num2str(handles.curRegr.r_95CI_low(handles.curlabel),'%1.2f') '-' num2str(handles.curRegr.r_95CI_up(handles.curlabel),'%1.2f')  ')'];
+            contig{end+1} = ['\bf P(T) value: \rm' num2str(handles.curRegr.p(handles.curlabel),'%g') ' (' num2str(handles.curRegr.t(handles.curlabel),'%1.2f') ')' ];
+            contig{end+1} = ['\bf Mean Absolute Error: \rm' num2str(handles.curRegr.MAE(handles.curlabel),'%1.1f')];
+            contig{end+1} = ['\bf Mean Squared Error: \rm' num2str(handles.curRegr.MSE(handles.curlabel),'%1.1f')];
+            contig{end+1} = ['\bf NRMSD: \rm' num2str(handles.curRegr.NRSMD(handles.curlabel),'%1.1f')];
+            contigmat = handles.curRegr.contigmat;
 
         case 'classification'
             

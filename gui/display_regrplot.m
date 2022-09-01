@@ -1,10 +1,14 @@
 % =========================================================================
 % =                             REGRESSION PLOT                           =
 % =========================================================================
-function handles = display_regrplot(handles, markflag, oocvflag)
+function handles = display_regrplot(handles, markflag, oocvflag, binarizeflag, alphax)
 
 if ~exist("oocvflag","var") || isempty(oocvflag)
     oocvflag = false;
+end
+
+if ~exist("binarizeflag","var") || isempty(binarizeflag)
+    binarizeflag = true;
 end
 
 % Get preferred figure type
@@ -17,11 +21,13 @@ uistack(handles.axes1,'top')
 
 if ~oocvflag
     regrplotstr = '';
+    lgsufstr = 'OOT'; 
     pred    = handles.Regr.mean_predictions;
     errbar  = handles.Regr.std_predictions;
     errbarCI1 = handles.Regr.CI1_predictions;
     errbarCI2 = handles.Regr.CI2_predictions;
     ind     = handles.Regr.index_predictions;
+    regr    = handles.Regr;
     label   = handles.Regr.labels;
     regrplotcl = 'b';
     cla
@@ -30,11 +36,13 @@ else
     [handles, oocvind] = get_oocvind(handles);
     hold on
     regrplotstr = '_oocv';
+    lgsufstr = 'OOCV';
     pred    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.MeanCV2PredictedValues;
     errbar  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.StdCV2PredictedValues;
     errbarCI1  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,1);
     errbarCI2  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,2);
     ind = true(1,height(pred));
+    regr    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Regr;
     % Check whether the labels are known
     labels_known = handles.OOCVinfo.Analyses{handles.curranal}.labels_known(oocvind);
     if labels_known
@@ -102,24 +110,24 @@ set(handles.axes1,'UserData',figdata);
 switch GraphType
     
     case 1
-        lgstr{1} = '$\mathbf{Median_{OOT}}$';
+        lgstr{1} = ['$\mathbf{Median^{' lgsufstr '}}$'];
 
     case 2
-        lgstr{1} = '$\mathbf{Median_{OOT} \pm 95\%CI}$';
+        lgstr{1} = ['$\mathbf{Median^{' lgsufstr '} \pm 95\%CI}$'];
         % Mean predictions with [95%] confidence interval
         L = pred - errbarCI1; U = errbarCI2 - pred;
-        handles.(['he' regplotstr])  = errorbar(lxL(ind),pred(ind), L(ind), U(ind),'ko','LineWidth',0.5,'MarkerSize',9);
+        handles.(['he' regplotstr]) = errorbar(lxL(ind),pred(ind), L(ind), U(ind),'ko','LineWidth',0.5,'MarkerSize',9);
     
     case 3
-        lgstr{1} = '$\mathbf{Median_{OOT} \pm SD}$';
+        lgstr{1} = ['$\mathbf{Median^{' lgsufstr '} \pm SD}$'];
         % Mean predictions with standard deviation
-        handles.(['he' regplotstr])  = errorbar(lxL(ind),pred(ind),errbar(ind),'ko','LineWidth',0.5,'MarkerSize',9);
+        handles.(['he' regplotstr]) = errorbar(lxL(ind),pred(ind),errbar(ind),'ko','LineWidth',0.5,'MarkerSize',9);
 end
 
-handles.(['regrplot' regrplotstr]) = scatter(lxL(ind),pred(ind),'Marker','o','MarkerFaceColor',regrplotcl,'MarkerEdgeColor',rgb('LightBlue'),'MarkerFaceAlpha',0.7, 'MarkerEdgeAlpha',0.2,'SizeData',80);
+handles.(['regrplot' regrplotstr]) = scatter(lxL(ind),pred(ind),'Marker','o','MarkerFaceColor',regrplotcl,'MarkerEdgeColor',rgb('LightBlue'),'MarkerFaceAlpha', alphax, 'MarkerEdgeAlpha',0.2,'SizeData',80);
 
 % Mark points according to "grouping"
-xhandles.hg = [];
+handles.hg = [];
 if markgroups
     for i = 1:ngroups
         indg = (ind == 1 & grouping == i);
@@ -153,18 +161,16 @@ try % Statistics toolbox available
     [yhat,dy] = polyconf(p,xy,s,'predopt','curve');
     handles.(['hline' regrplotstr]) = plot(xy,yhat,regrplotcl,'LineWidth',2);
     handles.(['hline_CI' regrplotstr]) = plotshaded(xy,[yhat+dy; yhat-dy],regrplotcl);
-    if ~oocvflag
-        lgstr{end+1} = '$\mathbf{\hat{y}_{linear}}$';
-        lgstr{end+1} = '$\mathbf{\hat{y}_{95\%CI}}$';
-    else
-        lgstr{end+1} = '$OOCV\mathbf{\hat{y}_{linear}}$';
-        lgstr{end+1} = '$OOCV\mathbf{\hat{y}_{95\%CI}}$';
-    end
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{95\%CI}}^{' lgsufstr '}$'];
 catch % or not
     handles.(['hline' regrplotstr]) = lsline;
     handles.(['hline_CI' regrplotstr]) = [];
-    lgstr{end+1} = '$\mathbf{\hat{y}_{linear}}$';
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
 end
+
+handles.(['regrplot_lgstr' regrplotstr]) = lgstr;
+
 % Prepare legend
 switch GraphType
     case 1
@@ -179,10 +185,16 @@ switch GraphType
         end
 end
 if ~oocvflag
-    handles.legend_classplot = legend(hdlvec, lgstr, 'Location','southeast', 'LineWidth', 1, 'Interpreter','latex');
+    lgstr = handles.regrplot_lgstr ;
 else
-    handles.legend_classplot_oocv = legend(hdlvec, [handles.legend_classplot.String lgstr], 'Location','southeast', 'LineWidth', 1, 'Interpreter','latex');
+    lgstr = [handles.regrplot_lgstr handles.regrplot_lgstr_oocv];    
 end
+if isfield(handles,'legend_classplot')
+    delete(handles.legend_classplot);
+end
+handles.legend_classplot = legend(hdlvec, lgstr, 'Location','southeast', 'LineWidth', 1, 'Interpreter','latex');
+HeightScaleFactor = 1.4;
+handles.legend_classplot.Position(4) =  handles.legend_classplot.Position(4) * HeightScaleFactor;
 
 % Set descriptions
 xlabel(lxN)
@@ -190,7 +202,10 @@ ylabel('Predicted targets')
 
 axes(handles.axes5)
 if isfield(handles,'txtPerf'); delete(handles.txtPerf); end
-    
-% Binarize at median
-m = nm_nanmedian(label); set(handles.txtBinarize,'String',m);
 
+handles.curRegr = regr;    
+if binarizeflag
+    % Binarize at median
+    m = nm_nanmedian(label); set(handles.txtBinarize,'String',m);
+    binarize_regr(handles, label, pred);
+end

@@ -53,8 +53,8 @@ switch handles.modeflag
         groupnames{1} = sprintf('Group 1 (>=%1.2f)',thresh);
         groupnames{2} = sprintf('Group 2 (< %1.2f)',thresh);
         if ~exist('contigmat','var') || isempty(contigmat)
-            contigmat = handles.Regr.contigmat;
-            labelh = handles.Regr.b_label;
+            contigmat = handles.curRegr.contigmat;
+            labelh = handles.curRegr.b_label;
         end
         CLR1 = [0.5 0.5 0.5]; CLR2 = [0.5 0.5 0.5];
 end
@@ -93,7 +93,7 @@ if ~isnan(Post)
     hp      = findobj(hpie, 'Type', 'patch');
     set(hp(1), 'FaceColor', cl, 'FaceAlpha', 0.3);
     if numel(hp)>1; set(hp(2), 'FaceColor', cl, 'FaceAlpha', 1); end
-    title(groupnames); axesh.Title.Position(2) = 1.5; axesh.FontUnits = 'normalized'; axesh.FontSize=0.1;
+    title(groupnames); axesh.Title.Position(2) = 1.25; axesh.FontUnits = 'normalized'; axesh.FontSize=0.075;
     display_patch_labels(hpie, Pre, Gain)
 else
     axesh.Visible='off'; cmdh.Visible = 'off';

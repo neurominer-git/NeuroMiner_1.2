@@ -538,7 +538,7 @@ for curclass = 1: nclass
                     Results.Group{g}.StdCV2PredictedValues{curclass}    = Results.StdCV2PredictedValues{curclass}(indg);
                     Results.Group{g}.CICV2PredictedValues{curclass}     = cell2mat(arrayfun( @(i) percentile(Results.BinCV2Predictions_DecisionValues{curclass}(indg(i),:),[2.5 97.5]), ...
                             1:numel(indg),'UniformOutput',false)');
-                    if LabelMode, Results.Group{g}.PredictionPerformance= ALLPARAM(Results.Group{g}.ObservedValues{curclass}, Results.Group{g}.MeanCV2PredictedValues{curclass}); end
+                    if LabelMode, Results.Group{g}.PredictionPerformance = ALLPARAM(Results.Group{g}.ObservedValues{curclass}, Results.Group{g}.MeanCV2PredictedValues{curclass}); end
                 end
             end
         case 'regression'
@@ -552,6 +552,8 @@ for curclass = 1: nclass
             Results.CICV2PredictedValues(indnan)=nan;
 
             Results.ErrCV2PredictedValues = Results.MeanCV2PredictedValues - labelOOCV;
+            Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , labelOOCV);
+
             if inp.ngroups > 1 && isfield(inp,'groupind')
                 try
                     [Results.GroupComp.P, Results.GroupComp.AnovaTab, Results.GroupComp.Stats] = ...

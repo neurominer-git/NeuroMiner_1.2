@@ -43,8 +43,8 @@ else
             hroc = plot(handles.(axeshdl),X, Y, 'Color', cl, 'LineWidth', linewidth); 
         end
     else
-        X = handles.Regr.X;
-        Y = handles.Regr.Y;
+        X = handles.curRegr.X;
+        Y = handles.curRegr.Y;
         hroc = plot(handles.(axeshdl),X, Y, 'Color', cl, 'LineWidth', linewidth); 
     end   
 end

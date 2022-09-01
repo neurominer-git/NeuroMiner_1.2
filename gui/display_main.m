@@ -57,16 +57,14 @@ switch h_list{h_val}
         handles.cmdMetricExport.Visible     = 'on';
 
         if strcmp(handles.selCVoocv.Enable,'on') && handles.selCVoocv.Value>1
-            handles  = display_regrplot(handles, [], false);
+            handles  = display_regrplot(handles, [], false, false, 0.2);
             handles.oocvview = true;
-            handles  = display_regrplot(handles, [], handles.oocvview);
+            handles  = display_regrplot(handles, [], handles.oocvview, true, 0.8);
             handles.oocvind = handles.selCVoocv.Value - 1;
             load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
         else
             handles.oocvview = false;
-            handles = display_regrplot(handles);
-            handles = binarize_regr(handles);
-
+            handles = display_regrplot(handles, [], false, true, 0.8);
             load_selCase(handles,handles.Regr.cases)
         end
 
