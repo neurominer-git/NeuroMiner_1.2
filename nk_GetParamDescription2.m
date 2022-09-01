@@ -1147,7 +1147,7 @@ switch action
             case 'DECTRE'
                 vargout.classifier = 'MATLAB''s fitctree / fitrtree algorithm';
             case 'RNDFOR'
-                vargout.classifier = "Python's sklearn.ensemble.RandomForestClassifier algorithm ";
+                vargout.classifier = 'Python''s sklearn.ensemble.RandomForestClassifier algorithm';
             case 'matLRN'
                 if isfield(params.SVM,'matLRN')
                     vargout.classifier = sprintf('ml_%s_%s', params.SVM.matLRN.learner.framework, char(params.SVM.matLRN.algo));
