@@ -3,6 +3,7 @@
 
 from sklearn.ensemble import GradientBoostingClassifier
 import pickle
+import uuid
 
 gb = GradientBoostingClassifier(n_estimators = n_est,
                                 loss = l,
@@ -10,5 +11,7 @@ gb = GradientBoostingClassifier(n_estimators = n_est,
                                 subsample = subsamp,
                                 max_depth = n_maxdepth)
 gb.fit(feat, lab)
-model_file = f'{rootdir}/GBC_model_{n_est}_{l}_{lr}_{subsamp}_{n_maxdepth}.sav'
+#model_file = f'{rootdir}/GBC_model_{n_est}_{l}_{lr}_{subsamp}_{n_maxdepth}.sav'
+random_name = uuid.uuid4().hex;
+model_file = f'{rootdir}/GBC_model_{random_name}.sav';
 pickle.dump(gb, open(model_file, 'wb'))
