@@ -21,6 +21,7 @@ switch MODEFL
         rs = results.predictions;
         ds = rs;
 end
+delete results_file;
 switch MODEFL
     case 'classification'
 
