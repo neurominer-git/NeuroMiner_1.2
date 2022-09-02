@@ -97,7 +97,7 @@ switch IN.method
         end
         for i = 1:m
             if snan(i), continue; end
-            fprintf('.'); 
+            if VERBOSE; fprintf('.'); end
             % Find which features are NaN in the given case i
             ind_Yi = find(indnan(i,:)); 
             n_ind_Yi = numel(ind_Yi);
