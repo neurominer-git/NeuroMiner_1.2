@@ -645,7 +645,7 @@ switch OptimFlag
                      if isfield(GRD,(SVM.prog)), PXX = GRD.(SVM.prog); else, PXX=[]; end
                     switch SVM.prog
                         case {'GLMNET','GRDBST','ELASVM'}
-                            GRD.(SVM.prog) = nk_GLMNET_config(SVM.prog, PXX, 0);
+                            GRD.(SVM.prog) = nk_GLMNET_config(SVM.prog, PXX, 0, NM.modeflag);
                         case 'ROBSVM'
                             t_act = 1; while t_act > 0, [ PXX, t_act ] = nk_ROBSVM_config(SVM.prog,PXX, NM.modeflag,0); end
                             GRD.(SVM.prog) = PXX; 

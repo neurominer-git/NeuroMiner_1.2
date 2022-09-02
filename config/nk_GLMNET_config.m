@@ -1,7 +1,7 @@
-function param = nk_GLMNET_config(prog, param, defaultsfl)
+function param = nk_GLMNET_config(prog, param, defaultsfl, framework)
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl = true; end
-param.options = nk_matLearn_getopts_config([], 'get_learner_params', prog, param);
+param.options = nk_matLearn_getopts_config([], 'get_learner_params', prog, param, framework);
 ind = 1;
 if ~defaultsfl
     while ~isempty(ind)
