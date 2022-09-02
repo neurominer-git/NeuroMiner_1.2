@@ -100,10 +100,10 @@ switch similarityMeasure
         end
     case 'Mutual information'
         R = pyrunfile('cv_computeMInetworks.py', 'netwX', ...
-            ref = double(RG), ...
-            X = double(A));
+            ref = RG, ...
+            X = A;
 end
-CM = R;
+CM = double(R);
 end
 
 function MIM = mi_mat(DATA)
