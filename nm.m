@@ -61,7 +61,7 @@ function nm(varargin)
 % (c) Nikolaos Koutsouleris, 05/2022
 global EXPERT OCTAVE NM 
 
-nosplash  = false; EXPERT = false; OCTAVE = false;
+nosplash  = false; EXPERT = false; OCTAVE = false; DEV = false; 
 % Initialize NM
 % Show splash
 if exist('varargin','var')
@@ -73,6 +73,8 @@ if exist('varargin','var')
                 EXPERT = true;
             case 'octave'
                 OCTAVE = true;
+            case 'dev'
+                DEV = true;
         end
     end
 end
