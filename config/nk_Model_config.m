@@ -352,7 +352,7 @@ switch act
 
             case {'GLMNET','GRDBST'}
                 if ~isfield(SVM,SVM.prog), SVM.(SVM.prog) = []; end
-                if ~isfield(NM.TrainParam.GRD,SVM.prog), NM.TrainParam.GRD.(SVM.prog) = nk_GLMNET_config(SVM.prog, [],1); end
+                if ~isfield(NM.TrainParam.GRD,SVM.prog), NM.TrainParam.GRD.(SVM.prog) = nk_GLMNET_config(SVM.prog, [],1, NM.modeflag); end
                 switch SVM.prog
                     case 'GLMNET'
                         switch NM.modeflag
