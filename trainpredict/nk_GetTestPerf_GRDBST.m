@@ -21,11 +21,3 @@ switch MODEFL
         rs = results.predictions;
         ds = rs;
 end
-switch MODEFL
-    case 'classification'
-
-        rs = sign(ds);
-    case 'regression'
-        rs = ds; 
-end
-
