@@ -1,3 +1,23 @@
+'''
+Author: Clara Vetter 
+Last changed: 02.09.2022
+
+This script is called by nk_GetParam2_RNDFOR.m and trains a random forest
+classification model on the training data. 
+
+Input from MATLAB: 
+    - parameters: 
+    - feat = training data
+    - lab = label 
+    - rootdir = path to analysis directory
+
+Output: 
+    - the model is stored in the analysis directory in a .sav file that 
+    will later be read in by the corresponding test script 
+    (py_regRANDFOR_predict.py). The file name is unique.
+    
+'''
+
 # trainRFRegressor
 # Python script to train a random forest regressor from NeuroMiner
 
@@ -42,6 +62,13 @@ if maxln == 0:
 if maxs == 0:
     maxs = None
 
+# set random state
+if boot: 
+    randomstate = 42
+else: 
+    randomstate = None
+
+
 rf = RandomForestRegressor(n_estimators = n_est,
         max_features = n_maxfeat,
         criterion = crit,
@@ -54,7 +81,8 @@ rf = RandomForestRegressor(n_estimators = n_est,
         bootstrap = boot,
         oob_score = oobs,
         ccp_alpha = ccpa,
-        max_samples = maxs
+        max_samples = maxs,
+        random_state = randomstate                   
         ) # others: verbose, random_state, warm_start, n_jobs
 
 rf.fit(feat, lab)

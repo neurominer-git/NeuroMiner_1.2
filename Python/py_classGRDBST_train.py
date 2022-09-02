@@ -32,7 +32,8 @@ gb = GradientBoostingClassifier(n_estimators = n_est,
                                 loss = l,
                                 learning_rate = lr,
                                 subsample = subsamp,
-                                max_depth = n_maxdepth)
+                                max_depth = n_maxdepth,
+                                random_state = 42)
 gb.fit(feat, lab)
 #model_file = f'{rootdir}/GBC_model_{n_est}_{l}_{lr}_{subsamp}_{n_maxdepth}.sav'
 random_name = uuid.uuid4().hex;
