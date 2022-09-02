@@ -35,7 +35,7 @@ function [sY, IN] = nk_PerfImputeObj(Y, IN)
 %                     criterion minnumcols (currently fixed at 0.5) is 
 %                     fulfilled.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2022
+% (c) Nikolaos Koutsouleris, 08/2022
 
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) 
@@ -94,11 +94,6 @@ switch IN.method
         if strcmp(IN.method,'hybrid')
             R = nk_CountUniques(tX);
             indNom = (R.U <= IN.hybrid.cutoff)';
-            %if there are no categorical columns according to
-            %IN.hybrid.cutoff change to euclidean distance mode
-            if ~any(indNom)
-                IN.method = 'euclidean';
-            end 
         end
         for i = 1:m
             if snan(i), continue; end
@@ -117,9 +112,10 @@ switch IN.method
                 indi_Yi = 1:size(tX,2); indi_Yi(ind_Yi(j))=[];
                 
                 % Find cases without missings 
-                indnan_Xj = isnan(tX(indnan_Xi, indi_Yi));
-                [~, ind_c]  = sort(sum(indnan_Xj),'ascend');
-                [~, ind_r] = sort(sum(isnan(tX(indnan_Xi,indi_Yi)), 2),'ascend');
+                tXX = tX(indnan_Xi, indi_Yi);
+                indnan_Xj = isnan(tXX);
+                [~, ind_c] = sort(sum(indnan_Xj),'ascend');
+                [~, ind_r] = sort(sum(isnan(tXX), 2),'ascend');
                 idx_c = sum(isnan(tX(indnan_Xi, indi_Yi(ind_c))))==0;
                 while sum(idx_c) < minnumcols
                     % if there is no column without missings start removing
