@@ -33,7 +33,7 @@ if EXPERT
 end
 if DEV
     fprintf('\n')
-    fürintf('\t>>> DEVELOPMENT MODE <<<')
+    fprintf('\t>>> DEVELOPMENT MODE <<<')
 fprintf('\n\t%s', NMinfo.info.ver); fprintf('\n')
 if exist('maindlg','var') && maindlg
     fprintf('\n(c) %s | %s ', NMinfo.info.author, NMinfo.info.datever)
