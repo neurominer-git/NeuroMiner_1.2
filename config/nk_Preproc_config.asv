@@ -23,7 +23,7 @@ function [PREPROC, act, stepind] = nk_Preproc_config(PREPROC, varind, parentstr,
 
 % Defaults:
 % ---------
-global NM EXPERT DEV
+global NM EXPERT
 
 % Set Step Index to 1 if none is specified
 if ~exist('stepind','var') || isempty(stepind), stepind = 1; end
@@ -42,7 +42,7 @@ end
 if ~exist('enind','var'), enind = []; end 
 if ~isstruct(enind)
     fl = true;
-    if EXPERT || DEV
+    if EXPERT
         EF = struct('correctnuis', fl, ...
             'reducedim',     fl, ...
             'extdim',        fl, ...
@@ -58,15 +58,7 @@ if ~isstruct(enind)
             'rankfeat',      fl, ...
             'remvarcomp',    fl, ...
             'devmap',        fl);
-
-        if DEV
-            EF.ROImeans = fl;
-            EF.graphComputation = fl;
-            EF.graphSparsity = fl;
-            EF.graphMetrics = fl;
-            EF.JuSpace = fl;
-            EF.customPreproc = fl;
-        end     
+            
     else 
         EF = struct('correctnuis', fl, ...
             'reducedim',     fl, ...
@@ -85,6 +77,14 @@ if ~isstruct(enind)
             'devmap',        fl, ...
             'JuSpace', fl);
     end
+
+    if isfield(NM, 'netwfl') && NM.netwfl
+        EF.ROImeans = fl;
+        EF.graphComputation = fl, ...
+            'graphSparsity', fl, ...
+            'graphMetrics', fl, ...
+            'JuSpace', fl, ...
+            'customPreproc', fl);
 
 else
     EF = enind;
