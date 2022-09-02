@@ -1,4 +1,4 @@
-function CM = graph_constructionJBE(A, method, referenceGroup, similarityMeasure)
+function CM = graph_constructionREFPLUSP(A, method, referenceGroup, similarityMeasure)
 % Jackknife Bias Estimation for network construction (Das et al., 2018)
 %
 % INPUT: matrix format, dimensions: n people x m features 
@@ -31,12 +31,21 @@ function CM = graph_constructionJBE(A, method, referenceGroup, similarityMeasure
 % OUTPUT: matrix format, dimensions: n people x (m/2-m) edges 
 global NM
 % % read in reference group data 
-RG = readtable(referenceGroup);
+if size(referenceGroup,1) >1
+    RG = referenceGroup;
+else 
+    RG = readtable(referenceGroup);
+    RG = table2array(RG);
+end
 
-% remove case and label variable 
-label_var = NM.datadescriptor{1,1}.input_settings.label_edit;
-case_var = NM.datadescriptor{1,1}.input_settings.case_edit;
-RG = table2array(removevars(RG, {label_var, case_var}));
+% if size(RG,2) == size(A,2) % check whether ID and case label are columns 
+
+% else
+%     % remove case and label variable 
+%     label_var = NM.datadescriptor{1,1}.input_settings.label_edit;
+%     case_var = NM.datadescriptor{1,1}.input_settings.case_edit;
+%     RG = table2array(removevars(RG, {label_var, case_var}));
+% end
 % RG = referenceGroup;
 % read in variable types vector
 %varTypes = readtable(variableTypesVec);
@@ -90,19 +99,9 @@ switch similarityMeasure
             end
         end
     case 'Mutual information'
-        RCM = mi_mat(RG);
-        for i = 1:size(A,1)
-            CURSAMPLE = [RG;A(i,:)];
-            CURCM = mi_mat(CURSAMPLE);
-            DIFCM = RCM - CURCM;
-            UPPTRI = triu(DIFCM,1);
-            tri  = triu(true(size(DIFCM)),1);
-            if ~exist('R', 'var')
-                R = UPPTRI(tri)';
-            else
-                R = [R;UPPTRI(tri)'];
-            end
-        end
+        R = pyrunfile('cv_computeMInetworks.py', 'netwX', ...
+            ref = double(RG), ...
+            X = double(A));
 end
 CM = R;
 end
@@ -113,8 +112,10 @@ bins = 10;
     for i = 1:size(DATA,2)
         for j = 1:size(DATA,2)
             if i<=j
-                %cur_mi = mutualinfo(DATA(:,i),DATA(:,j));
-                cur_mi = exp(-sum(KLDIV())
+                a = discretize(DATA(:,i));
+                b = discretize(DATA(:,j));
+                cur_mi = mi(a,b);
+                
 %                 cur_mi = pyrunfile('py_calc_MI.py', 'py_mi', ...
 %                     veci = DATA(:,i), vecj = DATA(:,j), ...
 %                     nbins = int64(bins));

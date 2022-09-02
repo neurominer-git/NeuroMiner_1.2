@@ -1157,7 +1157,7 @@ switch action
             case 'GLMNET'
                 vargout.classifier = 'LASSO/Elastic-net regularized GLM';
             case 'GRDBST'
-                vargout.classifier = "Gradient Boosting (from Python's scikit-learn package)";
+                vargout.classifier = 'Gradient Boosting (from Python''s scikit-learn package)';
             case 'ROBSVM'
                 vargout.classifier = 'Robust LIBSVM';
             case 'SEQOPT'
