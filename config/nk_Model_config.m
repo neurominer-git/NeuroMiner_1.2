@@ -13,7 +13,7 @@ if isfield(SVM,'prog')
     d = nk_GetParamDescription2(NM,TrainParam,'classifier',d);
     d = nk_GetParamDescription2(NM,TrainParam,'kernel',d);
     if isempty(strfind(d.prog,'RVM'))
-        progstr = [d.prog ' => ' d.classifier];
+        progstr = [d.prog '=>' d.classifier];
     else
         progstr = d.prog;
     end

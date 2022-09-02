@@ -2,6 +2,11 @@ function [GD, MultiBinBind] = nk_ModelNodeSelector(GD, MD, label, f, d, nclass, 
 
 global CV MULTI GRD SAV MODEFL RFE RAND MULTILABEL SVM xCV simFlag
 
+if ~isempty(simFlag) && simFlag
+    tCV = xCV;
+else
+    tCV = CV;
+end
 MultiBinBind = [];
 nl = nk_GetLabelDim(MULTILABEL);
 for curlabel=1:nl
@@ -52,15 +57,9 @@ for curlabel=1:nl
 
             case 'classification'
                 if RAND.Decompose ~= 9
-                    if ~simFlag
-                        fprintf('\n\n');
-                        fprintf('**** Selected binary classifiers #%g (%s) ****', ...
-                            curclass, CV.class{f,d}{curclass}.groupdesc)
-                    else 
-                        fprintf('\n\n');
-                        fprintf('**** Selected binary classifiers #%g (%s) ****', ...
-                            curclass, xCV.class{f,d}{curclass}.groupdesc)
-                    end
+                    fprintf('\n\n');
+                    fprintf('**** Selected binary classifiers #%g (%s) ****', ...
+                        curclass, tCV.class{f,d}{curclass}.groupdesc)
                 else
                     fprintf('\n\n');
                     fprintf('**** Selected multi-group classifier ****')
