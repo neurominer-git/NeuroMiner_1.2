@@ -12,6 +12,7 @@ switch MODEFL
         rs = results.predictions;
         votes = results.probabilities;
         ds = votes(:,2)./sum(votes,2);
+        ds = nk_CalibrateProbabilities(ds); 
     case 'regression'
         %rs = regRF_predict(tXtest,md); ds=rs;
         results_file = pyrunfile('py_regGRDBST_predict.py', ...
