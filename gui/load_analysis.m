@@ -39,14 +39,9 @@ for i = 1:nVarIn
         
         mli = varargin{i+1};
         handles.MLIdata = mli; 
-        if ~isfield(handles, 'MLIapp') %&& ~isnumeric(handles.MLIapp)
-            %handles.MLIapp.delete;
-            %handles = rmfield(handles,'MLIapp');
+        if ~isfield(handles, 'MLIapp') 
             handles.MLIapp = 0; 
         end
-        %handles.MLIapp = 0;
-        handles.thisMLIresult.Visible = 'on';
-        
     end
     
     

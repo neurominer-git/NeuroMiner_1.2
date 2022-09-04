@@ -55,22 +55,24 @@ if ~defaultsfl
     max_iter        = MLI.max_iter;
     n_visited       = MLI.n_visited;
     znormdata       = MLI.znormdata;
-    frac            = MLI.Modality{M}.frac;
-    usemap          = MLI.Modality{M}.MAP.flag;
-    mapfeat         = MLI.Modality{M}.MAP.map;
-    cutoff          = MLI.Modality{M}.MAP.cutoff;
-    cutoffmode      = MLI.Modality{M}.MAP.percentmode;
-    cutoffoperator  = MLI.Modality{M}.MAP.operator;
-    if isimaging
-        MLIatlasflag = MLI.Modality{M}.imgops.flag;
-        MLIatlasfile = MLI.Modality{M}.imgops.atlasfile;
-        MLIatlasvec  = MLI.Modality{M}.imgops.atlasvec;
-        MLIcsvfile   = MLI.Modality{M}.imgops.csvfile;
-        MLIcsvdelim  = MLI.Modality{M}.imgops.csvdelim;
-        MLIcsvid     = MLI.Modality{M}.imgops.csvid ;
-        MLIcsvcol    = MLI.Modality{M}.imgops.csvcol;
-        MLIcsvdesc   = MLI.Modality{M}.imgops.csvdesc;
-        MLIcsvnum    = MLI.Modality{M}.imgops.csvnum;        
+    if numel(MLI.Modality) >= M && ~isempty(MLI.Modality{M}) 
+        frac            = MLI.Modality{M}.frac;
+        usemap          = MLI.Modality{M}.MAP.flag;
+        mapfeat         = MLI.Modality{M}.MAP.map;
+        cutoff          = MLI.Modality{M}.MAP.cutoff;
+        cutoffmode      = MLI.Modality{M}.MAP.percentmode;
+        cutoffoperator  = MLI.Modality{M}.MAP.operator;
+        if isimaging
+            MLIatlasflag = MLI.Modality{M}.imgops.flag;
+            MLIatlasfile = MLI.Modality{M}.imgops.atlasfile;
+            MLIatlasvec  = MLI.Modality{M}.imgops.atlasvec;
+            MLIcsvfile   = MLI.Modality{M}.imgops.csvfile;
+            MLIcsvdelim  = MLI.Modality{M}.imgops.csvdelim;
+            MLIcsvid     = MLI.Modality{M}.imgops.csvid ;
+            MLIcsvcol    = MLI.Modality{M}.imgops.csvcol;
+            MLIcsvdesc   = MLI.Modality{M}.imgops.csvdesc;
+            MLIcsvnum    = MLI.Modality{M}.imgops.csvnum;        
+        end
     end
 
     switch method
@@ -222,7 +224,7 @@ if ~defaultsfl
               OcclusionAtlasCSVFileRead ];
     
     nk_PrintLogo
-    if isfield(MLI.Modality{M},'imgops') && ~isempty(MLI.Modality{M}.imgops) && ...
+    if numel(MLI.Modality) >= M && isfield(MLI.Modality{M},'imgops') && ~isempty(MLI.Modality{M}.imgops) && ...
             MLI.Modality{M}.imgops.flag && ~isempty(MLIcsvfile) && isfield(MLI.Modality{M}.imgops,'T') 
         if isfield(MLI.Modality{M}.imgops,'csvnum') && ~isempty(MLI.Modality{M}.imgops.csvnum)
             fprintf('\nFirst line of atlas descriptor file [imported]: %s\n\n', MLIcsvfile); 

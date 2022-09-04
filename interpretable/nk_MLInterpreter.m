@@ -154,7 +154,7 @@ else
                 case {'posneg','median','medianflip'}
                     % ordered permutations without replacement
                     % no repetitions
-                    if ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
+                    if isfield(inp.MLI.Modality{nx},'imgops') && ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
                         % Fraction of unique atlas values to be selected => nfrac 
                         nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.csvnum) * inp.MLI.Modality{nx}.frac );
                         % Create permutations of atlas indices => tI
@@ -178,7 +178,7 @@ else
                 case {'random'}
                     % non-ordered permutations without replacement,
                     % repetitions are allowed.
-                    if ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
+                    if isfield(inp.MLI.Modality{nx},'imgops') && ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
                         nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.csvnum) * inp.MLI.Modality{nx}.frac );
                         RandFeats(h, nx).I = false(nperms(nx), nYmap);
                         for nq = 1:nperms(nx)

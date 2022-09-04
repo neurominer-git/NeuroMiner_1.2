@@ -1065,7 +1065,6 @@ if isfield(handles, 'MLIdata') && ~isempty(handles.MLIdata)
     if ~isnumeric(handles.MLIapp) && isvalid(handles.MLIapp)
         updateFcn(handles.MLIapp, handles)
     end
-
 else 
     handles.thisMLIresult.Visible = 'off';
 end

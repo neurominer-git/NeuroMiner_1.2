@@ -25,7 +25,7 @@ function [ts, rs, ds, Model] = nk_GetTestPerf(Xtest, Ytest, Features, Model, X, 
 % =====================================================================================
 % (c) Nikolaos Koutsouleris, 08/2022
 
-global PREDICTFUNC EVALFUNC SVM MODEFL 
+global PREDICTFUNC EVALFUNC SVM MODEFL CVPOS
 
 % ******************************* Prepare *********************************
 s=1;
@@ -78,8 +78,13 @@ for k=1:s % Loop through all feature subspaces
 end
 
 % Sanity checks
-if ~any(ds), 
-    error('The prediction algorithm returned only 0''s! Check your learning parameters.'); end
+if ~any(ds)
+    fprintf('\n');
+    warning(['The prediction algorithm returned only 0''s in CV2 [%g,%g], CV1 [%g, %g]!' ...
+             '\nTest sample dimensions: %g rows, %g features.' ...
+             '\nCheck your learning parameters.'], ...
+        CVPOS.CV2p, CVPOS.CV2f, CVPOS.CV1p,CVPOS.CV1f, height(tXtest), size(tXtest,2)); 
+end
 if sum(isnan(ds)), error('The prediction algorithm returned scores with nonfinite values! Check your learning parameters.'); end
 %if numel(ds)>1 && numel(unique(ds))==1, error('The prediction algorithm returned all non-unique scores! Check your learning parameters.'); end
 

@@ -39,11 +39,10 @@ if handles.multilabel
 end
 
 
-[handles, visdata, oocvdata, mlidata] = switch_analysis(handles);
+[handles, visdata] = switch_analysis(handles);
 
 if isfield(handles,'MLIapp') && ~isfield(handles.NM.analysis{analind},'MLI') && ~isempty(handles.MLIapp) && handles.MLIapp~=0
     handles.MLIapp.delete;
-    handles.thisMLIresult.Visible = 'off';
     handles = rmfield(handles,'MLIapp');
 elseif isfield(handles,'MLIapp') && handles.MLIapp~=0 && isfield(handles.NM.analysis{analind},'MLI') && ishandle(handles.MLIapp)
     updateFcn(handles.MLIapp,handles);

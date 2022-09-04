@@ -87,7 +87,7 @@ if isfield(dat,'analysis')
 %             else
                 analdim = analsel;
                 return
-%            end
+            end
         else
             brief = 0;
         end

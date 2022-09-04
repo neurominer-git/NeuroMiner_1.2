@@ -1,7 +1,6 @@
 function [handles, visdata, oocvdata, mlidata] = switch_analysis(handles)
 
 visdata = []; oocvdata = []; mlidata = [];
-handles.thisMLIresult.Visible = 'off';
 analind = handles.curranal;
 handles.curmodal = 1; if strcmp(handles.selModal.Enable,'on'), handles.curmodal = handles.selModal.Value; end
 
@@ -34,19 +33,23 @@ elseif isfield(handles,'OOCV')
 end
 
 % Check whether selected analysis has MLI data
+mlifl='off';
 if handles.oocvview
     if isfield(handles.NM.analysis{analind}.OOCV{handles.oocvind},'MLI')
-        mlidata = handles.NM.analysis{analind}.OOCV{handles.oocvind}.MLI; 
+        mlidata = handles.NM.analysis{analind}.OOCV{handles.oocvind}.MLI;
+        mlifl = 'on';
     elseif isfield(handles,'MLI')
         handles = rmfield(handles,'MLI');
     end
 else
     if isfield(handles.NM.analysis{analind},'MLI')
-        mlidata = handles.NM.analysis{analind}.MLI; 
+        mlidata = handles.NM.analysis{analind}.MLI;
+        mlifl = 'on';
     elseif isfield(handles,'MLI')
         handles = rmfield(handles,'MLI');
     end
 end
+handles.thisMLIresult.Visible = mlifl;
 
 handles = load_analysis(handles, ...
                     'Subjects', handles.NM.cases, ...

@@ -25,6 +25,10 @@ analysis        = inp.analysis;
 GridAct         = inp.GridAct;
 batchflag       = inp.batchflag;
 algostr         = GetMLType(SVM);
+cases           = inp.cases;
+if inp.oocvflag
+    cases  = inp.OO.cases;
+end
 
 % Setup CV2 and CV1 counters and data containers:
 [ix, jx]        = size(CV.TrainInd);
@@ -61,16 +65,12 @@ CVPOS.fFull = FullPartFlag;
 FileNames = cell(ix,jx);
 
 RandFeats = struct('I',[]);
-if inp.oocvflag
-    cases  = inp.OO.cases;
-else
-    cases  = evalin('base','NM.cases');
-end
+
 
 for h=1:nclass
     switch MODEFL
         case 'classification'
-            inp.MLI.RangePred(h) = mean(analysis.BinClass{h}.mean_predictions);
+            inp.MLI.RangePred(h) = range(analysis.BinClass{h}.mean_predictions);
         case 'regression'
             inp.MLI.RangePred = range(analysis.Regr.mean_predictions);
     end
@@ -80,7 +80,7 @@ for h=1:nclass
     else
         mY2 = height(inp.X(1).Y);
     end
-    nY = zeros(1,nM); nY2 = nY;
+    nY = zeros(1,nM); nY2 = nY; datatype = zeros(1,nM);
     for nx=1:nM
         switch FUSION.flag
             case {0, 2, 3}
@@ -154,18 +154,18 @@ else
                 case {'posneg','median','medianflip'}
                     % ordered permutations without replacement
                     % no repetitions
-                    if ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
+                    if isfield(inp.MLI.Modality{nx},'imgops') && ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
                         % Fraction of unique atlas values to be selected => nfrac 
-                        nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique) * inp.MLI.Modality{nx}.frac );
+                        nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.csvnum) * inp.MLI.Modality{nx}.frac );
                         % Create permutations of atlas indices => tI
-                        [ tI, nperms(nx) ] = uperms( inp.MLI.Modality{nx}.imgops.atlasvec_unique, inp.MLI.nperms, nfrac ); 
+                        [ tI, nperms(nx) ] = uperms( inp.MLI.Modality{nx}.imgops.csvnum, inp.MLI.nperms, nfrac ); 
                         % Initialize logical index vector to map selected predictors within the space of MapIdx
                         RandFeats(h, nx).I = false(nperms(nx), nYmap);
                         for nq=1:nperms(nx)
                             % Find permuted atlas indices in masked atlas
                             % file (e.g. masked using CVR, sign-based )
                             RandFeats(h, nx).I(nq,:) = ismember(inp.MLI.Modality{nx}.imgops.atlasvec(inp.MLI.Modality{nx}.MAP.mapidx{h}), ...
-                                                                inp.MLI.Modality{nx}.imgops.atlasvec_unique(tI(nq,:)));
+                                                                inp.MLI.Modality{nx}.imgops.csvnum(tI(nq,:)));
                         end
                     else
                         % Fraction of (thresholded) image space 
@@ -179,12 +179,12 @@ else
                     % non-ordered permutations without replacement,
                     % repetitions are allowed.
                     if ~isempty(inp.MLI.Modality{nx}.imgops) && inp.MLI.Modality{nx}.imgops.flag
-                        nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique) * inp.MLI.Modality{nx}.frac );
+                        nfrac = ceil( numel(inp.MLI.Modality{nx}.imgops.csvnum) * inp.MLI.Modality{nx}.frac );
                         RandFeats(h, nx).I = false(nperms(nx), nYmap);
                         for nq = 1:nperms(nx)
                             tI = randperm( numel(inp.MLI.Modality{nx}.imgops.atlasvec_unique), nfrac); 
                             RandFeats(h, nx).I(nq,:) = ismember(inp.MLI.Modality{nx}.imgops.atlasvec(inp.MLI.Modality{nx}.MAP.mapidx{h}), ...
-                                                                inp.MLI.Modality{nx}.imgops.atlasvec_unique(tI));   
+                                                                inp.MLI.Modality{nx}.imgops.csvnum(tI));   
                         end
                     else
                         nfrac = ceil( nYmap * inp.MLI.Modality{nx}.frac );
@@ -665,9 +665,9 @@ for f=1:ix % Loop through CV2 permutations
                     fprintf('\nSaving %s', oMLIpath); 
                     save(oMLIpath,'predOrig', 'predInterp', 'mapInterp', 'mapInterp_ciu', 'mapInterp_cil', 'mapInterp_std', 'operm','ofold');
                 end
-                 if saveparam 
-                        fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
-                    end
+                if saveparam 
+                    fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); 
+                end
                 
             case 1
                 
