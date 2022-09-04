@@ -21,11 +21,23 @@ if ~isempty(act) || ~defaultsfl
         if ~exist("parentstr", "var"), parentstr=[]; end
         [~, param] = nk_Wrapper_config(act, param, SVM, MODEFL, GRD, MULTI, true, parentstr);
     end
+    if ~isfield(param.Wrapper,'GA')
+        [ ~, param.Wrapper ] = nk_GA_config(param.Wrapper,1); % Define GA defaults
+    end
+    if ~isfield(param.Wrapper,'SA')
+        [ ~, param.Wrapper ] = nk_SA_config(param.Wrapper,1); % Define SA defaults
+    end
+    if ~isfield(param.Wrapper,'PSO')
+        [ ~, param.Wrapper ] = nk_PSO_config(param.Wrapper,1); % Define PSO defaults
+    end
+    if ~isfield(param.Wrapper,'PFA')
+        [ ~, param.Wrapper ] = nk_PFA_config(param.Wrapper,1); % Define PFA defaults
+    end
     Wrapper = param.Wrapper; 
     if ~isfield(param.Wrapper,'EnsembleStrategy')
         param.Wrapper = nk_EnsembleStrategy2_config(Wrapper, SVM, MODEFL, 1);
     end
-    if isfield(Wrapper,'optflag'), optflag = Wrapper.optflag; else, optflag = 1; end 
+    %if isfield(Wrapper,'optflag'), optflag = Wrapper.optflag; else, optflag = 1; end 
             
     nk_PrintLogo
     mestr = 'Wrapper-based model selection setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
