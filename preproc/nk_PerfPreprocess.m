@@ -224,7 +224,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         vTr{pu} = usY{pu}(TrX,:); 
                         if pu == 1
                             % Remove cases which are completely NaN
-                            [vTr{pu}, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr{pu}, TrLX);
+                            [vTr{pu}, TrLX, SrcParam.iTrX] = nk_ManageNanCases(vTr{pu}, TrLX);
                             if multoocv
                                 for n=1:numel(usYocv)
                                     [vTs{pu,n}, ~, SrcParam.iOCV{n}] = nk_ManageNanCases(usYocv{n}{pu});
@@ -250,7 +250,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 else
                     vTr = usY(TrX,:); 
                     % Remove cases which are completely NaN
-                    [vTr, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr, TrLX);
+                    [vTr, TrLX, SrcParam.iTrX] = nk_ManageNanCases(vTr, TrLX);
                     if multoocv
                         for n=1:numel(usYocv)
                             [vTs{n}, ~, SrcParam.iOCV{n}] = nk_ManageNanCases(usYocv{n});
@@ -282,7 +282,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                         
                         if pu == 1
                             % Remove cases which are completely NaN
-                            [vTr{pu}, ~, SrcParam.iTrX] = nk_ManageNanCases(vTr{pu}, TrLX);
+                            [vTr{pu}, TrLX, SrcParam.iTrX] = nk_ManageNanCases(vTr{pu}, TrLX);
                             [vTs{pu,1}, TrL, SrcParam.iTr] = nk_ManageNanCases(vTs{pu,1}, TrL);
                             [vTs{pu,2}, CVL, SrcParam.iCV] = nk_ManageNanCases(vTs{pu,2}, CVL);
                            
@@ -314,7 +314,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                     vTr = usY(TrX,:); vTs{1} = usY(TrI,:); vTs{2} = usY(CVI,:); vTs{3} = usY(TsI{u},:);
                     
                     % Remove cases which are completely NaN
-                    [vTr, ~,SrcParam.iTrX] = nk_ManageNanCases(vTr, TrLX);
+                    [vTr, TrLX, SrcParam.iTrX] = nk_ManageNanCases(vTr, TrLX);
                     [vTs{1}, TrL, SrcParam.iTr] = nk_ManageNanCases(vTs{1}, TrL);
                     [vTs{2}, CVL, SrcParam.iCV] = nk_ManageNanCases(vTs{2}, CVL);
                     [vTs{3}, ~, SrcParam.iTs] = nk_ManageNanCases(vTs{3});
