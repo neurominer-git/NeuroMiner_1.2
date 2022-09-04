@@ -242,11 +242,13 @@ try
             cprintf('red','%s \n',paramstr(i,:)); 
         end
     end
+
 % 
 %     if ~s.analyses_completed && s.import_finished
 %         fprintf('\n\n')
-%         cprintf('*red','Important: To enter out-of-sample validation mode, all initialized analyses need to be complete & trained.\nIncomplete analyses can otherwise be deleted in the ''initialize &  manage analysis'' menu')
+%         cprintf('*red','Important: To enter external application mode, all initialized analyses need to be complete & trained.\nIncomplete analyses can otherwise be deleted in the ''initialize &  manage analysis'' menu')
 %     end
+
     if numel(NMfields) == 1 && strcmp(NMfields{1},'defs')
         mn_str = [ mn_str ...
             '|Load NeuroMiner structure' ...
