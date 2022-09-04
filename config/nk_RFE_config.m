@@ -11,7 +11,7 @@ if ~isempty(act) || ~defaultsfl
         [~, TrainParam.RFE ] = nk_Filter_config([], TrainParam.RFE, SVM, MODEFL, MULTI, 1); 
     end
     if ~isfield(TrainParam.RFE,'Wrapper')
-        [~, TrainParam.RFE ] = nk_Wrapper_config([], TrainParam.RFE, SVM, MODEFL, 1); 
+        [~, TrainParam.RFE ] = nk_Wrapper_config([], TrainParam.RFE, SVM, MODEFL, GRD, MULTI, 1); 
     end
     
     RFE = TrainParam.RFE;
