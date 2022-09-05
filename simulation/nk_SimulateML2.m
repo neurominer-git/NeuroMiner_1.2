@@ -211,7 +211,7 @@ if fromData
     writetable(varargin{1,2}, origData);
 
     reps = 10;
-    R = zeros(1,reps); %adjust to sth from RAND
+    R = zeros(1,reps); % repeated for 10 times to increase stability of results
     for k=1:reps
         tic
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
