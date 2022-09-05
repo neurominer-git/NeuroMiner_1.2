@@ -130,7 +130,7 @@ else
     end
     vxcheck = options.vxcheck;
     thresh = options.thresh;
-    typthresh = str2num(options.typthresh);
+    typthresh = options.typthresh;
     minext = options.minext;
     saving = options.saving;
     name = options.name;
