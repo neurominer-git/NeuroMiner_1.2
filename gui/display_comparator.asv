@@ -63,13 +63,13 @@ switch ActionMode
                                                                 '\nMake sure that prediction vectors have the same number of cases\n' ...
                                                                 'and predictions match NM outputs.']));
         handles.PerfTab.addedit.Layout.Row = 1;
-        handles.PerfTab.addedit.Layout.Column = 3;
+        handles.PerfTab.addedit.Layout.Column = [2 3];
 
-        handles.PerfTab.addedit_label  = uilabel(gl,'Text',sprintf('Optionally, enter external predictor outputs [ %g cases, variable # of predictors ]', size(handles.NM.cases,1)));
+        handles.PerfTab.addedit_label  = uilabel(gl,'Text',sprintf('Enter external predictor outputs [ %g cases, ]', size(handles.NM.cases,1)));
         handles.PerfTab.addedit_label.Layout.Row = 1;
         handles.PerfTab.addedit_label.Layout.Column = [1 2];
 
-        handles.PerfTab.multiflag      = uibutton(gl, 'state', 'Text','Multi-group', 'Enable', togmult, ...
+        handles.PerfTab.multiflag      = uibutton(gl, 'Text','Multi-group', 'Enable', togmult, ...
                                         'Tooltip', 'toggle button to compare multi-group or binary classifiers'); 
         handles.PerfTab.multiflag.Layout.Row = 1;
         handles.PerfTab.multiflag.Layout.Column = 4;
@@ -102,7 +102,7 @@ switch ActionMode
                                         'Position',[0.525 0.05 0.25 1]);
                                     
         handles.PerfTab.perf_radio4    = uicontrol(handles.PerfTab.perfplot_radio, 'style', 'radiobutton', 'Units', 'normalized', ...
-                                        'String','Median (IQR) plot ', ...
+                                        'String','Median (5%/95%) plot ', ...
                                         'Position',[0.8 0.05 0.20 1]);
                                     
         handles.PerfTab.perfplot_radio.Visible = 'on';
@@ -140,7 +140,7 @@ switch ActionMode
             end
         end
         
-        handles.PerfTab.Win = figure('NumberTitle','off','Name','NM Visual Comparator [of OOT performance measures]', 'Tag' ,WinTag,'MenuBar','none');
+        handles.PerfTab.Win = figure('NumberTitle','off','Name','NM Visual Performance Comparator', 'Tag' ,WinTag,'MenuBar','none');
         rowperfs=[];
         handles.PerfTab.analysisselect = uitable('units', 'normalized', 'position', [0.05, 0.110, 0.9, 0.45], ...
                                         'ColumnName', {'Analyses','Idx', 'Alias','Select'}, ... 
@@ -216,7 +216,7 @@ else
 end
 
 [FileName,PathName] = uiputfile(ext,'Save performance table','CompareTable');
-handles.PerfTab.fileseltext.Value = fullfile(PathName, FileName);
+handles.PerfTab.fileseltext.String = fullfile(PathName, FileName);
 
 function handles = set_order(src, evt, handles)
 
@@ -258,8 +258,8 @@ end
 function handles = compare_predictors(src, evt, handles)
 
 % Check whether path can be created
-pth = fileparts(handles.PerfTab.fileseltext.Value);
-if isempty(handles.PerfTab.fileseltext.Value) || isempty(pth), errordlg('Provide a valid output path before tabulating the data.'); return; end
+pth = fileparts(handles.PerfTab.fileseltext.String);
+if isempty(handles.PerfTab.fileseltext.String) || isempty(pth), errordlg('Provide a valid output path before tabulating the data.'); return; end
 
 if isfield(handles,'curlabel')
     curlabel = handles.curlabel;
@@ -326,10 +326,10 @@ for i=1:nA
     end
 end
 
-if ~isempty(handles.PerfTab.addedit.Value)
-    AdditionalPredictors = evalin('base', handles.PerfTab.addedit.Value);
+if ~isempty(handles.PerfTab.addedit.String)
+    AdditionalPredictors = evalin('base', handles.PerfTab.addedit.String);
     [nPadd, mPadd] = size(AdditionalPredictors);
-    if nPadd ~= size(handles.NM.label,1)
+    if nPadd ~= size(handles.NM.label,1),
         errordlg('External prediction matrices should contain the same number of cases as the label data in your NM structure');
     end
     nanPadd = sum(isnan(AdditionalPredictors),2)>0;
@@ -476,7 +476,7 @@ switch handles.PerfTab.multiflag.Value
         end
         
         AnalNames = [PNames AnalNames];
-        [ pth ,nam , ext ] = fileparts(handles.PerfTab.fileseltext.Value);
+        [ pth ,nam , ext ] = fileparts(handles.PerfTab.fileseltext.String);
         
         % Perform stats for each one-vs-rest classifier
         for curclass=1:handles.ngroups
@@ -645,10 +645,10 @@ switch handles.PerfTab.multiflag.Value
             end
             AnalNames = [PNames AnalNames];
             if handles.nclass > 1
-                [ pth ,nam , ext ] = fileparts(handles.PerfTab.fileseltext.Value);
+                [ pth ,nam , ext ] = fileparts(handles.PerfTab.fileseltext.String);
                 Filename = fullfile(pth, [nam sprintf('_Cl%g ', curclass) ext]);
             else
-                Filename = handles.PerfTab.fileseltext.Value;
+                Filename = handles.PerfTab.fileseltext.String;
             end
             handles.comparator_stats{curclass}.PredictorNames = AnalNames;
             handles.comparator_stats{curclass}.PredictorPerformances = G;
@@ -696,7 +696,7 @@ switch handles.PerfTab.multiflag.Value
                     sw = nm_95confint(d);
                     bar(ax, mw, 'FaceColor', rgb('LightSteelBlue'));
                     errorbar(ax, 1:numel(mw), mw, sw(1,:), sw(2,:), 'LineStyle', 'none', 'Color', 'k'); 
-                    ax.XTick = 1:numel(mw);
+                    ax.XTick = [1:numel(mw)];
                     ax.XTickLabel = AnalNames(~RefSelectionSel);
                     ax.XTickLabelRotation = 45;
                     ax.XLim = [0.25 numel(mw)+0.75];

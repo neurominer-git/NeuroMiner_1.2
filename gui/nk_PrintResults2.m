@@ -1172,6 +1172,7 @@ function CompModelsStats_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 display_comparator(handles, 'stats');
+drawnow
 
 % --- Executes on selection change in selSubParam.
 function selSubParam_Callback(hObject, eventdata, handles)

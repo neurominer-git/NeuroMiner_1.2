@@ -114,7 +114,7 @@ for i=1:nM
         plot(ax(li), mw, 'ko-', 'LineWidth', 2, 'MarkerFaceColor', 'k', 'MarkerSize', 10, 'MarkerEdgeColor', 'w');
         if size(sw,1) == 2
             er = errorbar(ax(li), 1:numel(mw), mw, sw(1,:), sw(2,:), 'LineStyle', 'none', 'Color', 'k'); 
-            lgstr = {'Median','25%/75% percentiles'};
+            lgstr = {'Median','IQR'};
         else
             er = errorbar(ax(li), 1:numel(mw), mw, sw, 'LineStyle', 'none', 'Color', 'k'); 
             lgstr = {'Median','Stdev'};

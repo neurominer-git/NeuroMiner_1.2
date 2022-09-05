@@ -114,21 +114,29 @@ switch IN.method
                 % Find cases without missings 
                 tXX = tX(indnan_Xi, indi_Yi);
                 indnan_Xj = isnan(tXX);
-                [~, ind_c] = sort(sum(indnan_Xj),'ascend');
-                [~, ind_r] = sort(sum(isnan(tXX), 2),'ascend');
-                idx_c = sum(isnan(tX(indnan_Xi, indi_Yi(ind_c))))==0;
-                while sum(idx_c) < minnumcols
-                    % if there is no column without missings start removing
-                    % cases from the imputation training sample
-                    ind_r(end)=[];
-                    idx_c = sum(isnan(tX(indnan_Xi(ind_r), indi_Yi(ind_c))))==0;
-                    if numel(indnan_Xi)<IN.k
-                        warning('Remaining samples in training data < k ');
+                if ~any(indnan_Xj)
+                    Xj = tXX;
+                else
+                    [~, ind_c] = sort(sum(indnan_Xj),'ascend');
+                    [~, ind_r] = sort(sum(isnan(tXX), 2),'ascend');
+                    idx_c = sum(isnan(tX(indnan_Xi, indi_Yi(ind_c))))==0;
+                    while sum(idx_c) < minnumcols
+                        % if there is no column without missings start removing
+                        % cases from the imputation training sample
+                        try
+                            ind_r(end)=[];
+                        catch
+                            disp(ind_r);
+                        end
+                        idx_c = sum(isnan(tX(indnan_Xi(ind_r), indi_Yi(ind_c))))==0;
+                        if numel(indnan_Xi)<IN.k
+                            warning('Remaining samples in training data < k ');
+                        end
                     end
+                    indi_Yi = indi_Yi(ind_c(idx_c));
+                    indnan_Xi = indnan_Xi(ind_r);
+                    Xj = tX(indnan_Xi, indi_Yi);
                 end
-                indi_Yi = indi_Yi(ind_c(idx_c));
-                indnan_Xi = indnan_Xi(ind_r);
-                Xj = tX(indnan_Xi, indi_Yi);
     
                 % Compute distance metric
                 switch IN.method
