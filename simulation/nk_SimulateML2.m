@@ -181,7 +181,7 @@ for i=1:nP % Loop through hyperparameter combinations
             IN.NfeatsMiss, ...
             IN.algorithm, ...
             IN.RAND, ...
-            IN.verbose, IN.Data, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps); % varargin
+            IN.verbose, IN.Modalities, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps, IN.SitesIdx); % varargin
     else
         [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);
     end
@@ -201,151 +201,250 @@ Res.Params = P;
 function [Rmean, R95CI] = compute_perf(nf, mr, nc, er, auc_max, auc_min, nb, bp, ncm, nfm, algorithm, RAND, varargin)
 global SVM fromData xNM xCV
 
+
+
 % Create marker matrix based on user's input
 % fill the rest of the matrix with uninformative features
 % in the range of -1 to 1
 
 % check if original data was provided
 if fromData
-    labels_a = varargin{1,3};
-    if isa(labels_a, 'cell') % only binary problems
-        num_labels = double(strcmp(labels_a,labels_a(1,1)));
-        num_labels(num_labels==0) = -1;
-    else % data and labels from NM structure; binary classification
-        num_labels = labels_a;
-        num_labels= num_labels-1; % simulate function could potentially better be adjusted to fit NM strucutre of labels
-    end
-    analrootdir = xNM.analysis{1,varargin{1,4}}.rootdir;
-    origData = sprintf('%s/origData.csv',analrootdir);
-    if isa(varargin{1,2},'double')
-        varargin{1,2} = array2table(varargin{1,2});
-    end
-    writetable(varargin{1,2}, origData);
-
+    verbose = varargin{1,1};
+    %Ys = varargin{1,2};
+    mods = varargin{1,2};
+    labels = varargin{1,3};
+    curanal = varargin{1,4};
+    add2orig = varargin{1,5};
     reps = varargin{1,6};
+    sitesIdx = varargin{1,7};
+
+    % what happens in the next lines, really necessary?
+%     if isa(labels_a, 'cell') % only binary problems
+%         num_labels = double(strcmp(labels_a,labels_a(1,1)));
+%         num_labels(num_labels==0) = -1;
+%     else % data and labels from NM structure; binary classification
+%         num_labels = labels_a;
+%         num_labels= num_labels-1; % simulate function could potentially better be adjusted to fit NM strucutre of labels
+%     end
+
+
+    analrootdir = xNM.analysis{1,curanal}.rootdir;
+    origDataFile = sprintf('%s/origData.csv',analrootdir);
+
+    
+    % check if several modalities included
+    %   if length(Ys) >1
+    % mods = 1:length(Ys);
+    modsNfeats = zeros(1,length(mods));
+    Y = [];
+    for i = 1:length(mods)
+        modNfeat(i) = size(xNM.Y{1,mods(i)},2);
+        Y = [Y, xNM.Y{1,i}];
+    end
+    modColIdx = repelem(mods, modNfeat);
+    %   end
+
+    %     if isa(varargin{1,2},'double')
+    %         Ytab = array2table(varargin{1,2});
+    %     end
+
+    %     Y = varargin{1,2};
+
+
+    % check whether covariates are included in analysis
+    if isfield(xNM, 'covars')
+        covColIdx = zeros(1,size(Y,2));
+        Y = [Y, xNM.covars];
+        covColIdx = [covColIdx, ones(1,size(xNM.covars,2))];
+    end
+
+    % check whether leave-one-group out cv framework is selected
+    cv1lcoIdx = 0;
+    if isfield(RAND,'CV1LCO')
+        cv1lcoColIdx = zeros(1,size(Y,2));
+        Y = [Y, RAND.CV1LCO,ind]
+        cv1lcoColIdx =[cv1lcoColIdx, 1];
+        cv1lcoIdx = length(cv1lcoColIdx);
+    end
+
+    cv2lcoIdx = 0; 
+    if isfield(RAND,'CV2LCO')
+        cv2lcoColIdx = zeros(1,size(Y,2));
+        Y = [Y, RAND.CV1LCO,ind]
+        cv2lcoColIdx =[cv2lcoColIdx, 1];
+        cv2lcoIdx = length(cv2lcoColIdx);
+    end
+
+    % check if sample size dependent vectors are defined in preproc 
+    % - estimate betas in subgroup only
+    % - ... ???
+
+   % covGroupIdx = 0;
+  % TO DO
+    
+    Ytab = array2table(Y);
+    writetable(Ytab, origDataFile);
+
+    
     R = zeros(1,reps); % repeated for 10 times to increase stability of results
     for k=1:reps
         tic
+        %sitesIdx = 0; %remove!
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
-            data_file = origData, ...
-            labels = int64(num_labels), ...
+            data_file = origDataFile, ...
+            labels = int64(labels), ...
             n_obs = int64(nc), ... % if vector, then n observations to be simulated within each group (defined by label)
+            cv1lco = int64(cv1lcoIdx), ...
+            cv2lco = int64(cv2lcoIdx), ...
+            sitesCols = int64(sitesIdx), ... % must have length > 1 (dummy coded sites)
             rootdir = analrootdir);
         toc
         M = readtable(py2mat(M_file));
 
         L = table2array(M(:,end));
-        L(L==0) = -1;
+%         L(L==0) = -1;
         M = table2array(M(:,1:end-1));
 
-        add2orig = varargin{1,5};
-        % if indicated, data will be added to original data 
+        
+        % if indicated, data will be added to original data
         if add2orig
-            M = vertcat(varagin{1,2}, M); 
+            %Mtab = array2table(M);
+            %Otab = Y;
+            %Mtab.Properties.VariableNames = Otab.Properties.VariableNames;
+            M = [Y;M];
+        end
+        
+         
+         % TO DO: whether group size relation is correct otherwise
+         % potentially use "conditions" of sdv package
+        if isfield(RAND,'CV2LCO')
+            % replace old CV2LCO with new one
+            cv2lcoColIdx = logical(cv2lcoColIdx);
+            RAND.CV2LCO.ind = M(:,cv2lcoColIdx == 1);
+            M = M(:,~cv2lcoColIdx);
+        end
+
+        if isfield(RAND,'CV1LCO')
+            % replace old CV1LCO with new one
+            cv1lcoColIdx = logical(cv1lcoColIdx);
+            RAND.CV2LCO.ind = M(:,cv1lcoColIdx == 1);
+            M = M(:,~cv1lcoColIdx);
+        end
+
+        if isfield(xNM, 'covars')
+            % add simulated covariates to xNM structure for preproc
+            covColIdx = logical(covColIdx);
+            xNM.covars = M(:,covColIdx);
+            % remove covariate columns
+            M = M(:,~covColIdx);
+        end
+
+        % separate different modalities into their own containers in xNM
+        for i = 1:length(unique(modColIdx))
+            xNM.Y{1,i} = M(:,modColIdx == mods(i));
         end
 
         nmr = size(M,2);
-        verbose = varargin{1,1};
+        
 
-        % create CV structure based on RAND
-        xNM.Y{1,1} = M;
-        xNM.analysis{1,varargin{1,4}}.params.TrainParam.FUSION.M = 1;
+      
+        xNM.analysis{1,curanal}.params.TrainParam.FUSION.M = mods;
         xNM.label = L;
-        origCV2LCO = []; 
+%         origCV2LCO = [];
 
         % what is CV2LCO again?? I assume it does not work if simulated
         % data is added to only one group
-        if add2orig
-            if isfield(RAND,'CV2LCO')
-                origCV2LCO = sort(RAND.CV2LCO.ind);
-                groups = unique(origCV2LCO);
-                nGroups = length(groups);
-                origN = length(origCV2LCO);
-                simCV2LCO = [];
-                for i=1:nGroups
-                    groupN = sum(origCV2LCO == groups(i));
-                    propGroup = groupN/origN;
-                    simGroupN = round(nc*propGroup);
-                    simGroupV = repelem(groups(i), simGroupN);
-                    simCV2LCO = [simCV2LCO, simGroupV];
-                end
-                % check whether simCV2LCO == nc, could be slightly different
-                % due to rounding
-                if length(simCV2LCO) > nc
-                    % delete one group member for as long as necessary to get
-                    % the vector to the required size
-                    dif = length(simCV2LCO)-nc;
+%         if add2orig
+%             if isfield(RAND,'CV2LCO')
+%                 origCV2LCO = sort(RAND.CV2LCO.ind);
+%                 groups = unique(origCV2LCO);
+%                 nGroups = length(groups);
+%                 origN = length(origCV2LCO);
+%                 simCV2LCO = [];
+%                 for i=1:nGroups
+%                     groupN = sum(origCV2LCO == groups(i));
+%                     propGroup = groupN/origN;
+%                     simGroupN = round(nc*propGroup);
+%                     simGroupV = repelem(groups(i), simGroupN);
+%                     simCV2LCO = [simCV2LCO, simGroupV];
+%                 end
+%                 % check whether simCV2LCO == nc, could be slightly different
+%                 % due to rounding
+%                 if length(simCV2LCO) > nc
+%                     % delete one group member for as long as necessary to get
+%                     % the vector to the required size
+%                     dif = length(simCV2LCO)-nc;
+% 
+%                     for i = 1:dif
+%                         group = groups(i);
+%                         groupIDXs = find(simCV2LCO == group);
+%                         rmIDX = groupIDXs(end);
+%                         simCV2LCO(rmIDX) = [];
+%                     end
+% 
+%                 elseif length(simCV2LCO) < nc
+%                     % add one group member for as long as necessary to get
+%                     % the vector to the required size
+%                     dif = nc-length(simCV2LCO);
+%                     for i = 1:dif
+%                         group = groups(i);
+%                         simCV2LCO(end+1) = group;
+%                     end
+% 
+%                 end
 
-                    for i = 1:dif
-                        group = groups(i);
-                        groupIDXs = find(simCV2LCO == group);
-                        rmIDX = groupIDXs(end);
-                        simCV2LCO(rmIDX) = [];
-                    end
+%             end
 
-                elseif length(simCV2LCO) < nc
-                    % add one group member for as long as necessary to get
-                    % the vector to the required size
-                    dif = nc-length(simCV2LCO);
-                    for i = 1:dif
-                        group = groups(i);
-                        simCV2LCO(end+1) = group;
-                    end
+%             RAND.CV2LCO.ind = simCV2LCO;
+%             origCV1LCO = [];
+%             if isfield(RAND,'CV1LCO')
+%                 origCV1LCO = sort(RAND.CV1LCO.ind);
+%                 groups = unique(origCV1LCO);
+%                 nGroups = length(groups);
+%                 origN = length(origCV1LCO);
+%                 simCV1LCO = [];
+%                 for i=1:nGroups
+%                     groupN = sum(origCV1LCO == groups(i));
+%                     propGroup = groupN/origN;
+%                     simGroupN = round(nc*propGroup);
+%                     simGroupV = repelem(groups(i), simGroupN);
+%                     simCV1LCO = [simCV1LCO, simGroupV];
+%                 end
+%                 % check whether simCV2LCO == nc, could be slightly different
+%                 % due to rounding
+%                 if length(simCV1LCO) > nc
+%                     % delete one group member for as long as necessary to get
+%                     % the vector to the required size
+%                     dif = length(simCV1LCO)-nc;
+% 
+%                     for i = 1:dif
+%                         group = groups(i);
+%                         groupIDXs = find(simCV1LCO == group);
+%                         rmIDX = groupIDXs(end);
+%                         simCV1LCO(rmIDX) = [];
+%                     end
+% 
+%                 elseif length(simCV1LCO) < nc
+%                     % add one group member for as long as necessary to get
+%                     % the vector to the required size
+%                     dif = nc-length(simCV1LCO);
+%                     for i = 1:dif
+%                         group = groups(i);
+%                         simCV1LCO(end+1) = group;
+%                     end
+% 
+%                 end
+% 
+%             end
+% 
+%             RAND.CV1LCO.ind = simCV1LCO;
+%         end
 
-                end
-
-            end
-
-            RAND.CV2LCO.ind = simCV2LCO;
-            origCV1LCO = [];
-            if isfield(RAND,'CV1LCO')
-                origCV1LCO = sort(RAND.CV1LCO.ind);
-                groups = unique(origCV1LCO);
-                nGroups = length(groups);
-                origN = length(origCV1LCO);
-                simCV1LCO = [];
-                for i=1:nGroups
-                    groupN = sum(origCV1LCO == groups(i));
-                    propGroup = groupN/origN;
-                    simGroupN = round(nc*propGroup);
-                    simGroupV = repelem(groups(i), simGroupN);
-                    simCV1LCO = [simCV1LCO, simGroupV];
-                end
-                % check whether simCV2LCO == nc, could be slightly different
-                % due to rounding
-                if length(simCV1LCO) > nc
-                    % delete one group member for as long as necessary to get
-                    % the vector to the required size
-                    dif = length(simCV1LCO)-nc;
-
-                    for i = 1:dif
-                        group = groups(i);
-                        groupIDXs = find(simCV1LCO == group);
-                        rmIDX = groupIDXs(end);
-                        simCV1LCO(rmIDX) = [];
-                    end
-
-                elseif length(simCV1LCO) < nc
-                    % add one group member for as long as necessary to get
-                    % the vector to the required size
-                    dif = nc-length(simCV1LCO);
-                    for i = 1:dif
-                        group = groups(i);
-                        simCV1LCO(end+1) = group;
-                    end
-
-                end
-
-            end
-
-            RAND.CV1LCO.ind = simCV1LCO;
-        end
-       
         simCV = nk_MakeCrossFolds(L, RAND, xNM.modeflag,[], xNM.groupnames, [], 0);
         xNM.cv = simCV;
         xCV = simCV;
         xNM.analind = varargin{1,4};
-        
+
         xinp = struct('analind',varargin{1,4}, ...
             'lfl',1, ...
             'preprocmat',[], ...
@@ -361,16 +460,16 @@ if fromData
         %[params,model] = nk_GetParams2(xNM,)
 
         %[params,model] = nk_GetParams2(xNM,)
-        %R(k) = xNM.analysis{1,varargin{1,4}}.TestPerformanceMean; 
+        %R(k) = xNM.analysis{1,varargin{1,4}}.TestPerformanceMean;
         R(k) = xNM.analysis{1,varargin{1,4}}.GDdims{1,1}.BinClass{1,1}.contigency.BAC;
-%         for i = 1:size(xNM.analysis{1,varargin{1,4}}.GDdims{1,1}.predictions{1,1},2)
-%             cur_pred = zeros(size(L));
-%             for pp = 1:size(xNM.analysis{1,varargin{1,4}}.GDdims{1,1}.predictions,1)
-%                 cur_pred(pp,1) = xNM.analysis{1,varargin{1,4}}.GDdims{1,1}.predictions{pp,1}(i);
-%             end
-%             R(k,i) = BAC(L,cur_pred);
-%         end
-        
+        %         for i = 1:size(xNM.analysis{1,varargin{1,4}}.GDdims{1,1}.predictions{1,1},2)
+        %             cur_pred = zeros(size(L));
+        %             for pp = 1:size(xNM.analysis{1,varargin{1,4}}.GDdims{1,1}.predictions,1)
+        %                 cur_pred(pp,1) = xNM.analysis{1,varargin{1,4}}.GDdims{1,1}.predictions{pp,1}(i);
+        %             end
+        %             R(k,i) = BAC(L,cur_pred);
+        %         end
+
         fprintf(' ==> mean simulation outcome at %1.3f in repetition: %g,',R(k),k);
     end
 else
@@ -598,7 +697,9 @@ else
         R(k,:) = Ri(:); fprintf(' ==> mean simulation outcome at %1.3f in repetition: %g,',mean(Ri(:)), k);
     end
 end
+
 R=R(:);
 Rmean = nm_nanmean(R);
 R95CI = nm_95confint(R);
+
 

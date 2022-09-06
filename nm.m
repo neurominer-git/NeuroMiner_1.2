@@ -59,7 +59,7 @@ function nm(varargin)
 % option.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 05/2022
-global EXPERT OCTAVE NM 
+global EXPERT DEV OCTAVE NM 
 
 nosplash  = false; EXPERT = false; OCTAVE = false; DEV = false; 
 % Initialize NM
