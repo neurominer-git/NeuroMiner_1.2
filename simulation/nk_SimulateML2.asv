@@ -169,7 +169,19 @@ for i=1:nP % Loop through hyperparameter combinations
     fprintf('\nWorking on parameter combination %g/%g: %s', i, nP, Xl{i});
     % Do the magic
     if fromData
-        [R(i), R95CI(:,i)] = compute_perf(IN.Nfeats, IN.Nmarkers, IN.Ncases(:,i), IN.eventprob, IN.AUCmax, IN.AUCmin, IN.Nbatches, IN.BatchPerc, IN.NcasesMiss, IN.NfeatsMiss, IN.algorithm, IN.RAND, IN.verbose, IN.Data, IN.DataLabel, IN.NRanalysis, IN.add2orig);
+        [R(i), R95CI(:,i)] = compute_perf(IN.Nfeats, ...
+            IN.Nmarkers, ...
+            IN.Ncases(:,i), ...
+            IN.eventprob, ...
+            IN.AUCmax, ...
+            IN.AUCmin, ...
+            IN.Nbatches, ...
+            IN.BatchPerc, ...
+            IN.NcasesMiss, ...
+            IN.NfeatsMiss, ...
+            IN.algorithm, ...
+            IN.RAND, ...
+            IN.verbose, IN.Data, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps); % varargin
     else
         [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);
     end
@@ -195,30 +207,31 @@ global SVM fromData xNM xCV
 
 % check if original data was provided
 if fromData
-    reps = 10;
-    R = zeros(1,reps); %adjust to sth from RAND
+    labels_a = varargin{1,3};
+    if isa(labels_a, 'cell') % only binary problems
+        num_labels = double(strcmp(labels_a,labels_a(1,1)));
+        num_labels(num_labels==0) = -1;
+    else % data and labels from NM structure; binary classification
+        num_labels = labels_a;
+        num_labels= num_labels-1; % simulate function could potentially better be adjusted to fit NM strucutre of labels
+    end
+    analrootdir = xNM.analysis{1,varargin{1,4}}.rootdir;
+    origData = sprintf('%s/origData.csv',analrootdir);
+    if isa(varargin{1,2},'double')
+        varargin{1,2} = array2table(varargin{1,2});
+    end
+    writetable(varargin{1,2}, origData);
+
+    reps = varargin{1,6};
+    R = zeros(1,reps); % repeated for 10 times to increase stability of results
     for k=1:reps
-        labels_a = varargin{1,3};
-        if isa(labels_a, 'cell') % only binary problems
-            num_labels = double(strcmp(labels_a,labels_a(1,1)));
-            num_labels(num_labels==0) = -1;
-        else % data and labels from NM structure; binary classification
-            num_labels = labels_a;
-            num_labels= num_labels-1; % simulate function could potentially better be adjusted to fit NM strucutre of labels
-        end
-        analrootdir = xNM.analysis{1,varargin{1,4}}.rootdir;
-        origData = sprintf('%s/origData.csv',analrootdir);
-        if isa(varargin{1,2},'double')
-            varargin{1,2} = array2table(varargin{1,2});
-        end
-        writetable(varargin{1,2}, origData);
-        
+        tic
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
             data_file = origData, ...
             labels = int64(num_labels), ...
             n_obs = int64(nc), ... % if vector, then n observations to be simulated within each group (defined by label)
             rootdir = analrootdir);
-
+        toc
         M = readtable(py2mat(M_file));
 
         L = table2array(M(:,end));
@@ -228,7 +241,10 @@ if fromData
         add2orig = varargin{1,5};
         % if indicated, data will be added to original data 
         if add2orig
-            M = vertcat(varagin{1,2}, M); 
+            Mtab = array2table(M);
+            Otab = varargin{1,2};
+            Mtab.Properties.VariableNames = 
+            M = vertcat(varargin{1,2}, array2table(M)); 
         end
 
         nmr = size(M,2);
