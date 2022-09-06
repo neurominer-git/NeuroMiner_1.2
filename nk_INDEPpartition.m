@@ -1,6 +1,6 @@
 function [cv, K, P] = nk_INDEPpartition(Groups, Labels, LGOflip, OutReps)
 % =========================================================================
-% cv = nk_INDEPpartition(Groups, Labels, LGOflip)
+% cv = nk_INDEPpartition(Groups, Labels, LGOflip, OutReps)
 % =========================================================================
 % This function performs a leave-group-out/-in (LGO) split of the data in 
 % order to test the generalizability of a model across different groups of 
@@ -11,7 +11,7 @@ function [cv, K, P] = nk_INDEPpartition(Groups, Labels, LGOflip, OutReps)
 % Use LGO=1 only if each of your groups is of sufficient size or define 
 % one vs rest scenarios using 'Groups'.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NeuroMiner 1.0, (c) Nikolaos Koutsouleris, 08/2018
+% NeuroMiner 1.1, (c) Nikolaos Koutsouleris, 09/2022
 
 if ~exist('OutReps','var') || isempty(OutReps), OutReps = 1; end
 [~, ~, Groups_u] = nk_MakeDummyVariables(Groups,[], 'sorted');
@@ -21,8 +21,10 @@ trainidxs = cell(OutReps,K); testidxs = cell(OutReps,K);
 for j=1:OutReps
     for i=1:K
         if LGOflip
+            % Leave-group-in
             I = Groups == Groups_u(i);
         else
+            % Leave-group-out
             I = Groups ~= Groups_u(i);
         end
         trainidxs{j,i} = find(I);
