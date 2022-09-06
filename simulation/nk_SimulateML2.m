@@ -262,7 +262,7 @@ if fromData
     cv1lcoIdx = 0;
     if isfield(RAND,'CV1LCO')
         cv1lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, RAND.CV1LCO,ind]
+        Y = [Y, RAND.CV1LCO.ind]
         cv1lcoColIdx =[cv1lcoColIdx, 1];
         cv1lcoIdx = length(cv1lcoColIdx);
     end
@@ -270,7 +270,7 @@ if fromData
     cv2lcoIdx = 0; 
     if isfield(RAND,'CV2LCO')
         cv2lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, RAND.CV1LCO,ind]
+        Y = [Y, RAND.CV1LCO.ind];
         cv2lcoColIdx =[cv2lcoColIdx, 1];
         cv2lcoIdx = length(cv2lcoColIdx);
     end
@@ -278,7 +278,19 @@ if fromData
     % check if sample size dependent vectors are defined in preproc 
     % - estimate betas in subgroup only
     % - ... ???
-
+    pstepCovSubgroup = [];
+    covSubgroupIdx = zeros(1,length(Y));
+    for m = length(mods)
+        preprocs = NM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM;
+        for ps = 1:length(preprocs)
+            if any(strcmp(fieldnames(preprocs{1,ps}),'SUBGROUP'))
+                pstepCovSubgroup = [pstepCovSubgroup; m, ps]; 
+                Y = [Y, preprocs{1,ps}.SUBGROUP];
+                covSubgroupIdx = [covSubgroupIdx, 1];
+                break;
+            end
+        end
+    end
    % covGroupIdx = 0;
   % TO DO
     
@@ -314,6 +326,16 @@ if fromData
             M = [Y;M];
         end
         
+        if ~isempty(covSubgroupIdx)
+            covSubgroupIdx = logical(covSubgroupIdx);
+            for csg = 1:size(pstepCovSubgroup,2)
+                m = pstepCovSubgroup(csg,1);
+                ps = pstepCovSubgroup(csg,2);
+                NM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = Y(:,size(Y,1)-size(pstepCovSubgroup,2)+csg);
+            end
+            Y = Y(:,~covSubgroupIdx);
+        end
+       
          
          % TO DO: whether group size relation is correct otherwise
          % potentially use "conditions" of sdv package
