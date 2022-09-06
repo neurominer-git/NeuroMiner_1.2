@@ -1,4 +1,4 @@
- % =========================================================================
+% =========================================================================
 % cv = nk_MakeCrossFolds(label, RAND, ...
 %                        decomposeflag, modeflag, groups, groupnames, ...
 %                        oldcv, appendfl, auto_adjust)
@@ -17,15 +17,15 @@
 % The outer CV data fold [1,1] of binary classifier 1 is accessed via:
 % cv.TestInd{1,1}(cv.classnew{1,1}{1}.ind)
 %
-% If you want to access one inner fold [k,l] of a binary classifier b of the
-% current outer CV index [i,j] you use the expression:
-% Y{i,j}.inY{k,l}(dat.class{i,j}{b}.ind,:)
+% If you want to access one inner CV fold [k,l] of a binary classifier b 
+% with the current outer CV index [i,j] you should use the expression:
+% cv.TrainInd{i,j}(cv.class{i,j}{b}.TrainInd{k,l}/TestInd{k,l})
 %
-% First generate outer CV folds. Whole data is split intop training folds
-% (used for model generation / learning and validation fold, that are
+% First generate outer CV folds. Whole data is split into training folds
+% (used for model generation/learning and validation fold, that are
 % completely unseen by the learning algorithm)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NeuroMiner 1.0, (c) Nikolaos Koutsouleris, 08/2018
+% NeuroMiner 1.1, (c) Nikolaos Koutsouleris, 09/2022
 
 function cv = nk_MakeCrossFolds(label, RAND, modeflag, groups, groupnames, oldcv, appendfl, auto_adjust)
 
@@ -38,7 +38,8 @@ InFold          = RAND.InnerFold;
 decomposeflag   = RAND.Decompose;
 CV2LCO = []; if isfield(RAND,'CV2LCO'), CV2LCO = RAND.CV2LCO; end
 CV1LCO = []; if isfield(RAND,'CV1LCO'), CV1LCO = RAND.CV1LCO; end
-if isfield(RAND,'CV2FRAME') && RAND.CV2FRAME == 4 , cv2frame = true; else, cv2frame = false; end
+% Check whether leave-group-in or leave-group-out has been selected.
+if isfield(RAND,'CV2Frame') && RAND.CV2Frame == 4 , cv2frame = true; else, cv2frame = false; end
 if ~exist('auto_adjust', 'var'), auto_adjust = false; end
 
 if isempty(CV2LCO)

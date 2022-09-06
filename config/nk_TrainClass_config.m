@@ -155,7 +155,7 @@ if ~exist('act','var') || isempty(act)
     
     %% Check whether there are analyses that have been completed and make stacking options available
     s = nk_GetNMStatus(NM);
-    if ~isempty(s.completed_analyses) && any(s.completed_analyses & s.isequalcv_analyses) && sum(s.nmodal_analyses)>1
+    if ~isempty(s.completed_analyses) && sum(s.completed_analyses)>1 && sum(s.nmodal_analyses)>1
         menustr = [ menustr sprintf('Define meta-learning/stacking options [ %s ]|', STATUS.STACKING) ]; menuact = [ menuact 18 ]; 
     end
     
@@ -314,7 +314,7 @@ switch act
     case 0
         return
     case 1
-        if isfield(NM.TrainParam,'FUSION'), 
+        if isfield(NM.TrainParam,'FUSION') 
             fusedef = NM.TrainParam.FUSION.flag ;
         else
             fusedef = 1; 
@@ -329,7 +329,7 @@ switch act
             if numel(NM.TrainParam.FUSION.M) == 1
                 NM.TrainParam.FUSION.flag = false;                
             end
-            if isempty(find(NM.TrainParam.FUSION.M == varind)),
+            if isempty(find(NM.TrainParam.FUSION.M == varind))
                 varind = NM.TrainParam.FUSION.M(1);
             end
             if NM.TrainParam.FUSION.flag == 3
@@ -422,7 +422,8 @@ switch act
                         NM.TrainParam.STRAT{varind}.GRD, [], navistr); 
             end
         else
-            if ~isfield(NM.TrainParam,'RFE'), [~, NM.TrainParam.STRAT{varind}.RFE ] = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1); end
+            if ~isfield(NM.TrainParam,'RFE'), [~, NM.TrainParam.STRAT{varind}.RFE ] = ...
+                    nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1); end
             act = 1; while act>0, [ act, NM.TrainParam.RFE ] = nk_RFE_config(act, NM.TrainParam, NM.TrainParam.SVM, NM.modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, [], navistr); end
         end
         

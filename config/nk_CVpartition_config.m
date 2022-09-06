@@ -300,13 +300,11 @@ if ~defaultsfl
                     case {1,2}
                         NM.TrainParam.RAND.InnerPerm = ...
                             nk_input('Number of permutations for Inner (CV1) cross-validation',0,'w1',CV1pn);
-                     case {3,4}
-                        if NM.TrainParam.RAND.CV2Frame == 3
-                              NM.TrainParam.RAND.CV1LCO.ind = ...
-                                     nk_input('Define index vector for Inner (CV1) case-to-group assignment',0,'i',[],[numel(NM.cases),1]);
-                                 NM.TrainParam.RAND.InnerPerm = 1;
-                                 NM.TrainParam.RAND.InnerFold = numel(unique(NM.TrainParam.RAND.CV1LCO.ind));
-                        end
+                    case {3,4}    
+                          NM.TrainParam.RAND.CV1LCO.ind = ...
+                                 nk_input('Define index vector for Inner (CV1) case-to-group assignment',0,'i',[],[numel(NM.cases),1]);
+                             NM.TrainParam.RAND.InnerPerm = 1;
+                             NM.TrainParam.RAND.InnerFold = numel(unique(NM.TrainParam.RAND.CV1LCO.ind));
                  end
              else
                   NM.TrainParam.RAND.InnerPerm = ...
