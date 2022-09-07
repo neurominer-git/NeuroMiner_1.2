@@ -27,7 +27,9 @@ switch act
                 Unq = unique(T.(Vars{i}));
                 nUnq = numel(Unq); 
                 if nUnq>uniquelim
-                    error('\nFound %g unique values in column ''%s'' while only %g unique values are allowed.', nUnq, Vars{i}, uniquelim );
+                    errordlg('\nFound %g unique values in column ''%s'' while only %g unique values are allowed.', nUnq, Vars{i}, uniquelim );
+                    Tdummy = T;
+                    return
                 end
                 Tx_dummy = nk_MakeDummyVariables(T.(Vars{i}));
                 VarNames = cellstr([repmat([Vars{i} '_'], nUnq, 1) char(Unq)]);
