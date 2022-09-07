@@ -209,6 +209,7 @@ global SVM fromData xNM xCV
 
 % check if original data was provided
 if fromData
+    xNM = evalin('base','NM');
     verbose = varargin{1,1};
     %Ys = varargin{1,2};
     mods = varargin{1,2};
@@ -218,7 +219,7 @@ if fromData
     reps = varargin{1,6};
     sitesIdx = varargin{1,7};
 
-    IN.RAND = RAND;
+    origRAND = RAND;
     
 
     % what happens in the next lines, really necessary?
@@ -264,17 +265,17 @@ if fromData
 
     % check whether leave-one-group out cv framework is selected
     cv1lcoIdx = 0;
-    if isfield(RAND,'CV1LCO')
+    if isfield(origRAND,'CV1LCO')
         cv1lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, RAND.CV1LCO.ind]
+        Y = [Y, origRAND.CV1LCO.ind]
         cv1lcoColIdx =[cv1lcoColIdx, 1];
         cv1lcoIdx = length(cv1lcoColIdx);
     end
 
     cv2lcoIdx = 0; 
-    if isfield(RAND,'CV2LCO')
+    if isfield(origRAND,'CV2LCO')
         cv2lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, RAND.CV2LCO.ind];
+        Y = [Y, origRAND.CV2LCO.ind];
         cv2lcoColIdx =[cv2lcoColIdx, 1];
         cv2lcoIdx = length(cv2lcoColIdx);
     end
@@ -304,9 +305,8 @@ if fromData
     
     R = zeros(1,reps); % repeated for 10 times to increase stability of results
     for k=1:reps
+        tempRAND = origRAND;
         tic
-        %sitesIdx = 0; %remove!
-        
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
             data_file = origDataFile, ...
             labels = int64(labels), ...
@@ -345,17 +345,17 @@ if fromData
          
          % TO DO: whether group size relation is correct otherwise
          % potentially use "conditions" of sdv package
-        if isfield(RAND,'CV2LCO')
+        if isfield(tempRAND,'CV2LCO')
             % replace old CV2LCO with new one
             cv2lcoColIdx = logical(cv2lcoColIdx);
-            RAND.CV2LCO.ind = M(:,cv2lcoColIdx == 1);
+            tempRAND.CV2LCO.ind = M(:,cv2lcoColIdx == 1);
             M = M(:,~cv2lcoColIdx);
         end
 
-        if isfield(RAND,'CV1LCO')
+        if isfield(tempRAND,'CV1LCO')
             % replace old CV1LCO with new one
             cv1lcoColIdx = logical(cv1lcoColIdx);
-            RAND.CV1LCO.ind = M(:,cv1lcoColIdx == 1);
+            tempRAND.CV1LCO.ind = M(:,cv1lcoColIdx == 1);
             M = M(:,~cv1lcoColIdx);
         end
 
@@ -468,7 +468,7 @@ if fromData
 %             RAND.CV1LCO.ind = simCV1LCO;
 %         end
 
-        simCV = nk_MakeCrossFolds(L, RAND, xNM.modeflag,[], xNM.groupnames, [], 0);
+        simCV = nk_MakeCrossFolds(L, tempRAND, xNM.modeflag,[], xNM.groupnames, [], 0);
         xNM.cv = simCV;
         xCV = simCV;
         xNM.analind = varargin{1,4};
