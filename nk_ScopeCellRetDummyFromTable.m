@@ -24,7 +24,8 @@ switch act
         for i=1:nVars
             if iscell(T.(Vars{i}))
                 idxCell(i)=true;
-                Unq = unique(T.(Vars{i}));
+                Ti = rmmissing(T.(Vars{i}));
+                Unq = unique(Ti);
                 nUnq = numel(Unq); 
                 if nUnq>uniquelim
                     errordlg('\nFound %g unique values in column ''%s'' while only %g unique values are allowed.', nUnq, Vars{i}, uniquelim );
