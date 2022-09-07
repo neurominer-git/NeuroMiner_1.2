@@ -116,7 +116,7 @@ if ~isfield(IN, 'verbose') || isempty(IN.verbose)
 end
 
 if fromData
-    IN.RAND = analysis.params.TrainParam.RAND;
+    origRAND = analysis.params.TrainParam.RAND;
     P = IN.Ncases;
     nP = size(P,2);
 else
@@ -180,7 +180,7 @@ for i=1:nP % Loop through hyperparameter combinations
             IN.NcasesMiss, ...
             IN.NfeatsMiss, ...
             IN.algorithm, ...
-            IN.RAND, ...
+            origRAND, ...
             IN.verbose, IN.Modalities, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps, IN.SitesIdx); % varargin
     else
         [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);
@@ -217,6 +217,9 @@ if fromData
     add2orig = varargin{1,5};
     reps = varargin{1,6};
     sitesIdx = varargin{1,7};
+
+    IN.RAND = RAND;
+    
 
     % what happens in the next lines, really necessary?
 %     if isa(labels_a, 'cell') % only binary problems
