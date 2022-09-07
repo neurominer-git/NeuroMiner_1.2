@@ -185,9 +185,9 @@ if isfield(IO,'datasource'),    datasource = IO.datasource; end
 if isfield(IO,'n_subjects'),    n_subjects = IO.n_subjects; end
 if isfield(IO,'delimit'),       delimit = IO.delimit; end
 if isfield(IO,'sheet'),         sheet = IO.sheet; end
-if isfield(IO,'oocvflag'),      oocvflag = IO.oocvflag; else IO.labels_known=true; IO.oocvflag = false; end
+if isfield(IO,'oocvflag'),      oocvflag = IO.oocvflag; else, IO.labels_known=true; IO.oocvflag = false; end
 if isfield(IO,'globvar_edit'),  globvar_edit = IO.globvar_edit ; end
-if isfield(IO,'gopt'),          gopt = IO.gopt; else IO.gopt = gopt; end
+if isfield(IO,'gopt'),          gopt = IO.gopt; else, IO.gopt = gopt; end
 if ~isfield(IO,'completed'),    IO.completed = completed; end
 if ~isfield(IO,'reread_mat'),   IO.reread_mat = reread_mat; end
 
@@ -446,7 +446,7 @@ switch datasource
             
             if (isfield(IO,'PP') && ~isempty(IO.PP)) 
                
-               if ~oocvflag, 
+               if ~oocvflag
                    globscalestr = globals{globscale};
                    mn_globnorm = sprintf('Define global multiplier [ %g ]|',globnorm); mn_act = [ mn_act 'def_globnorm' ]; mn_str = [mn_str mn_globnorm]; 
                    mn_globscale = sprintf('Adjust data for globals [ %s ]|',globscalestr); mn_act = [ mn_act 'sel_globscale' ]; mn_str = [mn_str mn_globscale]; 
@@ -482,7 +482,7 @@ switch datasource
                 flproc = true;
             case 'regression'
                 mn_label_edit_m = 'double vector/matrix';
-                if ~strcmp(desc_groups{1},na_str), 
+                if ~strcmp(desc_groups{1},na_str) 
                     flproc=true; 
                 else
                     mess = GenerateMessageEntry(mess, sprintf('Provide a sample identifier'));
@@ -575,10 +575,11 @@ switch datasource
                                     mn_groupmode = sprintf('%s [ Matrix from spreadsheet file: %s ]|',mn_groupmode_b, M_edit);
                                     mn_act = [ mn_act 'sel_matsource' ]; 
                                     mn_str = [mn_str mn_groupmode];
-                                    if ~isfield(IO,'sheets')|| isempty(IO.sheets) || ~iscell(IO.sheets)
+                                    if ~isfield(IO,'sheets') || isempty(IO.sheets) || ~iscell(IO.sheets) || IO.reread_mat
                                         fprintf('\nChecking spreadsheet file %s ...',IO.M_edit);
                                         [~,IO.sheets] = xlsfinfo(IO.M_edit);
                                     end
+                                    if isfield(IO,'sheet') && ~strcmp(IO.sheet, na_str); mess = GenerateMessageEntry(mess, sprintf('* Source sheet defined'),[],'blue'); end
                                     if numel(IO.sheets)>1
                                         mn_sheet = sprintf('Define name of sheet in spreadsheet file [ %s ]|',sheet); mn_act = [ mn_act 'sel_sheet' ]; mn_str = [ mn_str mn_sheet ]; 
                                     else
@@ -681,6 +682,7 @@ end
 disallow = CheckReadyStatus(mess);
 
 if ~isempty(mess)
+    fprintf('\n');
     for i=1:numel(mess)
         if isempty(mess(i).text), continue; end
         fprintf('\n');mess(i).text = regexprep(mess(i).text,'\','/');
@@ -980,7 +982,7 @@ switch act
         if iscell(label_edit), label_edit = strjoin(label_edit,','); end
         label_edit = nk_input(sprintf('Define labels: %s in %s',groupmode_varstr, groupmode_str),0,'s', label_edit);
         t_label_edit = strsplit(label_edit,',');
-        if numel(t_label_edit)==1,
+        if numel(t_label_edit)==1
             label_edit = deblank(char(t_label_edit));
         else
             label_edit = regexprep(t_label_edit,',','');
@@ -1028,7 +1030,7 @@ switch act
     case 'sel_sheet'
         mn_sel = []; mn_act = [];
         for i=1:numel(IO.sheets)
-            mn_sel = sprintf('%s|%s',mn_sel,i,IO.sheets{i});
+            mn_sel = sprintf('%s|%s',mn_sel,IO.sheets{i});
             mn_act = [mn_act i];
         end
         mn_sel(1)=[]; 

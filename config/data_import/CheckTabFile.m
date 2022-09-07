@@ -64,8 +64,8 @@ if ~isfield(IO,'t_Y') || isempty(IO.t_Y) || IO.reread_mat
                 IO.t_Y = readtable(IO.M_edit, 'Delimiter', IO.delimit);
                 s_featnames = IO.t_Y.Properties.VariableNames;
             case 4
-                if strcmp(IO.sheet,na_str)
-                    mess = GenerateMessageEntry(mess, sprintf('ERROR %s: You have not specified a source sheet in ''%s''.',act, matrixname)); 
+                if strcmp(IO.sheet, na_str) 
+                    mess = GenerateMessageEntry(mess, sprintf('* %s: Please choose a source sheet in ''%s''!',act, matrixname)); 
                     return
                 else
                     IO.t_Y = readtable(IO.M_edit, 'Sheet', char(IO.sheet));
