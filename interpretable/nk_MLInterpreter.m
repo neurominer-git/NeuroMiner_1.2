@@ -143,8 +143,8 @@ else
             % Compute subspace size of current modality
             nYmap = sum(inp.MLI.Modality{nx}.MAP.mapidx{h});
             if nYmap<=2
-                error('Only two features out of %g were included in the feature mask. Reconsider the cutoffs used for mask definition!', ...
-                    numel(inp.MLI.Modality{nx}.MAP.mapidx{h}));
+                error('Only %g features out of %g were included in the feature mask. Reconsider the cutoffs used for mask definition!', ...
+                    nYmap, numel(inp.MLI.Modality{nx}.MAP.mapidx{h}));
             end
             nperms(nx) = inp.MLI.nperms;
             if nM > 1, fprintf('\n\t\tModality #%g=> ', nx); end
