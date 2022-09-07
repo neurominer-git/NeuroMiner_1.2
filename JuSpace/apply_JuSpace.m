@@ -1,5 +1,8 @@
 function Ypet = apply_JuSpace(Yimg, brainmask, atlas, cortype, autocorcorrect, petlist, dir_save)
 global JSMEM 
+
+addpath(genpath('/opt/matlab/JuSpace_v1.3/'))
+
 S.Vm                         = spm_vol(brainmask);
 [S.dims, S.indvol, ~, S.vox] = nk_ReadMaskIndVol(S.Vm, []);
 image_for_size = string(brainmask);

@@ -20,17 +20,16 @@ if type(n_obs) is not int:
         
         # split dataset
         group_df = data[data['label'] == np.unique(labels)[i]]
-        if cv1lco > 0:
-            group_df.rename(columns = {list(group_df)[cv1lco-1]:'CV1LCO'}, inplace=True)
-           
-        if cv2lco > 0:
-            group_df.rename(columns = {list(group_df)[cv2lco-1]:'CV2LCO'}, inplace=True)
+        if cv1lcoflag:
+            group_df['CV1LCO'] = cv1lco
+        if cv2lcoflag:
+            group_df['CV2LCO'] = cv2lco
 
         constraints = []
-        if cv1lco > 0 and cv2lco > 0:
+        if cv1lcoflag and cv2lcoflag:
             fixed_cvlco_constraint = FixedConstrained(column_names = ['CV1LCO', 'CV2LCO'])
             constraints.append(fixed_cvlco_constraint)
-        if type(sitesCols) is not int:
+        if onehotencodingflag:
             sites_constraint = OneHotEncoding(column_names = sitesCols)
             constraints.append(sites_constraint)
         
