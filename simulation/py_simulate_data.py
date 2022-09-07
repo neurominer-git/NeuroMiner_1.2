@@ -21,22 +21,27 @@ if type(n_obs) is not int:
         # split dataset
         group_df = data[data['label'] == np.unique(labels)[i]]
         if cv1lco > 0:
-            group_df.rename(columns = {list(group_df)[cv1lco-1]:'CV1LCO'}, inplace=True)
+            group_df.columns.value[cv1lco-1] = 'CV1LCO'
            
         if cv2lco > 0:
-            group_df.rename(columns = {list(group_df)[cv2lco-1]:'CV2LCO'}, inplace=True)
+            group_df.columns.values[cv2lco-1]:'CV2LCO'
 
         constraints = []
         if cv1lco > 0 and cv2lco > 0:
             fixed_cvlco_constraint = FixedConstrained(column_names = ['CV1LCO', 'CV2LCO'])
             constraints.append(fixed_cvlco_constraint)
         if type(sitesCols) is not int:
-            sites_constraint = OneHotEncoding(column_names = sitesCols)
+            auxSitesColsNames = [f'Y{idx}' for idx in sitesCols]
+            sitesColsPy = [x-1 for x in sitesCols]
+            print(sitesColsPy)
+            #group_df.columns.values[sitesColsPy] = auxSitesColsNames
+            #print(list(group_df))
+            sites_constraint = OneHotEncoding(column_names = auxSitesColsNames)
             constraints.append(sites_constraint)
         
 
         model = GaussianCopula(constraints = constraints)
-        
+        #print(list(group_df))
         model.fit(group_df)
 #         if len(cv1lco)>0: # in the case of leave-one group ot CV (either CV1 or CV2)
 #             conditions = pd.DataFrame({

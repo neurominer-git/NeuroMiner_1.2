@@ -116,7 +116,7 @@ if ~isfield(IN, 'verbose') || isempty(IN.verbose)
 end
 
 if fromData
-    IN.RAND = analysis.params.TrainParam.RAND;
+    origRAND = analysis.params.TrainParam.RAND;
     P = IN.Ncases;
     nP = size(P,2);
 else
@@ -180,7 +180,7 @@ for i=1:nP % Loop through hyperparameter combinations
             IN.NcasesMiss, ...
             IN.NfeatsMiss, ...
             IN.algorithm, ...
-            IN.RAND, ...
+            origRAND, ...
             IN.verbose, IN.Modalities, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps, IN.SitesIdx); % varargin
     else
         [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);
@@ -209,6 +209,7 @@ global SVM fromData xNM xCV
 
 % check if original data was provided
 if fromData
+    xNM = evalin('base','NM');
     verbose = varargin{1,1};
     %Ys = varargin{1,2};
     mods = varargin{1,2};
@@ -217,6 +218,9 @@ if fromData
     add2orig = varargin{1,5};
     reps = varargin{1,6};
     sitesIdx = varargin{1,7};
+
+    origRAND = RAND;
+    
 
     % what happens in the next lines, really necessary?
 %     if isa(labels_a, 'cell') % only binary problems
@@ -254,23 +258,24 @@ if fromData
     % check whether covariates are included in analysis
     if isfield(xNM, 'covars')
         covColIdx = zeros(1,size(Y,2));
+        sitesIdxY = sitesIdx + size(Y,2);
         Y = [Y, xNM.covars];
         covColIdx = [covColIdx, ones(1,size(xNM.covars,2))];
     end
 
     % check whether leave-one-group out cv framework is selected
     cv1lcoIdx = 0;
-    if isfield(RAND,'CV1LCO')
+    if isfield(origRAND,'CV1LCO')
         cv1lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, RAND.CV1LCO.ind]
+        Y = [Y, origRAND.CV1LCO.ind]
         cv1lcoColIdx =[cv1lcoColIdx, 1];
         cv1lcoIdx = length(cv1lcoColIdx);
     end
 
     cv2lcoIdx = 0; 
-    if isfield(RAND,'CV2LCO')
+    if isfield(origRAND,'CV2LCO')
         cv2lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, RAND.CV1LCO.ind];
+        Y = [Y, origRAND.CV2LCO.ind];
         cv2lcoColIdx =[cv2lcoColIdx, 1];
         cv2lcoIdx = length(cv2lcoColIdx);
     end
@@ -281,7 +286,7 @@ if fromData
     pstepCovSubgroup = [];
     covSubgroupIdx = zeros(1,length(Y));
     for m = length(mods)
-        preprocs = NM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM;
+        preprocs = xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM;
         for ps = 1:length(preprocs)
             if any(strcmp(fieldnames(preprocs{1,ps}),'SUBGROUP'))
                 pstepCovSubgroup = [pstepCovSubgroup; m, ps]; 
@@ -300,15 +305,15 @@ if fromData
     
     R = zeros(1,reps); % repeated for 10 times to increase stability of results
     for k=1:reps
+        tempRAND = origRAND;
         tic
-        %sitesIdx = 0; %remove!
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
             data_file = origDataFile, ...
             labels = int64(labels), ...
             n_obs = int64(nc), ... % if vector, then n observations to be simulated within each group (defined by label)
             cv1lco = int64(cv1lcoIdx), ...
             cv2lco = int64(cv2lcoIdx), ...
-            sitesCols = int64(sitesIdx), ... % must have length > 1 (dummy coded sites)
+            sitesCols = int64(sitesIdxY), ... % must have length > 1 (dummy coded sites)
             rootdir = analrootdir);
         toc
         M = readtable(py2mat(M_file));
@@ -324,14 +329,15 @@ if fromData
             %Otab = Y;
             %Mtab.Properties.VariableNames = Otab.Properties.VariableNames;
             M = [Y;M];
+            L = [labels;L];
         end
         
-        if ~isempty(covSubgroupIdx)
+        if sum(covSubgroupIdx)>0
             covSubgroupIdx = logical(covSubgroupIdx);
-            for csg = 1:size(pstepCovSubgroup,2)
+            for csg = 1:size(pstepCovSubgroup,1)
                 m = pstepCovSubgroup(csg,1);
                 ps = pstepCovSubgroup(csg,2);
-                NM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = Y(:,size(Y,1)-size(pstepCovSubgroup,2)+csg);
+                xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = M(:,size(M,2)-size(pstepCovSubgroup,1)+csg);
             end
             Y = Y(:,~covSubgroupIdx);
         end
@@ -339,17 +345,17 @@ if fromData
          
          % TO DO: whether group size relation is correct otherwise
          % potentially use "conditions" of sdv package
-        if isfield(RAND,'CV2LCO')
+        if isfield(tempRAND,'CV2LCO')
             % replace old CV2LCO with new one
             cv2lcoColIdx = logical(cv2lcoColIdx);
-            RAND.CV2LCO.ind = M(:,cv2lcoColIdx == 1);
+            tempRAND.CV2LCO.ind = M(:,cv2lcoColIdx == 1);
             M = M(:,~cv2lcoColIdx);
         end
 
-        if isfield(RAND,'CV1LCO')
+        if isfield(tempRAND,'CV1LCO')
             % replace old CV1LCO with new one
             cv1lcoColIdx = logical(cv1lcoColIdx);
-            RAND.CV2LCO.ind = M(:,cv1lcoColIdx == 1);
+            tempRAND.CV1LCO.ind = M(:,cv1lcoColIdx == 1);
             M = M(:,~cv1lcoColIdx);
         end
 
@@ -462,7 +468,7 @@ if fromData
 %             RAND.CV1LCO.ind = simCV1LCO;
 %         end
 
-        simCV = nk_MakeCrossFolds(L, RAND, xNM.modeflag,[], xNM.groupnames, [], 0);
+        simCV = nk_MakeCrossFolds(L, tempRAND, xNM.modeflag,[], xNM.groupnames, [], 0);
         xNM.cv = simCV;
         xCV = simCV;
         xNM.analind = varargin{1,4};
