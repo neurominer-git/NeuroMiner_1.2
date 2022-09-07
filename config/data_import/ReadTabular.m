@@ -36,7 +36,14 @@ switch fileflg
         if ~isfield(IO,'oocvflag') || ~IO.oocvflag || IO.labels_known
             IO.s_label = table2array(IO.Y(:,col_label));
         end
-        IO.Y(:, col_cases | col_label) = []; IO.Y = table2array(IO.Y);
+        IO.Y(:, col_cases | col_label) = []; 
+        if isfield(IO,'cellcols') && any(IO.cellcols)
+            IO.Y = nk_ScopeCellRetDummyFromTable('replace',IO.Y, IO.uniquelim);
+            col_cases = strcmp(IO.Y.Properties.VariableNames, IO.case_edit);
+            col_label = RetCellInCellsIndex(IO.Y.Properties.VariableNames, IO.label_edit);
+            IO.s_featnames = IO.Y.Properties.VariableNames;
+        end
+        IO.Y = table2array(IO.Y);
         IO.s_featnames(col_cases | col_label) = [];
 end
 

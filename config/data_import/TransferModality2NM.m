@@ -36,7 +36,7 @@ if isfield(I,'Y')
     for i=varind:nM+varind
         
         % Map current modality data to iY
-        if iscell(I.Y),
+        if iscell(I.Y)
             n = size(I.Y{cnt},2);
             iY = I.Y{cnt};
             if isfield(I,'Yw'), iYw = I.Yw{cnt}; else, iYw=[];end

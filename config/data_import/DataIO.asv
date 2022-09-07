@@ -579,7 +579,7 @@ switch datasource
                                         fprintf('\nChecking spreadsheet file %s ...',IO.M_edit);
                                         [~,IO.sheets] = xlsfinfo(IO.M_edit);
                                     end
-                                    if isfield(IO,'sheets') && ~strcmp(IO.sheets, na_str); mess = GenerateMessageEntry(mess, sprintf('* Source sheet defined.'),[],'blue');
+                                    if isfield(IO,'sheet') && ~strcmp(IO.sheet, na_str); mess = GenerateMessageEntry(mess, sprintf('* Source sheet defined'), false,'blue'); end
                                     if numel(IO.sheets)>1
                                         mn_sheet = sprintf('Define name of sheet in spreadsheet file [ %s ]|',sheet); mn_act = [ mn_act 'sel_sheet' ]; mn_str = [ mn_str mn_sheet ]; 
                                     else
@@ -601,7 +601,13 @@ switch datasource
 
                             if isempty(mess) && ~strcmp(IO.case_edit,na_str) && ~any(strcmp(IO.label_edit,na_str)) 
                                 [~, mess, IO] = CheckTabFile(IO, 'check_matrix', na_str, mess);
+                                if any(IO.cellcols),
+                                    mn_uniquelim_edit = sprintf('Specify maximum # of uniq [ %s ]|', check_str); 
+                                    mn_act = [ mn_act 'def_labels' ]; mn_str = [mn_str mn_uniquelim_edit];
+                                end
                             end
+
+
                         end
                     else
                         mn_groupmode = sprintf('%s[ %s: %s ]|',mn_groupmode_b, groupmode_str, na_str);

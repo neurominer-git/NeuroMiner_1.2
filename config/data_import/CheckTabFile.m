@@ -72,6 +72,15 @@ if ~isfield(IO,'t_Y') || isempty(IO.t_Y) || IO.reread_mat
                     s_featnames = IO.t_Y.Properties.VariableNames;
                     fprintf('\nChecking spreadsheet file %s ...',IO.M_edit);
                     [~,IO.sheets] = xlsfinfo(IO.M_edit);
+                    if ~strcmp(IO.case_edit,na_str) && ~strcmp(IO.label_edit,na_str)
+                        col_cases = strcmp(s_featnames,IO.case_edit);
+                        col_label = strcmp(s_featnames, IO.label_edit);
+                        ttY = IO.t_Y; ttY( :, col_cases | col_label) = [];
+                        [~,IO.cellcols] = nk_ScopeCellRetDummyFromTable('scope', ttY);
+                    else
+                        IO.cellcols = [];
+                    end
+                    
                 end
         end
     catch

@@ -1,0 +1,34 @@
+function Tdummy = nk_ScopeCellRetDummyFromTable(act, T, uniquelim)
+
+if ~exist("uniquelim","var") || isempty(uniquelim)
+    uniquelim = 20;
+end
+
+Vars = T.Properties.VariableNames;
+nVars = numel(Vars);
+
+switch act
+    case 'scope'
+        idxCell = false(1,nVars);
+        idxCell(i)=true;
+      
+    case 'replace'
+      
+        Tdummy = []; Vdummy = [];
+        for i=1:nVars
+            if iscell(T.(Vars{i}))
+                Unq = unique(T.(Vars{i}));
+                nUnq = numel(Unq); 
+                if nUnq>uniquelim
+                    error('\nFound %g unique values in column ''%s'' while only %g unique values are allowed.', nUnq, Vars{i}, uniquelim );
+                end
+                Tx_dummy = nk_MakeDummyVariables(T.(Vars{i}));
+                VarNames = cellstr([repmat([Vars{i} '_'], nUnq, 1) char(Unq)]);
+                Tdummy = [ Tdummy array2table(Tx_dummy,"VariableNames",VarNames) ];
+        
+            else
+                Tdummy = [ Tdummy T(:,i) ];
+                Vdummy = [ Vdummy Vars{i}];
+            end
+        end
+end
