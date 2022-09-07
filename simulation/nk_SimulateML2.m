@@ -337,7 +337,7 @@ if fromData
             for csg = 1:size(pstepCovSubgroup,1)
                 m = pstepCovSubgroup(csg,1);
                 ps = pstepCovSubgroup(csg,2);
-                xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = Y(:,size(Y,1)-size(pstepCovSubgroup,2)+csg);
+                xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = M(:,size(M,2)-size(pstepCovSubgroup,1)+csg);
             end
             Y = Y(:,~covSubgroupIdx);
         end

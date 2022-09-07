@@ -209,6 +209,7 @@ global SVM fromData xNM xCV
 
 % check if original data was provided
 if fromData
+    xNM = evalin('base','NM');
     verbose = varargin{1,1};
     %Ys = varargin{1,2};
     mods = varargin{1,2};
@@ -304,7 +305,7 @@ if fromData
     
     R = zeros(1,reps); % repeated for 10 times to increase stability of results
     for k=1:reps
-        tempRAND = RAND;
+        tempRAND = origRAND;
         tic
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
             data_file = origDataFile, ...
@@ -333,10 +334,10 @@ if fromData
         
         if sum(covSubgroupIdx)>0
             covSubgroupIdx = logical(covSubgroupIdx);
-            for csg = 1:size(pstepCovSubgroup,2)
+            for csg = 1:size(pstepCovSubgroup,1)
                 m = pstepCovSubgroup(csg,1);
                 ps = pstepCovSubgroup(csg,2);
-                xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = Y(:,size(Y,1)-size(pstepCovSubgroup,2)+csg);
+                xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = M(:,size(M,2)-size(pstepCovSubgroup,1)+csg);
             end
             Y = Y(:,~covSubgroupIdx);
         end

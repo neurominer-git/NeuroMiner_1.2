@@ -107,7 +107,8 @@ if eIN || ~isfield(IN,'beta') || isempty(IN.beta)
         IN.beta = pinv(IN.G) * Y; 
     else
         % Compute IN.beta from a subgroup of observations
-        IN.beta = pinv(IN.G(IN.subgroup,:)) * Y(IN.subgroup,:);
+        idxSubgroup = logical(IN.subgroup);
+        IN.beta = pinv(IN.G(idxSubgroup,:)) * Y(idxSubgroup,:);
     end
 end
 if eIN || ~isfield(IN,'revertflag') || isempty(IN.revertflag) || ~IN.revertflag
