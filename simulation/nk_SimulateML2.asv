@@ -270,7 +270,7 @@ if fromData
     cv2lcoIdx = 0; 
     if isfield(RAND,'CV2LCO')
         cv2lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, RAND.CV1LCO.ind];
+        Y = [Y, RAND.CV2LCO.ind];
         cv2lcoColIdx =[cv2lcoColIdx, 1];
         cv2lcoIdx = length(cv2lcoColIdx);
     end
@@ -281,7 +281,7 @@ if fromData
     pstepCovSubgroup = [];
     covSubgroupIdx = zeros(1,length(Y));
     for m = length(mods)
-        preprocs = NM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM;
+        preprocs = xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM;
         for ps = 1:length(preprocs)
             if any(strcmp(fieldnames(preprocs{1,ps}),'SUBGROUP'))
                 pstepCovSubgroup = [pstepCovSubgroup; m, ps]; 
@@ -302,6 +302,7 @@ if fromData
     for k=1:reps
         tic
         %sitesIdx = 0; %remove!
+        sitesColNames 
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
             data_file = origDataFile, ...
             labels = int64(labels), ...
@@ -331,13 +332,11 @@ if fromData
             for csg = 1:size(pstepCovSubgroup,2)
                 m = pstepCovSubgroup(csg,1);
                 ps = pstepCovSubgroup(csg,2);
-                NM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = Y(:,size(Y,1)-size(pstepCovSubgroup,2)+csg);
+                xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = Y(:,size(Y,1)-size(pstepCovSubgroup,2)+csg);
             end
+            Y = Y(:,~covSubgroupIdx);
         end
-        for i = 1:6
-            a(end-4+i);
-        end
-
+       
          
          % TO DO: whether group size relation is correct otherwise
          % potentially use "conditions" of sdv package
@@ -351,7 +350,7 @@ if fromData
         if isfield(RAND,'CV1LCO')
             % replace old CV1LCO with new one
             cv1lcoColIdx = logical(cv1lcoColIdx);
-            RAND.CV2LCO.ind = M(:,cv1lcoColIdx == 1);
+            RAND.CV1LCO.ind = M(:,cv1lcoColIdx == 1);
             M = M(:,~cv1lcoColIdx);
         end
 

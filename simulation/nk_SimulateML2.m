@@ -254,6 +254,7 @@ if fromData
     % check whether covariates are included in analysis
     if isfield(xNM, 'covars')
         covColIdx = zeros(1,size(Y,2));
+        sitesIdxY = sitesIdx + size(Y,2);
         Y = [Y, xNM.covars];
         covColIdx = [covColIdx, ones(1,size(xNM.covars,2))];
     end
@@ -270,7 +271,7 @@ if fromData
     cv2lcoIdx = 0; 
     if isfield(RAND,'CV2LCO')
         cv2lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, RAND.CV1LCO.ind];
+        Y = [Y, RAND.CV2LCO.ind];
         cv2lcoColIdx =[cv2lcoColIdx, 1];
         cv2lcoIdx = length(cv2lcoColIdx);
     end
@@ -281,7 +282,7 @@ if fromData
     pstepCovSubgroup = [];
     covSubgroupIdx = zeros(1,length(Y));
     for m = length(mods)
-        preprocs = NM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM;
+        preprocs = xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM;
         for ps = 1:length(preprocs)
             if any(strcmp(fieldnames(preprocs{1,ps}),'SUBGROUP'))
                 pstepCovSubgroup = [pstepCovSubgroup; m, ps]; 
@@ -302,13 +303,14 @@ if fromData
     for k=1:reps
         tic
         %sitesIdx = 0; %remove!
+        
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
             data_file = origDataFile, ...
             labels = int64(labels), ...
             n_obs = int64(nc), ... % if vector, then n observations to be simulated within each group (defined by label)
             cv1lco = int64(cv1lcoIdx), ...
             cv2lco = int64(cv2lcoIdx), ...
-            sitesCols = int64(sitesIdx), ... % must have length > 1 (dummy coded sites)
+            sitesCols = int64(sitesIdxY), ... % must have length > 1 (dummy coded sites)
             rootdir = analrootdir);
         toc
         M = readtable(py2mat(M_file));
@@ -324,14 +326,15 @@ if fromData
             %Otab = Y;
             %Mtab.Properties.VariableNames = Otab.Properties.VariableNames;
             M = [Y;M];
+            L = [labels;L];
         end
         
-        if ~isempty(covSubgroupIdx)
+        if sum(covSubgroupIdx)>0
             covSubgroupIdx = logical(covSubgroupIdx);
             for csg = 1:size(pstepCovSubgroup,2)
                 m = pstepCovSubgroup(csg,1);
                 ps = pstepCovSubgroup(csg,2);
-                NM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = Y(:,size(Y,1)-size(pstepCovSubgroup,2)+csg);
+                xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = Y(:,size(Y,1)-size(pstepCovSubgroup,2)+csg);
             end
             Y = Y(:,~covSubgroupIdx);
         end
@@ -349,7 +352,7 @@ if fromData
         if isfield(RAND,'CV1LCO')
             % replace old CV1LCO with new one
             cv1lcoColIdx = logical(cv1lcoColIdx);
-            RAND.CV2LCO.ind = M(:,cv1lcoColIdx == 1);
+            RAND.CV1LCO.ind = M(:,cv1lcoColIdx == 1);
             M = M(:,~cv1lcoColIdx);
         end
 
