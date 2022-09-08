@@ -223,6 +223,8 @@ if fromData
         condName = 'label';    
     elseif condIdx > 0
         condName = app.NM.covnames(condIdx);
+    else 
+        condName = ''
     end
 
     origRAND = RAND;
@@ -311,25 +313,36 @@ if fromData
                         Y = [Y, preprocs{1,ps}.SUBGROUP];
                         preprocIdx = [preprocIdx, 1];
                         preprocVecs.Sequence = [preprocVecs.Sequence, 1]; 
-                        YColNames = [YColNames, "PREPROCPARAM"+m*ps];
+                        YColNames = [YColNames, "COVARSSUBGROUP"+m*ps];
                         break;
                     end
-                case 'rank' % type 2
-                    if isfield(preprocs{1,ps}, 'LABEL')
+                case 'rankfeat' % type 2 (
+                    if isfield(preprocs{1,ps}, 'label')
                         preprocVecs.ModPStep = [preprocVec.ModPStep; m, ps]; 
-                        Y = [Y, preprocs{1,ps}.LABEL];
+                        Y = [Y, preprocs{1,ps}.label];
                         preprocIdx = [preprocIdx, 1];
-                        preprocVecs.Sequence = [preprocVecs.Sequence, 2];   
-                        YColNames = [YColNames, "PREPROCPARAM"+m*ps];
-                        break;
+                        preprocVecs.Sequence = [preprocVecs.Sequence, 21];   
+                        YColNames = [YColNames, "RANKFEATLABEL"+m*ps];
                     end
-                case 'variance' % TO DO
-                    if isfield(preprocs{1,ps}, 'LABEL')
-                        preprocVecs.ModPStep = [preprocVec.ModPStep; m, ps];  
-                        Y = [Y, preprocs{1,ps}.LABEL];
+                    if isfield(preprocs{1,ps}, 'glabel')
+                        preprocVecs.ModPStep = [preprocVec.ModPStep; m, ps];
+                        Y = [Y, preprocs{1,ps}.glabel];
                         preprocIdx = [preprocIdx, 1];
-                        preprocVecs.Sequence = [preprocVecs.Sequence, 2];   
-                        YColNames = [YColNames, "PREPROCPARAM"+m*ps];
+                        preprocVecs.Sequence = [preprocVecs.Sequence, 22];
+                        YColNames = [YColNames, "RANKFEATGLABEL"+m*ps];
+                    end
+                    break;
+                case 'remvarcomp' 
+                    if isfield(preprocs{1,ps}, 'REMOVECOMP')
+                        preprocVecs.ModPStep = [preprocVec.ModPStep; m, ps];  
+                        Y = [Y, preprocs{1,ps}.G];
+                        for i = 1:size(preprocs{1,ps}.G,2)
+                            preprocIdx = [preprocIdx, 1];
+                            preprocVecs.Sequence = [preprocVecs.Sequence, 3];   
+                            YColNames = [YColNames, "REMOVECOMPG"+dim];
+                        end
+                    
+    
                         break;
                     end
             end
@@ -337,7 +350,9 @@ if fromData
         end
     end
 
-    % ADD RANK, VARIANCE
+    % TODO: ADD DUMMY_CODED FEATURES AS CONSTRAINT
+
+
 
 
 %    
@@ -346,6 +361,7 @@ if fromData
 
     
     condGroupVec = []
+    
     % if certain condition 
     if condIdx >= 0 
         if condIdx == 0 % label
@@ -365,7 +381,7 @@ if fromData
     for k=1:reps
         tempRAND = origRAND;
         tic
-        M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
+        M_file = pyrunfile('py_simulate_data2.py', 'out_path', ...
             data_file = origDataFile, ...
             labels = double(labels), ...
             n_obs = int64(nc), ... % if vector, then n observations to be simulated within each group (defined by label)
@@ -399,10 +415,12 @@ if fromData
                 ps = preprocVecs.ModPStep(pt,2);
                 if preprocVecs.Sequence(pt) == 1 % covars subgroup
                     xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = M(:,size(M,2)-size(preprocVecs.Sequence,2)+pt);
-                elseif preprocVecs.Sequence(pt) == 2 % rank target labels
-                    xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.LABEL = M(:,size(M,2)-size(preprocVecs.Sequence,2)+pt);
+                elseif preprocVecs.Sequence(pt) == 21 % rank target labels
+                    xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.label = M(:,size(M,2)-size(preprocVecs.Sequence,2)+pt);
+                elseif  preprocVecs.Sequence(pt) == 22  % compute in subgroup
+                    xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.glabel = M(:,size(M,2)-size(preprocVecs.Sequence,2)+pt);
                 elseif preprocVecs.Sequence(pt) == 3 % variance matrix
-                    % TO DO 
+                    xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.G = M(:,size(M,2)-size(preprocVecs.Sequence,2)+pt);  
                 end
             end
             M = M(:,~preprocIdx);

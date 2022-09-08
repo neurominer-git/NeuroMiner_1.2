@@ -28,14 +28,15 @@ if type(sitesCols) is not int:
         
 model = GaussianCopula(constraints = constraints)
     
-model.fit(group_df)
+model.fit(data)
 
 # conditions 
+print(len(condVals))
 if len(condVals) > 0:
     condition = pd.DataFrame({condColName : condVals})#, num_rows = condN)
-    sim_sample = model.sample_remaining_columns(conditions = [condition])
+    sim_sample = model.sample_remaining_columns(condition)
 else: 
-    sim_sample = model.sample(data)
+    sim_sample = model.sample(n_obs)
 
 
 out_path = f'{rootdir}/simData.csv'
