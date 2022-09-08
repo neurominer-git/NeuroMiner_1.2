@@ -76,9 +76,9 @@ if ~isfield(IO,'t_Y') || isempty(IO.t_Y) || IO.reread_mat
                         col_cases = strcmp(s_featnames,IO.case_edit);
                         col_label = strcmp(s_featnames, IO.label_edit);
                         ttY = IO.t_Y; ttY( :, col_cases | col_label) = [];
-                        [~,IO.cellcols] = nk_ScopeCellRetDummyFromTable('scope', ttY);
+                        [~,IO.cellcols, IO.cellcolsinfo] = nk_ScopeCellRetDummyFromTable('scope', ttY);
                     else
-                        IO.cellcols = [];
+                        IO.cellcols = []; IO.cellcolsinfo = [];
                     end
                     
                 end
