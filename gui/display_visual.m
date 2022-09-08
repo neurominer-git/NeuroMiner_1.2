@@ -672,7 +672,9 @@ switch meas{measind}
                 st.fig = handles.pn3DView; 
                 st.NMaxes = [ handles.axes26 handles.axes27 handles.axes28];
                 set(handles.pn3DView,'Visible','on'); set(handles.axes33,'Visible','off');
-                nk_WriteVol(y,'temp',2,v.params.brainmask,[],0,'gt');
+                nk_WriteVol(y,'temp',2,v.params.brainmask,[], ...
+                    handles.NM.datadescriptor{v.params.varind}.threshval, ...
+                    char(handles.NM.datadescriptor{v.params.varind}.threshop));
                 if ~isfield(handles,'orthviews')
                     handles.orthviews = nk_orthviews('Image','temp.nii'); 
                 else

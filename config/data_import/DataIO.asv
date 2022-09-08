@@ -52,6 +52,7 @@ gopt = na_str;
 P = []; Pnan = [];
 globscale = 1;
 globnorm = 1;
+uniquelim = 15;
 delimit = 'tab'; sheet = na_str;
 Thresh = struct('nVml',0,'Vml',0,'Lm',[],'threshop','gt');
 completed = false;
@@ -117,6 +118,7 @@ if ~exist('IO','var') || isempty(IO) || ~isstruct(IO)
                'delimit', delimit, ...
                'sheet', sheet, ...
                'reread_mat', reread_mat, ...
+               'uniquelim', uniquelim, ...
                'completed', completed); 
 end
 
@@ -159,9 +161,9 @@ if isfield(IO,'desc_data'),     desc_data = IO.desc_data; end
 if isfield(IO,'rowhead'),       rowhead = IO.rowhead; end
 if isfield(IO,'colhead'),       colhead = IO.colhead; end
 if isfield(IO,'brainmask'),     brainmask = IO.brainmask; end
-if isfield(IO,'badcoords'),     badcoords = IO.badcoords;  end
+%if isfield(IO,'badcoords'),     badcoords = IO.badcoords;  end
 if isfield(IO,'wfu_flag'),      wfu_flag = IO.wfu_flag;  end
-if isfield(IO,'spm_cov_avail'), spm_cov_avail = IO.spm_cov_avail; end
+%if isfield(IO,'spm_cov_avail'), spm_cov_avail = IO.spm_cov_avail; end
 if isfield(IO,'P'),             P = IO.P; end
 if isfield(IO,'Pnan'),          Pnan = IO.Pnan; nan_subjects = IO.nan_subjects; end
 if isfield(IO,'V'),             V = IO.V; end
@@ -175,14 +177,14 @@ if isfield(IO,'case_edit'),     case_edit = IO.case_edit;  end
 if isfield(IO,'col_edit'),      col_edit = IO.col_edit; end
 if isfield(IO,'labelmanage_edit'), labelmanage_edit = IO.labelmanage_edit; end
 if isfield(IO,'covmanage_edit'), covmanage_edit = IO.covmanage_edit; end
-if isfield(IO,'filt'),          filt = IO.filt; end
-if isfield(IO,'filt_str'),      filt_str = IO.filt_str; end
+%if isfield(IO,'filt'),          filt = IO.filt; end
+%if isfield(IO,'filt_str'),      filt_str = IO.filt_str; end
 if isfield(IO,'nangroup'),      nangroup = IO.nangroup; end
 if isfield(IO,'modeflag'),      modeflag = IO.modeflag; else, IO.modeflag = modeflag; end
 if isfield(IO,'survanal_flag'), survanal_flag = IO.survanal_flag; end
 if isfield(IO,'survanal_time'), survanal_time = IO.survanal_time; end
 if isfield(IO,'datasource'),    datasource = IO.datasource; end
-if isfield(IO,'n_subjects'),    n_subjects = IO.n_subjects; end
+%if isfield(IO,'n_subjects'),    n_subjects = IO.n_subjects; end
 if isfield(IO,'delimit'),       delimit = IO.delimit; end
 if isfield(IO,'sheet'),         sheet = IO.sheet; end
 if isfield(IO,'oocvflag'),      oocvflag = IO.oocvflag; else, IO.labels_known=true; IO.oocvflag = false; end
@@ -601,10 +603,11 @@ switch datasource
 
                             if isempty(mess) && ~strcmp(IO.case_edit,na_str) && ~any(strcmp(IO.label_edit,na_str)) 
                                 [~, mess, IO] = CheckTabFile(IO, 'check_matrix', na_str, mess);
-                                if any(IO.cellcols),
-                                    mn_uniquelim_edit = sprintf('Specify maximum # of uniq [ %s ]|', check_str); 
-                                    mn_act = [ mn_act 'def_labels' ]; mn_str = [mn_str mn_uniquelim_edit];
-                                end
+                            end
+
+                            if isfield(IO,'cellcols') && any(IO.cellcols)
+                                mn_uniquelim_edit = sprintf('Specify maximum # of unique values in non-numeric variables for dummy coding [ %g ]|', IO.uniquelim); 
+                                mn_act = [ mn_act 'def_uniquelim' ]; mn_str = [mn_str mn_uniquelim_edit];
                             end
 
 
@@ -1028,6 +1031,9 @@ switch act
     case 'def_colhead'
         IO.colhead = nk_input('Are variable names in column headers?',0,'yes|no',[1,2], colhead);
     
+    case 'def_uniquelim'
+        IO.uniquelim = nk_input('Define max number of unique values in non-numeric variables allowed for dummy coding?',0,'i', IO.uniquelim);
+
     case 'sel_delimit'
         defdelimit = find(strcmp(delimiters,delimit));
         IO.delimit = char(nk_input('Specify column delimiter used in text file',0,'m','Comma|Semicolon|Space|Tabulator|Bar',{'comma','semi','space','tab','bar'},defdelimit)); 
@@ -1122,10 +1128,18 @@ switch act
                 
             case {3,4}
                 ID = table2cell(IO.t_Y(:,{case_edit}));
-                F = IO.t_Y.Properties.VariableNames;
-                col_cases = strcmp(F,case_edit);
-                col_label = RetCellInCellsIndex(F, label_edit);
-                M = table2array(IO.t_Y(:, ~col_cases & ~col_label ));
+                col_cases = strcmp(IO.t_Y.Properties.VariableNames,case_edit);
+                col_label = RetCellInCellsIndex(IO.t_Y.Properties.VariableNames, label_edit);
+                M = IO.t_Y(:, ~col_cases & ~col_label );
+                if isfield(IO,'cellcols') && any(IO.cellcols)
+                    M = nk_ScopeCellRetDummyFromTable('replace',M, IO.uniquelim);
+                    col_cases = strcmp(M.Properties.VariableNames,case_edit);
+                    col_label = RetCellInCellsIndex(M.Properties.VariableNames, label_edit);
+                    F = M.Properties.VariableNames;
+                else
+                    F = IO.t_Y.Properties.VariableNames;
+                end
+                M = table2array(M);
                 F = F(~col_cases & ~col_label );
         end
         

@@ -11,9 +11,9 @@ if ~defaultsfl
     if isfield(PRUNE,'inf'),  PruneInf = PRUNE.inf; end
     if isfield(PRUNE,'perc') && ~isempty(PRUNE.perc), PrunePerc = PRUNE.perc; end
     
-    if PruneZero == 1, PRUNEZEROSTR = 'yes'; else PRUNEZEROSTR = 'no'; end
-    if PruneNan  == 1, PRUNENANSTR  = 'yes'; else PRUNENANSTR  = 'no'; end
-    if PruneInf  == 1, PRUNEINFSTR  = 'yes'; else PRUNEINFSTR  = 'no'; end
+    if PruneZero == 1, PRUNEZEROSTR = 'yes'; else, PRUNEZEROSTR = 'no'; end
+    if PruneNan  == 1, PRUNENANSTR  = 'yes'; else, PRUNENANSTR  = 'no'; end
+    if PruneInf  == 1, PRUNEINFSTR  = 'yes'; else, PRUNEINFSTR  = 'no'; end
     if ~isempty(PrunePerc)
         PercDef = 1;
         PRUNEPERCSTR = ['yes, ' nk_ConcatParamstr(PrunePerc)];

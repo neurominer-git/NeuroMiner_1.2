@@ -58,7 +58,7 @@ global VERBOSE
 
 if ~isfield(IN,'method') || isempty(IN.method), IN.method = 'euclidean'; end
 if ~isfield(IN,'k') || isempty(IN.k), IN.k = 7; end
-if ~isfield(IN,'blockind') || isempty(IN.blockind), IN.blockind = 1:n; end
+if ~isfield(IN,'blockind') || isempty(IN.blockind), IN.blockind = true(1,n); end
 if ~isfield(IN,'minnumcols') || isempty(IN.minnumcols), IN.minnumcols = 0.75; end
 if ~isfield(IN,'X') && ~strcmp(IN.method,'singlemean'), ...
         error('The training data matrix is missing from the input parameters!'); end

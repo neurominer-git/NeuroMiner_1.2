@@ -332,7 +332,11 @@ tsfl     = actparam.tsfl;
 i        = actparam.i;
 tsproc   = false;
 InputParam.P{i}.IMPUTE.X = InputParam.Tr;
-if trfl, 
+if trfl 
+    % Check whether there any pruning operations happened beforehand
+    if isfield(actparam,'PRUNE') && isfield(InputParam.P{i}.IMPUTE,'blockind') && ~isempty(InputParam.P{i}.IMPUTE.blockind) 
+        InputParam.P{i}.IMPUTE.blockind = InputParam.P{i}.IMPUTE.blockind(actparam.PRUNE.NonPruneVec);
+    end
     [InputParam.Tr, TrParami] = nk_PerfImputeObj(InputParam.Tr, InputParam.P{i}.IMPUTE); 
     if tsfl, tsproc = true; end  
 end
@@ -370,8 +374,8 @@ if ~isfield(InputParam.P{i}.SCALE,'AcMatFl'), InputParam.P{i}.SCALE.AcMatFl = fa
 if ~isfield(InputParam.P{i}.SCALE,'ZeroOne'), InputParam.P{i}.SCALE.ZeroOne = 1;     end
 if ~isfield(InputParam.P{i}.SCALE,'zerooutflag'), InputParam.P{i}.SCALE.zerooutflag = 1;     end
 if VERBOSE
-    if InputParam.P{i}.SCALE.ZeroOne == 1, rangestr = '[0, 1]'; else rangestr = '[-1, 1]'; end
-    if InputParam.P{i}.SCALE.AcMatFl, fprintf('\tScaling whole matrix to %s ...', rangestr); else fprintf('\tScaling each feature to %s ...', rangestr); end
+    if InputParam.P{i}.SCALE.ZeroOne == 1, rangestr = '[0, 1]'; else, rangestr = '[-1, 1]'; end
+    if InputParam.P{i}.SCALE.AcMatFl, fprintf('\tScaling whole matrix to %s ...', rangestr); else, fprintf('\tScaling each feature to %s ...', rangestr); end
 end
 if paramfl && tsfl && isfield(TrParami,'minY') && ...
         isfield(TrParami,'maxY'), tsproc = true;
@@ -586,10 +590,12 @@ if isfield(actparam,'Templ')
     end
 end
 
+if isfield(actparam,'PRUNE'), actparam = rmfield(actparam,'PRUNE'); end
+
 InputParam.P{i}.TrX = InputParam.Tr;
 
 if VERBOSE    
-    if trfl, 
+    if trfl
         featnum = size(InputParam.Tr,2); 
     elseif tsfl
         if iscell(InputParam.Ts)
@@ -607,7 +613,7 @@ DIMRED = InputParam.P{i};
 if paramfl && tsfl && isfield(InputParam.P{i},'DR') && ...
         isfield(TrParami,'mpp')
     tsproc = true;
-elseif trfl, 
+elseif trfl
      if actparam.adasynfl 
         if iscell(SrcParam.TrainLabelSyn)
             DIMRED.DR.labels = [InputParam.P{i}.DR.labels(:,actparam.curlabel); SrcParam.TrainLabelSyn{actparam.j}(:,actparam.curlabel)]; 
@@ -739,7 +745,7 @@ end
 
 if paramfl && tsfl && isfield(TrParami,'NonPruneVec') 
     tsproc = true;
-elseif trfl, 
+elseif trfl
     if VERBOSE;fprintf('\tAttribute pruning ...'); end
     [InputParam.Tr, TrParami] = nk_PerfElimZeroObj(InputParam.Tr, InputParam.P{i}.PRUNE);
     % All subsequent processing steps that use fixed column indices have to
@@ -750,6 +756,7 @@ elseif trfl,
         end
     end
     if tsfl, tsproc = true; end
+    actparam.PRUNE.NonPruneVec = TrParami.NonPruneVec;
 end
 
 if tsproc, InputParam.Ts = nk_PerfElimZeroObj(InputParam.Ts, TrParami); end
@@ -823,18 +830,21 @@ elseif trfl,
    % Training mode, learn beta and optionally apply it to
     % out-of-sample data
     [ InputParam.Tr, TrParami ] = nk_PerfWActObj(InputParam.Tr, InputParam.P{i});
+    if isfield(actparam,'PRUNE')
+        ind = sum(TrParami.ind,2)>1;
+        actparam.PRUNE.NonPruneVec = actparam.PRUNE.NonPruneVec(ind);
+    end
     if tsfl, tsproc = true; end
+    if isfield(InputParam,'Yw') && isfield(TrParami,'ind') && isnumeric(InputParam.Yw)
+        Yw = [];
+        for i=1:size(TrParami.ind,2)
+            Yw = [ Yw InputParam.Yw(TrParami.ind(:,i))];
+        end
+        InputParam.Yw = Yw;
+    end
 end
 
 if tsproc, InputParam.Ts = nk_PerfWActObj(InputParam.Ts, TrParami ); end
-
-if isfield(InputParam,'Yw') && isfield(TrParami,'ind') && isnumeric(InputParam.Yw)
-    Yw = [];
-    for i=1:size(TrParami.ind,2)
-        Yw = [ Yw InputParam.Yw(TrParami.ind(:,i))];
-    end
-    InputParam.Yw = Yw;
-end
 
 end
 
