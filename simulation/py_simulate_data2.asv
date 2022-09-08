@@ -1,0 +1,49 @@
+# function that simulates data with the same structure as input data
+import pandas as pd
+import numpy as np
+from sdv.tabular import GaussianCopula
+from sdv.constraints import OneHotEncoding, FixedCombinations
+from tqdm import tqdm
+
+data = pd.read_csv(data_file)
+data['label'] = labels 
+
+# preallocate space for simulated dataset
+sim_sample = pd.DataFrame(columns = data.columns)
+
+if cv1lco > 0:
+    group_df.columns.value[cv1lco-1] = 'CV1LCO'
+           
+if cv2lco > 0:
+    group_df.columns.values[cv2lco-1]:'CV2LCO'
+
+
+# constraints         
+constraints = []
+
+# keep relationship between outer and inner leave-one-group-out categorization the same
+if cv1lco > 0 and cv2lco > 0:
+    fixed_cvlco_constraint = FixedConstrained(column_names = ['CV1LCO', 'CV2LCO'])
+    constraints.append(fixed_cvlco_constraint)
+
+# cosider dummy-coded sites    
+if type(sitesCols) is not int:
+    auxSitesColsNames = [f'Y{idx}' for idx in sitesCols]
+    sitesColsPy = [x-1 for x in sitesCols]
+    sites_constraint = OneHotEncoding(column_names = auxSitesColsNames)
+    constraints.append(sites_constraint)
+        
+model = GaussianCopula(constraints = constraints)
+    
+model.fit(group_df)
+
+# conditions 
+
+
+
+sim_group = model.sample(data)
+sim_sample = sim_sample.append(sim_group)
+
+
+out_path = f'{rootdir}/simData.csv'
+sim_sample.to_csv(out_path,index=False)

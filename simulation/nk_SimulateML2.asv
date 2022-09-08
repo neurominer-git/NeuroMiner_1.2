@@ -181,7 +181,7 @@ for i=1:nP % Loop through hyperparameter combinations
             IN.NfeatsMiss, ...
             IN.algorithm, ...
             origRAND, ...
-            IN.verbose, IN.Modalities, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps, IN.SitesIdx); % varargin
+            IN.verbose, IN.Modalities, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps, IN.SitesIdx, IN.condIdx); % varargin
     else
         [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);
     end
@@ -218,6 +218,12 @@ if fromData
     add2orig = varargin{1,5};
     reps = varargin{1,6};
     sitesIdx = varargin{1,7};
+    condIdx = varargin{1,8};
+    if condIdx == 0
+        condName = 'label';    
+    elseif condIdx > 0
+        condName = app.NM.covnames(condIdx);
+    end
 
     origRAND = RAND;
     
@@ -239,13 +245,16 @@ if fromData
     % check if several modalities included
     %   if length(Ys) >1
     % mods = 1:length(Ys);
-    modsNfeats = zeros(1,length(mods));
+    modNfeats = zeros(1,length(mods));
     Y = [];
+    YColNames = [];
     for i = 1:length(mods)
-        modNfeat(i) = size(xNM.Y{1,mods(i)},2);
-        Y = [Y, xNM.Y{1,i}];
+        modNfeats(i) = size(xNM.Y{1,mods(i)},2);
+        Y = [Y, xNM.Y{1,i}];   
     end
-    modColIdx = repelem(mods, modNfeat);
+    modColIdx = repelem(mods, modNfeats);
+    modNameVec = "Ymod" + modColIdx + "_Feat" + (1:sum(modNfeats));
+    YColNames = [YColNames, modNameVec];
     %   end
 
     %     if isa(varargin{1,2},'double')
@@ -261,8 +270,9 @@ if fromData
         sitesIdxY = sitesIdx + size(Y,2);
         Y = [Y, xNM.covars];
         covColIdx = [covColIdx, ones(1,size(xNM.covars,2))];
+        YColNames = [YColNames, xNM.covnames'];
     end
-
+  
     % check whether leave-one-group out cv framework is selected
     cv1lcoIdx = 0;
     if isfield(origRAND,'CV1LCO')
@@ -270,6 +280,7 @@ if fromData
         Y = [Y, origRAND.CV1LCO.ind]
         cv1lcoColIdx =[cv1lcoColIdx, 1];
         cv1lcoIdx = length(cv1lcoColIdx);
+        YColNames = [YColNames, 'CV1LCO'];
     end
 
     cv2lcoIdx = 0; 
@@ -278,29 +289,75 @@ if fromData
         Y = [Y, origRAND.CV2LCO.ind];
         cv2lcoColIdx =[cv2lcoColIdx, 1];
         cv2lcoIdx = length(cv2lcoColIdx);
+        YColNames = [YColNames, 'CV2LCO'];
     end
+    
 
     % check if sample size dependent vectors are defined in preproc 
     % - estimate betas in subgroup only
     % - ... ???
-    pstepCovSubgroup = [];
-    covSubgroupIdx = zeros(1,length(Y));
+    preprocVecs.ModPStep = [];
+    preprocVecs.Sequence = [];
+
+    preprocIdx = zeros(1,length(Y));
+    
     for m = length(mods)
         preprocs = xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM;
         for ps = 1:length(preprocs)
-            if any(strcmp(fieldnames(preprocs{1,ps}),'SUBGROUP'))
-                pstepCovSubgroup = [pstepCovSubgroup; m, ps]; 
-                Y = [Y, preprocs{1,ps}.SUBGROUP];
-                covSubgroupIdx = [covSubgroupIdx, 1];
-                break;
+            switch preprocs{1,ps}.cmd
+                case 'correctnuis' % type of preproc vec param 1 
+                    if isfield(preprocs{1,ps},'SUBGROUP')
+                        preprocVecs.ModPStep = [preprocVecs.ModPStep; m, ps]; 
+                        Y = [Y, preprocs{1,ps}.SUBGROUP];
+                        preprocIdx = [preprocIdx, 1];
+                        preprocVecs.Sequence = [preprocVecs.Sequence, 1]; 
+                        YColNames = [YColNames, "PREPROCPARAM"+m*ps];
+                        break;
+                    end
+                case 'rank' % type 2
+                    if isfield(preprocs{1,ps}, 'LABEL')
+                        preprocVecs.ModPStep = [preprocVec.ModPStep; m, ps]; 
+                        Y = [Y, preprocs{1,ps}.LABEL];
+                        preprocIdx = [preprocIdx, 1];
+                        preprocVecs.Sequence = [preprocVecs.Sequence, 2];   
+                        YColNames = [YColNames, "PREPROCPARAM"+m*ps];
+                        break;
+                    end
+                case 'variance' % TO DO
+                    if isfield(preprocs{1,ps}, 'LABEL')
+                        preprocVecs.ModPStep = [preprocVec.ModPStep; m, ps];  
+                        Y = [Y, preprocs{1,ps}.LABEL];
+                        preprocIdx = [preprocIdx, 1];
+                        preprocVecs.Sequence = [preprocVecs.Sequence, 2];   
+                        YColNames = [YColNames, "PREPROCPARAM"+m*ps];
+                        break;
+                    end
             end
+           
         end
     end
-   % covGroupIdx = 0;
-  % TO DO
-    
-    Ytab = array2table(Y);
+
+    % ADD RANK, VARIANCE
+
+
+%    
+    Ytab = array2table(Y, 'VariableNames', YColNames);
     writetable(Ytab, origDataFile);
+
+    
+    condGroupVec = []
+    % if certain condition 
+    if condIdx)
+        if simCond == 0 % label
+            condName = 'label';
+            condIdxY = size(Ytab,2) + 1;
+        elseif simCond > 0 % one of the covars
+            % check whether it's a categorical variable  TO DO 
+            condName = xNM.covnames(simCond);
+            [tf, condIdxY] = ismember(condName, COBREgmv.Properties.VariableNames);
+            condGroupVec = repelem(unique(simCond),nc);
+        end
+    end
 
     
     R = zeros(1,reps); % repeated for 10 times to increase stability of results
@@ -309,11 +366,13 @@ if fromData
         tic
         M_file = pyrunfile('py_simulate_data.py', 'out_path', ...
             data_file = origDataFile, ...
-            labels = int64(labels), ...
+            labels = double(labels), ...
             n_obs = int64(nc), ... % if vector, then n observations to be simulated within each group (defined by label)
-            cv1lco = int64(cv1lcoIdx), ...
+            cv1lco = int64(cv1lcoIdx), ... % vector of 
             cv2lco = int64(cv2lcoIdx), ...
-            sitesCols = int64(sitesIdxY), ... % must have length > 1 (dummy coded sites)
+            sitesCols = int64(sitesIdxY), ... % must have length > 1 (dummy coded sites), otherwise discarded
+            condVals = int64(condGroupVec), ... % vector that has length = n-to-simulate (nc)
+            condColName = condName, ... % column name of the variable that provides groups for special sampling % condCol = int64(condIdxY), ...
             rootdir = analrootdir);
         toc
         M = readtable(py2mat(M_file));
@@ -332,14 +391,20 @@ if fromData
             L = [labels;L];
         end
         
-        if sum(covSubgroupIdx)>0
-            covSubgroupIdx = logical(covSubgroupIdx);
-            for csg = 1:size(pstepCovSubgroup,1)
-                m = pstepCovSubgroup(csg,1);
-                ps = pstepCovSubgroup(csg,2);
-                xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = M(:,size(M,2)-size(pstepCovSubgroup,1)+csg);
+        if sum(preprocIdx)>0
+            preprocIdx = logical(preprocIdx);
+            for pt = 1:size(preprocVecs.Sequence,2)
+                m = preprocVecs.ModPStep(pt,1);
+                ps = preprocVecs.ModPStep(pt,2);
+                if preprocVecs.Sequence(pt) == 1 % covars subgroup
+                    xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.SUBGROUP = M(:,size(M,2)-size(preprocVecs.Sequence,2)+pt);
+                elseif preprocVecs.Sequence(pt) == 2 % rank target labels
+                    xNM.analysis{1,curanal}.params.TrainParam.PREPROC{1,m}.ACTPARAM{1,ps}.LABEL = M(:,size(M,2)-size(preprocVecs.Sequence,2)+pt);
+                elseif preprocVecs.Sequence(pt) == 3 % variance matrix
+                    % TO DO 
+                end
             end
-            M = Y(:,~covSubgroupIdx);
+            M = M(:,~preprocIdx);
         end
        
          
