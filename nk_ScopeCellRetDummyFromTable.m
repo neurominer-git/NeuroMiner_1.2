@@ -1,4 +1,4 @@
-function [Tdummy, idxCell] = nk_ScopeCellRetDummyFromTable(act, T, uniquelim)
+function [Tdummy, idxCell, idxCellInfo] = nk_ScopeCellRetDummyFromTable(act, T, uniquelim)
 
 if ~exist("uniquelim","var") || isempty(uniquelim)
     uniquelim = 20;
@@ -8,14 +8,18 @@ Vars = T.Properties.VariableNames;
 nVars = numel(Vars);
 Tdummy = []; Vdummy = [];
 idxCell = false(1,nVars);
-        
+idxCellInfo = [];       
 switch act
 
     case 'scope'
-    
+        cnt=1;
         for i=1:nVars
             if iscell(T.(Vars{i}))
                 idxCell(i)=true;
+                idxCellInfo(cnt).VarName = Vars{i};
+                idxCellInfo(cnt).UniqueVals = unique(rmmissing(T.(Vars{i})));
+                idxCellInfo(cnt).nUniqueVals = numel(idxCellInfo(cnt).UniqueVals);
+                cnt=cnt+1;
             end
         end
         

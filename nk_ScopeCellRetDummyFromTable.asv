@@ -1,4 +1,4 @@
-function Tdummy = nk_ScopeCellRetDummyFromTable(act, T, uniquelim)
+function [Tdummy, idxCell, idxCellInfo] = nk_ScopeCellRetDummyFromTable(act, T, uniquelim)
 
 if ~exist("uniquelim","var") || isempty(uniquelim)
     uniquelim = 20;
@@ -6,21 +6,34 @@ end
 
 Vars = T.Properties.VariableNames;
 nVars = numel(Vars);
-
+Tdummy = []; Vdummy = [];
+idxCell = false(1,nVars);
+idxCellInfo = [];       
 switch act
+
     case 'scope'
-        idxCell = false(1,nVars);
-        idxCell(i)=true;
-      
-    case 'replace'
-      
-        Tdummy = []; Vdummy = [];
+        
         for i=1:nVars
             if iscell(T.(Vars{i}))
-                Unq = unique(T.(Vars{i}));
+                idxCell(i)=true;
+                idxCellInfo(cnt).VarName = Vars{i};
+                idxCellInfo(cnt).UniqueVals = unique(rmmissing(T.Vars{i}));
+                idxCellInfo(cnt).nUniqueVals = numel(UniqueVals);
+            end
+        end
+        
+    case 'replace'
+      
+        for i=1:nVars
+            if iscell(T.(Vars{i}))
+                idxCell(i)=true;
+                Ti = rmmissing(T.(Vars{i}));
+                Unq = unique(Ti);
                 nUnq = numel(Unq); 
                 if nUnq>uniquelim
-                    error('\nFound %g unique values in column ''%s'' while only %g unique values are allowed.', nUnq, Vars{i}, uniquelim );
+                    errordlg('\nFound %g unique values in column ''%s'' while only %g unique values are allowed.', nUnq, Vars{i}, uniquelim );
+                    Tdummy = T;
+                    return
                 end
                 Tx_dummy = nk_MakeDummyVariables(T.(Vars{i}));
                 VarNames = cellstr([repmat([Vars{i} '_'], nUnq, 1) char(Unq)]);
