@@ -28,7 +28,7 @@ if isempty(IN),             error('Suitable input structure is missing. See the 
 if ~isfield(IN,'curlabel'), error('Label vector/matrix is missing! Add a ''curlabel'' variable to your input structure.'); end
 if ~isfield(IN,'algostr'),  error('No feature weighting algorithm found in the input structure. Provide one according to the function help.'); end
 if isfield(IN,'curglabel') && ~isempty(IN.curglabel)
-    Y = oY(IN.curglabel,:); L = IN.curlabel(IN.curglabel); 
+    Y = oY(logical(IN.curglabel),:); L = IN.curlabel(logical(IN.curglabel)); 
 else
     Y = oY; L = IN.curlabel;
 end
