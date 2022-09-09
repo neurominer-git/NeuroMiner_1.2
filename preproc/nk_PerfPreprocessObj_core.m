@@ -82,18 +82,20 @@ end
 
 if nact>1, fprintf('\t...Execute preprocessing sequence: '); end
 
+ActParam = struct('trfl', trfl, ...
+                  'paramfl', paramfl, ...
+                  'tsfl', tsfl, ...
+                  'cfl', cfl, ...
+                  'nTs', nTs', ...
+                  'nC', nC, ...
+                  'i',0, ...
+                  'adasynfl', adasynfl, ...
+                  'curlabel', 1, ...
+                  'label_interaction', nL>1);
+
 for i=1:nact
     
-    ActParam = struct('trfl', trfl, ...
-                      'paramfl', paramfl, ...
-                      'tsfl', tsfl, ...
-                      'cfl', cfl, ...
-                      'nTs', nTs', ...
-                      'nC', nC, ...
-                      'i',i, ...
-                      'adasynfl', adasynfl, ...
-                      'curlabel', 1, ...
-                      'label_interaction', nL>1);
+    ActParam.i=i;
     tStart = tic; 
     
     if iscell(act), acti = act{i}; end
@@ -311,7 +313,7 @@ for i=1:nact
             InputParam.Tr = [InputParam.Tr; InputParam.TrSyn];
         end
         if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param{InputParam.curclass}{i}; end
-        [ SrcParam, InputParam, TrParami ] = feval( funcstr, SrcParam, InputParam, TrParam, TrParami, ActParam );
+        [ SrcParam, InputParam, TrParami, ActParam ] = feval( funcstr, SrcParam, InputParam, TrParam, TrParami, ActParam );
     end
     
     % No Out-of-sample mode => build up TrParam structure array
@@ -333,10 +335,6 @@ i        = actparam.i;
 tsproc   = false;
 InputParam.P{i}.IMPUTE.X = InputParam.Tr;
 if trfl 
-    % Check whether there any pruning operations happened beforehand
-    if isfield(actparam,'PRUNE') && isfield(InputParam.P{i}.IMPUTE,'blockind') && ~isempty(InputParam.P{i}.IMPUTE.blockind) 
-        InputParam.P{i}.IMPUTE.blockind = InputParam.P{i}.IMPUTE.blockind(actparam.PRUNE.NonPruneVec);
-    end
     [InputParam.Tr, TrParami] = nk_PerfImputeObj(InputParam.Tr, InputParam.P{i}.IMPUTE); 
     if tsfl, tsproc = true; end  
 end
@@ -460,7 +458,7 @@ if VERBOSE; fprintf('\tCorrect groups for offsets from global mean(s) ...'); end
 
 if paramfl && tsfl && isfield(TrParami,'meanY') && isfield(TrParami,'meanG')
     tsproc = true;
-elseif trfl, 
+elseif trfl
      if actparam.adasynfl && isfield(InputParam.P{i},'sTrInd') && ~isempty(InputParam.P{i}.sTrInd)
         if iscell(SrcParam.covarsSyn)
             InputParam.P{i}.sTrInd = [InputParam.P{i}.sTrInd; SrcParam.covarsSyn{actparam.j}(:,InputParam.P{i}.sIND)]; 
@@ -493,7 +491,7 @@ if VERBOSE;
         InputParam.P{i}.DISCRET.binsteps, ...
         InputParam.P{i}.DISCRET.binstop)
 end
-if paramfl && tsfl && isfield(TrParami,'mY') && isfield(TrParami,'sY'), 
+if paramfl && tsfl && isfield(TrParami,'mY') && isfield(TrParami,'sY') 
     tsproc = true;
 elseif trfl,
     [InputParam.Tr, TrParami] = nk_PerfDiscretizeObj(InputParam.Tr, InputParam.P{i});
@@ -697,8 +695,8 @@ IN.nointercept = 1; if isfield(InputParam.P{i},'INTERCEPT'), IN.nointercept = ~I
 
 if VERBOSE
     fprintf('\tPartial correlations ...'); 
-    if IN.revertflag, fprintf(' introduce covariate effects ...'); else fprintf(' remove covariate effects ...'); end
-    if IN.nointercept, fprintf(' intecept disabled ...'); else fprintf(' intercept enabled ...'); end
+    if IN.revertflag, fprintf(' introduce covariate effects ...'); else, fprintf(' remove covariate effects ...'); end
+    if IN.nointercept, fprintf(' intecept disabled ...'); else, fprintf(' intercept enabled ...'); end
 end
 
 if isfield(InputParam.P{i},'BETAEXT')
@@ -749,14 +747,15 @@ elseif trfl
     if VERBOSE;fprintf('\tAttribute pruning ...'); end
     [InputParam.Tr, TrParami] = nk_PerfElimZeroObj(InputParam.Tr, InputParam.P{i}.PRUNE);
     % All subsequent processing steps that use fixed column indices have to
-    % be adjusted to the pruned matrix 
+    % be adjusted to the pruned matrix, except for the case of
+    % dimensionality reduction preceeding these steps.
     for z=i+1:numel(InputParam.P)
+        if isfield(InputParam.P{z},'DR'), break; end 
         if isfield(InputParam.P{z},'IMPUTE') && ~isempty(InputParam.P{z}.IMPUTE.blockind)
             InputParam.P{z}.IMPUTE.blockind = InputParam.P{z}.IMPUTE.blockind(TrParami.NonPruneVec);
         end
     end
     if tsfl, tsproc = true; end
-    actparam.PRUNE.NonPruneVec = TrParami.NonPruneVec;
 end
 
 if tsproc, InputParam.Ts = nk_PerfElimZeroObj(InputParam.Ts, TrParami); end

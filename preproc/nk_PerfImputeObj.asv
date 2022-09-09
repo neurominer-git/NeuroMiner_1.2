@@ -124,11 +124,7 @@ switch IN.method
                     idx_c = sum(isnan(tX(indnan_Xi, indi_Yi(ind_c))))==0;
                     
                     % minnumcols determines how many columns must have no missings values
-                    % the loop will remove those cases that contain the largest amount of missing data
-                    % and then recompute idx_c. If you have a lot of
-                    % missings in the data the current loop might remove to
-                    % many subjects ... further improvements will include
-                    % an alternating subjects/columns removal.
+                    % the loop will remove those cases that contain missing data
                     while sum(idx_c) < minnumcols 
                         % if there is no column without missings start removing
                         % cases from the imputation training sample

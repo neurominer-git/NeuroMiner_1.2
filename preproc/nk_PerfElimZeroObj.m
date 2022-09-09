@@ -22,7 +22,7 @@ function [Y, IN] = PerfElimZeroObj(Y, IN)
 
 global VERBOSE SVM
 % Defaults
-if isempty(IN),eIN=true; else eIN=false; end
+if isempty(IN),eIN=true; else, eIN=false; end
 
 if eIN || ~isfield(IN,'NonPruneVec') || isempty(IN.NonPruneVec)
     if ~isfield(IN,'zero'), IN.zero = 1; end
