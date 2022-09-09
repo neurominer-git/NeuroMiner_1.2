@@ -38,7 +38,7 @@ if ~defaultsfl
                 case {2,3}
                     dims = 0.8;
                 case 1
-                    dims = floor(size(NM.Y{NM.TrainParam.FUSION.M(1)},2)/10);
+                    dims = floor(size(NM.Y{NM.TrainParam.FUSION.M(1)},2)*0.8);
             end
         case 2
             switch PercMode
