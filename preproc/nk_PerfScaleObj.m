@@ -34,7 +34,7 @@ end
 function [sY, IN] = PerfScaleObj(Y, IN)
 
 % Defaults
-if isempty(IN),eIN=true; else eIN=false; end
+if isempty(IN),eIN=true; else, eIN=false; end
 % Determine min and max over entire array?
 if eIN|| ~isfield(IN,'overmatflag')     || isempty(IN.AcMatFl),     IN.AcMatFl = false;     end
 % Scale to [0,1] or [-1,1]?
@@ -44,38 +44,43 @@ if eIN || ~isfield(IN,'revertflag')     || isempty(IN.revertflag),  IN.revertfla
 % Zero-out non-finite features 
 if eIN || ~isfield(IN,'zerooutflag')    || isempty(IN.zerooutflag), IN.zerooutflag = 2;  end
 
-[mY,nY] = size(Y);
+[mY, nY] = size(Y);
 
 % Check for Minimum
 if eIN || ~isfield(IN,'minY') || isempty(IN.minY)
     if IN.AcMatFl, IN.minY = repmat(min(Y(:)),1,nY); else, IN.minY = nm_nanmin(Y); end
-elseif size(IN.minY,2) == 1 && nY > 1; 
+elseif size(IN.minY,2) == 1 && nY > 1 
     IN.minY = repmat(IN.minY,1,nY);
 end
 
 % Check for Maximum
 if eIN || ~isfield(IN,'maxY') || isempty(IN.maxY)
     if IN.AcMatFl, IN.maxY = repmat(max(Y(:)),1,nY); else, IN.maxY = nm_nanmax(Y); end
-elseif size(IN.maxY,2) == 1 && nY > 1; 
+elseif size(IN.maxY,2) == 1 && nY > 1 
     IN.maxY = repmat(IN.maxY,1,nY);
 end
+if eIN || ~isfield(IN,'ise') || isempty(IN.ise)
+    IN.ise = ~(IN.minY == IN.maxY);
+end
+if any(IN.ise==0), nY = size(Y(:,IN.ise),2); end
 
 switch IN.ZeroOne
     case 1
         % Scale EACH FEATURE in the data to [0, 1]
         if ~IN.revertflag
-            sY = (Y - repmat(IN.minY,mY,1)) * spdiags(1./(IN.maxY-IN.minY)', 0, nY, nY); 
+            sY = (Y(:,IN.ise) - repmat(IN.minY(IN.ise),mY,1)) * spdiags(1./(IN.maxY(IN.ise)-IN.minY(IN.ise))', 0, nY, nY); 
         else
-            sY = bsxfun(@plus,bsxfun(@times, Y, (IN.maxY - IN.minY)),IN.minY);           
+            sY = bsxfun(@plus,bsxfun(@times, Y(:,IN.ise), (IN.maxY(IN.ise) - IN.minY(IN.ise))),IN.minY(IN.ise));           
         end
     case 2
         % Scale EACH FEATURE in the data to [-1, 1]
         if ~IN.revertflag
-            sY = 2 * bsxfun(@rdivide,bsxfun(@minus,Y,IN.minY),IN.maxY-IN.minY) - 1;
+            sY = 2 * bsxfun(@rdivide,bsxfun(@minus,Y(:,IN.ise),IN.minY(IN.ise)),IN.maxY(IN.ise)-IN.minY(IN.ise)) - 1;
         else
-            sY = bsxfun(@times, Y./2+0.5, (IN.maxY-IN.minY) + IN.minY);
+            sY = bsxfun(@times, Y(:,IN.ise)./2+0.5, (IN.maxY(IN.ise)-IN.minY(IN.ise)) + IN.minY(IN.ise));
         end
 end
 
 if issparse(sY), sY = full(sY); end
+tY = Y; tY(:,IN.ise) = sY; sY = tY;
 [ sY, IN ] = nk_PerfZeroOut(sY, IN);
