@@ -25,6 +25,7 @@ if isfield(TemplParam,'ACTPARAM')
         
         actionseq{ac} = TemplParam.ACTPARAM{ac}.cmd;
         InputParam.P{ac}.LabelInteraction = false;
+        InputParam.P{ac}.cmd = actionseq{ac};
         
         switch actionseq{ac}
             
@@ -34,6 +35,7 @@ if isfield(TemplParam,'ACTPARAM')
                 InputParam.P{ac}.LABELIMPUTE = TemplParam.ACTPARAM{ac}.LABELIMPUTE;
                 SrcParam.NaNflag = true;
                 InputParam.P{ac}.BINMOD = TemplParam.BINMOD;
+
                     
             case 'impute'
                 

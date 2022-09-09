@@ -749,7 +749,7 @@ elseif trfl
     % All subsequent processing steps that use fixed column indices have to
     % be adjusted to the pruned matrix, except for the case of
     % dimensionality reduction preceeding these steps.
-    InputParam = adjust_featuremasks(i, InputParam, TrParami);
+    InputParam = adjust_featuremasks(i, InputParam, TrParami.NonPruneVec);
     if tsfl, tsproc = true; end
 end
 
