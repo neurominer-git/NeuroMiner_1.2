@@ -17,7 +17,7 @@ if ~defaultsfl
     MnuStr = sprintf('%s|Define how to combine sequential predictions [ %s ]',MnuStr, REPLACESTR); MnuAct = [MnuAct 2];
     
     ANCHORARR = {'Decision boundary','Median of decision score distribution'}; ANCHORSTR = ANCHORARR{SEQOPT.AnchorType};
-    MnuStr = sprintf('%s|Define how of the deferral window is anchored [ %s ]',MnuStr, ANCHORSTR);                  MnuAct = [MnuAct 3];
+    MnuStr = sprintf('%s|Define how the deferral window is anchored [ %s ]',MnuStr, ANCHORSTR);                  MnuAct = [MnuAct 3];
     
     
     [~ , ~, ~, critstr ] = nk_GetScaleYAxisLabel;
