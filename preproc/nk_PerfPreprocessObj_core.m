@@ -749,12 +749,7 @@ elseif trfl
     % All subsequent processing steps that use fixed column indices have to
     % be adjusted to the pruned matrix, except for the case of
     % dimensionality reduction preceeding these steps.
-    for z=i+1:numel(InputParam.P)
-        if isfield(InputParam.P{z},'DR'), break; end 
-        if isfield(InputParam.P{z},'IMPUTE') && ~isempty(InputParam.P{z}.IMPUTE.blockind)
-            InputParam.P{z}.IMPUTE.blockind = InputParam.P{z}.IMPUTE.blockind(TrParami.NonPruneVec);
-        end
-    end
+    InputParam = adjust_featuremasks(i, InputParam, TrParami);
     if tsfl, tsproc = true; end
 end
 
@@ -1041,7 +1036,7 @@ if tsproc, InputParam.Ts = perfJuSpace(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_ROImeans(SrcParam, InputParam, ~, TrParami, actparam)
-global VERBOSE PREPROC
+global VERBOSE 
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
@@ -1085,4 +1080,21 @@ else
     SrcParam.MultiTrainLabel = SrcParam.oMultiTrainLabel;
 end
 
+end
+% =========================================================================
+function InputParam = adjust_featuremasks(i, InputParam, NonPruneVec)
+    for z=i+1:numel(InputParam.P)
+        switch InputParam.P{z}.cmd
+            case 'reducedim'
+                break
+            case 'impute' 
+                if isfield(InputParam.P{z}.IMPUTE,'blockind') && ~isempty(InputParam.P{z}.IMPUTE.blockind)
+                    InputParam.P{z}.IMPUTE.blockind = InputParam.P{z}.IMPUTE.blockind(NonPruneVec);
+                end
+            case 'correctnuis'
+                if isfield(InputParam.P{z},'BETAEXT') && ~isempty(InputParam.P{z}.BETAEXT)
+                    InputParam.P{z}.BETAEXT = InputParam.P{z}.BETAEXT(NonPruneVec);
+                end
+        end
+    end
 end
