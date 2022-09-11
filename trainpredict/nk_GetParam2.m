@@ -37,7 +37,7 @@ if sNaN
     error('\nFound %g non-finite values in training matrix!\nThis usually happend in intermediate fusion mode when some data modalities have cases with completely missing data.\nCheck your preprocessing settings and your data!', sNaN)
 end
 
-if height(Y) ~= height(label)
+if size(Y,1) ~= size(label,1)
     error('\nTraining data matrix and labels must have the same number of observations!')
 end
 
