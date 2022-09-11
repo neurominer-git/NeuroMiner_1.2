@@ -82,5 +82,5 @@ switch IN.ZeroOne
 end
 
 if issparse(sY), sY = full(sY); end
-tY = Y; tY(:,IN.ise) = sY; sY = tY;
+if sum(~IN.ise), tY = Y; tY(:,IN.ise) = sY; tY(:, ~IN.ise) = 0; sY = tY; end
 [ sY, IN ] = nk_PerfZeroOut(sY, IN);
