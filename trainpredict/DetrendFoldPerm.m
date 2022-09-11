@@ -47,7 +47,11 @@ if OUT.detrend.flag
                         [~, beta(ll), p(ll)] = nk_DetrendPredictions2([], [], P, L);
                     case 'classification'
                         L(L==-1)=0; X = [D L]; I=sum(isnan(X),2);
-                        ROCout = roc2(X(~I,:),[],[],0);
+                        try
+                            ROCout = roc2(X(~I,:),[],[],0);
+                        catch
+                            disp(X)
+                        end
                         aucs(ll,curclass)= ROCout.AUC; thresh(ll,curclass)=ROCout.co;
                 end
                 ll=ll+1;

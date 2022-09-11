@@ -70,7 +70,7 @@ else
     mnusel = [3 1];
 end
 
-if EXPERT && ~any(strcmp(SVM.prog, {'SEQOPT','WBLCOX'}))
+if EXPERT && ~any(strcmp(SVM.prog, {'SEQOPT','WBLCOX','DECTRE'}))
     if isfield(SVM,'Post') && isfield(SVM.Post,'Detrend') && SVM.Post.Detrend
         detrendstr = 'enabled';
     else
@@ -87,13 +87,13 @@ if EXPERT && ~any(strcmp(SVM.prog, {'SEQOPT','WBLCOX'}))
     end
 end
 
-if isfield(SVM,'kernel'), kerntype = SVM.kernel.kernstr; else kerntype = []; end
+if isfield(SVM,'kernel'), kerntype = SVM.kernel.kernstr; else, kerntype = []; end
 
 switch NM.modeflag
     case 'classification'
         if EXPERT 
             adasyndef = {'yes','no'};
-            if ~isfield(SVM,'ADASYN'),
+            if ~isfield(SVM,'ADASYN')
                 SVM.ADASYN.flag = 2;
                 adasynstr = adasyndef{2}; 
             else
@@ -327,15 +327,15 @@ switch act
                 SVM.FAMRVR.tolerance = nk_input('Tolerance',0,'e',.1);
                 SVM = nk_Kernel_config(SVM);
 
-            case {'MEXELM','DECTRE', 'RNDFOR'}
-                %SVM.MEXELM.nHidden = nk_input('# of hidden neurons',0,'e',100);
+            case {'MEXELM','DECTRE','RNDFOR'}
                 switch SVM.prog
                     case 'DECTRE'
                         if ~isfield(SVM,SVM.prog), SVM.(SVM.prog) = []; end
+                        SVM.Post.Detrend = 0;
                     otherwise
                         SVM = nk_Kernel_config(SVM);
                 end
-
+                
             case 'matLRN'
                 if ~isfield(SVM,'matLRN'), SVM.matLRN = []; end
                 switch NM.modeflag
@@ -349,6 +349,7 @@ switch act
                     NM.TrainParam.GRD.matLearn = nk_matLearn_config(matLRN,matLRN.learner.framework,3);
                 end
                 SVM.matLRN = matLRN;
+                SVM = nk_Kernel_config(SVM);
 
             case {'GLMNET','GRDBST'}
                 if ~isfield(SVM,SVM.prog), SVM.(SVM.prog) = []; end
