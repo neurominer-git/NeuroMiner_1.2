@@ -1135,8 +1135,10 @@ switch act
                     M = nk_ScopeCellRetDummyFromTable('replace',M, IO.uniquelim);
                     col_cases = strcmp(M.Properties.VariableNames,case_edit);
                     col_label = RetCellInCellsIndex(M.Properties.VariableNames, label_edit);
+                    F = M.Properties.VariableNames;
+                else
+                    F = IO.t_Y.Properties.VariableNames;
                 end
-                F = M.Properties.VariableNames;
                 M = table2array(M);
                 F = F(~col_cases & ~col_label );
         end

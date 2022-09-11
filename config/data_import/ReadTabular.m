@@ -37,6 +37,7 @@ switch fileflg
             IO.s_label = table2array(IO.Y(:,col_label));
         end
         IO.Y(:, col_cases | col_label) = []; 
+        [~,IO.cellcols, IO.cellcolsinfo] = nk_ScopeCellRetDummyFromTable('scope', IO.Y);
         if isfield(IO,'cellcols') && any(IO.cellcols)
             IO.Y = nk_ScopeCellRetDummyFromTable('replace',IO.Y, IO.uniquelim);
             col_cases = strcmp(IO.Y.Properties.VariableNames, IO.case_edit);
