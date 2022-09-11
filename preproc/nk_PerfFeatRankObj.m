@@ -109,7 +109,12 @@ switch IN.algostr
         % simple univariate correlation using Pearson's or Spearman's
         % correlation coefficient
         if VERBOSE, fprintf(' %s', IN.algostr); end
-        IN.W = abs(nk_CorrMat(Y,L,IN.algostr));
+        if strcmp(IN.algostr,'pearson')
+            type = 'pearson_fast';
+        else
+            type = 'spearman';
+        end
+        IN.W = abs(nk_CorrMat(Y,L,type));
 
     case 'fscore'
         if VERBOSE; fprintf(' F-Score'); end
