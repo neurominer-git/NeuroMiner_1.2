@@ -389,7 +389,7 @@ switch datasource
                         else
                             filestri = num2str(size(P{i},1));
                         end
-                        filestr = sprintf('%s, N(%s)=%s', filestr, desc_groups{i},filestri);
+                        filestr = sprintf('%s, N(%s)=%s', filestr, desc_groups{i}, filestri);
                     end
                 else
                     filestri = num2str(size(P{1},1));
@@ -920,18 +920,32 @@ switch act
         end
         
     case 'sel_img'
-        IO.PP = []; t_n_subjects = nan(1,n_samples);
-        for i=1:n_samples
+        if varind > 1, t_n_samples = 1; else, t_n_samples = n_samples; end
+        IO.PP = []; t_n_subjects = nan(1, t_n_samples);
+        for i=1:t_n_samples
             if ~oocvflag
-                hdrstr = sprintf('Select %s for sample %g: %s', IO.datasource, i, desc_groups{i});
+                if varind > 1
+                    hdrstr = sprintf('Select %s images', IO.datasource);
+                else
+                    hdrstr = sprintf('Select %s images for sample %g: %s', IO.datasource, i, desc_groups{i});
+                end
             else
                 if IO.labels_known
-                    hdrstr = sprintf('Select %s for independent sample %g: %s', IO.datasource, i, desc_groups{i});
+                    hdrstr = sprintf('Select %s images for independent sample %g: %s', IO.datasource, i, desc_groups{i});
                 else
-                    hdrstr = sprintf('Select %s for independent test data', IO.datasource );
+                    hdrstr = sprintf('Select %s images for independent test data', IO.datasource );
                 end
             end
-            if isfield(IO,'P') && numel(IO.P)>=i, Pi = IO.P{i}; else, Pi=[];  end
+            
+            if isfield(IO,'P') && numel(IO.P)>=i 
+                if t_n_samples ~= n_samples && (~oocvflag || (oocvflag && IO.labels_known))
+                    Pi = char(IO.P');
+                else
+                    Pi = IO.P{i}; 
+                end
+            else
+                Pi=[];  
+            end
             [P, V, mess] = nk_FileSelector(t_n_subjects(i), datasource, hdrstr, IO.filt, Pi, mess);
             if ~isempty(P) && ~isempty(V)    
                 IO.P{i} = P; IO.V{i} = V; IO.PP = char(IO.PP,IO.P{i}); 
@@ -939,6 +953,18 @@ switch act
                 break
             end	
         end
+
+        if ~isempty(IO.PP) && (t_n_samples ~= n_samples && (~oocvflag || (oocvflag && IO.labels_known)))
+            P = IO.P{1}; V = IO.V{1};
+            cnt1 = 1; cnt2 = IO.n_subjects(1);
+            for i=1:n_samples-1
+                IO.P{i} = P( cnt1:cnt2,: ); IO.V{i} = V(cnt1:cnt2);
+                cnt1 = cnt1 + IO.n_subjects(i);
+                cnt2 = cnt2 + IO.n_subjects(i+1);
+            end
+            IO.P{i+1} = P( cnt1:cnt2,: ); IO.V{i+1} = V(cnt1:cnt2);
+        end
+
         if ~isempty(IO.PP)
             IO.PP(1,:)=[]; 
             [IO,mess] = RetrieveImageInfo(IO, datasource,mess);
