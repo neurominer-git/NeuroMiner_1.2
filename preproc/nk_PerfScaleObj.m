@@ -82,5 +82,9 @@ switch IN.ZeroOne
 end
 
 if issparse(sY), sY = full(sY); end
+
+% Deal with zero-variance columns and replace them with 0's.
 if sum(~IN.ise), tY = Y; tY(:,IN.ise) = sY; tY(:, ~IN.ise) = 0; sY = tY; end
+
+% Deal with complete-NaN features and replace them with 0's.
 [ sY, IN ] = nk_PerfZeroOut(sY, IN);
