@@ -747,12 +747,20 @@ elseif trfl
     if VERBOSE;fprintf('\tAttribute pruning ...'); end
     [InputParam.Tr, TrParami] = nk_PerfElimZeroObj(InputParam.Tr, InputParam.P{i}.PRUNE);
     % All subsequent processing steps that use fixed column indices have to
-    % be adjusted to the pruned matrix 
-    dimredflag = false;
+    % be adjusted to the pruned matrix, except for the case of
+    % dimensionality reduction preceeding these steps.
     for z=i+1:numel(InputParam.P)
-        if isfield(InputParam.P{z},'DR'), dimredflag = true; end 
-        if isfield(InputParam.P{z},'IMPUTE') && ~isempty(InputParam.P{z}.IMPUTE.blockind)
-            InputParam.P{z}.IMPUTE.blockind = InputParam.P{z}.IMPUTE.blockind(TrParami.NonPruneVec);
+        switch InputParam.P{z}.cmd
+            case 'reducedim'
+                break
+            case 'impute' 
+                if isfield(InputParam.P{z}.IMPUTE,'blockind') && ~isempty(InputParam.P{z}.IMPUTE.blockind)
+                    InputParam.P{z}.IMPUTE.blockind = InputParam.P{z}.IMPUTE.blockind(TrParami.NonPruneVec);
+                end
+            case 'correctnuis'
+                if isfield(InputParam.P{z},'BETAEXT') && ~isempty(InputParam.P{z}.BETAEXT)
+                    InputParam.P{z}.BETAEXT = InputParam.P{z}.BE(TrParami.NonPruneVec);
+                end
         end
     end
     if tsfl, tsproc = true; end

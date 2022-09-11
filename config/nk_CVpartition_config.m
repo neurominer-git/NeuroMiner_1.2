@@ -213,7 +213,7 @@ if ~defaultsfl
                             EQbinstr = sprintf('Define # of bins in label histogram [ %g ]|', Eq.bincount);
                             EQshufflestr = sprintf('Shuffle removed observations to CV1 test data [ %s ]|', shufflestr{addremoved2test});
                             EQorigstr = 'Show original histogram of the entire data|';
-                            EQeqstr = 'Show (equalized) histogram of CV1 training partition [1,1] (build CV structure first)|';
+                            EQeqstr = 'Show (equalized) histogram of CV1 training partition [1,1] (build CV structure first!)|';
                             MenuVec = [MenuVec 14:20];
                         end
                     case 'classification'

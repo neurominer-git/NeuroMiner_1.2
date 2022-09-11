@@ -272,7 +272,8 @@ if fromData
         sitesIdxY = sitesIdx + size(Y,2);
         Y = [Y, xNM.covars];
         covColIdx = [covColIdx, ones(1,size(xNM.covars,2))];
-        YColNames = [YColNames, xNM.covnames'];
+        if height(xNM.covnames)>1; xNM.covnames = xNM.covnames'; end
+        YColNames = [YColNames, xNM.covnames];
     end
   
     % check whether leave-one-group out cv framework is selected

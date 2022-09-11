@@ -138,7 +138,7 @@ if ~defaultsfl
         end
         OcclusionMapFeatStr = ['Define which map to use [ ' MapFeatStr ' ]|'];
         mnuact = [ mnuact 8 ];
-        OcclusionMapCutoffStr = ['Define cutoff value (scalar or 2-value vector) [ ' num2str(cutoff) ' ]|'];
+        OcclusionMapCutoffStr = ['Define map cutoff value (scalar or 2-value vector) [ ' num2str(cutoff) ' ]|'];
         mnuact = [ mnuact 9 ];
         switch cutoffmode
             case 'absolute'
@@ -146,14 +146,14 @@ if ~defaultsfl
             case 'percentile'
                 DEFCUTOFFMODE = 2;
         end
-        OcclusionMapCutoffModeStr = ['Define cutoff method [ ' cutoffmode ' ]|'];
+        OcclusionMapCutoffModeStr = ['Define map cutoff method [ ' cutoffmode ' ]|'];
         mnuact = [ mnuact 10 ];
         if numel(cutoff)>1
             MapCutoffOperatorStr = {'<,>', '<=,>=', '>,<', '>=,<='};
         else
             MapCutoffOperatorStr = {'<', '<=', '>', '>=', '==', '~='};
         end
-        OcclusionMapCutoffOperator = ['Define cutoff operator [ ' MapCutoffOperatorStr{cutoffoperator} ' ]|'];
+        OcclusionMapCutoffOperator = ['Define map cutoff operator [ ' MapCutoffOperatorStr{cutoffoperator} ' ]|'];
         mnuact = [ mnuact 11 ];
     else
         OcclusionMapFeatStr = '';

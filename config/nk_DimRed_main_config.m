@@ -5,9 +5,9 @@ CALIBUSE = 2;
 
 if ~defaultsfl
     if isempty(DR), [DR, PX] = nk_DimRed_main_config(DR, PX, parentstr, true); end
-    if isfield(DR,'RedMode'),   RedMode = DR.RedMode; else RedMode = []; end
-    if isfield(DR,'dims'),      dims = DR.dims; else dims = []; end
-    if isfield(DR,'PercMode'),  PercMode = DR.PercMode; else PercMode = []; end
+    if isfield(DR,'RedMode'),   RedMode = DR.RedMode; else, RedMode = []; end
+    if isfield(DR,'dims'),      dims = DR.dims; else, dims = []; end
+    if isfield(DR,'PercMode'),  PercMode = DR.PercMode; else, PercMode = []; end
     if isfield(DR,'CALIBUSE'),  CALIBUSE = DR.CALIBUSE; end
     if ~ischar(RedMode)
         DRSTR_REDMODE = 'undefined';
@@ -187,12 +187,12 @@ if ~defaultsfl
             DR.NMFmethod            = NMFmethod{nk_input('Choose NMF method',0,'mq',strjoin(NMFmethoddesc,'|'),1:numel(NMFmethoddesc), defitem)};
             DR.tmax                 = nk_input('Maximum run-time in seconds',0,'i',DR.tmax);
         case 'ProbPCA'
-            if isfield(DR,'ProbPCA'), iter= DR.ProbPCA.iter; else iter = 200; end
+            if isfield(DR,'ProbPCA'), iter= DR.ProbPCA.iter; else, iter = 200; end
             DR.ProbPCA.iter = nk_input('# of iterations ',0,'e',iter);
             PX = nk_AddParam(DR.ProbPCA.iter, 'ProbPCA-Iter', 1, PX, 'replace');
 
         case 'LPP'
-            if isfield(DR,'LPP'), 
+            if isfield(DR,'LPP') 
                 Sigma = DR.LPP.Sigma; 
                 K = DR.LPP.k; 
             else
@@ -202,25 +202,14 @@ if ~defaultsfl
             DR.LPP.k = nk_input('# of nearest neighbors (k)',0,'e',K);
             PX = nk_AddParam(DR.LPP.Sigma, 'LPP-Sigma', 1, PX, 'replace');
             PX = nk_AddParam(DR.LPP.k, 'LPP-K', 1, PX);
-            %if isfield(DR,'LPP') && isfield(DR.LPP,'constuctW'), options = DR.LPP.constructW.options; else options = []; end
-    %         [DR.LPP.constructW.options, PX] = nk_ConstructW_config(options, [], navistr);
-    %         
-    %         fprintf('\n\n *********** Linear Graph Embedding (LGE) Setup ***********\n\n')
-    %         DR.LPP.options.regu = nk_input('LGE Setup: Regularization',0,'m', 'a* = argmax (a''X''WXa)/(a''X''DXa+ReguAlpha*I)|PCA',[1,0],2); 
-    %         if DR.LPP.options.regu
-    %             DR.LPP.options.ReguAlpha = nk_input('LGE Setup -> ReguAlpha',0,'e',0.1);  
-    %             PX = nk_AddParam(DR.LPP.options.ReguAlpha, 'LPP-RegulAlpha', 1, PX);
-    %             DR.LPP.options.ReguType = 'Ridge';
-            %end
-            %DR.DRsoft = 1
 
         case 'LLTSA'
-            if isfield(DR,'LLTSA'), k=DR.LLTSA.k; else k=12; end
+            if isfield(DR,'LLTSA'), k=DR.LLTSA.k; else, k=12; end
             DR.LLTSA.k = nk_input('# of nearest neighbors (k)',0,'e',k);                 
             PX = nk_AddParam(DR.LLTSA.k, 'LLTSA-K', 1, PX, 'replace');
 
         case 'Laplacian'
-            if isfield(DR,'Laplacian'), k=DR.Laplacian.k; else k=12; end
+            if isfield(DR,'Laplacian'), k=DR.Laplacian.k; else, k=12; end
             DR.Laplacian.k = nk_input('# of nearest neighbors (k)',0,'e',k);                 
             PX = nk_AddParam(DR.Laplacian.k, 'Laplacian-K', 1, PX, 'replace');
             DR.Laplacian.s = nk_input('Sigma',0,'e',1);              
