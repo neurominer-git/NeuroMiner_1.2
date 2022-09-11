@@ -702,11 +702,11 @@ switch action
         
         switch params.CostFun
             case 1
-                vargout.CostType = 'argmax(CV=>training data)';
+                vargout.CostType = ' argmax(CV=>training data)';
             case 2
-                vargout.CostType = 'argmax(CV=>test data)';
+                vargout.CostType = ' argmax(CV=>test data)';
             case 3
-                vargout.CostType = 'argmax(CV=>training & test data)';
+                vargout.CostType = ' argmax(CV=>training & test data)';
         end
         switch params.SubSpaceStrategy
             case 1
