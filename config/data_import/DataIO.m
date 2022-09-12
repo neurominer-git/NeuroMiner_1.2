@@ -22,7 +22,7 @@ function [IO, act, mess] = DataIO(NM, parentstr, IO, mess, varind)
 % act           :       Previously selected menu item
 % mess          :       Updated message structure
 % =========================================================================
-% (c) Nikolaos Koutsouleris 10/2018
+% (c) Nikolaos Koutsouleris 09/2022
 
 global SPMAVAIL FSAVAIL
 

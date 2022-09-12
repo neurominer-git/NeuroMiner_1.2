@@ -35,7 +35,7 @@ function [sY, IN] = nk_PerfImputeObj(Y, IN)
 %                     criterion minnumcols (currently fixed at 0.5) is 
 %                     fulfilled.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 08/2022
+% (c) Nikolaos Koutsouleris, 09/2022
 
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) 
@@ -56,19 +56,21 @@ global VERBOSE
 %% Prepare
 if ~isfield(IN,'method') || isempty(IN.method), IN.method = 'euclidean'; end
 if ~isfield(IN,'k') || isempty(IN.k), IN.k = 7; end
-if ~isfield(IN,'blockind') || isempty(IN.blockind), IN.blockind = true(1,n); end
+if ~isfield(IN,'blockind') || isempty(IN.blockind), IN.blockind = true(1, size(Y,2)); end
 if ~isfield(IN,'minnumcols') || isempty(IN.minnumcols), IN.minnumcols = 0.75; end
 if ~isfield(IN,'X') && ~strcmp(IN.method,'singlemean'), ...
-        error('The training data matrix is missing from the input parameters!'); end
+   error('The training data matrix is missing from the input parameters!'); 
+end
 sY      = Y;
 tY      = Y(:,IN.blockind);
 stY     = tY;
 indnan  = isnan(tY);
 snan    = sum(indnan,2)==0;
-[m, n] = size(tY);
+[m, n]  = size(tY);
 minnumcols = ceil(n * IN.minnumcols);
 if VERBOSE, fprintf('\tImpute missing values');end
 ll=0; 
+
 switch IN.method
     case 'singlemean'
         mn = nm_nanmedian(tY,2); 

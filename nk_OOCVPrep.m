@@ -205,6 +205,7 @@ switch act
          for i=1:nA
             nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'setup_main', 0); 
             NM.runtime.curanal = inp.analind(i);
+            if nA>1, inp = nk_GetAnalModalInfo_config(NM, inp); end
             inp.analysis_id = NM.analysis{inp.analind(i)}.id;
             inp.saveoptdir = [ NM.analysis{inp.analind(i)}.rootdir filesep 'opt' ];
             NM.analysis{inp.analind(i)}.OOCV{inp.oocvind} = OOCVPrep(NM, inp, NM.analysis{inp.analind(i)});

@@ -5,7 +5,11 @@ if ~isfield(NM,'analysis'), inp=[]; return; end
 if ~isfield(inp,'analind') || isempty(inp.analind)
     t_act = 1; while t_act>0, [t_act, inp.analind] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> SELECT ANALYSIS', 1, [], 0, 0); end;
 end
-analysis = NM.analysis{inp.analind};
+if isfield(NM,'runtime')
+    analysis = NM.analysis{NM.runtime.curanal};
+else
+    analysis = NM.analysis{inp.analind};
+end
 
 %% Define modality-independent parameters of current analysis as global variables
 nk_SetupGlobVars2(analysis.params, 'setup_main', 0); 

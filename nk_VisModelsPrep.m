@@ -89,17 +89,19 @@ if ~isempty(analysis)
     end 
 
     % Configure write out of CV2 partition maps (for imaging analyses only)
-    if nk_CheckContainsImagingData(NM, inp.analind)
-        WRITECV2_opts     = {'yes','no'};       
-        WriteCV2str = sprintf('Write CVR, sign-based consistency maps (FDR) and masked CVR images [ %s ]|', ...
-            WRITECV2_opts{inp.writeCV2}) ;                                                                                       WriteCV2Act = 13;  
+    if numel(inp.analind)<2
+        if nk_CheckContainsImagingData(NM, inp.analind)
+            WRITECV2_opts     = {'yes','no'};       
+            WriteCV2str = sprintf('Write CVR, sign-based consistency maps (FDR) and masked CVR images [ %s ]|', ...
+                WRITECV2_opts{inp.writeCV2}) ;                                                                                   WriteCV2Act = 13;  
+        end
     end
 
     % Configure loading of pre-existing parameters and models
     if inp.saveparam == 2 && inp.lfl == 1 && inp.CV1==2
         LoadStr = sprintf('Use saved pre-processing params and models [ %s ]|', YesNo_opts{inp.loadparam});                  LoadAct = 7;
         if inp.loadparam == 1
-            if isfield(inp,'optpreprocmat'), 
+            if isfield(inp,'optpreprocmat') 
                 selGridPreproc = ~cellfun(@isempty,inp.optpreprocmat);
                 nParamFiles = sprintf('%g files selected', sum(selGridPreproc(:))); 
             else
@@ -236,6 +238,7 @@ switch act
         for i=1:nA
             nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'setup_main', 0); 
             NM.runtime.curanal = inp.analind(i);
+            if nA>1, inp = nk_GetAnalModalInfo_config(NM, inp); end
             inp.analysis_id = NM.analysis{inp.analind(i)}.id;
             inp.saveoptdir = [ NM.analysis{inp.analind(i)}.rootdir filesep 'opt' ];
             NM.analysis{inp.analind(i)} = VisModelsPrep(NM, inp, NM.analysis{inp.analind(i)});

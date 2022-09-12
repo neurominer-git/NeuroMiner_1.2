@@ -168,7 +168,7 @@ switch act
                 else
                     if isfield(PREPROC,'ACTPARAM')
                         I = arrayfun( @(j) isfield(PREPROC.ACTPARAM{j},'RANK'), 1:numel( PREPROC.ACTPARAM ));
-                        if any(I), 
+                        if any(I) 
                             I = find(I);
                             for z=1:numel(I)
                                 if isfield(PREPROC.ACTPARAM{I(z)}.RANK,'EXTERN')
@@ -276,8 +276,6 @@ switch act
         case 7
             
             % LABEL SCALING (regression only)
-            %datid = NM.id;
-            
             nk_SetupGlobVars2(analysis.params, 'setup_strat', 1); 
             labels = nk_LabelTransform(PREPROC, MODEFL, NM.label);
             %% Get Training / CV data (Y) & Build modality suffix

@@ -146,7 +146,7 @@ if ~isempty(analysis)
                 end
             else
                 nT = sum(sum(~cellfun(@isempty, inp.(inp.sfieldnames{inp.lfl}))));
-                if nT>0,
+                if nT>0
                     if iscell(inp.(inp.sfieldnames{inp.lfl}))
                         mT = 0;
                     else
@@ -256,7 +256,7 @@ if ~isempty(analysis)
                     inp.GridAct             = true(ix,jx);
                 case 2 % Running with precomputed Preprocdatamats
                     [preprocmat, emptfl]    = nk_GenPreprocMaster2(NM.id, CV(1), [],  NM.analysis{inp.analind}.rootdir, [], [], inp.varind, inp.varstr, inp.concatfl);
-                    if ~emptfl && ~isempty(preprocmat),
+                    if ~emptfl && ~isempty(preprocmat)
                         inp.preprocmat      = preprocmat;
                         inp.gdmat           = [];
                         inp.gdanalmat       = [];
@@ -265,7 +265,7 @@ if ~isempty(analysis)
                 case 3 % Running with precomputed CVdatamats (aggregation run --- allowing to tweak some post-training model selection options)
 
                     [gdmat, emptfl]         = nk_GenCVdataMaster2(NM.id, CV(1), [], fullfile(NM.analysis{inp.analind}.rootdir, algostr), [], [], inp.varind, inp.varstr, inp.concatfl);
-                    if ~emptfl && ~isempty(gdmat),
+                    if ~emptfl && ~isempty(gdmat)
                         inp.preprocmat      = cell(inp.nF,1);
                         inp.gdmat           = gdmat;
                         inp.GridAct         = ~cellfun(@isempty,gdmat{1});
@@ -273,7 +273,7 @@ if ~isempty(analysis)
                 case 4 % Running with existing CVresults (simple aggregation run --- basically for multiple modalities)
 
                     [gdanalmat, emptfl]     = nk_GenCVresultsMaster(NM.id,[], fullfile(NM.analysis{inp.analind}.rootdir, algostr));
-                    if ~emptfl && ~isempty(gdanalmat),
+                    if ~emptfl && ~isempty(gdanalmat)
                         inp.preprocmat      = cell(inp.nF,1);
                         inp.gdmat           = [];
                         inp.gdanalmat       = gdanalmat;
@@ -291,34 +291,38 @@ if ~isempty(analysis)
             % act==7 is the automation option. Make sure that inp is properly defined
             % To this end create an inp structure based on
             nA = 1; if numel(inp.analind)>1, nA = numel(inp.analind); end
-
+            % Differentiate according whether you work with real data or
+            % in simulation mode
             if ~isfield(inp,'simFlag') || ~inp.simFlag
-                for i=1:nA
-                    nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'setup_main', 0);
-                    NM.runtime.curanal = inp.analind(i);
-                    inp.analysis_id = NM.analysis{inp.analind(i)}.id;
-                    NM.analysis{inp.analind(i)} = MLOptimizerPrep(NM, NM.analysis{inp.analind(i)}, inp);
-                    nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'clear', 0);
-                end
+                tNM = NM;
             else
+                tNM = xNM;
                 inp.preprocmat          = [];
                 inp.gdmat               = [];
                 inp.gdanalmat           = [];
                 inp.GridAct             = true(ix,jx);
-                for i=1:nA
-                    nk_SetupGlobVars2(xNM.analysis{inp.analind(i)}.params, 'setup_main', 0);
-                    xNM.runtime.curanal = inp.analind(i);
-                    inp.analysis_id = xNM.analysis{inp.analind(i)}.id;
-                    xNM.analysis{inp.analind(i)} = MLOptimizerPrep(xNM, xNM.analysis{inp.analind(i)}, inp);
-                    nk_SetupGlobVars2(xNM.analysis{inp.analind(i)}.params, 'clear', 0);
-                end
             end
-
+            % Run through multiple analyses if needed    
+            for i=1:nA
+                nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'setup_main', 0);
+                tNM.runtime.curanal = inp.analind(i);
+                if nA>1, inp = nk_GetAnalModalInfo_config(tNM, inp); end
+                inp.analysis_id = tNM.analysis{inp.analind(i)}.id;
+                tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
+                nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'clear', 0);
+            end
+            % Copy back results to NM/xNM
+            if ~isfield(inp,'simFlag') || ~inp.simFlag
+                NM = tNM;
+            else
+                xNM = tNM;
+            end
+            clear tNM
             h = findobj('Tag','PrintCVBarsBin'); if ~isempty(h), delete(h); end
     end
 end
 
-if nargout == 3,
+if nargout == 3
     NMo = NM;
 else
     NMo = [];

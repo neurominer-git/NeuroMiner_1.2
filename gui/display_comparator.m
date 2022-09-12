@@ -6,7 +6,7 @@ function handles = display_comparator(handles, act)
 % multiple models, Wilcoxon's test for binary comparisons) or allow the
 % user to interactively plot (sorted) model performances
 % _________________________________________________________________________
-% (c) Nikolaos Koutsouleris, 03/2020
+% (c) Nikolaos Koutsouleris, 09/2022
 
 if ~exist('act','var') || isempty(act), act = 'stats'; end
 if ~isfield(handles,'PerfCompWin')
