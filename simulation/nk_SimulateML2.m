@@ -133,10 +133,8 @@ else
     nP = size(P,1);
 end
 
-
 R = zeros(nP,1);
 R95CI = zeros(2,nP);
-
 
 if nargin == 2
     ax = axes;
@@ -152,16 +150,16 @@ for i=1:nP
     if fromData
         sC = sprintf('C: %g/%g', i, size(P,1));
     else
-        if numel(IN.Nfeats)>1,       sF = sprintf('F%g', P(i,1)); else, sF= ''; end
-        if numel(IN.Nmarkers)>1,     sM = sprintf(' M:%g', P(i,2)); else, sM= ''; end
-        if numel(IN.Ncases)>1,       sC = sprintf(' C:%g', P(i,3)); else, sC= ''; end
-        if numel(IN.eventprob)>1,    sE = sprintf(' E:%g', P(i,4)); else, sE= ''; end
-        if numel(IN.AUCmax)>1,       sAU = sprintf(' AU:%g', P(i,5)); else, sAU= ''; end
-        if numel(IN.AUCmin)>1,       sAL = sprintf(' AL:%g', P(i,6)); else, sAL= ''; end
-        if numel(IN.Nbatches)>1,     sB = sprintf(' B:%g', P(i,7)); else, sB= ''; end
-        if numel(IN.BatchPerc)>1,    sBP = sprintf(' BP:%g', P(i,8)); else, sBP= ''; end
-        if numel(IN.NcasesMiss)>1,   sCm = sprintf(' Cm:%g', P(i,9)); else, sCm= ''; end
-        if numel(IN.NfeatsMiss)>1,   sFm = sprintf(' Fm:%g', P(i,10)); else, sFm= ''; end
+        if numel(IN.Nfeats)>1,       sF = sprintf('F: %g', P(i,1)); else, sF= ''; end
+        if numel(IN.Nmarkers)>1,     sM = sprintf(' M: %g', P(i,2)); else, sM= ''; end
+        if numel(IN.Ncases)>1,       sC = sprintf(' C: %g', P(i,3)); else, sC= ''; end
+        if numel(IN.eventprob)>1,    sE = sprintf(' E: %g', P(i,4)); else, sE= ''; end
+        if numel(IN.AUCmax)>1,       sAU = sprintf(' AU: %g', P(i,5)); else, sAU= ''; end
+        if numel(IN.AUCmin)>1,       sAL = sprintf(' AL: %g', P(i,6)); else, sAL= ''; end
+        if numel(IN.Nbatches)>1,     sB = sprintf(' B: %g', P(i,7)); else, sB= ''; end
+        if numel(IN.BatchPerc)>1,    sBP = sprintf(' BP: %g', P(i,8)); else, sBP= ''; end
+        if numel(IN.NcasesMiss)>1,   sCm = sprintf(' Cm: %g', P(i,9)); else, sCm= ''; end
+        if numel(IN.NfeatsMiss)>1,   sFm = sprintf(' Fm: %g', P(i,10)); else, sFm= ''; end
         Xl{i} = sprintf('%s%s%s%s%s%s%s%s%s%s',sF, sM, sC, sE, sAU, sAL, sB, sBP, sCm, sFm);
     end
 end
@@ -183,7 +181,7 @@ for i=1:nP % Loop through hyperparameter combinations
             origRAND, ...
             IN.verbose, IN.Modalities, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps, IN.SitesIdx, IN.condIdx); % varargin
     else
-        [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose);
+        [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose, [], [], [], [], IN.reps);
     end
     % Update the simulation plot
     plot(ax,1:i,R(1:i),'b-');
@@ -200,8 +198,6 @@ Res.Params = P;
 
 function [Rmean, R95CI] = compute_perf(nf, mr, nc, er, auc_max, auc_min, nb, bp, ncm, nfm, algorithm, RAND, varargin)
 global SVM fromData xNM xCV
-
-
 
 % Create marker matrix based on user's input
 % fill the rest of the matrix with uninformative features
@@ -224,7 +220,7 @@ if fromData
     elseif condIdx > 0
         condName = app.NM.covnames(condIdx);
     else 
-        condName = ''
+        condName = '';
     end
 
     origRAND = RAND;
@@ -280,7 +276,7 @@ if fromData
     cv1lcoIdx = 0;
     if isfield(origRAND,'CV1LCO')
         cv1lcoColIdx = zeros(1,size(Y,2));
-        Y = [Y, origRAND.CV1LCO.ind]
+        Y = [Y, origRAND.CV1LCO.ind];
         cv1lcoColIdx =[cv1lcoColIdx, 1];
         cv1lcoIdx = length(cv1lcoColIdx);
         YColNames = [YColNames, 'CV1LCO'];
@@ -353,15 +349,11 @@ if fromData
 
     % TODO: ADD DUMMY_CODED FEATURES AS CONSTRAINT
 
-
-
-
 %    
     Ytab = array2table(Y, 'VariableNames', YColNames);
     writetable(Ytab, origDataFile);
 
-    
-    condGroupVec = []
+    condGroupVec = [];
     
     % if certain condition 
     if condIdx >= 0 
@@ -459,8 +451,6 @@ if fromData
 
         nmr = size(M,2);
         
-
-      
         xNM.analysis{1,curanal}.params.TrainParam.FUSION.M = mods;
         xNM.label = L;
 %         origCV2LCO = [];
@@ -586,6 +576,7 @@ if fromData
         fprintf(' ==> mean simulation outcome at %1.3f in repetition: %g,',R(k),k);
     end
 else
+    reps = varargin{6};
     nmr 	= ceil(nf*mr);
     nc1     = ceil(nc*er);
     nc2     = nc-nc1;
@@ -645,7 +636,6 @@ else
     MODEFL = 'classification';
 
     % We want to repeat this ten times for producing more stable results
-    reps = 10;
     pCV = RAND.OuterPerm;
     nCV = RAND.OuterFold;
     R = zeros(reps,pCV*nCV);

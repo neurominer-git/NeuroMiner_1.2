@@ -1,4 +1,4 @@
-function [ Res, IN ] = nk_SimulateML2(IN, axes)
+function [ Res, IN ] = nk_SimulateML3(IN, axes)
 % =========================================================================
 % FORMAT function [ R, P ] = nk_SimulateML(IN)
 % =========================================================================
@@ -168,8 +168,6 @@ Res.Params = P;
 function [Rmean, R95CI] = compute_perf(nf, mr, nc, er, auc_max, auc_min, nb, bp, ncm, nfm, algorithm, RAND, varargin)
 global SVM fromData
 
-
-
 % Create marker matrix based on user's input
 % fill the rest of the matrix with uninformative features 
 % in the range of -1 to 1
@@ -213,8 +211,6 @@ else
     FM = [rand(nc1,nmr); -1*rand(nc2,nmr)];
     M = [ FM nk_PerfScaleObj(randn(nc,nf-nmr), IN)];
 end
- 
-
 
 % Define algorithm to use for the simulation
 LIBSVMTRAIN = @svmtrain312;
