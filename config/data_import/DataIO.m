@@ -946,7 +946,7 @@ switch act
             else
                 Pi=[];  
             end
-            [P, V, mess] = nk_FileSelector(t_n_subjects(i), datasource, hdrstr, IO.filt, Pi, mess);
+            [P, V, mess] = nk_FileSelector(t_n_subjects(i), datasource, hdrstr, IO.filt, Pi, [], mess);
             if ~isempty(P) && ~isempty(V)    
                 IO.P{i} = P; IO.V{i} = V; IO.PP = char(IO.PP,IO.P{i}); 
             elseif ~oocvflag 
