@@ -327,7 +327,7 @@ switch datasource
                 end
             end
             
-            if ~isempty(brainmask), [~,bmask_str] = fileparts(brainmask); else bmask_str = na_str; end
+            if ~isempty(brainmask), [~,bmask_str] = fileparts(brainmask); else, bmask_str = na_str; end
             if ~strcmp(bmask_str,na_str) && ~exist(brainmask,'file') 
                 bmask_act = 'Update';
                 mess = GenerateMessageEntry(mess, sprintf('ERROR: Space-defining defining image could not be found in %s!\nUpdate path to point to the correct image!',brainmask));
@@ -406,7 +406,6 @@ switch datasource
                 mn_files = sprintf('Select images files [ %s ]|', filestr);
                 if (isfield(IO,'PP') && ~isempty(IO.PP)) && isfield(IO,'L')
                     nP=size(IO.PP,1); nL=size(IO.L,1);
-                    %if IO.nangroup && IO.nan_subjects > 0; nL = nL + IO.nan_subjects; end
                     if nP~= nL, mess = GenerateMessageEntry(mess, sprintf('ERROR: No. of specified images (N=%g) does not match no. of cases (N=%g) in label array!',nP,nL)); end
                 end
             end
@@ -414,7 +413,7 @@ switch datasource
             mn_act = [ mn_act 'sel_img' ]; mn_str = [ mn_str mn_files ];
             
             if ~oocvflag && nangroup == 1
-                if isempty(Pnan),
+                if isempty(Pnan)
                     nanfilestr = na_str;
                 else
                     nanfilestr = sprintf('N=%g',nan_subjects);
@@ -855,8 +854,8 @@ switch act
             
         elseif IO.wfu_flag == 2
             [brainmask, Vm] = nk_FileSelector(1,IO.datasource,'Select space-defining image', IO.spacedef_filt);
-            if isempty(brainmask), return, end;
-            if isempty(Vm),
+            if isempty(brainmask), return, end
+            if isempty(Vm)
                 mess = GenerateMessageEntry(mess,'ERROR: I can read MGZ files only in Linux!');
             elseif ~isempty(brainmask)
                 if oocvflag
@@ -891,12 +890,12 @@ switch act
         if ~oocvflag
             if isfield(IO,'Pw') && ~isempty(IO.Pw), Pw=IO.Pw; useweight =1; else, Pw = []; useweight = 0; end 
             useweight = nk_input('Read-in images for weighting / subspace extraction',0,'yes|no',[1,0],useweight);
-            if useweight,
+            if useweight
                 [Pw, Vw, mess] = nk_FileSelector(Inf, datasource, 'Select images for weighting / subspace extraction', IO.filt, Pw, mess);
             else
                 Pw = []; Vw = [];
             end
-            if ~isempty(Pw) && ~isempty(Vw), 
+            if ~isempty(Pw) && ~isempty(Vw)
                 IO.Pw = Pw; IO.Vw = Vw; 
             else
                 if isfield(IO,'Pw'), IO = rmfield(IO,'Pw'); end
@@ -974,10 +973,10 @@ switch act
         
     case 'sel_nanimg'
         hdrstr = sprintf('Select %s for unlabeled cases', IO.datasource );
-        if nan_subjects > 0; ns = nan_subjects; else ns = Inf; end
+        if nan_subjects > 0; ns = nan_subjects; else, ns = Inf; end
         [IO.Pnan, IO.Vnan, mess] = nk_FileSelector(ns, datasource, hdrstr, IO.filt, mess);
         IO.nan_subjects = size(IO.Pnan,1);
-        if ~isempty(IO.Pnan), 
+        if ~isempty(IO.Pnan) 
             IO.PP = char(IO.PP,IO.Pnan);
             [IO,mess] = RetrieveImageInfo(IO, datasource,mess);
             IO.n_subjects_all= size(char(IO.PP),1);
@@ -1126,7 +1125,7 @@ switch act
             img_ind = nk_input('Select images for display',0,'i',[1 size(PP,1)]);
             if isfield(IO,'Pw') && ~isempty(IO.Pw) 
                 Pw=[]; for n=1:size(IO.Pw); if exist(deblank(IO.Pw(n,:)),'file'), Pw = char(Pw,IO.Pw(n,:)); end; end
-                if ~isempty(Pw), 
+                if ~isempty(Pw) 
                     Pw(1,:)=[]; PPsel = char(IO.brainmask, Pw, PP(img_ind,:)); 
                 else
                     PPsel = char(IO.brainmask,PP(img_ind,:));
@@ -1230,7 +1229,7 @@ switch act
             end
             flg = false;
             
-            if ~isempty(mess),
+            if ~isempty(mess)
                 cnt = numel(mess)+1;
                 for i=1:numel(mess)
                    if mess(i).flag == 1; flg = true; end

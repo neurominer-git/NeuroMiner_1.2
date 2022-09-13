@@ -90,7 +90,7 @@ if isfield(IO,'ID')
     ind = zeros(numel(IO.ID),1); flg = false; 
     for i=1:numel(IO.ID)
         ii = find(strcmp(IO.s_ID,IO.ID{i}));
-        if ~any(ii),
+        if ~any(ii)
             mess = GenerateMessageEntry(mess, sprintf('Error during import of new matrix-based modality data. Could not find case ''%s'' in the IDs of the new modality!',IO.ID{i}));
             flg = true;
             continue

@@ -205,6 +205,9 @@ else
                 inp.MLI.nperms = min(nperms);
                 warning('\nNo of permutations unequal across modalities. Using the minimum number (#%g) of permutations.', inp.MLI.nperms )
             end
+        elseif min(nperms) < inp.MLI.nperms
+             inp.MLI.nperms = min(nperms);
+             warning('\nNumber of permutations adjusted to %g', inp.MLI.nperms )
         end
     end 
     fprintf('\nSaving to %s', permfile);
