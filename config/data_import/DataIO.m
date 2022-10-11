@@ -693,8 +693,9 @@ if ~isempty(mess)
     fprintf('\n');
     for i=1:numel(mess)
         if isempty(mess(i).text), continue; end
-        fprintf('\n');mess(i).text = regexprep(mess(i).text,'\','/');
-        cprintf(mess(i).format,mess(i).text); 
+        fprintf('\n');
+        mess(i).text = regexprep(mess(i).text,'\','/');
+        fprintf(mess(i).text); 
     end
     fprintf('\n')
     mess = [];

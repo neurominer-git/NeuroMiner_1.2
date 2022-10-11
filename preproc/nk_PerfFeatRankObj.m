@@ -129,13 +129,14 @@ switch IN.algostr
         IN.W = RGS(Y, L, IN.RGS.extra_param)'; 
 
     case {'libsvm','liblin'}
-        if ~isempty(opt) && ~isempty(Params_desc); 
-            IN.SVM.SlackParam = nk_ReturnParam('Slack',Params_desc, opt); 
-            IN.SVM.EpsParam = nk_ReturnParam('Epsilon',Params_desc, opt); 
-            IN.SVM.NuParam = nk_ReturnParam('Nu',Params_desc, opt); 
+        if ~isempty(opt) && ~isempty(Params_desc) 
+            IN.SVM.SlackParam = nk_ReturnParam('SlackRank',Params_desc, opt); 
+            IN.SVM.EpsParam = nk_ReturnParam('EpsilonRank',Params_desc, opt); 
+            IN.SVM.NuParam = nk_ReturnParam('NuRank',Params_desc, opt); 
+            IN.SVM.Tolerance = nk_ReturnParam('TolRank',Params_desc, opt); 
         end
         if strcmp(IN.SVM.modeflag,'regression'), L = nk_ScaleData(L,0,1); end
-        if isfield(IN.SVM,'evalperf'), evalperf = IN.SVM.evalperf; else evalperf = 1; end
+        if isfield(IN.SVM,'evalperf'), evalperf = IN.SVM.evalperf; else, evalperf = 1; end
         IN.W = abs(nk_SVMFeatRank(Y, L, IN.SVM, evalperf))'; 
 
     case 'relief'

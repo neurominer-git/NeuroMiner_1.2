@@ -619,7 +619,7 @@ global NMinfo
 PJump    = 1;		%-Jumping of pointer to question?
 TTips    = 1;		%-Use ToolTipStrings? (which can be annoying!)
 ConCrash = 1;		%-Add "crash out" option to 'Interactive'fig.ContextMenu
-CmdLine		=true;
+CmdLine  =true;
 
 %-Condition arguments
 %=======================================================================

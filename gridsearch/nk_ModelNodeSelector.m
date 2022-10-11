@@ -16,7 +16,7 @@ for curlabel=1:nl
 
     % Optionally, apply penalization term on the grid search to avoid
     % overfitting and promote sparse and diverse models
-    if isfield(GRD,'OptRegul') && GRD.OptRegul.flag && isfield(GRD.OptRegul,'type') 
+    if isfield(GRD,'OptRegul') && GRD.OptRegul.flag == 1 && isfield(GRD.OptRegul,'type') 
         switch GRD.OptRegul.type
             case 1 % Model complexity is regularization constraint
                 Regul = nk_ComputeRegulFunction(GD.C(:,:,curlabel), 0, GRD.OptRegul.RegulTypeComplexity);
@@ -179,7 +179,7 @@ for curlabel=1:nl
            % Optionally, apply penalization term on the grid search to avoid
             % overfitting and promote sparse and diverse models
 
-           if isfield(GRD,'OptRegul') && GRD.OptRegul.flag && isfield(GRD.OptRegul,'type')
+           if isfield(GRD,'OptRegul') && GRD.OptRegul.flag ==1 && isfield(GRD.OptRegul,'type')
 
                switch GRD.OptRegul.type
                    case 1

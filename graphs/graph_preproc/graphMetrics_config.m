@@ -15,7 +15,7 @@ if ~defaultsfl
     menuact = 1;
     
     nk_PrintLogo
-    mestr = 'Graph metrics'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+    mestr = 'Graph metrics'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
     act = nk_input(mestr,0,'mq', menustr, menuact);
     
     switch act

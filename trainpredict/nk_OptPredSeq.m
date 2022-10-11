@@ -94,7 +94,7 @@ if ~exist('IN','var') || isempty(IN)
             jC(ind_jC) = true;
         end
         
-        if VERBOSE, fprintf('\n\n');cprintf('black*','Working on model sequence %g/%g:', j, nC); cprintf('blue','\t%s ', strjoin(Ddesc(jC),', ')); end
+        if VERBOSE, fprintf('\n\n');fprintf('Working on model sequence %g/%g:', j, nC); fprintf('\t%s ', strjoin(Ddesc(jC),', ')); end
 
         % Get model outputs for given sequence in C
         jD = D(:,jC);       % Get decision scores for current sequence
@@ -170,7 +170,7 @@ if ~exist('IN','var') || isempty(IN)
         if j==1, optCrit = tIN.OPT; IN = tIN; end
        
         if tIN.(char(OPTCRIT))(end) > optCrit(end)
-            if VERBOSE, fprintf('\n');cprintf('blue*','+++ New optimal sequence: %s ', strjoin(Ddesc(jC),', ')); end
+            if VERBOSE, fprintf('\n'); fprintf('+++ New optimal sequence: %s ', strjoin(Ddesc(jC),', ')); end
             IN = tIN; 
             cnt = cnt +1;
             optCrit(cnt) = IN.OPT(end);

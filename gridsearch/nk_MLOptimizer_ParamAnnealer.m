@@ -161,4 +161,4 @@ while ( T > end_T )
     tElapsed = toc; tElapsedSum = tElapsedSum+tElapsed; fprintf('\tCompleted in %1.2f sec.',tElapsed)
     i=i+1;
 end
-fprintf('\n');cprintf('*black','CV2 [%g, %g]: OPTIMIZATION COMPLETED IN %1.2f SEC', f, d, tElapsedSum)
+fprintf('\n');fprintf('CV2 [%g, %g]: OPTIMIZATION COMPLETED IN %1.2f SEC', f, d, tElapsedSum)

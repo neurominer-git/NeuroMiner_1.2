@@ -73,11 +73,11 @@ switch act
                 end
 
             end
-            if ~fndfl, 
-                if verbose == 2, cprintf('red*','NO MATCH FOUND !!!'); end
+            if ~fndfl
+                if verbose == 2, fprintf('NO MATCH FOUND !!!'); end
                 cntnf = cntnf+1; 
                 nfid{cntnf} = dstr;    
-                if verbose == 2 && strcmp(act,'intersectnan'), cprintf('green', ' filled with NaN!'), end
+                if verbose == 2 && strcmp(act,'intersectnan'), fprintf(' filled with NaN!'), end
             end
             nanDid = [nanDid; fndfl];
         end
@@ -183,12 +183,12 @@ switch act
         cases_m = Did(mDid);    
         
 end
-if cntnf>0,
-    cprintf('red','\n==========================================================')
-    fprintf('\n'); cprintf('red*','NO MATCHES FOUND FOR %g SUBJECTS!!! ', cntnf);
+if cntnf>0
+    fprintf('\n==========================================================')
+    fprintf('\n'); fprintf('NO MATCHES FOUND FOR %g SUBJECTS!!! ', cntnf);
     for i = 1:cntnf
-       cprintf('red','\n\t%s',nfid{i}); 
+       fprintf('\n\t%s',nfid{i}); 
     end
-    cprintf('red','\n==========================================================\n')
+    fprintf('\n==========================================================\n')
 end
 Sind = mSid; Dind = mDid;

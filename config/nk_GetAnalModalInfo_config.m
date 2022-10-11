@@ -3,7 +3,7 @@ global FUSION STACKING MODELDIR
 
 if ~isfield(NM,'analysis'), inp=[]; return; end
 if ~isfield(inp,'analind') || isempty(inp.analind)
-    t_act = 1; while t_act>0, [t_act, inp.analind] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> SELECT ANALYSIS', 1, [], 0, 0); end;
+    t_act = 1; while t_act>0, [t_act, inp.analind] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> SELECT ANALYSIS', 1, [], 0, 0); end
 end
 if isfield(NM,'runtime')
     analysis = NM.analysis{NM.runtime.curanal};

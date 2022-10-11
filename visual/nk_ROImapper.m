@@ -360,7 +360,7 @@ if nargout > 2 && isfield(options,'data') && ( numel(options.data) == nP || nume
 
             % Set un-selected ROIs in slice to 0
             for n = 1:nROI
-                if ~any(vROI(n).ref.sel), 
+                if ~any(vROI(n).ref.sel) 
                     ROIimg(ROIimg == vROI(n).ref.id) = 0; 
                 else
                     icnt=icnt+1;

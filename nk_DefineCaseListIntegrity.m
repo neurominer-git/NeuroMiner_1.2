@@ -8,8 +8,8 @@ if ~isempty(cases)
     fprintf('\n*** Case list integrity check ***')
     if ~isequal(cases,tcases)
         for i=1:nT
-            if ~isequal(cases{i}, tcases{i}), a = '*'; else a = ''; end
-            fprintf('\n'); cprintf('red','old: %s, new: %s\t%s ', cases{i}, tcases{i},a)
+            if ~isequal(cases{i}, tcases{i}), a = '*'; else, a = ''; end
+            fprintf('\n'); fprintf('old: %s, new: %s\t%s ', cases{i}, tcases{i},a)
         end
         fprintf('\n=====================================================================\n');
         warning('Existing case identifiers are not identical to current ones.')
@@ -49,6 +49,6 @@ if ~isempty(cases)
                 passed = 0; 
         end
     else
-        cprintf('green','\npassed.')
+        fprintf('\npassed.')
     end
 end

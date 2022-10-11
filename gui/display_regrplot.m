@@ -29,6 +29,7 @@ if ~oocvflag
     ind     = handles.Regr.index_predictions;
     regr    = handles.Regr;
     label   = handles.Regr.labels;
+    subjects = handles.subjects;
     regrplotcl = 'b';
     cla
     hold on
@@ -37,6 +38,7 @@ else
     hold on
     regrplotstr = '_oocv';
     lgsufstr = 'OOCV';
+    subjects = handles.OOCV(oocvind).data.tbl.rownames;
     pred    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.MeanCV2PredictedValues;
     errbar  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.StdCV2PredictedValues;
     errbarCI1  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,1);
@@ -86,10 +88,14 @@ pss = cell(1,numel(findnan)); psslen=0;
 for i=1:numel(findnan)
       pss{i} = sprintf(['Subject ID [%g]: %s' ...
             '\nObserved Target: %g' ...
-            '\nPredicted Target: %g\n'], i, handles.subjects{findnan(i)}, label(i), pred(i));
+            '\nPredicted Target: %g\n'], i, subjects{findnan(i)}, label(i), pred(i));
      if size(pss{i},2)> psslen, psslen=size(pss{i},2); pssi = i; end
 end
+try
 hText = uicontrol('Style','text','String', pss{pssi},'FontSize',11, 'Units','normalized', 'Parent', gcf,'Visible','off'); 
+catch
+    disp(pssi)
+end
 figdata.x = lxL;
 figdata.y = pred;
 figdata.patterntext = pss;
@@ -116,12 +122,12 @@ switch GraphType
         lgstr{1} = ['$\mathbf{Median^{' lgsufstr '} \pm 95\%CI}$'];
         % Mean predictions with [95%] confidence interval
         L = pred - errbarCI1; U = errbarCI2 - pred;
-        handles.(['he' regplotstr]) = errorbar(lxL(ind),pred(ind), L(ind), U(ind),'ko','LineWidth',0.5,'MarkerSize',9);
+        handles.(['he' regrplotstr]) = errorbar(lxL(ind),pred(ind), L(ind), U(ind),'ko','LineWidth',0.5,'MarkerSize',9);
     
     case 3
         lgstr{1} = ['$\mathbf{Median^{' lgsufstr '} \pm SD}$'];
         % Mean predictions with standard deviation
-        handles.(['he' regplotstr]) = errorbar(lxL(ind),pred(ind),errbar(ind),'ko','LineWidth',0.5,'MarkerSize',9);
+        handles.(['he' regrplotstr]) = errorbar(lxL(ind),pred(ind),errbar(ind),'ko','LineWidth',0.5,'MarkerSize',9);
 end
 
 handles.(['regrplot' regrplotstr]) = scatter(lxL(ind),pred(ind),'Marker','o','MarkerFaceColor',regrplotcl,'MarkerEdgeColor',rgb('LightBlue'),'MarkerFaceAlpha', alphax, 'MarkerEdgeAlpha',0.2,'SizeData',80);
@@ -207,5 +213,5 @@ handles.curRegr = regr;
 if binarizeflag
     % Binarize at median
     m = nm_nanmedian(label); set(handles.txtBinarize,'String',m);
-    binarize_regr(handles, label, pred);
+    binarize_regr(handles);
 end

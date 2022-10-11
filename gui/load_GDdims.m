@@ -250,7 +250,7 @@ if isfield(GDdims,'BinClass') || isfield(GDdims,'MultiClass')
         remind = find(  strcmp('FPRvec',handles.MultiClass.tbl_cont.rownames) | ...
                         strcmp('TPRvec',handles.MultiClass.tbl_cont.rownames) | ...
                         strcmp('X',handles.MultiClass.tbl_cont.rownames));
-        for j = 1:handles.ngroups, 
+        for j = 1:handles.ngroups
             handles.MultiClass.tbl_cont.colnames{j+1} = sprintf('%s vs REST',handles.NM.groupnames{j});
             arr = struct2cell( handles.MultiClass.class{j});
             arr(remind)=[];

@@ -30,7 +30,7 @@ end
 [errfl, n_dims, vox] = check_image_dimensions(V, n_dims, vox);
 switch errfl
     case 0
-        fprintf('\n');cprintf('green','Image checks passed! All images have the same size and voxel size')
+        fprintf('\n');fprintf('Image checks passed! All images have the same size and voxel size')
     case 1
         error('Incompatible image dimensions')
     case 2

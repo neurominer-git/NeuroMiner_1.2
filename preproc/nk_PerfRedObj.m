@@ -69,7 +69,7 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
     if ~isempty(IN.DR.dims)
         if VERBOSE, fprintf(' %g', IN.DR.dims); end
         if sum(IN.indNonRem) < IN.DR.dims || size(Y,2) < IN.DR.dims,
-           cprintf('err','Number of nonzero features (=%g) in original space less than number of features (=%g) in projected space!', ...
+           fprintf('Number of nonzero features (=%g) in original space less than number of features (=%g) in projected space!', ...
                sum(IN.indNonRem),IN.DR.dims);
            IN.DR.dims = sum(IN.indNonRem)-1;
         end

@@ -12,19 +12,11 @@ if isfield(PREPROC,'SPATIAL') && ~isempty(PREPROC.SPATIAL)
     
     %% Display current preprocessing sequence
     fprintf('\n\n')
-    cprintf('*black','SPATIAL OPERATIONS PIPELINE \n')
-    cprintf('*black','=========================== ')
+    fprintf('SPATIAL OPERATIONS PIPELINE \n')
+    fprintf('=========================== ')
     for i=1:numel(d.PREPROC.spatialfiltering)
         stepstr = sprintf('Step %g: %s',i,d.PREPROC.spatialfiltering{i});
-        if strcmp(PREPROC.SPATIAL{i}.cmd,'extfeat')
-            cprintf([1 0.5 0],'\n%s',stepstr)
-        else
-            if i==stepind, 
-                fprintf('\n'); cprintf('*black','=> %s',stepstr), 
-            else
-                fprintf('\n%s', stepstr);
-            end
-        end
+        fprintf('\n%s', stepstr);
     end
     
     cmdstr = sprintf('Add %s|Remove %s', ds, ds);

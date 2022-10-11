@@ -236,18 +236,12 @@ try
     fprintf('\nCurrent working directory: %s',pwd)
     if ~s.setup_ok && s.import_finished
         fprintf('\n\n')
-        cprintf('*red','Parameter setup not complete! \n')
+        fprintf('Parameter setup not complete! \n')
         if iscell(paramstr), paramstr = char(paramstr); end
         for i=1:size(paramstr,1) 
-            cprintf('red','%s \n',paramstr(i,:)); 
+            fprintf('%s \n',paramstr(i,:)); 
         end
     end
-
-% 
-%     if ~s.analyses_completed && s.import_finished
-%         fprintf('\n\n')
-%         cprintf('*red','Important: To enter external application mode, all initialized analyses need to be complete & trained.\nIncomplete analyses can otherwise be deleted in the ''initialize &  manage analysis'' menu')
-%     end
 
     if numel(NMfields) == 1 && strcmp(NMfields{1},'defs')
         mn_str = [ mn_str ...
@@ -408,8 +402,6 @@ try
                 % use information from your sample TO DO
                 %simulationRes = simulate_sampleSize(NM);
             else
-                
-                
                 simulationRes = simSample_App2(NM);
                 %simulationRes = simulate_sampleSize();
             end

@@ -120,11 +120,11 @@ if isfield(inp,'oocvind') && ~isempty(inp.oocvind)
     end
     smiss = sum(oocvconducted==0); missf = find(oocvconducted==0);
     if smiss>0
-       fprintf('\n');cprintf('red*','=================================================================================================== ')
-       fprintf('\n'); cprintf('red*','%g input-layer model(s) have not been applied to the test data! The stacked model needs all of them. ', smiss);
-       fprintf('\n'); cprintf('red*','Following models need to be applied to the independent data to generate features for the stacker: ')
+       fprintf('\n'); fprintf('=================================================================================================== ')
+       fprintf('\n'); fprintf('%g input-layer model(s) have not been applied to the test data! The stacked model needs all of them. ', smiss);
+       fprintf('\n'); fprintf('Following models need to be applied to the independent data to generate features for the stacker: ')
        for amx = 1:smiss
-           fprintf('\n'); cprintf('red*','==> Analysis ID: %s ', inp.analyses{missf(amx)}.id);
+           fprintf('\n'); fprintf('==> Analysis ID: %s ', inp.analyses{missf(amx)}.id);
        end
        error('Aborting stacker prepocessing module due to missing input features')
     else
@@ -149,7 +149,7 @@ for am = 1:nA
     for jm=1:nM
         if nM>1, bgstr = 'bagged '; else, bgstr=''; end
          if ~exist(inp.analyses{am}.GDdims{jm}.RootPath,'dir')
-             cprintf('red*','\nRoot path %s of analysis %g not found.', inp.analyses{am}.GDdims{jm}.RootPath, am);
+             fprintf('\nRoot path %s of analysis %g not found.', inp.analyses{am}.GDdims{jm}.RootPath, am);
              GDD(cnt).RootPath = cellstr(spm_select(nM,'dir',sprintf('Select the root path(s) [n=%g] of %sanalysis %g [%s]:', ...
                  nM, bgstr, am, inp.analyses{am}.desc)));
          else
@@ -169,7 +169,7 @@ for am = 1:nA
              error('CVdatamat is missing for:\tAnalysis %g (%s),\n\tModality %g,\n\tCV2 [%g, %g].\nMake sure you have computed it before running the stacked analysis.', ...
                  am, inp.analyses{am}.id, jm, inp.f, inp.d);
          end
-         cprintf('blue*','\n%s: ', analid(am,:)); [~,nam]= fileparts(CVpath); fprintf('Loading %s', nam); load(CVpath,'GD'); 
+         fprintf('\n%s: ', analid(am,:)); [~,nam]= fileparts(CVpath); fprintf('Loading %s', nam); load(CVpath,'GD'); 
          GDD(cnt).GD = GD; clear GD;
          
          if oocvflag

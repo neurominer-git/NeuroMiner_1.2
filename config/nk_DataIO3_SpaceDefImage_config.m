@@ -5,7 +5,7 @@ if ~exist('datatype','var') || isempty(datatype), datatype = 'nifti'; end
 switch datatype
     case {'nifti','spm'}
         % Read-in space-defining image and check number of unique values
-        if ~exist(Vm.fname,'file'), 
+        if ~exist(Vm.fname,'file')
             if isempty(fileparts(Vm.fname)), Vm.fname = fullfile(pwd,Vm.fname); end
             if ~exist(Vm.fname,'file'), Thresh = struct('nVml',0,'Vml',0,'Lm',[],'threshop','gt'); return; end
         end
@@ -13,7 +13,7 @@ switch datatype
         Vmx = spm_read_vols(Vm);
     case 'surf'
         % Read-in space-defining image and check number of unique values
-        if isfield(Vm,'fspec') && exist(Vm.fspec,'file'), 
+        if isfield(Vm,'fspec') && exist(Vm.fspec,'file')
             if isempty(fileparts(Vm.fspec)), Vm.fspec = fullfile(pwd,Vm.fspec); end
             if ~exist(Vm.fspec,'file'), Thresh = struct('nVml',0,'Vml',0,'Lm',[],'threshop','gt'); return; end
             [~,Vmx] = SurfaceReader(Vm.fspec);
@@ -24,10 +24,10 @@ end
 Vml = unique(Vmx(:)); 
 % Ingore 0 label, which should be the background data
 if isempty(Vml)
-    cprintf('red','\nThis is header-only image. setting threshold to zero.')
+    fprintf('\nThis is header-only image. setting threshold to zero.')
     Thresh = struct('nVml',0,'Vml',0,'Lm',[],'threshop','gt');
-elseif ~Vml(1), 
-    cprintf('red','\nFound a zero label in the space-defining image. Ignoring it.')
+elseif ~Vml(1) 
+    fprintf('\nFound a zero label in the space-defining image. Ignoring it.')
     Vml(1)=[]; 
 end
 nVml = numel(Vml);

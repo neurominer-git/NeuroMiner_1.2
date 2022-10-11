@@ -5,6 +5,6 @@ function I = nk_SignBasedConsistency(E)
 % consistency vector I by the number of nonfinite values in the ensemble matrix.
 % I = 2 * abs( nanmean(E>0,2) - 0.5) .* (1 - sum(isnan(E),2) / size( E, 2));
 Rnan = 1-sum(isnan(E),2) / size( E, 2 );
-Ip = nanmean(E>0,2).*Rnan;
-In = nanmean(E<0,2).*Rnan;
+Ip = nm_nanmean(E>0,2).*Rnan;
+In = nm_nanmean(E<0,2).*Rnan;
 I = abs(Ip-In);

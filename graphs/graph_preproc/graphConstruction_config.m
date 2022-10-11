@@ -70,7 +70,7 @@ if ~defaultsfl
     %[menustr, menuact] = nk_CheckCalibAvailMenu_config(menustr, menuact, CALIBUSE);
 
     nk_PrintLogo
-    mestr = 'Graph construction'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr);
+    mestr = 'Graph construction'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr);
     act = nk_input(mestr,0,'mq', menustr, menuact);
 
     switch act
@@ -189,7 +189,7 @@ if ~defaultsfl
 if isfield(GRAPHCONSTRUCTION,'method'), def = find(strcmp(menuact,GRAPHCONSTRUCTION.method)); else, def = 1; end %what does this line do?
 
 nk_PrintLogo
-mestr = 'Graph construction methods'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr); 
+mestr = 'Graph construction methods'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr); 
 if isempty(def), def=1; end
 
 act = nk_input(mestr,0, 'mq', menustr, menuact, def);

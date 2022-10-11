@@ -38,12 +38,12 @@ switch h_list{h_val}
             
             if strcmp(handles.selCVoocv.Enable,'on') && handles.selCVoocv.Value>1
                 handles.oocvview = true;
-                handles  = display_classplot_oocv(h_class, handles);
+                handles = display_classplot_oocv(h_class, handles);
                 handles.oocvind = handles.selCVoocv.Value - 1;
                 load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
             else
                 handles.oocvview = false;
-                handles  = display_classplot(h_class, handles);
+                handles = display_classplot(h_class, handles);
                 load_selCase(handles,handles.BinClass{h_class}.cases)
             end
         end

@@ -1,15 +1,15 @@
-function handles = binarize_regr(handles, label, pred)
+function handles = binarize_regr(handles)
 
 m = str2double(get(handles.txtBinarize,'String')); 
 if isempty(m)
     errordlg('Enter numeric threshold')    
-elseif m <= min(label) || m >= max(label)
-    errordlg(sprintf('Threshold out of target range [%g %g]',min(label),max(label)));
+elseif m <= min(handles.labels) || m >= max(handles.labels)
+    errordlg(sprintf('Threshold out of target range [%g %g]',min(handles.labels),max(handles.labels)));
 else
-    handles.curRegr.b_label = label; 
-    handles.curRegr.b_label(label>=m) = 1; 
-    handles.curRegr.b_label(label<m) = -1;
-    handles.curRegr.b_pred = pred; 
+    handles.curRegr.b_label = handles.labels; 
+    handles.curRegr.b_label(handles.labels>=m) = 1; 
+    handles.curRegr.b_label(handles.labels<m) = -1;
+    handles.curRegr.b_pred = handles.Regr.mean_predictions; 
     handles.curRegr.b_pred = handles.curRegr.b_pred - m;
     [handles.curRegr.X, ...
      handles.curRegr.Y, ...

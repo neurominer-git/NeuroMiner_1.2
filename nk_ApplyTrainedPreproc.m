@@ -44,6 +44,7 @@ if smoothonly
     inp = nk_PerfInitSpatial(analysis, inp, paramfl);
     inp.smoothonly = false;
     inp.issmoothed = true;
+    Param = [];
 else
     Yocv = []; 
     issmoothed = false; if isfield(inp,'issmoothed') && inp.issmoothed, issmoothed = true; end

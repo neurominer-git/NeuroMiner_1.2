@@ -7,8 +7,8 @@ nP = numel(Param.PFE.Perc);
 
 funcomp = {@max, @min};
 
-if check_fsizes(IN);
-    cprintf('err','\nFeature masks have unequal dimensionalities due to feature preprocessing setup. Skipping Cross-CV1 feature operations.')
+if check_fsizes(IN)
+    fprintf('\nFeature masks have unequal dimensionalities due to feature preprocessing setup. Skipping Cross-CV1 feature operations.')
     return
 end
 

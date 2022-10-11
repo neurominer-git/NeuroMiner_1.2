@@ -155,10 +155,10 @@ elseif isnan(param) && ~optfound
     fprintf('\n');warning('Greedy backward search did not return any feature mask for given parameter setting. Return original feature space.')
 else
     optfound = 1;
-    if r.KneePoint,
+    if r.KneePoint
         kneepoint = knee_pt(Opt.Param,[],true);
         if isnan(kneepoint)
-            cprintf('err','\nNot enough data points to compute kneepoint. Selecting final feature mask.');
+            fprintf('\nNot enough data points to compute kneepoint. Selecting final feature mask.');
         else
             fprintf('\nSelected kneepoint of optimization curve at wrapper cycle #%g => %s = %g', kneepoint, ActStr, Opt.Param(kneepoint));
         end
@@ -166,7 +166,7 @@ else
         try
             optind = r.FullInd(Opt.S{kneepoint});
         catch
-            cprintf('err','\nNo optimum found. Selecting original feature mask.');
+            fprintf('\nNo optimum found. Selecting original feature mask.');
             optind = r.FullInd;
         end
     else

@@ -45,10 +45,10 @@ for n = 1: numel(oocv)
                 % Cases are always the same in the OOCV setting
                 handles.OOCV(cnt).data.tbl(j).rownames = handles.OOCVinfo.Analyses{handles.curranal}.cases{cnt};    
                 if labels_known
-                    handles.OOCV(cnt).data.tbl(j).colnames = {'Cases', 'EXP_LABEL', 'PRED_LABEL', 'Errors', 'Mean_Score', 'Std_Score', 'Ens_Prob1', 'Ens_Prob-1'};
+                    handles.OOCV(cnt).data.tbl(j).colnames = {'Cases', 'EXP_LABEL', 'PRED_LABEL', 'Errors', 'Mean_Score', 'Std_Score', 'Ens_Prob1', 'Ens_Prob-1', 'PercRank_Score'};
                     handles.OOCV(cnt).data.tbl(j).array    = Cont.BinLabels{j}; Errors =  Cont.BinProbPredictions{j} ~=  Cont.BinLabels{j};
                 else
-                    handles.OOCV(cnt).data.tbl(j).colnames = {'Cases', 'PRED_LABEL', 'Mean_Score', 'Std_Score', 'Ens_Prob1', 'Ens_Prob-1'};
+                    handles.OOCV(cnt).data.tbl(j).colnames = {'Cases', 'PRED_LABEL', 'Mean_Score', 'Std_Score', 'Ens_Prob1', 'Ens_Prob-1', 'PercRank_Score'};
                     handles.OOCV(cnt).data.tbl(j).array    = []; Errors = [];
                 end
                 
@@ -57,8 +57,8 @@ for n = 1: numel(oocv)
                                                          Errors ...
                                                          Cont.MeanCV2PredictedValues{j} ...
                                                          Cont.StdCV2PredictedValues{j} ...
-                                                         Cont.BinMajVoteProbabilities{j}] ;
-                
+                                                         Cont.BinMajVoteProbabilities{j} ...
+                                                         ranktransform(handles.BinClass{j}.mean_predictions, Cont.MeanCV2PredictedValues{j})] ; 
             end
             if multi_res
                 handles.OOCV(cnt).data.tbl_mult = struct('rownames',[],'colnames',[],'array',[]);

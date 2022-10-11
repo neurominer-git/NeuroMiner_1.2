@@ -17,8 +17,9 @@ if OUT.detrend.flag
     PermNum = numel(PermVec);
     FoldNum = numel(FoldVec);
     ClassNum = numel(ClassVec);
-    thresh = zeros(PermNum * FoldNum,ClassNum); aucs=thresh;
-    beta = thresh; p=thresh;
+    thresh = zeros(PermNum * FoldNum, ClassNum); 
+    aucs=thresh;
+    beta = zeros(PermNum * FoldNum, 2); p=beta;
     ll=1;
     for ii=1:PermNum % Loop through CV1 permutations
 
@@ -44,7 +45,7 @@ if OUT.detrend.flag
 
                 switch MODEFL
                     case 'regression'
-                        [~, beta(ll), p(ll)] = nk_DetrendPredictions2([], [], P, L);
+                        [~, beta(ll,:), p(ll,:)] = nk_DetrendPredictions2([], [], P, L);
                     case 'classification'
                         L(L==-1)=0; X = [D L]; I=sum(isnan(X),2);
                         try

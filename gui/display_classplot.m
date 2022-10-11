@@ -29,7 +29,7 @@ end
 
 %% Display classification plot
 % Define X axis data
-if ~isfield(handles.BinClass{h},'Xaxis') || isempty(handles.BinClass{h}.Xaxis), 
+if ~isfield(handles.BinClass{h},'Xaxis') || isempty(handles.BinClass{h}.Xaxis)
     lxL = 1:length(handles.BinClass{h}.labelh);
     lxN = [SrtStr 'Subject No.'];
     AltAx = false;

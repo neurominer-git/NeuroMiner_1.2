@@ -57,7 +57,7 @@ switch act
                 end
             end
         catch
-            cprintf('red','Requested visualization parameter not found.')
+            fprintf('Requested visualization parameter not found.')
             T = printvis_ranked_cross_binary(analysis, [], [], [], [], 'info');
             return
         end

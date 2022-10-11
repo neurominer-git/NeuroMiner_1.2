@@ -73,7 +73,7 @@ if AS.analcompleteflag >0 && AS.oocvappflag
                             OOCVinfo.Analyses{i}.defs{j}    = NM.OOCV{OOCVinfo.Analyses{i}.OOCVvec(j)}.defs;
                             OOCVinfo.Analyses{i}.descriptor{j} = sprintf('%s (<-%s): %g cases%s',  OOCVinfo.Analyses{i}.desc{j}, OOCVinfo.Analyses{i}.date{j}, OOCVinfo.Analyses{i}.n_subjects_all(j), lblstr); 
                         catch
-                            cprintf('red','\nOOCV data container %g does not exist',j);
+                            fprintf('\nOOCV data container %g does not exist',j);
                         end
                     end
                  else

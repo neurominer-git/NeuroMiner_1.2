@@ -22,10 +22,10 @@ sens = TP / ( TP + FN );
 spec = TN / ( TN + FP );
 
 if ~any(expected>0)
-    if VERBOSE; fprintf('\n');cprintf('red','No positive labels: Specificity will be used instead of Sensitivity * Specificity'); end
+    if VERBOSE; fprintf('\n');fprintf('No positive labels: Specificity will be used instead of Sensitivity * Specificity'); end
     param = spec*100;
 elseif ~any(expected<0)
-    if VERBOSE; fprintf('\n');cprintf('red','No negative labels: Sensitivity will be used instead of Sensitivity * Specificity'); end
+    if VERBOSE; fprintf('\n');fprintf('No negative labels: Sensitivity will be used instead of Sensitivity * Specificity'); end
     param = sens*100;
 else
     param = spec * sens * 100;

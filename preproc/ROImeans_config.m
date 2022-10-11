@@ -1,4 +1,4 @@
-function [ROIMEANS, act ] = ROIMEANS_config(ROIMEANS, brainmask, parentstr, defaultsfl)
+function [ROIMEANS, act ] = ROImeans_config(ROIMEANS, brainmask, parentstr, defaultsfl)
 
 
 Atlas = [];
@@ -20,7 +20,7 @@ if ~defaultsfl
     menustr = ['Atlas                       [' ATLASSTR ']'];
     menuact = [1];
     nk_PrintLogo
-    mestr = 'ROIMEANS Toolbox step setup'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr);
+    mestr = 'ROIMEANS Toolbox step setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr);
     act = nk_input(mestr,0,'mq', menustr, menuact);
 
     switch act

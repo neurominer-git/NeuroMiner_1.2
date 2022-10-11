@@ -78,7 +78,7 @@ switch act
                     load(I1); 
                     filefound = true;
                 catch
-                    cprintf('red','\nCould not load file %s ', I1);
+                    fprintf('\nCould not load file %s ', I1);
                     filefound = false;
                     return;
                 end

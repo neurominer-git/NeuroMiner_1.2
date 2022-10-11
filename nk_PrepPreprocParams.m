@@ -37,7 +37,7 @@ if analysis.Model.NumPreMLParams > 0
         paramfl.PXunique{u} = unique(paramfl.PXopt{u},'rows','stable');
     end
 else
-    if VERBOSE, 
-        fprintf('\n'); cprintf('blue','No preprocessing parameter optimization included in trained model');
+    if VERBOSE
+        fprintf('\n'); fprintf('No preprocessing parameter optimization included in trained model');
     end
 end

@@ -5,7 +5,7 @@ function [act, inp, NMo] = nk_MLOptimizerPrep(act, inp, parentstr)
 % This function allows the interactive and batch use of the ML training and
 % cross-validation module of NM
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris 09/2022
+% (c) Nikolaos Koutsouleris 10/2018
 
 global CV NM xNM simFlag JSMEM %xNM for simulation 
 
@@ -36,6 +36,7 @@ if ~exist('inp','var') || isempty(inp)
         [ ix, jx ] = size(CV(1).TrainInd);
         simFlag = 0; 
     end
+    
     inp.GridAct = false(ix,jx);
 end
 
@@ -44,11 +45,10 @@ if isfield(inp,'analind')
     if numel(inp.analind)<2
         AnalSelStr = sprintf('Analysis %g', inp.analind);
     else
-        if ~inp.HideGridAct, cvequalstr = 'same-size CV structures'; else, cvequalstr = 'different CV structures'; end
-        AnalSelStr = sprintf('%g Analyses: %s [ %s ]',numel(inp.analind), strjoin(cellstr(num2str(inp.analind'))',', '), cvequalstr);
+        AnalSelStr = sprintf('%g Analyses: %s',numel(inp.analind), strjoin(cellstr(num2str(inp.analind'))',', '));
     end
 else
-    AnalSelStr = 'none selected';
+    AnalSelStr = na_str;
 end
 
 if ~isfield(inp,'simFlag') || ~inp.simFlag
@@ -71,22 +71,22 @@ end
 if ~exist('inp','var') || isempty(inp)
     if isfield(analysis,'GDdims')
         fprintf('\n')
-        fprintf('******************************************************* \n')
-        fprintf('ATTENTION: \n')
-        fprintf('Previous analysis detected \n')
-        fprintf('If you proceed this analysis will be deleted. \n')
-        fprintf('******************************************************* \n')
+        cprintf('*red','******************************************************* \n')
+        cprintf('*red','ATTENTION: \n')
+        cprintf('*red','Previous analysis detected \n')
+        cprintf('*red','If you proceed this analysis will be deleted. \n')
+        cprintf('*red','******************************************************* \n')
         procflag = nk_input('Proceed anyway',0,'yes|no',[1,0], 2);
         if ~procflag, return; end
         analysis = rmfield(analysis,'GDdims');
-        fprintf('\n');fprintf('Training and CV results deleted!');
+        fprintf('\n');cprintf('*red','Training and CV results deleted!');
         if isfield(analysis,'visdata')
             analysis = rmfield(analysis,'visdata');
-            fprintf('\n');fprintf('Visualization results deleted!');
+            fprintf('\n');cprintf('*red','Visualization results deleted!');
         end
         if isfield(analysis,'OOCV')
             analysis = rmfield(analysis,'OOCV');
-            fprintf('\n');fprintf('Independent test data results deleted!');
+            fprintf('\n');cprintf('*red','Independent test data results deleted!');
         end
         analysis.status = 0;
     end
@@ -187,7 +187,7 @@ if ~isempty(analysis)
     disallow = false;
 
     %% Check whether all parameters are available
-    if (~sum(inp.GridAct(:)) && ~inp.HideGridAct) || isempty(inp.analind), disallow = true; end
+    if (~sum(inp.GridAct(:)) && ||  isempty(inp.analind)), disallow = true; end
     if inp.lfl>1, if ~isfield(inp, inp.sfieldnames{inp.lfl}) || isempty(inp.(inp.sfieldnames{inp.lfl})), disallow = true; end; end
 
     if ~disallow, menustr = [menustr 'PROCEED >>>']; menuact = [menuact 6]; end
@@ -235,16 +235,14 @@ if ~isempty(analysis)
                 inp.gdanalmat           = [];
                 nA = numel(inp.analind);
                 if nA>1
-                    AS = nk_GetAnalysisStatus(NM, inp.analind);
-                    if ~AS.betweenfoldpermequal_cv
+                    AS = nk_GetAnalysisStatus(NM);
+                    if ~AS.betweenequal_cv
                         inp.HideGridAct = true; 
                     else
                         [ ix, jx ] = size(NM.analysis{inp.analind(1)}.params.cv.TrainInd);
                         inp.GridAct = false(ix,jx);
-                        inp.HideGridAct = false;
                     end
                 else
-                    inp.HideGridAct = false;
                     inp = nk_GetAnalModalInfo_config(NM, inp);
                     [ ix, jx ] = size(NM.analysis{inp.analind}.params.cv.TrainInd);
                     inp.GridAct = false(ix,jx);
@@ -413,7 +411,29 @@ for i = 1:inp1.nF
     inp.stranalysis = SAV.matname; strGDdimsfile = fullfile(inp.rootdir, ...
         [inp.stranalysis '_CVdimanalysis' strout '_ID' dat.id '.mat']);
 
-    [~, PreML] = nk_GenPreML(PREPROC);
+    PX = nk_ReturnParamChain(PREPROC, 1); PreML = [];
+
+    if ~isempty(PX)
+        nP = numel(PX);
+        if nP>1
+            Params = []; Params_desc=[]; ModalityVec = [];
+            for n=1:nP
+                Params = [Params PX(n).Params];
+                for m=1:numel(PX(n).Params_desc)
+                    PX(n).Params_desc{m} = sprintf('%s_{M%g}',PX(n).Params_desc{m},n);
+                end
+                Params_desc = [Params_desc PX(n).Params_desc] ;
+                ModalityVec = [ModalityVec n*ones(1,numel(PX(n).Params))];
+            end
+            PreML.Params_desc   = Params_desc;
+            PreML.Params        = Params;
+            PreML.ModalityVec   = ModalityVec;
+        else
+            PreML.Params_desc   = PX.Params_desc;
+            PreML.Params        = PX.Params;
+            PreML.ModalityVec   = ones(1,numel(PX.Params));
+        end
+    end
 
     maxacc = zeros(inp.nclass, 1); maxtestacc = zeros(inp.nclass,1 );
 

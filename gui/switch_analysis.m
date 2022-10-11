@@ -27,7 +27,8 @@ end
 
 % Check whether selected analysis has OOCV data
 if isfield(handles.NM.analysis{analind},'OOCV') && handles.NM.defs.analyses_locked
-    oocvdata = handles.NM.analysis{analind}.OOCV; 
+    idx = ~cellfun(@isempty,handles.NM.analysis{analind}.OOCV);
+    oocvdata = handles.NM.analysis{analind}.OOCV(idx); 
 elseif isfield(handles,'OOCV')
     handles = rmfield(handles,'OOCV');
 end

@@ -16,6 +16,7 @@ if ~isempty(act) || ~defaultsfl
     
     RFE = TrainParam.RFE;
     RFE.dispres = 1;
+    [~,RFE.PreML] = nk_GenPreML(TrainParam.PREPROC{TrainParam.ActiveModality});
     nk_PrintLogo
     
     immretstr = ''; menuvec = 1:3;
@@ -28,7 +29,7 @@ if ~isempty(act) || ~defaultsfl
         menuvec = 1:4;
     else
         % Deactivate immediate retrain!
-        if isfield(RFE,'RetrainImmediate') && RFE.RetrainImmediate, cprintf('red','Full CV1 partition training DISABLED due to optimization requirements'); end
+        if isfield(RFE,'RetrainImmediate') && RFE.RetrainImmediate, fprintf('Full CV1 partition training DISABLED due to optimization requirements'); end
         RFE.RetrainImmediate = 0;
     end
     

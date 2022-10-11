@@ -12,7 +12,7 @@ trainidxs = cell(nperms,K); testidxs = cell(nperms,K);
 
 uLabels = unique(Labels);
 % Check whether there are non-finite values in the label vector
-if any(~isfinite(uLabels)), 
+if any(~isfinite(uLabels))
     NaNflag = true; 
     uLabels(~isfinite(uLabels))=[];
 else
@@ -47,7 +47,7 @@ for h=1:nperms % Loop through perms
     trainidx    = cell(1,K);
     testidx     = cell(1,K);
     
-    for j=1:mL,  % Loop through classes
+    for j=1:mL  % Loop through classes
         
         % row vector, indeces of members of the current (jth) class
         indClassCX = []; 

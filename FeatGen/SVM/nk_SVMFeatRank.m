@@ -113,17 +113,14 @@ for i = 1:nP
             end
             
         case 'LIBLIN'
-            if strcmp(P.Params_desc{1},'SlackParam')
-                SlackParam = sprintf( ' -c %1.3f', Ps(i,1));
-            else
-                SlackParam = ' -c 1';
-            end
-            if numel(P.Params_desc)>1 && strcmp(P.Params_desc{2},'EpsParam')
-                EpsParam = sprintf( ' -p %1.3f', Ps(i,2)); 
-            else
-                EpsParam = '';
-            end
-            cmdstr = [  SlackParam EpsParam CMDSTR.simplemodel ];
+            EpsParam = ''; Tolerance = ' -e 0.01'; SlackParam = ' -c 1';
+            idx = find(strcmp(P.Params_desc,'SlackParam')); 
+            if idx, SlackParam = sprintf( ' -c %1.4f', Ps(i,idx)); end
+            idx = find(strcmp(P.Params_desc,'EpsParam')); 
+            if idx, EpsParam = sprintf( ' -p %1.4f', Ps(i,idx)); end
+            idx = find(strcmp(P.Params_desc,'Tol')); 
+            if idx, Tolerance = sprintf( ' -e %1.4f', Ps(i,idx)); end
+            cmdstr = [  SlackParam EpsParam Tolerance CMDSTR.notolmodel CMDSTR.quiet];
             fprintf('\nTraining LIBLINEAR model with command string:%s', cmdstr);
             model = train_liblin244(label,Y,cmdstr);
             R(:,i) = model.w; 

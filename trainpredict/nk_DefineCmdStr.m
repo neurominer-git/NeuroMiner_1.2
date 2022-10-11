@@ -87,8 +87,9 @@ switch SVM.prog
         
     case 'LIBLIN'
         
-                vargout.simplemodel = [ ' -s ' num2str(SVM.LIBLIN.classifier) ...
+        vargout.simplemodel = [ ' -s ' num2str(SVM.LIBLIN.classifier) ...
                                         ' -e ' num2str(SVM.LIBLIN.tolerance) ];
+        vargout.notolmodel = [ ' -s ' num2str(SVM.LIBLIN.classifier) ];
                 
         switch MODEFL
             case 'classification'

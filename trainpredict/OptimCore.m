@@ -132,7 +132,7 @@ else
     end
 end
 
-% Evaluate Sequence Optimizer
+% Evaluate Sequence Optimizer or Adaptive Cox-Proportional Hazards Model
 switch SVM.prog
     case 'SEQOPT'
         [OUT.critgain, OUT.examfreq, OUT.percthreshU, OUT.percthreshL, OUT.absthreshU, OUT.absthreshL] = EvalSeqOpt(OUT.mdl);    

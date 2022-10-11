@@ -14,11 +14,11 @@ if ~exist('act','var'), act = []; end
 menustr = []; menuact = []; 
 
 %% Select variate to work on
-if ~exist('varind','var') || isempty(varind), 
-    varind = 1; 
-    if isfield(NM,'TrainParam') && ...
-            isfield(NM.TrainParam,'FUSION') && isfield(NM.TrainParam.FUSION,'M')
+if ~exist('varind','var') || isempty(varind)
+    if isfield(NM,'TrainParam')
         varind = NM.TrainParam.FUSION.M(1);
+    else
+        varind = 1;
     end
 end
 
@@ -52,8 +52,7 @@ end
 % structures from one NM workspace to the other and in cases where a data
 % fusion was implemented in on NM workspace but was not possible in another
 % workspace NM crashed.
-if isfield(NM,'TrainParam') && ...
-            isfield(NM.TrainParam,'FUSION') && isfield(NM.TrainParam.FUSION,'M')
+if isfield(NM.TrainParam,'FUSION') && isfield(NM.TrainParam.FUSION,'M')
     nM1 = numel(NM.Y);
     nM2 = numel(NM.TrainParam.FUSION.M);
     if nM1 < nM2 || nM1 < max(NM.TrainParam.FUSION.M) 
@@ -61,6 +60,7 @@ if isfield(NM,'TrainParam') && ...
         NM.TrainParam.FUSION.flag = 0;
     end
 end
+NM.TrainParam.ActiveModality = varind;
 
 % for compatibility reasons
 if ~isfield(NM.TrainParam,'STACKING') || ~NM.TrainParam.STACKING.flag
@@ -76,10 +76,19 @@ if NM.TrainParam.STACKING.flag == 1
     if isfield(NM.TrainParam.PREPROC{varind},'SPATIAL')
         NM.TrainParam.PREPROC{varind} = rmfield(NM.TrainParam.PREPROC{varind},'SPATIAL');
     end
+    NM.TrainParam.ActiveModality = varind;
 end
 
 nan_in_label=false;         if sum(isnan(NM.label(:)))>0, nan_in_label=true; end
 nY = numel(NM.Y);
+
+
+if ~isfield(NM.TrainParam,'MLI')
+    NM.TrainParam.MLI=[];
+    for i=1:nY
+        NM.TrainParam.MLI = nk_MLI_config(NM.TrainParam.MLI, i, 1);
+    end
+end
 
 %% Create further default configurations
 if ~isfield(NM.TrainParam,'PREPROC')
@@ -88,12 +97,6 @@ if ~isfield(NM.TrainParam,'PREPROC')
         nan_in_pred = false;        if sum(isnan(NM.Y{i}(:)))>0, nan_in_pred=true; end
         NM.TrainParam.PREPROC{i}    = DefPREPROC(NM.modeflag,nan_in_pred,nan_in_label);
         NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC, i, 1);
-        if isfield(NM.TrainParam,'MLI')
-            MLI = NM.TrainParam.MLI;
-        else
-            MLI = [];
-        end
-        NM.TrainParam.MLI           = nk_MLI_config(MLI, i, 1);
     end
 else
     switch NM.TrainParam.FUSION.flag
@@ -342,6 +345,7 @@ switch act
             NM.TrainParam.FUSION.M = nk_SelectVariateIndex(NM, 1, 1, 1 );
             varind = NM.TrainParam.FUSION.M;
         end
+        NM.TrainParam.ActiveModality = varind;
         
     case 2
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag ;
@@ -350,6 +354,7 @@ switch act
             M = [];
         end
         varind = nk_SelectVariateIndex(NM, 1, 1, 1, M);
+        NM.TrainParam.ActiveModality = varind;
     
     case 3
         act = 1; while act>0, act = nk_CVpartition_config; end

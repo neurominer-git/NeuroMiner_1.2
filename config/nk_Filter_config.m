@@ -72,7 +72,7 @@ if ~isempty(act) || ~defaultsfl
         if isfield(param,'Wrapper') && isfield(param.Wrapper,'SubSpaceFlag') && param.Wrapper.SubSpaceFlag
             param.Wrapper.SubSpaceFlag = 0;
             param.Wrapper.EnsembleStrategy.type = 0;
-            cprintf('red','Ensemble-based subspace optimization in Wrapper module DISABLED');
+            fprintf('Ensemble-based subspace optimization in Wrapper module DISABLED');
         end
     end
     nk_PrintLogo

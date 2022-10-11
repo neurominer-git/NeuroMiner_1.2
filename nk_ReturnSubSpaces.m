@@ -51,7 +51,7 @@ if iscell(V)
 else
     indV=1;
 end
-if ~indV, error('\nNo images found to read in!'); end
+if ~indV, fprintf('\n'); error('No images found to read in!'); end
 
 % work in Z direction through the image space
 for sl=1:Vm.dim(3)
@@ -95,7 +95,7 @@ for sl=1:Vm.dim(3)
                         error('\nFile problem: %s,',V{j}(i).fname)
                     end
                     if any(isnan(d))
-                        cprintf('red','\nNan in image %s', V{j}(i).fname);
+                        fprintf('\nNan in image %s', V{j}(i).fname);
                     end
                     y(i,:) = d(ind0);
                 end

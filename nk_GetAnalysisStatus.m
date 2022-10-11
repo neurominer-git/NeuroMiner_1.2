@@ -1,7 +1,9 @@
-function Status = nk_GetAnalysisStatus(NM)
+function Status = nk_GetAnalysisStatus(NM, analdim)
 
 Status.completed_analyses       = [];  
 Status.isequal_cv               = []; 
+Status.betweenequal_cv          = []; 
+Status.betweenfoldpermequal_cv  = [];
 Status.nmodal_analyses          = [];
 Status.analexistflag            = false; 
 Status.analreadyflag            = false; 
@@ -18,7 +20,12 @@ Status.analyses_interpreted     = [];
 
 if isfield(NM,'analysis')
     
-    n_anal = numel(NM.analysis);
+    if ~exist("analdim","var") || isempty(analdim)
+        n_anal = numel(NM.analysis);
+        analdim = 1:n_anal;
+    else
+        n_anal = numel(analdim);
+    end
     Status.completed_analyses       = false(1,n_anal);
     Status.isequal_cv               = false(1,n_anal);
     Status.nmodal_analyses          = zeros(1,n_anal);
@@ -28,31 +35,37 @@ if isfield(NM,'analysis')
     Status.analyses_visualized      = false(1,n_anal);
     Status.analyses_imaging         = cell(1,n_anal);
     Status.analyses_interpreted     = false(1,n_anal);
+    cvs = cell(1,n_anal);
+
 
     for i = 1:n_anal
+
+        cvs{i} = NM.analysis{analdim(i)}.params.cv;
+
         % Completed analyses
-        if NM.analysis{i}.status
+        if NM.analysis{analdim(i)}.status
             Status.completed_analyses(i)= true; 
         end
         % Analyses with equal CV structures (according to NM workspace CV)
-        if isequaln(NM.cv, NM.analysis{i}.params.cv)
+        if isequaln(NM.cv, NM.analysis{analdim(i)}.params.cv)
             Status.isequal_cv(i) = true; 
         end
+
         % Number of modalities
         if Status.completed_analyses(i)
-            Status.nmodal_analyses(i) = numel(NM.analysis{i}.GDdims);
+            Status.nmodal_analyses(i) = numel(NM.analysis{analdim(i)}.GDdims);
         end
         % Stacking analyses
-        if NM.analysis{i}.params.TrainParam.STACKING.flag==1
+        if NM.analysis{analdim(i)}.params.TrainParam.STACKING.flag==1
             Status.stacking_analyses(i) = true;
-            Status.n_inputanalyses(i) = numel(NM.analysis{i}.params.TrainParam.STACKING.sel_anal); 
+            Status.n_inputanalyses(i) = numel(NM.analysis{analdim(i)}.params.TrainParam.STACKING.sel_anal); 
         end
         % Sequence analyses
-        if strcmp(NM.analysis{i}.params.TrainParam.SVM.prog,'SEQOPT')
+        if strcmp(NM.analysis{analdim(i)}.params.TrainParam.SVM.prog,'SEQOPT')
             Status.sequence_analyses(i) = true;
         end
         % Fusion analyses
-        FUSION = NM.analysis{i}.params.TrainParam.FUSION;
+        FUSION = NM.analysis{analdim(i)}.params.TrainParam.FUSION;
         Modality = FUSION.M;
         switch FUSION.flag
             case {0, 2, 3}
@@ -61,9 +74,9 @@ if isfield(NM,'analysis')
                 nM = 1;
         end
         % Non-deterministic analyses
-        if isfield(NM.analysis{i}.params.TrainParam.SVM,'ADASYN') && NM.analysis{i}.params.TrainParam.SVM.ADASYN.flag==1
+        if isfield(NM.analysis{analdim(i)}.params.TrainParam.SVM,'ADASYN') && NM.analysis{analdim(i)}.params.TrainParam.SVM.ADASYN.flag==1
             for j=1:nM
-                PREPROC = NM.analysis{i}.params.TrainParam.PREPROC{Modality(j)};
+                PREPROC = NM.analysis{analdim(i)}.params.TrainParam.PREPROC{Modality(j)};
                 Status.analyses_nondeterministic(i).modality(j) = false;
                 if isfield(PREPROC,'ACTPARAM')
                     for q=numel(PREPROC.ACTPARAM):-1:1
@@ -80,19 +93,32 @@ if isfield(NM,'analysis')
                Status.analyses_nondeterministic(i).modality = false(1,nM);
            end
         end
-        if isfield(NM.analysis{i},'visdata')
+        if isfield(NM.analysis{analdim(i)},'visdata')
             Status.analyses_visualized(i) = true;
         end
         for j=1:nM
-            if strcmp(NM.analysis{i}.params.datadescriptor{Modality(j)}.source,'image')
+            if strcmp(NM.analysis{analdim(i)}.params.datadescriptor{Modality(j)}.source,'image')
                 Status.analyses_imaging{i} = [ Status.analyses_imaging{i}  Modality(j)];
             else
                 Status.analyses_imaging{i} = [];
             end
         end
-        if isfield(NM.analysis{i},'MLI')
+        if isfield(NM.analysis{analdim(i)},'MLI')
             Status.analyses_interpreted(i) = true;
         end
+    end
+    if numel(cvs)>1
+        Status.betweenequal_cv = isequaln(cvs{:});
+        a_folds = zeros(1,n_anal); a_perms = zeros(1,n_anal); 
+        for i_anal = 1:n_anal, [a_perms(i_anal), a_folds(i_anal)] = size(cvs{i_anal}.TrainInd); end
+        if numel(unique(a_perms)) == 1 && numel(unique(a_folds)) == 1
+            Status.betweenfoldpermequal_cv = 1;
+        else
+            Status.betweenfoldpermequal_cv = 0;
+        end
+    else
+        Status.betweenequal_cv = 1;
+        Status.betweenfoldpermequal_cv = 1;
     end
 end
 

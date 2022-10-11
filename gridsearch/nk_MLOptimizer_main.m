@@ -110,16 +110,6 @@ for i=1:inparams.nclass
             if VERBOSE, fprintf('\n%s #%g: no slack parameters needed.',strout,i); end
     end
 
-    %% Add precomputed kernel 
-%     switch inparams.stranalysis
-%         case 'precomputed'
-%             SVM.kernel.kernstr = '-t 4';
-%             global WL; 
-%             WL = '-t 4';
-%             fprintf('Precomputed kernel');
-%         otherwise
-%             fprintf('No precomputed kernel');
-%     end
     %% Define kernel parameter settings
     switch SVM.kernel.kernstr
         case {' -t 0', 'lin','linear','lin_kernel','none','lin_elm'}
@@ -155,7 +145,6 @@ for i=1:inparams.nclass
                     end
                 end
             end
-            %fprintf('\n%s #%g: no kernel parameters for now.',strout,i) 
         otherwise
             switch SVM.prog
                 case 'LIBSVM'

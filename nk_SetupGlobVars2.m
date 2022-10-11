@@ -49,7 +49,7 @@ switch act
         end
         
         try 
-            RAND    = dat.TrainParam.RAND;
+            RAND = dat.TrainParam.RAND;
         catch
             paramstr = sprintf('%s\n%s',paramstr,'Cross-validation setup');
         end

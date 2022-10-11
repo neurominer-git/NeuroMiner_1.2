@@ -29,7 +29,7 @@ for i=1:nvar
             try
                 load(px);
             catch
-                cprintf('red','\nCould not open file. May be corrupt. Recompute CV2 partition [%g,%g].',f,d);
+                fprintf('\nCould not open file. May be corrupt. Recompute CV2 partition [%g,%g].',f,d);
                 fnd = false;
                 return
             end

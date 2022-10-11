@@ -1,4 +1,4 @@
-function cdf = normcdf (x, m, s)
+function cdf = nm_normcdf (x, m, s)
 	% NORMCDF  CDF of the normal distribution
 	%  CDF = normcdf(X, M, S) computes the cumulative distribution
 	%  function (CDF) at X of the normal distribution with mean M

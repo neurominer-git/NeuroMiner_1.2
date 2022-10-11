@@ -20,6 +20,12 @@ if rtype > 0
         P.Params_desc{end+1}    = 'EpsParam';
     end
 end
+
+if isfield(Param,'NuParam') && strcmp(P.SVM.prog,'LIBLIN')
+    P.Params{end+1}         = Param.Tolerance;
+    P.Params_desc{end+1}    = 'Tol';
+end
+
 P.Comb = allcomb(P.Params,'matlab');
 
 end

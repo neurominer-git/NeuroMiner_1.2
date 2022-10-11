@@ -65,7 +65,7 @@ if ~isempty(act) || ~defaultsfl
             actind = 1;
         end
         
-        if prod(GRD.n_params)>1
+        if prod(GRD.n_params)>1 || (isfield(param,'PreML') && ~isempty(param.PreML) && (numel(param.PreML.Params)>1 || numel(param.PreML.Params{1})>1))
             GrdOptStr = ['Learn wrapper model only at parameter optimum [ ' d.WrapperOptFlag ' ]|']; actind = [actind 3 ];
         else
             GrdOptStr = '';

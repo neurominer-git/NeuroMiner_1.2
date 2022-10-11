@@ -27,6 +27,7 @@ if ~exist('inp','var') || isempty(inp)
                     ...                         % 2 = operate at CV2 level
                     'loadparam', 2, ...         % 1 = load existing optpreproc and/or optmodel parameters from disk
                     ...                         % 2 = recompute parameters
+                    'HideGridAct', false, ...
                     'batchflag', 0);            % 1 = Run in batchmode (without graphics outputs)
                                                 % 0 = run in interactive mode
 end
@@ -39,14 +40,16 @@ DATASCRAM = false; if isfield(NM.defs,'data_scrambled') && ~isempty(NM.defs.data
 % Select analysis
 if numel(NM.analysis)>1
     if numel(inp.analind)<2
-        AnalSelStr = sprintf('Analysis %g', inp.analind);   
+        AnalSelStr = sprintf('Analysis %g', inp.analind);
     else
-        AnalSelStr = sprintf('%g Analyses: %s',numel(inp.analind), strjoin(cellstr(num2str(inp.analind'))',', '));
-    end
-    AnalSelectStr = sprintf('Choose analysis to work on [ %s ]|', AnalSelStr);                                              AnalSelectAct = 1;   
+        if ~inp.HideGridAct, cvequalstr = 'same-size CV structures'; else, cvequalstr = 'different CV structures'; end
+        AnalSelStr = sprintf('%g Analyses: %s [ %s ]',numel(inp.analind), strjoin(cellstr(num2str(inp.analind'))',', '), cvequalstr);
+    end 
+    AnalSelectStr = sprintf('Choose analysis to work on [ %s ]|', AnalSelStr);                                              AnalSelectAct = 1;
 else
     AnalSelectStr = ''; AnalSelectAct = [];
 end
+
 analysis      = NM.analysis{inp.analind(1)}; 
 % Select independent test data container
 if isfield(inp,'oocvind'), OOCVSelStr = sprintf('New data #%g: %s', inp.oocvind, inp.OO.desc); else, OOCVSelStr = na_str; end
@@ -77,7 +80,11 @@ if ~isempty(analysis)
     
     % Retrieve CV2 partitions to operate on
     if ~isfield(inp,'GridAct'), inp.GridAct = analysis.GDdims{1}.GridAct; end                                              
-    GridSelectStr = sprintf('Select CV2 partitions to operate on [ %g selected ]|',  sum(inp.GridAct(:)));                  GridSelectAct = 5;
+    if ~inp.HideGridAct
+        GridSelectStr = sprintf('Select CV2 partitions to operate on [ %g selected ]|',  sum(inp.GridAct(:)));              GridSelectAct = 5;
+    else
+        GridSelectStr =''; GridSelectAct=[];
+    end
     
     % Configure loading of pre-existing parameters and models
     if inp.saveparam == 2 && inp.lfl == 1
@@ -140,7 +147,7 @@ menuact = [ AnalSelectAct ...
 disallow = false;
 
 %% Check whether all parameters are available
-if ~sum(inp.GridAct(:)) || isempty(inp.analind), disallow = true; end
+if (~sum(inp.GridAct(:)) && ~inp.HideGridAct) || isempty(inp.analind), disallow = true; end
 
 if inp.loadparam == 1
     if ~isfield(inp,'optpreprocmat') || isempty(inp.optpreprocmat), disallow = true; end
@@ -166,8 +173,21 @@ switch act
                 [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief); 
             end
             if ~isempty(analind), inp.analind = complvec(analind) ; end
+            nA = numel(inp.analind);
+            if nA>1
+                AS = nk_GetAnalysisStatus(NM, inp.analind);
+                if ~AS.betweenfoldpermequal_cv
+                    inp.HideGridAct = true; 
+                else
+                    inp.GridAct = NM.analysis{inp.analind(1)}.GDdims{1}.GridAct;
+                    inp.HideGridAct = false;
+                end
+            else
+                inp.HideGridAct = false;
+                inp.GridAct = NM.analysis{inp.analind}.GDdims{1}.GridAct;
+            end
         end
-        inp.GridAct = NM.analysis{inp.analind(1)}.GDdims{1}.GridAct;
+       
     % Select OOCV data
     case 2    
         [ NM, OO, oocvind ] = nk_SelectOOCVdata(NM, 1, 0);  
@@ -205,7 +225,10 @@ switch act
          for i=1:nA
             nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'setup_main', 0); 
             NM.runtime.curanal = inp.analind(i);
-            if nA>1, inp = nk_GetAnalModalInfo_config(NM, inp); end
+            if nA>1
+                inp = nk_GetAnalModalInfo_config(NM, inp); 
+                if inp.HideGridAct, inp.GridAct = NM.analysis{inp.analind(i)}.GDdims{1}.GridAct; end
+            end
             inp.analysis_id = NM.analysis{inp.analind(i)}.id;
             inp.saveoptdir = [ NM.analysis{inp.analind(i)}.rootdir filesep 'opt' ];
             NM.analysis{inp.analind(i)}.OOCV{inp.oocvind} = OOCVPrep(NM, inp, NM.analysis{inp.analind(i)});
@@ -307,7 +330,7 @@ for i = 1:inp1.nF
 	        load(strOOCVfile)
         else
 	        if MULTILABEL.flag && MULTILABEL.dim>1
-		        fprintf('\n\n');cprintf('*black','====== Working on label #%g ====== ',j);
+		        fprintf('\n\n');fprintf('====== Working on label #%g ====== ',j);
 		        inp.curlabel = j;
 	        else
 		        inp.curlabel = 1;

@@ -48,8 +48,8 @@ for curclass=1:nP
             headstr = sprintf('%s|%s',headstr,headstrn);
         end
         headstr = sprintf('%s |%12s |%13s\n',headstr, 'CV1', 'CV2');
-        cprintf('*blue','%s',headstr);
-        cprintf('*blue',repmat('=',1,length(headstr)));
+        fprintf('%s',headstr);
+        fprintf(repmat('=',1,length(headstr)));
         for i=1:nipos
             paramstr = [];
             for n = 1:size(tP(ipos(i),:),2)
@@ -67,7 +67,7 @@ for curclass=1:nP
             fprintf('\n[%4g]%s%13.2f|%13.2f', i, paramstr, TR(ipos(i)), TS(ipos(i)))
         end 
         fprintf('\n');
-        cprintf('*blue',repmat('=',1,length(headstr)));
+        fprintf(repmat('=',1,length(headstr)));
     end
  end
 

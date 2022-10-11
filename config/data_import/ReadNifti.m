@@ -6,7 +6,7 @@ if isfield(IO,'globscale') && IO.globscale>1
     GM = IO.globnorm;
 else
     g = ones(size(IO.PP,1),1); GM = 1;
-    cprintf('blue','\nNo global normalization')
+    fprintf('\nNo global normalization.')
 end
 
 gSF = GM./g; 
@@ -54,9 +54,9 @@ fprintf(fid,'\n%s', F{:});
 fprintf(fid,'\n\n');
 fclose(fid);
 clc
-cprintf('black*','See %s for import information \n', filereport);
+fprintf('See %s for import information \n', filereport);
 
-if IO.nangroup && IO.nan_subjects > 0, 
+if IO.nangroup && IO.nan_subjects > 0
     n_subjects = [IO.n_subjects IO.nan_subjects];
 else
     n_subjects = IO.n_subjects;

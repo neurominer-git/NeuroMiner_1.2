@@ -167,11 +167,11 @@ while maxK > minK
 end
         
 for curclass=1:nclass
-    if r.KneePoint,
+    if r.KneePoint
         kneepoint = knee_pt(Opt.Param,[],true);
-        if VERBOSE,
+        if VERBOSE
             if isnan(kneepoint)
-                cprintf('err','\nNot enough data points to compute kneepoint. Selecting final feature mask.');
+                fprintf('\nNot enough data points to compute kneepoint. Selecting final feature mask.');
             else
                 fprintf('\nSelected kneepoint of optimization curve at wrapper cycle #%g => %s = %g', kneepoint, ActStr, Opt.Param(kneepoint));
             end

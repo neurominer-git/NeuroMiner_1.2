@@ -158,7 +158,7 @@ for f=1:ix % Loop through CV2 permutations
                         load(oOOCVpath)
                         loadfl = true;
                     catch
-                        cprintf('red','\nCould not open file. May be corrupt. Recompute CV2 partition [%g,%g].',f,d);
+                        fprintf('\nCould not open file. May be corrupt. Recompute CV2 partition [%g,%g].',f,d);
                         loadfl = false;
                     end
                     
@@ -527,7 +527,11 @@ for curclass = 1: nclass
             if isfield(inp,'groupind')
                 vec = unique(inp.groupind);
                 for g = 1:numel(vec)
-                    indg = find(inp.groupind == vec(g));
+                    if iscell(vec)
+                        indg = find(strcmp(inp.groupind,vec{g}));
+                    else
+                        indg = find(inp.groupind == vec(g));
+                    end
                     if LabelMode
                         if curclass == 1
                             Results.Group{g}.ObservedValues{curclass} = labelDicho{curclass}(indg);

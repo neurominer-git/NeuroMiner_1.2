@@ -67,16 +67,16 @@ for i=1:inp.nummodal
     str = sprintf('Modality %g [ %s ]: ', i, NM.datadescriptor{i}.desc);
     fprintf('\n'); 
     if i==inp.currmodal
-        cprintf('*black', '==> %s ', str); curstr = '*';
+        fprintf('==> %s ', str); 
     else
-        fprintf('\t%s', str); curstr = '';
+        fprintf('\t%s', str); 
     end
     if strcmp(availstr,'available')
-        cprintf([curstr 'green'], '%s ', availstr);
+        fprintf('%s ', availstr);
     elseif strcmp(availstr,'linked')
-        cprintf([curstr 'blue'], '%s [ %s ] ', availstr, NM.(inp.fldnam){inp.oocvind}.Y);
+        fprintf('%s [ %s ] ', availstr, NM.(inp.fldnam){inp.oocvind}.Y);
     else
-        cprintf([curstr 'red'], '%s ', availstr);
+        fprintf( '%s ', availstr);
     end   
 end
 fprintf('\n')
@@ -179,7 +179,7 @@ function NM  = InputOOCVModality(inp, NM, Y, parentstr)
 
 nk_PrintLogo
 fprintf('\n\n'); mestr = sprintf('Input %s for Modality %g', inp.dattype, inp.currmodal);  
-navistr = sprintf('%s >>> %s',parentstr, mestr); cprintf('*blue','\nYou are here: %s >>>',navistr); 
+navistr = sprintf('%s >>> %s',parentstr, mestr); fprintf('\nYou are here: %s >>>',navistr); 
 
 % Retrieve input settings from the discovery data
 IO = NM.datadescriptor{inp.currmodal}.input_settings;

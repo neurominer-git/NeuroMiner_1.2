@@ -114,7 +114,7 @@ for i = 1 : nM
         compfun        = nk_ReturnEvalOperator(SVM.GridParam);
         
         % Generate or load permutation matrix from file.
-        cprintf('black*','\nPERMUTATION MODE ENABLED.')
+        fprintf('\nPERMUTATION MODE ENABLED.')
         if pmode(i)
             permfile = fullfile(inp.rootdir,[SAV.matname '_VISpermmat_ID' id '.mat']);
             if ~exist(permfile,'file')
@@ -257,9 +257,6 @@ for f=1:ix % Loop through CV2 permutations
                 if isfield(inp,'CV1') && inp.CV1 == 1, inp.smoothonly = true; end
                 
                 % find range of feature in current CV1 partition 
-                % Range = findRange(inp)
-                %for z=1:numel(Range)
-                
                 [ inp, contfl, analysis, mapY, GD, MD, Param, paramfl ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
                 inp.loadGD = false;
                 
@@ -410,7 +407,7 @@ for f=1:ix % Loop through CV2 permutations
                         
                         for h=1:nclass % Loop through binary comparisons
                     
-                            if nclass > 1, fprintf('\n');cprintf('blue*', '*** %s #%g *** ',algostr, h); end
+                            if nclass > 1, fprintf('\n');fprintf('*** %s #%g *** ',algostr, h); end
 
                             switch MODEFL
                                 case 'classification'
@@ -429,7 +426,7 @@ for f=1:ix % Loop through CV2 permutations
                             
                             for m = 1 : nP % parameter combinations
 
-                                if nP>1, fprintf('\n');cprintf(rgb('RoyalBlue'),'Extracing model parameters at parameter node #%g/%g ', m, nP); end
+                                if nP>1, fprintf('\n');fprintf('Extracing model parameters at parameter node #%g/%g ', m, nP); end
                                 % Prepare learning params
                                 cPs = Ps(m,:); sPs = nk_PrepMLParams(Ps, Pdesc, m);
 

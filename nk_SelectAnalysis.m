@@ -26,7 +26,7 @@ function [act, analdim, dat, showmodalvec, brief, indanal] = nk_SelectAnalysis(d
 % dat               : (modified) NM structure
 % showmodalvec      : (modified) list of modality to show to user  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2017
+% (c) Nikolaos Koutsouleris, 09/2022
 
 if ~exist('newflag','var')  || isempty(newflag),     newflag = false; end
 if ~exist('modflag','var')  || isempty(modflag),     modflag = false; end
@@ -85,7 +85,7 @@ if isfield(dat,'analysis')
 %                 analdim = analsel;
 %                 return
 %             else
-                analdim = analsel;
+                analdim = indanal(analsel);
                 return
 %            end
         else
@@ -101,9 +101,9 @@ if isfield(dat,'analysis')
     end
     
     clc
-    cprintf('*red','%s \n',repmat('*',1,size(titlestr,2)));
-    cprintf('*red','%s \n', titlestr)
-    cprintf('*red','%s \n',repmat('*',1,size(titlestr,2)));
+    fprintf('%s \n',repmat('*',1,size(titlestr,2)));
+    fprintf('%s \n', titlestr)
+    fprintf('%s \n',repmat('*',1,size(titlestr,2)));
     fprintf('\n')
     if n == 1
         analstr = sprintf('1 %sANALYSIS',complstr);
@@ -122,21 +122,21 @@ if isfield(dat,'analysis')
         if isempty(FUSION), FUSION.flag = 0; end
         if nvar > 1
             if params.TrainParam.STACKING.flag == 1
-                cprintf('*black', 'STACKING ANALYSIS OPERATES ON ANALYSES %s ', strjoin(string(params.TrainParam.STACKING.sel_anal),', ')); 
+                fprintf('STACKING ANALYSIS OPERATES ON ANALYSES %s ', strjoin(string(params.TrainParam.STACKING.sel_anal),', ')); 
                 fprintf('\n\tStacking descriptors: %s', strjoin(params.TrainParam.STACKING.featnames,','))
                 predstr = {'CV1 training data','CV1 test data'};
                 fprintf('\n\tPrediction extraction for stacking from %s ', predstr{params.TrainParam.STACKING.mode});
             else
                 nF = numel(FUSION.M);
-                if nF>1,
+                if nF>1
                     strmod = sprintf('%g MODALITIES',nF);
                 else
                     strmod = 'MODALITY';
                 end
-                cprintf('*black', 'ANALYSIS OPERATES ON %s ', strmod); 
-                for j=1:nF, 
-                    if j > showmodalmax, fprintf(' ...'); break; end;
-                    cprintf('*black','#%g ', FUSION.M(j)); 
+                fprintf('ANALYSIS OPERATES ON %s ', strmod); 
+                for j=1:nF
+                    if j > showmodalmax, fprintf(' ...'); break; end
+                    fprintf('#%g ', FUSION.M(j)); 
                 end
             end
             fprintf('\n') 
@@ -176,23 +176,23 @@ if isfield(dat,'analysis')
                 mxl = 0;
                 for i=1:numel(d.datadescriptor)
                     mdlstr = sprintf('MODALITY %g : %s \n', FUSION.M(i), d.datadescriptor{i});
-                    cprintf('*blue',mdlstr);
+                    fprintf(mdlstr);
                     mxli = size(mdlstr,2);
                     if mxli > mxl, mxl = mxli; end
                 end
             else
-                if numel(d.datadescriptor) > 1,
+                if numel(d.datadescriptor) > 1
                     datdesc = d.datadescriptor{j};
                 else
                     datdesc = d.datadescriptor{1};
                 end
                 mdlstr = sprintf('MODALITY %g : %s \n', FUSION.M(j), datdesc);
-                cprintf('*blue',mdlstr);
+                fprintf(mdlstr);
                 mxl = size(mdlstr,2);
             end
             
-            cprintf('*blue','%s \n',repmat('*',1,mxl));
-            cprintf('*black','Preprocessing: \n'); 
+            fprintf('%s \n',repmat('*',1,mxl));
+            fprintf('Preprocessing: \n'); 
             
             if strcmp(dat.modeflag,'classification')
                 fprintf('\t* %s \n', d.PREPROC.groupmode);
@@ -206,20 +206,20 @@ if isfield(dat,'analysis')
             
             if FUSION.flag == 3, print_modalitydata(dat, params, 1); end
             
-            if jj > showmodalmax, 
-                cprintf('*blue','%s \n',repmat('-',1,mxl)); 
-                cprintf('*red','>>> %g further modalities included in this analysis... \n', nF-j+1);
+            if jj > showmodalmax
+                fprintf('%s \n',repmat('-',1,mxl)); 
+                fprintf('>>> %g further modalities included in this analysis... \n', nF-j+1);
                 skipfl = true;
                 break; 
             else
-                if j<nvar, cprintf('*blue','%s \n',repmat('-',1,mxl)); end
+                if j<nvar, fprintf('%s \n',repmat('-',1,mxl)); end
             end
         end
     end
     if ~skipfl && FUSION.flag ~= 3, print_modalitydata(dat, params, FUSION.M); end
-    if nF > 1, cprintf('*blue','%s \n',repmat('=',1,100)); end
-    cprintf('*black','Cross-Validation: '); fprintf('\n\t* %s\n\n', e.cv);
-    cprintf('*black','Results: ');
+    if nF > 1, fprintf('%s \n',repmat('=',1,100)); end
+    fprintf('Cross-Validation: '); fprintf('\n\t* %s\n\n', e.cv);
+    fprintf('Results: ');
     istr = [];
     
     if analyses{analind}.status
@@ -418,7 +418,7 @@ function print_modalitydata(dat, params, varind)
         fprintf('Preprocessing Optimization: %g parameter combinations', e.preML_nCombs); 
         for i=1:numel(e.preML), fprintf('\n\t(%g) %s', i, e.preML{i}); end; fprintf('\n');
     else
-        cprintf('*black','No optimization of preprocessing parameters \n')
+        fprintf('No optimization of preprocessing parameters \n')
     end
     if e.ML_nCombs>0
         fprintf('ML Optimization: %g parameter combinations',e.ML_nCombs); 

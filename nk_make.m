@@ -34,7 +34,7 @@ try
     fprintf('\nCompiling: %s\n',funcname)
     mex(funcname);
 catch
-    cprintf('*red','\nCompiling of %s failed!',funcname)
+    warning('\nCompiling of %s failed!',funcname)
 end
 
 end

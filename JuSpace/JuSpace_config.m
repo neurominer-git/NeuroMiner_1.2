@@ -92,7 +92,7 @@ if ~defaultsfl
     menuact = [1 2 3 4];
 
     nk_PrintLogo
-    mestr = 'JuSpace Toolbox step setup'; navistr = [parentstr ' >>> ' mestr]; cprintf('*blue','\nYou are here: %s >>> ',parentstr);
+    mestr = 'JuSpace Toolbox step setup'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>> ',parentstr);
     act = nk_input(mestr,0,'mq', menustr, menuact);
 
     switch act

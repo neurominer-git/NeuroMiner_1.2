@@ -449,8 +449,8 @@ switch OptimFlag
             
             GRD.GridMaxType = GridMaxType;
             if prod(n_pars) * nP > 1
-                if strcmp(SVM.prog,'LIBSVM') && strcmp(SVM.prog,'MikRVM') && strcmp(SVM.prog,'MVTRVR')
-                    if OptRegul.flag, regstr = 'Yes'; else, regstr = 'No'; end
+                if strcmp(SVM.prog,'LIBSVM') || strcmp(SVM.prog,'MikRVM') || strcmp(SVM.prog,'MVTRVR')
+                    if OptRegul.flag==1, regstr = 'Yes'; else, regstr = 'No'; end
                     menustr = sprintf('%s|Enable regularization of model selection [ %s ]', menustr, regstr);               menuact = [ menuact 7 ];
                     if OptRegul.flag
                         if isfield(TrainParam,'RFE') && ...
@@ -462,7 +462,7 @@ switch OptimFlag
                                 isfield(TrainParam.RFE.Wrapper,'EnsembleStrategy') && ...
                                 isfield(TrainParam.RFE.Wrapper.EnsembleStrategy,'type') && ...
                                 TrainParam.RFE.Wrapper.EnsembleStrategy.type ~= 9)
-                            switch OptRegul.flag
+                            switch OptRegul.type
                                 case 1
                                     crossstr = 'Model complexity';
                                 case 2
@@ -512,9 +512,7 @@ switch OptimFlag
                 case 6
                     PolyDegrdefs  = nk_input([Pdparstr ' for polynomial kernels'],0,'e',PolyDegrdefs);  PX = nk_AddParam(PolyDegrdefs, ['ML-' Pdparstr], 2, PX);
                 case 7
-                    if ~OptRegul.flag, OptRegul.flag = 2; end
-                    OptRegul.flag   = nk_input('Enable model selection across CV1 parameters ?', 0, ...
-                                                    'yes|no',[1,0], OptRegul.flag);
+                    if OptRegul.flag==1, OptRegul.flag = 2; else, OptRegul.flag=1; end
                 case 8
                     OptRegul.type   = nk_input('Regularize with',0,'mq', ...
                                               ['Model complexity|' ...

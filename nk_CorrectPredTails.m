@@ -1,4 +1,4 @@
-function [ sY, Y, IN ] = nk_CorrectPredTails( Y, IN )
+function [ sY, Y, IN ] = nk_CorrectPredTails( Y, X, IN )
 % =========================================================================
 % function [ sY, Y, IN ] = nk_CorrectPredTails( Y, IN )
 % =========================================================================
@@ -48,5 +48,5 @@ if exist('IN','var') && ~isempty(IN)
 else
     error('Please provide a valid IN structure for the function!')
 end
-
-if ~flag, sY = nk_DetrendPredictions2(IN.beta,IN.p,Y); end
+if ~exist("X", "var"), X=[]; end
+if ~flag, sY = nk_DetrendPredictions2(IN.beta, IN.p, Y, X); end

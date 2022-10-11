@@ -3,7 +3,7 @@ function [cases, files, mess] = nk_DefineCaseNames2(P, N, cases_comp, mess)
 if ~exist('mess','var') || isempty(mess), mess=[];end
 
 if ~exist('P','var') || isempty(P)
-    cprintf('red','\nOperating in matrix mode.')
+    fprintf('\nOperating in matrix mode.')
     caseopt= nk_input('Where do I find the Subject IDs ?',0,'m', ...
         'In the MATLAB(R) workspace|In a text file|Autogenerate subject IDs',1:3,1);	
 
@@ -31,7 +31,7 @@ if ~exist('P','var') || isempty(P)
     end
     files = P;
 else
-    cprintf('red','\nOperating in file mode.')
+    fprintf('\nOperating in file mode.')
     casemanip = 1;
     files = P;
 end

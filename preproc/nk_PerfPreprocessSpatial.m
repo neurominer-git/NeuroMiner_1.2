@@ -65,7 +65,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                     inp.Yw{u} = nk_PerfSpatFilt2( inp.iYw, uPREPROC, paramfl.PV ); 
                 else
                     I = arrayfun( @(j) isfield(uPREPROC.ACTPARAM{j},'RANK'), 1:numel( uPREPROC.ACTPARAM ));
-                    if any(I), 
+                    if any(I)
                         Ix = find(I);
                         for qx = 1:numel(Ix)
                             if isfield(uPREPROC.ACTPARAM{Ix(qx)}.RANK,'EXTERN')
@@ -81,7 +81,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                     end
                 end
                 
-                if ~isempty(Yocv), 
+                if ~isempty(Yocv)
                     if iscell(Yocv)
                         for n=1:numel(Yocv)
                            fprintf('\nPredictor #%g: Smoothing independent test data (%s)', u, inp.desc_oocv{n});

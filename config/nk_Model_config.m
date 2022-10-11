@@ -44,7 +44,7 @@ if isfield(SVM,'prog')
         mnuact = [ optimstr progstr learnparstr ];
         mnusel = [ menusel 1 mnuconf];
     elseif strcmp(SVM.prog,'matLRN')
-        cprintf('blue','\nDefine possible kernel configuration required for a matLearn algorithm in the Learning algorithm parameters setup')
+        fprintf('\nDefine possible kernel configuration required for a matLearn algorithm in the Learning algorithm parameters setup')
         mnuact = [ optimstr progstr learnparstr ];
         mnusel = [ menusel 1 mnuconf];
     else
@@ -55,7 +55,7 @@ if isfield(SVM,'prog')
 else
     
     if isempty(SVM)
-        cprintf('red','No model configuration found for modality %g', varind)
+        fprintf('No model configuration found for modality %g', varind)
         copyflag = nk_input('Do you want to use another modality''s configuration as template for current model configuration',0,'yes|no',[1,0],1);
         if copyflag
             varind_copy = nk_input('Specify modality index',0,'e');
