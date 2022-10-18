@@ -6,7 +6,6 @@ if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
    
-
     if isfield(GRAPHMETRICS,'metric'), MetricsYes = GRAPHMETRICS.metrics; end
 
     if MetricsYes == 1, METRICSSTR = 'yes'; else METRICSSTR = 'no'; end

@@ -313,6 +313,7 @@ if ~isempty(analysis)
                 inp.gdmat               = [];
                 inp.gdanalmat           = [];
                 inp.GridAct             = true(ix,jx);
+                
             end
             % Run through multiple analyses if needed    
             for i=1:nA
@@ -326,13 +327,28 @@ if ~isempty(analysis)
                     end
                 end
                 inp.analysis_id = tNM.analysis{inp.analind(i)}.id;
+                
+                % check whether alternative label should be used
+                if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
+                    tNM.label = tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.newlabel; 
+                    tNM.modeflag = tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.newmode;  
+                end
+
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
                 nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'clear', 0);
             end
             % Copy back results to NM/xNM
             if ~isfield(inp,'simFlag') || ~inp.simFlag
+                if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
+                    tNM.label = NM.label; 
+                    tNM.modeflag = NM.modeflag; 
+                end
                 NM = tNM;
             else
+                if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
+                    tNM.label = NM.label; 
+                    tNM.modeflag = NM.modeflag; 
+                end
                 xNM = tNM;
             end
             clear tNM
@@ -474,6 +490,7 @@ end
 % Store analysis results in analysis structure and set status to 1
 analysis.GDdims = GDdims;
 if ~isempty(META) && META.flag
+    %if 
     IN.labels = inp.labels;
     IN.nclass = inp.nclass;
     IN.ngroups = unique(inp.labels); IN.ngroups(isnan(IN.ngroups))=[]; IN.ngroups = numel(IN.ngroups);

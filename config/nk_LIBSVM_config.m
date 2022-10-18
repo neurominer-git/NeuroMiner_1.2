@@ -3,6 +3,7 @@ function param = nk_LIBSVM_config(res, param, defaultsfl, cvfl, parentstr)
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 if ~exist('cvfl','var') || isempty(cvfl), cvfl = 0; end
 if ~exist('param','var') || ~isfield(param,'LIBSVM'), param.LIBSVM = []; end
+if ~exist('modeflag', 'var'), modeflag = res.modeflag; end
 
 % DEFAULTS 
 % +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -31,7 +32,7 @@ end
 if isfield(param.LIBSVM,'classifier') && isnumeric(param.LIBSVM.classifier),
     classifier = param.LIBSVM.classifier;
 else
-    switch res.modeflag
+    switch modeflag
         case 'classification'
             classifier = 0; 
         case 'regression'
@@ -158,7 +159,7 @@ pstr = sprintf('%g',p);
 % INTERACTIVE LIBSVM MENU CONFIGURATION
 if ~defaultsfl
     
-    switch res.modeflag
+    switch modeflag
         case 'classification'
             switch classifier 
                 case 3
@@ -211,7 +212,7 @@ if ~defaultsfl
             end
                     
         case 2
-            switch res.modeflag
+            switch modeflag
                 case 'classification'
                     switch LIBSVMver
                         case 3
@@ -237,7 +238,7 @@ if ~defaultsfl
                     cldef = find(menuclsel == classifier);     
             end
             classifier = nk_input('Classifier type to use',0,'m', menuclact, menuclsel, cldef);
-            if ~cvfl && strcmp(res.modeflag,'regression')
+            if ~cvfl && strcmp(modeflag,'regression')
                 switch classifier
                     case 3
                         p = .1;

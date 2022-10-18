@@ -17,6 +17,14 @@ if isfield(handles,'SubIndex') && ~handles.oocvview, I = handles.SubIndex; else,
 if size(handles.NM.label,2)>1, handles.multilabel = true; else, handles.multilabel=false; end
 handles.curlabel = get(handles.selLabel,'Value');
 
+
+% set alternative label
+if isfield(handles.NM.analysis{analind}.params.TrainParam, 'LABEL') && handles.NM.analysis{analind}.params.TrainParam.LABEL.flag
+    handles.label = handles.NM.analysis{analind}.params.TrainParam.LABEL.newlabel;
+else
+    handles.label = handles.NM.label;
+end
+
 % Check whether selected analysis has visualisation data
 if isfield(handles.NM.analysis{analind},'visdata')
     visdata = handles.NM.analysis{analind}.visdata; 
@@ -55,7 +63,7 @@ handles.thisMLIresult.Visible = mlifl;
 handles = load_analysis(handles, ...
                     'Subjects', handles.NM.cases, ...
                     'Params', handles.NM.analysis{analind}.params, ...
-                    'Analysis', handles.NM.cv, handles.NM.label(I,:), GDdims, ...
+                    'Analysis', handles.NM.cv, handles.label(I,:), GDdims, ...
                     'Visdata', visdata, ...
                     'OOCVdata', oocvdata, ...
                     'MLIdata', mlidata);

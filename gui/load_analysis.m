@@ -16,7 +16,7 @@ for i = 1:nVarIn
     elseif strcmpi(varargin{i}, 'Analysis')
         
         handles.GDdims = varargin{i+3};
-        handles = load_GDdims(handles, varargin{i+1}, handles.NM.label, handles.GDdims);
+        handles = load_GDdims(handles, varargin{i+1}, handles.label, handles.GDdims);
 
     elseif strcmpi(varargin{i}, 'Visdata')
     

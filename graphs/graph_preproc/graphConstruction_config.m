@@ -107,44 +107,15 @@ if ~defaultsfl
                     GRAPHCONSTRUCTION.refGroup = nk_FileSelector(1,0,'Select file with reference group data (in the same format as main data, incl. group and ID column)','.*\.txt$|.*\.csv');
             end
         case 4
-            %             switch GCSTR_METHOD
-            %                 %                 case 'KL divergence'
-%             readParcA = nk_input('Read in parcellation atlas externally', 0, 'mq', ...
-%                 ['From MATLAB workspace |' ...
-%                 'From file |'], [0,1], 0);
-% 
-%             switch readParcA
-%                 case 0
-%                     GRAPHCONSTRUCTION.parcellation = nk_input('Parcellation atlas variable name in Matlab workspace',0,'e');
-%                 case 1
-            GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
-            %ParcellationAtlas = GRAPHCONSTRUCTION.parcellation;
-            %
-            %                 case 'Normative network + 1'
-            % %                     readVarT = nk_input('Read in variable types externally', 0, 'mq', ...
-            % %                         ['From MATLAB workspace |' ...
-            % %                         'From file |'], [0,1], 0);
-            %
-            % %                     switch readVarT
-            % %                         case 0
-            % %                             GRAPHCONSTRUCTION.variableTypes = nk_input('Define variable types vector',0,'e',[],[1 (size(NM.Y{1},2)-2)]);
-            % %                         case 1
-            % %                             GRAPHCONSTRUCTION.variableTypes = nk_FileSelector(1,0,'Select file containing variable types vector','.*\.txt$|.*\.csv');
-            % %                     end
-            %
-            %                     %GRAPHCONSTRUCTION.refGroup = nk_input('Reference group name (as defined in dataset)', 0, 's');
-            %
-            %             end
+                       GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
+          
     end
 
-    %ParcellationAtlas = 'Hammers.nii';
 
 else
     [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION,PX, parentstr, true);
     act = 0;
 end
-%GRAPHCONSTRUCTION.method = ConstructionMethod;
-%GRAPHCONSTRUCTION.parcellation = ParcellationAtlas;
 
 if exist('PX','var') && ~isempty(PX) && ...
         isfield (PX,'Px') && ...
@@ -156,26 +127,7 @@ else
 end
 end
 
-%     
-%     switch act
-%         case 1
-%             [GRAPHCONSTRUCTION, PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, parentstr);
-%             %GRAPHCONSTRUCTION.parcellation = cv_ExtGraphConstr_config(GRAPHCONSTRUCTION.method, [], [], true);
-%         case 2 % for compatibility
-%             %t_act = 1; while t_act > 0, [ParcellationAtlas, t_act] = cv_ExtGraphConstr_config(ConstructionMethod, ParcellationAtlas, 0, navistr);end
-%             GRAPHCONSTRUCTION.parcellation = nk_input('Define parcellation atlas file path',0, 's', ParcellationAtlas);
-%                 ;
-%         case 1000
-%             CALIBUSE = nk_AskCalibUse_config(mestr, CALIBUSE);
-%             
-%     end
-% else
-%     [GRAPHCONSTRUCTION, PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, parentstr, true);
-%     %GRAPHCONSTRUCTION.parcellation = cv_ExtGraphConstr_config(GRAPHCONSTRUCTION.method, [], [], true);
-%     act = 0;
-% end
 
-% 
 function [GRAPHCONSTRUCTION, PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, parentstr, defaultsfl)
 global NM
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end

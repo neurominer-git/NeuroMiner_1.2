@@ -8,6 +8,12 @@ else
     optimstr = d.GridParam; optimstr = ['Define ML model performance criterion [ ' optimstr ' ]|']; menusel = 3;
 end
 
+if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
+    modeflag = NM.TrainParam.LABEL.newmode;
+else
+    modeflag = NM.modeflag;
+end
+
 if isfield(SVM,'prog')
     d = nk_GetParamDescription2(NM,TrainParam,'SVMprog',d);
     d = nk_GetParamDescription2(NM,TrainParam,'classifier',d);
@@ -76,7 +82,7 @@ if EXPERT && ~any(strcmp(SVM.prog, {'SEQOPT','WBLCOX','DECTRE'}))
     else
         detrendstr = 'Disabled / NA';
     end
-    switch NM.modeflag
+    switch modeflag
         case 'regression'
             mnuact = [ mnuact 'Detrend predicted targets [ ' detrendstr ']|' ]; 
             mnusel = [ mnusel 5 ];
@@ -89,7 +95,7 @@ end
 
 if isfield(SVM,'kernel'), kerntype = SVM.kernel.kernstr; else, kerntype = []; end
 
-switch NM.modeflag
+switch modeflag
     case 'classification'
         if EXPERT 
             adasyndef = {'yes','no'};
@@ -124,8 +130,9 @@ switch NM.modeflag
         SVM.ADASYN.flag = 2;
 end
 
-switch NM.modeflag
-    
+
+switch modeflag
+
     case 'classification'
         if EXPERT
             sftmenu = ['SVM --------------> LIBSVM|' ...
@@ -254,7 +261,7 @@ switch act
     case 1
 
         nk_PrintLogo
-        mestr = ['Define model algorithm for ' NM.modeflag]; fprintf('\nYou are here: %s >>>',navistr);
+        mestr = ['Define model algorithm for ' modeflag]; fprintf('\nYou are here: %s >>>',navistr);
         selProg = nk_input(mestr,0,'mq', sftmenu, 1:size(sftval,1), 1);
         if selProg, SVM.prog = sftval(selProg,:); end
         
@@ -276,7 +283,7 @@ switch act
                 SVM.RVMflag = true;
                 SVM.RVM.UserOpt = SB2_UserOptions;
                 SVM.RVM.ParamSet = SB2_ParameterSettings;
-                switch NM.modeflag
+                switch modeflag
                     case 'regression'
                        sftval = char(nk_input('Select likelihood model',0,'m', ...
                                 ['Gaussian (for real valued functions)|' ...
@@ -338,7 +345,7 @@ switch act
                 
             case 'matLRN'
                 if ~isfield(SVM,'matLRN'), SVM.matLRN = []; end
-                switch NM.modeflag
+                switch modeflag
                     case 'classification'
                         matLRN = nk_matLearn_config(SVM.matLRN,'binaryclass',1);
 
@@ -353,10 +360,10 @@ switch act
 
             case {'GLMNET','GRDBST'}
                 if ~isfield(SVM,SVM.prog), SVM.(SVM.prog) = []; end
-                if ~isfield(NM.TrainParam.GRD,SVM.prog), NM.TrainParam.GRD.(SVM.prog) = nk_GLMNET_config(SVM.prog, [],1, NM.modeflag); end
+                if ~isfield(NM.TrainParam.GRD,SVM.prog), NM.TrainParam.GRD.(SVM.prog) = nk_GLMNET_config(SVM.prog, [],1, modeflag); end
                 switch SVM.prog
                     case 'GLMNET'
-                        switch NM.modeflag
+                        switch modeflag
                             case 'classification'
                                 SVM.GLMNET.family = 'binomial';
                             otherwise
@@ -366,7 +373,7 @@ switch act
 
             case 'ROBSVM'
                 if ~isfield(SVM,SVM.prog), SVM.(SVM.prog) = []; end
-                if ~isfield(NM.TrainParam.GRD,SVM.prog), NM.TrainParam.GRD.(SVM.prog) = nk_ROBSVM_config(SVM.prog, [], NM.modeflag, 1); end
+                if ~isfield(NM.TrainParam.GRD,SVM.prog), NM.TrainParam.GRD.(SVM.prog) = nk_ROBSVM_config(SVM.prog, [], modeflag, 1); end
 
             case 'SEQOPT'
                 act = 1; if ~isfield(SVM,'SEQOPT'), [~, SVM.SEQOPT ] = nk_SEQOPT_config([],1); end

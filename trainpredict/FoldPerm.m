@@ -149,7 +149,10 @@ for ii=1:PermNum % Loop through CV1 permutations
             kSubjCV = size(tCV{1},1);
             
             %% Determine labels for learning process
+            
             modelTrL{curclass} = IN.Y.TrL{i,j}{curclass}(:,MULTILABEL.curdim);
+            
+
             tTrL{curclass} = zeros(size(tTr{1},1),1); 
             tTrL{curclass}(TrInd) = IN.Y.TrL{i,j}{curclass}(:,MULTILABEL.curdim);
             tCVL{curclass} = zeros(size(tCV{1},1),1); 
