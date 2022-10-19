@@ -40,7 +40,7 @@ try
                 t_label = table2array(t_Y(:,label_edit(j)));
         end
         
-        % Ceck whether unlabeled datapoints have to be added to the label
+        % Check whether unlabeled datapoints have to be added to the label
         % matrix
         if IO.nangroup == 1 && IO.nan_subjects > 0
            t_label = [t_label; nan(IO.nan_subjects,size(t_label,2))];

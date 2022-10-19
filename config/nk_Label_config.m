@@ -1,79 +1,11 @@
-% function [ALTLAB, act] = nk_Label_config(altlab)
-% 
-% global NM
-% 
-% % if ~isempty(altlab)
-% %     altlabflag = altlab.flag;
-% %     lab = altlab.lab;
-% %     labelname = altlab.labname;
-% %     modeflag = altlab.modeflag;
-% %     if strcmp(modeflag, 'classification')
-% %         groupnames = altlab.groupnames;
-% %     else
-% %         groupnames = [];
-% %     end
-% % else
-% %     altlabflag = 0;
-% %     lab = [];
-% %     labelname = '';
-% %     modeflag = NM.modeflag;
-% %     groupnames = [];
-% % end
-% altlabflag = 1;
-% lab = ''
-% if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
-% 
-% if ~defaultsfl
-% 
-%     if isfield(, ALTLABSTR = 'Yes'; else, ALTLABSTR = 'No'; end
-% 
-%     if ~isempty(lab), LABSTR = labelname; else, LABSTR = ''; end
-% 
-%     menustr = ['Use alternative label [' ALTLABSTR ']|' ...
-%         'Read in alternative label [' LABSTR ']'];
-%     menuact = 1:2;
-% 
-%     nk_PrintLogo
-%     mestr = 'Alternative label';
-%     act = nk_input(mestr,0,'mq', menustr, menuact);
-%     
-%     switch act
-%         case 1
-%             if altlabflag == 1
-%                 altlabflag = 0;
-%             elseif altlabflag == 0
-%                 altlabflag = 1;
-%             end
-%         case 2
-%             lab = nk_input('Label variable',0,'r',[],[NM.n_subjects_all 1]);
-%             labelname = nk_input('Label name', 0, 'r',[], [],[]);
-%         case 3
-%             quit;
-%     end
-% 
-% else
-%     act = 0;
-% end
-% 
-% ALTLAB.flag = altlabflag;
-% if altlabflag 
-%     ALTLAB.label = lab;
-%    % NM.label = [NM.label,lab];
-% end
-% 
-% 
-% 
-
-
-
-
-function [ ALTLAB, act ] = graphMetrics_config(ALTLAB)
+function [ ALTLAB, act ] = nk_Labels_config(ALTLAB)
 global NM
 
 altlabflag = 0;
 newlabel = 'no label defined';
 newlabelname = 'no name defined';
 newmode = 'no new mode defined';
+newgroupnames = [];
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
@@ -83,6 +15,7 @@ if ~defaultsfl
     if isfield(ALTLAB,'newlabel'), newlabel = ALTLAB.newlabel; end
     if isfield(ALTLAB,'newlabelname'), newlabelname = ALTLAB.newlabelname; end
     if isfield(ALTLAB,'newmode'), newmode = ALTLAB.newmode; end
+    if isfield(ALTLAB,'newgroupnames'), newgroupnames = ALTLAB.newgroupnames; end
 
 
     if altlabflag == 1, 
@@ -102,9 +35,6 @@ if ~defaultsfl
         menuact = 1;
     end
     
-       
-    
-    
     nk_PrintLogo
     mestr = 'Alternative label'; navistr = [' >>> ' mestr]; fprintf('\nYou are here: %s >>> '); 
     act = nk_input(mestr,0,'mq', menustr, menuact);
@@ -122,7 +52,7 @@ if ~defaultsfl
                 % structure (if one exists)
                 newgroupsN = numel(unique(newlabel));
                 newgroups = unique(newlabel);
-                newgroupnames = nk_input('Groupnames',0,'r',[],[newgroupsN 1]);
+                newgroupnames = nk_input('Groupnames (as vector, no numeric names)',0,'e',[],[newgroupsN 1]);
 
                 if isfield(NM, 'cv')
                     cv_ok = check_CV_class(NM.cv, NM.cases, newlabel, newgroups);
@@ -146,6 +76,11 @@ ALTLAB.flag = altlabflag;
 ALTLAB.newlabel = newlabel; 
 ALTLAB.newlabelname = newlabelname; 
 ALTLAB.newmode = newmode; 
+if strcmp(newmode,'classification')
+    ALTLAB.newgroupnames = newgroupnames;
+elseif isfield(ALTLAB, 'newgroupnames')
+    ALTLAB = rmfield(ALTLAB, 'newgroupnames');
+end
 
 function compatCVflag = check_CV_class(cv, indcases, label, groups)
 compatCVflag = 1;

@@ -359,26 +359,21 @@ end
 class_wrapper = @(ind) GenClass(g, ulb, nclass, inp.TrainParam.LABEL.newlabel(ind), inp.TrainParam.RAND.Decompose, NaNflag);
 newclass = cellfun(class_wrapper, inp.cv.TrainInd, 'UniformOutput', false);
 
-% class_wrapper2 = @(class) GenClass2(class, )
-% newclass1 = cellfun(class_wrapper2, newclass, 'UniformOutput', false);
+class_wrapper2 = @(class) GenClass2(class, )
+newclass1 = cellfun(class_wrapper2, newclass, 'UniformOutput', false);
 
 for i = 1:size(cvadj.class,1)
     for j = 1:size(cvadj.class,2)
         if iscell(cvadj.class{i,j})
             for l = 1:length(cvadj.class{i,j})
-                newclass{i,j}{l}.TrainInd = cvadj.class{i,j}{l}.TrainInd; 
-                newclass{i,j}{l}.TestInd = cvadj.class{i,j}{l}.TestInd; 
-                label_wrapper = @(ind) inp.TrainParam.LABEL.newlabel(ind);
-                newclass{i,j}{l}.TrainLabel = cellfun(label_wrapper, newclass{i,j}{l}.TrainInd, 'UniformOutput', false);
-                newclass{i,j}{l}.TestLabel = cellfun(label_wrapper, newclass{i,j}{l}.TestInd, 'UniformOutput', false);
+                newclass{i,j}.TrainInd = cvadj.class{i,j}{l}.TrainInd; 
+                newclass{i,j}.TestInd = cvadj.class{i,j}{l}.TestInd; 
             end
 %             class_wrapper2 = @(class) GenClass2(class, cvadj.class{i,j}, [], inp.TrainParam.LABEL.newlabel);
 %             newclass{i,j} = cellfun(class_wrapper2, newclass, 'UniformOutput', false);
         else
             newclass{i,j}.TrainInd = cvadj.class{i,j}.TrainInd; 
             newclass{i,j}.TestInd = cvadj.class{i,j}.TestInd; 
-            class.TrainLabel = inp.TrainParam.LABEL.newlabel(cvadj.class{i,j}.TrainInd);
-            class.TestLabel = inp.TrainParam.LABEL.newlabel(cvadj.class{i,j}.TestInd);
 %             class_wrapper2 = @(class) GenClass2(class, cvadj.class{i,j}.TrainInd, cvadj.class{i,j}.TestInd, inp.TrainParam.LABEL.newlabel);
 %             newclass{i,j} = cellfun(class_wrapper2, newclass, 'UniformOutput', false);
         end
