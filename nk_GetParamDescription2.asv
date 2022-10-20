@@ -519,15 +519,15 @@ switch action
                             if ~isempty(actparamAUX.GRAPHMETRICS.metricslist) 
                                 for j= 1:size(actparamAUX.GRAPHMETRICS.metricslist,2) 
                                     if j == 1
-                                        METRICSLISTSTR = actparamAUX.GRAPHMETRICS.metricslist{j}.id;
+                                        METRICSLISTSTR = actparamAUX.GRAPHMETRICS.petList{j}.id;
                                     else
                                         METRICSLISTSTR = sprintf('%s, %s', METRICSLISTSTR, actparamAUX.GRAPHMETRICS.metricslist{j}.id);
 
                                     end
                                 end
-                                preprocact{i} = sprintf('Compute graph metrics from connectivity matrices: %s ', METRICSLISTSTR);
+                                preprocact{i} = sprintf('Compute correlations with neurotransmitter maps: %s (JuSpace Toolbox)', PETLISTSTR);
                             end
-                            
+                            preprocact{i} = 'Compute graph metrics from connectivity matrices';
                             
                         case 'graphComputation'
                             preprocact{i} = 'Construct individual networks';
