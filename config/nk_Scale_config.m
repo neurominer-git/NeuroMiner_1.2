@@ -1,6 +1,12 @@
 function [ SCALE, act ] = nk_Scale_config(SCALE, parentstr, defaultsfl)
 
+global CALIBAVAIL
+
 AcMatFl = 0; ZeroOne = 1; ZeroOut = 1; SCALE.xscale = 1; CALIBUSE = 2;
+
+if CALIBAVAIL
+    CALIBUSE = 1;
+end
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 

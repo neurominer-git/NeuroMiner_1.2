@@ -23,12 +23,12 @@ for curclass = 1 : ukbin
                 SrcParam.BinaryTrainLabel   = SrcParam.TrX;
                 SrcParam.BinaryCVLabel      = SrcParam.TrX;
             end
-            SrcParam.MultiTrainLabel    = inp.label;
-            SrcParam.MultiCVLabel       = inp.label;
+            SrcParam.MultiTrainLabel    = inp.labels;
+            SrcParam.MultiCVLabel       = inp.labels;
         case 'regression'
             SrcParam.TrX = true(length(inp.labels),1);
-            SrcParam.TrainLabel         = inp.label;
-            SrcParam.CVLabel            = inp.label;
+            SrcParam.TrainLabel         = inp.labels;
+            SrcParam.CVLabel            = inp.labels;
     end
      if iscell(Y)
         iY = Y{curclass}{1}(SrcParam.TrX,:);

@@ -726,8 +726,10 @@ else
 end
 
 if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
+INcalib.TrCovars = CALIB.covars;
+if CALIB.flag && CALIB.preprocstep > i, InputParam.C = nk_PartialCorrelationsObj(InputPara.C, INcalib);
 end
-
+end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_elimzero(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
@@ -973,6 +975,11 @@ if isfield(actparam,'opt')
     InputParam.P{i}.GRAPHCONSTRUCTION.p = actparam.opt;
 end
 
+% if calibration data exists, replace refgroup with C
+if isfield(InputParam, 'C') && strcmp(InputParam.P{i}.GRAPHCONSTRUCTION.method, "Normative network + 1") && InputParam.P{i}.GRAPHCONSTRUCTION.refGroup == -1
+    InputParam.P{i}.GRAPHCONSTRUCTION.refGroup = InputParam.C;
+end
+
 if paramfl && tsfl 
      tsproc = true;
 elseif trfl
@@ -1057,6 +1064,8 @@ elseif trfl
 end
 
 if tsproc, InputParam.Ts = perfROImeans(InputParam.Ts, TrParami); end
+if CALIB.flag && CALIB.preprocstep > i, InputParam.C = perfROImeans(InputParam.C, InputParam.P{i}.ROIMEANS);
+end
 end
 % =========================================================================
 function [InputParam, SrcParam] = perform_adasyn(InputParam, SrcParam)

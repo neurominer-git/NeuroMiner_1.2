@@ -226,6 +226,7 @@ switch act
                     % Check whether calibration data is available 
                     if exist('C','var') && ~isempty(C) && isfield(PREPROC,'CALIB') && ~isempty(PREPROC.CALIB),
                         CALIB.flag = true;
+                        P = inp.X;
                         C = nk_PerfSpatFilt2( C, PREPROC, P ); 
                     elseif isfield(PREPROC,'TEMPLPROC') && ~isempty(PREPROC.TEMPLPROC) && PREPROC.TEMPLPROC
                         % For factorization methods: TEMPLATE MAPPING 
@@ -285,7 +286,7 @@ switch act
                                 end
                             end
     
-                            [mapY, Param] = nk_PerfPreprocess(Y, inp, labels, paramfl);
+                            [mapY, Param] = nk_PerfPreprocess(Y, inp, labels, paramfl,[],C);
     
                             outfold = jx; outperm = ix;
                             

@@ -52,3 +52,7 @@ else
     end
 end
 
+if isfield(analysis, 'C')
+    inp.C = analysis.C;
+end
+

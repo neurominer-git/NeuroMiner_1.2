@@ -159,6 +159,9 @@ switch act
                 NM.analysis{A.analdim}.params.cv              = NM.cv;
                 NM.analysis{A.analdim}.params.id              = NM.id;
                 NM.analysis{A.analdim}.meta.TIME              = datestr(now);
+                if isfield(NM,'C')
+                    NM.analysis{A.analdim}.C                  = NM.C;
+                end
                 try
                   NM.analysis{A.analdim}.meta.USER              = java.lang.System.getProperty('user.name');
                   NM.analysis{A.analdim}.meta.OS.name           = java.lang.System.getProperty('os.name');

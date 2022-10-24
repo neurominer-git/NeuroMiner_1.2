@@ -373,6 +373,11 @@ for k=sta_iy:stp_iy % Inner permutation loop
             else 
                 inp.covars_oocv = [];
             end
+            if isfield(inp,'covars_cocv')
+                SrcParam.covars_cocv        = inp.covars_cocv;
+            else 
+                inp.covars_cocv = [];
+            end
             SrcParam.iOCV               = iOCV; % To resolve bug in nk_GenPreprocSequence.m reported by Mark Dong (29/09/2021)
 
             % Run ADASYN if needed

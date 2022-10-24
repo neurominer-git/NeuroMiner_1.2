@@ -8,7 +8,7 @@
 % (c) Nikolaos Koutsouleris, 07/2022
 
 function [act, varind] = nk_TrainClass_config(act, varind, parentstr)
-global NM
+global NM CALIBAVAIL
 
 if ~exist('act','var'), act = []; end
 menustr = []; menuact = [];
@@ -141,10 +141,10 @@ end
 
 %% Check data entry status
 if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'LABEL'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'CALIB','LABEL'});
     STATUS = nk_CheckFieldStatus(NM.TrainParam.STRAT{varind},{'PREPROC','SVM','GRD','RFE','MULTI','VIS','MLI'}, [], [], STATUS);
 else
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI', 'LABEL'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI', 'CALIB', 'LABEL'});
 end
 switch STATUS.PREPROC
     case '...'
@@ -285,6 +285,7 @@ if ~exist('act','var') || isempty(act)
     flx = flSVM && flGRD && flPREPROC;
 
     menustr = [ menustr 'Use different label [ ' STATUS.LABEL ']|']; menuact = [menuact 99] ;
+    menustr = [ menustr 'Calibration data [ ' STATUS.CALIB ']|']; menuact = [menuact 1000];
     menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 5:6 ];
 
     if flx
@@ -656,6 +657,12 @@ switch act
             NM.TrainParam.LABEL         = LABEL;
         end
 
+ %% read in calibration data
+    case 1000
+
+        NM = nk_DefineOOCVData_config(NM, 2, 'calib');
+        [NM, C, oocvind, fldnam, dattype] = nk_SelectOOCVdata(NM, 2, 0);
+        CALIBAVAIL = 1;
 end
 act = 1;
 

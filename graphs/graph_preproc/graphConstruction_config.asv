@@ -115,7 +115,7 @@ if ~defaultsfl
                 case 1
                     GRAPHCONSTRUCTION.refGroup = nk_FileSelector(1,0,'Select file with reference group data (in the same format as main data, incl. group and ID column)','.*\.txt$|.*\.csv');
                 case 2
-                    GRAPHCONSTRUCTION.refGroup = -1;  % flag for calibration data
+                    GRAPHCONSTRUCTION.refGroup = NM.C; 
             end
         case 4
                        GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
