@@ -382,9 +382,7 @@ else
     if tsfl, tsproc = true; end  
 end
 if tsproc, InputParam.Ts = nk_PerfScaleObj(InputParam.Ts, TrParami); end
-if isfield(InputParam, 'C') %CALIB.flag && CALIB.preprocstep > i
-    InputParam.C = nk_PerfScaleObj(InputParam.C, InputParam.P{i}.SCALE);
-end
+
 end
 
 % =========================================================================
@@ -682,7 +680,7 @@ if tsproc, InputParam.Ts = nk_PerfExtDimObj(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_correctnuis(SrcParam, InputParam, ~, TrParami, actparam)
-global VERBOSE CALIB
+global VERBOSE
 
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -729,9 +727,8 @@ end
 
 if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
 INcalib.TrCovars = CALIB.covars;
-if isfield(InputParam, 'C') %CALIB.flag && CALIB.preprocstep > i
-    InputParam.C = nk_PartialCorrelationsObj(InputParam.C, INcalib);
-end
+% if CALIB.flag && CALIB.preprocstep > i, InputParam.C = nk_PartialCorrelationsObj(InputPara.C, INcalib);
+% end
 end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_elimzero(SrcParam, InputParam, ~, TrParami, actparam)
@@ -1067,7 +1064,7 @@ elseif trfl
 end
 % 
 if tsproc, InputParam.Ts = perfROImeans(InputParam.Ts, TrParami); end
-if isfield(InputParam, 'C') %&& CALIB.preprocstep > i 
+if isfield(InputParam, 'C') && CALIB.preprocstep > i 
     InputParam.C = perfROImeans(InputParam.C, InputParam.P{i}.ROIMEANS);
 end
 end

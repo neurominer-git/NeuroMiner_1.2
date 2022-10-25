@@ -60,6 +60,9 @@ inparams.preprocmat =       inp.preprocmat;
 if isfield(inp,'time2event')
     inparams.time2event =   inp.time2event;
 end
+if isfield(inp, 'C')
+    inparams.C =            inp.C;
+end
 
 clear inp
 

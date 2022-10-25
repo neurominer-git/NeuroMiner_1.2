@@ -26,7 +26,7 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, ...
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 07/2022
 
-global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL
+global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL CALIB
 
 % Initialize runtime variables
 i       = inp.f; % Curration permutation
@@ -50,6 +50,11 @@ if ~exist('paramfl','var'), paramfl.use_exist = false; end
 cv2flag = false; if isfield(PREPROC,'CV2flag') && (PREPROC.CV2flag - 1) == 1; cv2flag = true; end
 tYocv   = []; if exist('Yocv','var') && ~isempty(Yocv), tYocv.Ts = cell(iy,jy); else, Yocv = []; end
 if ~exist('Cocv','var'), Cocv = []; end
+
+if isfield(inp, 'C')
+    Cocv = inp.C{1,1}.Y{1,1};
+    CALIB = inp.C{1,1};
+end
 
 % Set binary/regression or multi-group processing mode
 if iscell(PREPROC)
@@ -101,7 +106,7 @@ end
 
 % Generate template parameters (e.g. for Procrustes rotation)
 if isfield(paramfl,'templateflag') && paramfl.templateflag 
-    TEMPL = nk_GenTemplParam(PREPROC, tgenCV, MODEFL, RAND, sY, inp, kbin);
+    TEMPL = nk_GenTemplParam(PREPROC, tCV, MODEFL, RAND, sY, inp, kbin);
 else
     clear TEMPL
 end

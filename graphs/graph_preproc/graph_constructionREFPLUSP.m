@@ -32,8 +32,8 @@ function CM = graph_constructionREFPLUSP(A, method, referenceGroup, similarityMe
 global NM
 % % read in reference group data 
 if size(referenceGroup,1) >1
-    RG = referenceGroup;
-else 
+    RG = referenceGroup; 
+else
     RG = readtable(referenceGroup);
     RG = table2array(RG);
 end

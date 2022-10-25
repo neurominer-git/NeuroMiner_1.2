@@ -33,7 +33,9 @@ global NM
 % % read in reference group data 
 if size(referenceGroup,1) >1
     RG = referenceGroup;
-else 
+elseif isnumeric(referenceGroup) && referenceGroup == -1
+    RG = 
+else
     RG = readtable(referenceGroup);
     RG = table2array(RG);
 end
@@ -99,22 +101,11 @@ switch similarityMeasure
             end
         end
     case 'Mutual information'
-        R = pyrunfile('')
-        RCM = mi_mat(RG);
-        for i = 1:size(A,1)
-            CURSAMPLE = [RG;A(i,:)];
-            CURCM = mi_mat(CURSAMPLE);
-            DIFCM = RCM - CURCM;
-            UPPTRI = triu(DIFCM,1);
-            tri  = triu(true(size(DIFCM)),1);
-            if ~exist('R', 'var')
-                R = UPPTRI(tri)';
-            else
-                R = [R;UPPTRI(tri)'];
-            end
-        end
+        R = pyrunfile('cv_computeMInetworks.py', 'netwX', ...
+            ref = RG, ...
+            X = A);
 end
-CM = R;
+CM = double(R);
 end
 
 function MIM = mi_mat(DATA)
