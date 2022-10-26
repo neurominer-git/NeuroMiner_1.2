@@ -52,7 +52,7 @@ tYocv   = []; if exist('Yocv','var') && ~isempty(Yocv), tYocv.Ts = cell(iy,jy); 
 if ~exist('Cocv','var'), Cocv = []; end
 
 if isfield(inp, 'C')
-    Cocv = inp.C{1,1}.Y{1,1};
+    Cocv = inp.C{1,1}.Y;
     CALIB = inp.C{1,1};
 end
 
@@ -378,8 +378,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
             else 
                 inp.covars_oocv = [];
             end
-            if isfield(inp,'covars_cocv')
-                SrcParam.covars_cocv        = inp.covars_cocv;
+            if isfield(inp,'C') && isfield(inp.C{1,1}, 'covars')
+                SrcParam.covars_cocv        = inp.C{1,1}.covars;
             else 
                 inp.covars_cocv = [];
             end

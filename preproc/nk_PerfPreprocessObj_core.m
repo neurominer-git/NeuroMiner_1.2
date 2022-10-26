@@ -474,7 +474,9 @@ else
     if VERBOSE;fprintf(' not performed.'); end
 end
 if tsproc, InputParam.Ts = nk_PerfRemMeanDiffObj(InputParam.Ts, TrParami); end
-
+if isfield(InputParam, 'C') %CALIB.flag && CALIB.preprocstep > i
+    InputParam.C = nk_PerfRemMeanDiffObj(InputParam.C, INcalib);
+end
 end
 
 % =========================================================================
@@ -728,7 +730,9 @@ else
 end
 
 if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
+INcalib = IN;
 INcalib.TrCovars = CALIB.covars;
+INcalib = rmfield(INcalib, 'subgroup');
 if isfield(InputParam, 'C') %CALIB.flag && CALIB.preprocstep > i
     InputParam.C = nk_PartialCorrelationsObj(InputParam.C, INcalib);
 end
