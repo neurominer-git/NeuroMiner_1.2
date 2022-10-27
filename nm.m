@@ -443,7 +443,7 @@ if isfield(NM.defs,'JTextArea')
 end
 if ~isequal(filename,0) && ~isequal(pathname,0)
     fprintf('\nSaving %s ... please wait',filename)
-    save(fullfile(pathname,filename),'NM')
+    save(fullfile(pathname,filename),'NM','-v7.3')
 end
 
 end

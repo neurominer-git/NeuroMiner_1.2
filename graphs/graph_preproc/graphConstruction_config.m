@@ -48,7 +48,7 @@ if ~defaultsfl
         else
             if size(ReferenceGroup,1) >1
                 GCSTR_REFG = 'from Matlab workspace';
-            elseif isequal(ReferenceGroup, NM.C)
+            elseif isfield(NM, 'C') && isequal(ReferenceGroup, NM.C)
                 GCSTR_REFG = 'calibration data';
             else
                 GCSTR_REFG = ReferenceGroup;

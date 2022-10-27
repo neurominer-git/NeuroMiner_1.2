@@ -378,8 +378,8 @@ for k=sta_iy:stp_iy % Inner permutation loop
             else 
                 inp.covars_oocv = [];
             end
-            if isfield(inp,'C') && isfield(inp.C, 'covars')
-                SrcParam.covars_cocv        = inp.C.covars;
+            if isfield(inp,'C') && isfield(inp.C{1,1}, 'covars')
+                SrcParam.covars_cocv        = inp.C{1,1}.covars;
             else 
                 inp.covars_cocv = [];
             end

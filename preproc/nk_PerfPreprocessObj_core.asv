@@ -209,7 +209,15 @@ for i=1:nact
                         end
                     end
                 end
-
+                if isfield(InputParam,'C')
+                    InputParam.C = InputParam.C';
+                    if i==1    
+                        InputParamj.C = InputParam.C{jj}; 
+                    else
+                        InputParamj.C = InputParam.C{jj,nl}; 
+                   end
+                    
+                end
                 % ... and now apply multiple parameters to shelf thus creating
                 % multi-shelf versions of the data 
                 for l = 1: nO
@@ -475,6 +483,11 @@ else
 end
 if tsproc, InputParam.Ts = nk_PerfRemMeanDiffObj(InputParam.Ts, TrParami); end
 if isfield(InputParam, 'C') %CALIB.flag && CALIB.preprocstep > i
+    INcalib = InputParam.P{i};
+    
+  
+    INcalib.sTrInd = SrcParam.covars_cocv(:,INcalib.sIND);
+    INcalib.dTrInd = SrcParam.covars_cocv(:,INcalib.dIND);
     InputParam.C = nk_PerfRemMeanDiffObj(InputParam.C, INcalib);
 end
 end
