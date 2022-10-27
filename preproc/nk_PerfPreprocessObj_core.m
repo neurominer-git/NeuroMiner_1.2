@@ -40,7 +40,14 @@ if isfield(InputParam,'Tr'), trfl=true; end
 nTs = 0; if isfield(InputParam,'Ts'), tsfl=true; if iscell(InputParam.Ts), nTs = size(InputParam.Ts,2); end; end
 
 % Has calibration data been transferred? [not used currently]
-nC = 0; if isfield(InputParam,'C'), cfl=true; if iscell(InputParam.C), nC = size(InputParam.C,2); end; end
+nC = 0; if isfield(InputParam,'C')
+    filename = InputParam.C{1,1}.Y ;
+    InputParam.C{1,1}.Y = load(InputParam.C{1,1}.Y, 'CY');
+    cfl=true; 
+    if iscell(InputParam.C)
+        nC = size(InputParam.C,2); 
+    end; 
+end
 
 if ~trfl && ~tsfl, error('\nNo Preprocessing performed because training and test data are missing.\nCheck your parameters!!!'); end
 

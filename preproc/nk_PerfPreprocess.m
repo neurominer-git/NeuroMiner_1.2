@@ -52,6 +52,8 @@ tYocv   = []; if exist('Yocv','var') && ~isempty(Yocv), tYocv.Ts = cell(iy,jy); 
 if ~exist('Cocv','var'), Cocv = []; end
 
 if isfield(inp, 'C')
+    load(inp.C{1,1}.Y);
+    inp.C{1,1}.Y = Cfile{1,1}; % this had to be implemented to overcome memory issues when saving the NM struct with calib loaded (needed for compiling)
     Cocv = inp.C{1,1}.Y;
     CALIB = inp.C{1,1};
 end
