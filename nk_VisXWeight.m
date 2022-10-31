@@ -269,7 +269,7 @@ for n=1:nM
         if nM == 1 && mM>1
             for m=1:numel(varind)
                 if procfl
-                    % Estract indices to modality
+                    % Extract indices to modality
                     indX = inp.X.dimvecx(m)+1:inp.X.dimvecx(m+1);
                     mW{m} = nmW(indX);
                     mP{m} = nmP(indX);
