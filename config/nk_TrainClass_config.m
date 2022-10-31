@@ -665,8 +665,8 @@ switch act
         CALIBAVAIL = 1;
         Cfile = NM.C{1,1}.Y;
         Cfile_path = sprintf('%s/testC', pwd);
-        save(Cfile_path, 'Cfile');
-        NM.C{1,1}.Y = Cfile_path;
+        %save(Cfile_path, 'Cfile');
+        %NM.C{1,1}.Y = Cfile_path;
 end
 act = 1;
 
