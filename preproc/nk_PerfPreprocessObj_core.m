@@ -704,7 +704,7 @@ if tsproc, InputParam.Ts = nk_PerfExtDimObj(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_correctnuis(SrcParam, InputParam, ~, TrParami, actparam)
-global VERBOSE CALIB
+global VERBOSE CALIB 
 
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -750,11 +750,13 @@ else
 end
 
 if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
-INcalib = IN;
-INcalib.TrCovars = CALIB.covars;
-INcalib = rmfield(INcalib, 'subgroup');
-if isfield(InputParam, 'C') %CALIB.flag && CALIB.preprocstep > i
+if CALIB.flag && isfield(InputParam, 'C')
+    INcalib = IN;
+    INcalib.TrCovars = CALIB.covars;
+    INcalib = rmfield(INcalib, 'subgroup');
+    %if isfield(InputParam, 'C') %CALIB.flag && CALIB.preprocstep > i
     InputParam.C = nk_PartialCorrelationsObj(InputParam.C, INcalib);
+    %end
 end
 end
 % =========================================================================
@@ -1003,7 +1005,7 @@ if isfield(actparam,'opt')
 end
 
 % if calibration data exists, replace refgroup with C
-if isfield(InputParam, 'C') && strcmp(InputParam.P{i}.GRAPHCONSTRUCTION.method, "Normative network + 1") && InputParam.P{i}.GRAPHCONSTRUCTION.refGroup == -1
+if CALIB.flag && isfield(InputParam, 'C') && strcmp(InputParam.P{i}.GRAPHCONSTRUCTION.method, "Normative network + 1") && InputParam.P{i}.GRAPHCONSTRUCTION.refGroup == -1
     InputParam.P{i}.GRAPHCONSTRUCTION.refGroup = InputParam.C;
 end
 
@@ -1091,7 +1093,7 @@ elseif trfl
 end
 % 
 if tsproc, InputParam.Ts = perfROImeans(InputParam.Ts, TrParami); end
-if isfield(InputParam, 'C') %&& CALIB.preprocstep > i 
+if CALIB.flag && isfield(InputParam, 'C') %&& CALIB.preprocstep > i 
     InputParam.C = perfROImeans(InputParam.C, InputParam.P{i}.ROIMEANS);
 end
 end

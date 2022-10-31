@@ -1,4 +1,4 @@
-function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P, F, VI, decompfl, procfl, Fadd)
+function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P, F, VI, decompfl, memprob, procfl, Fadd)
 % =========================================================================
 % [mW, mP, mR, mSR, mC, W, mPA] = nk_VisXWeight(inp, MD, Y, L, varind, ...
 %                                          P, F, VI, decompfl, procfl, Fadd)
@@ -34,7 +34,7 @@ function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P
 % (c) Nikolaos Koutsouleris, 05/2022
 
 global SVM %TEMPL
-
+if ~exist('memprob','var') || isempty(memprob), memprob = false; end % to fix bug report
 if ~exist('procfl','var') || isempty(procfl), procfl = true; end
 if ~exist('Fadd','var') || isempty(Fadd), Fadd = true(size(F)); end
 mPA = []; PA = []; warning off
@@ -75,7 +75,7 @@ end
 % Loop through modalities
 for n=1:nM
     
-    if iscell(inp.PREPROC), 
+    if iscell(inp.PREPROC)
         nPREPROC = inp.PREPROC{n};
         nPX      = P{n};
     else
@@ -129,7 +129,7 @@ for n=1:nM
                     % Very frequently users opt to scale features after
                     % factorization/dimensionality reduction. In these cases
                     % scaling has to be reverted prior to back-projection
-                    if ~reducedimfl && decompfl(n),
+                    if ~reducedimfl && decompfl(n)
                         IN = nPREPROC.ACTPARAM{a}.SCALE;
                         IN.minY = naPX.minY; IN.maxY = naPX.maxY; 
                         IN.revertflag = true;
@@ -167,7 +167,7 @@ for n=1:nM
 
                         switch DR.RedMode                                        
                             case {'PCA','RobPCA','SparsePCA'}
-                                if strcmp(DR.RedMode,'RobPCA'), 
+                                if strcmp(DR.RedMode,'RobPCA') 
                                     DRsoft = 1; 
                                 else
                                     DRsoft = DR.DRsoft;
@@ -186,8 +186,8 @@ for n=1:nM
                             case {'optNMF','NeNMF','NNMF','PLS','LPP', 'NPE', 'LLTSA', 'SPCA', 'PPCA', 'FA', 'FactorAnalysis', 'NCA', 'MCML', 'LMNN'}
                                  nmW = mpp.vec * nmW;
                                  nmP = logical(mpp.vec * nmP);
-                            case {'Autoencoder','AutoEncoder'}
-
+                                 if ~isempty(PA), nmPA = mpp.vec * nmPA; end
+                            
                             otherwise
                                  error('Reconstruction of data is not supported for this technique.');
                         end
@@ -195,8 +195,9 @@ for n=1:nM
                         % If features had been removed prior to dimensionality
                         % reduction take care that you recover the original space
                         if isfield(naPX,'indNonRem') && ~isempty(naPX.indNonRem) && sum(~naPX.indNonRem) > 0
-                            tmW = zeros(size(naPX.indNonRem')); tmP = zeros(size(naPX.indNonRem'));
+                            tmW = zeros(size(naPX.indNonRem')); tmP = tmW; 
                             tmW(naPX.indNonRem) = nmW; nmW = tmW; tmP(naPX.indNonRem) = nmP; nmP = tmP;  
+                            if ~isempty(PA), tmPA = tmW; tmPA(naPX.indNonRem) = nmPA; nmPA = tmPA; end
                             % Don't forget to adjust the feature masks and the
                             % indices to modalities in case of fused feature spaces
                             %tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(naPX.indNonRem) = lFuVI; lFuVI = tlFuVI;
@@ -205,7 +206,6 @@ for n=1:nM
                         end
                         reducedimfl = true;
                     end
-                        
 
                 case {'elimzero','extfeat','extdim'}
                     % Find eliminated feature vector
@@ -226,13 +226,7 @@ for n=1:nM
                     tmW = zeros(length(pIND),1); tmW(pIND) = nmW; nmW = tmW;   
                     tmP = false(length(pIND),1); tmP(pIND) = nmP; nmP = tmP;
                     if ~isempty(PA)
-                        try
-                            tmPA = zeros(length(pIND),1);
-                            tmPA(naPX.(IND)) = nmPA; nmPA = tmPA;
-                        catch
-                            disp(sum(naPX.(IND)))
-                            disp(numel(nmPA))
-                        end
+                         tmPA = tmW; tmPA(naPX.(IND)) = nmPA; nmPA = tmPA; 
                     end 
                     % Don't forget to adjust the feature masks and the
                     % indices to modalities in case of fused feature spaces
@@ -240,6 +234,8 @@ for n=1:nM
                         tlFuVI = false(length(pIND),1); tlFuVI(lFuVI) = true; lFuVI = tlFuVI;
                         tlVI = false(length(pIND),1); tlVI(fVI) = true; fVI = tlVI;
                     end
+                case 'juspace'
+                    
             end
 
         end
@@ -263,7 +259,9 @@ for n=1:nM
             tY = nk_PerfZeroOut(tY, IN);
             nmR  =   nk_CorrMat(L, tY,'pearson'); 
             nmSR =   nk_CorrMat(L, tY,'spearman');
-            nmC  =   corrcoef(tY); %nmC = nmC(:);
+            if ~memprob
+                nmC  =   corrcoef(tY);
+            end
         else
             nmR  =  nan(size(nmW)); nmSR = nmR; nmC = nmR;
         end
@@ -277,7 +275,7 @@ for n=1:nM
                     mP{m} = nmP(indX);
                     mR{m} = nmR(indX);
                     mSR{m} = nmSR(indX);
-                    if ~decompfl(n)
+                    if ~decompfl(n) && ~memprob
                         mC{m} = nmC(indX, indX);
                     end
                     if ~isempty(PA), mPA{m} = nmPA(indX); end
@@ -286,7 +284,7 @@ for n=1:nM
                     mP{m} = nmP;
                     mR{m} = nmR;
                     mSR{m} = nmSR;
-                    if ~decompfl(n)
+                    if ~decompfl(n) && ~memprob
                         mC{m} = nmC;
                     end
                     if ~isempty(PA), mPA{m} = nmPA; end
@@ -300,11 +298,15 @@ for n=1:nM
                 if isempty(mR{n})
                     mR{n} = zeros(size(nmW,1),1);
                     mSR{n} = zeros(size(nmW,1),1);
-                    mC{n} = zeros(size(nmW,1),size(nmW,1));
+                    if ~memprob
+                        mC{n} = zeros(size(nmW,1),size(nmW,1));
+                    end
                 end
                 mR{n}(lFuVI) = nmR(lFuVI);
                 mSR{n}(lFuVI) = nmSR(lFuVI); 
-                mC{n}(lFuVI,lFuVI) = nmC(lFuVI,lFuVI);
+                if ~memprob
+                    mC{n}(lFuVI,lFuVI) = nmC(lFuVI,lFuVI);
+                end
             else
                 mR{n} = nmR;
                 mSR{n} = nmSR; 
@@ -318,7 +320,7 @@ for n=1:nM
         end
         if mM>1 % intermediate / late fusion
             mW{n} = nmW;
-             if ~isempty(PA), mPA{n} = nmPA; end
+            if ~isempty(PA), mPA{n} = nmPA; end
         else % Concatenate weight vectors (early fusion)
             mW = [mW; nmW]; 
             if ~isempty(PA), mPA = [mPA; nmPA]; end

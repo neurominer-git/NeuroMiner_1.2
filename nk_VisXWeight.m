@@ -234,6 +234,8 @@ for n=1:nM
                         tlFuVI = false(length(pIND),1); tlFuVI(lFuVI) = true; lFuVI = tlFuVI;
                         tlVI = false(length(pIND),1); tlVI(fVI) = true; fVI = tlVI;
                     end
+               % case 'juspace'
+
             end
 
         end

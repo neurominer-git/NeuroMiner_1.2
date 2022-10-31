@@ -750,6 +750,7 @@ else
 end
 
 if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
+if CALIB
 INcalib = IN;
 INcalib.TrCovars = CALIB.covars;
 INcalib = rmfield(INcalib, 'subgroup');

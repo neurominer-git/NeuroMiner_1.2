@@ -331,7 +331,15 @@ for f=1:ix % Loop through CV2 permutations
                     for n=1:nM
                         
                         % Retrieve dimensionality of target space
-                        D                          = getD(FUSION.flag, inp, n);
+                        D                      = getD(FUSION.flag, inp, n);
+                        juspaceflag = false;
+                        for a = 1:numel(iPREPROC.ACTPARAM)
+                            if iPREPROC.ACTPARAM{a}.cmd == 'JuSpace'
+                                juspaceflag = true;
+                                D = numel(iPREPROC.ACTPARAM{a}.JUSPACE.petList);
+                            end
+                        end
+                       
                         % Setup container for weight storage
                         I1.VCV1{h,n}               = zeros(D, ill,'single'); 
                         I1.VCV1SUM{h,n}            = zeros(D, 1,'single');
@@ -699,6 +707,9 @@ for f=1:ix % Loop through CV2 permutations
                                                 end
                                             else
                                                 [ ~, ~, ~, badcoords ] = getD(FUSION.flag, inp, n); badcoords = ~badcoords;
+                                                if juspaceflag
+                                                    badcoords = zeros(D,1);
+                                                end
                                                 I1.VCV1PERM{h,n}(badcoords & Fpind,il(h)) = Pvals;
                                                 [~,~,~,I1.VCV1PERM_FDR{h,n}(badcoords & Fpind, il(h))] = fdr_bh(Pvals,0.05,'pdep'); 
                                                 I1.VCV1ZSCORE{h,n}(badcoords & Fpind,il(h)) = Zvals;
@@ -744,6 +755,9 @@ for f=1:ix % Loop through CV2 permutations
                                             % original space of modality
                                             [ ~, ~, ~, badcoords] = getD(FUSION.flag, inp, n); badcoords = ~badcoords;
 
+                                            if juspaceflag
+                                                badcoords = zeros(D,1);
+                                            end
                                             % Store results in CV1 container variables                                    
                                             % I1.numCV1parts(h, n) = I1.numCV1parts(h, n) + 1;
                                             I1.VCV1{h,n}(badcoords,il(h)) = Tx{n};

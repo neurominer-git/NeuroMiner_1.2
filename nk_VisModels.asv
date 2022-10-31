@@ -103,18 +103,18 @@ for i = 1 : nM
         else
             pmode(i) = iVis.PERM.mode;
         end
-        if isfield(iVis.PERM,'covars_idx')
-            covidx(i) = iVis.PERM.covars_idx;
-        else
-            covidx = [];
-        end
+%         if isfield(iVis.PERM,'covars_idx')
+%             covidx(i) = iVis.PERM.covars_idx;
+%         else
+%             covidx = [];
+%         end
 
         permfl(i)      = true; 
         nperms(i)      = iVis.PERM.nperms;
         compfun        = nk_ReturnEvalOperator(SVM.GridParam);
         
         % Generate or load permutation matrix from file.
-        cprintf('black*','\nPERMUTATION MODE ENABLED.')
+        fprintf('\nPERMUTATION MODE ENABLED.')
         if pmode(i)
             permfile = fullfile(inp.rootdir,[SAV.matname '_VISpermmat_ID' id '.mat']);
             if ~exist(permfile,'file')
@@ -257,9 +257,6 @@ for f=1:ix % Loop through CV2 permutations
                 if isfield(inp,'CV1') && inp.CV1 == 1, inp.smoothonly = true; end
                 
                 % find range of feature in current CV1 partition 
-                % Range = findRange(inp)
-                %for z=1:numel(Range)
-                
                 [ inp, contfl, analysis, mapY, GD, MD, Param, paramfl ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
                 inp.loadGD = false;
                 
@@ -334,7 +331,15 @@ for f=1:ix % Loop through CV2 permutations
                     for n=1:nM
                         
                         % Retrieve dimensionality of target space
-                        D                          = getD(FUSION.flag, inp, n);
+                        D                      = getD(FUSION.flag, inp, n);
+                        juspaceflag = false;
+                        for a = 1:numel(iPREPROC.ACTPARAM)
+                            if iPREPROC.ACTPARAM{a}.cmd == 'juspace'
+                                juspaceflag = true;
+                                D = numel(iPREPROC.ACTPARAM{a}.JUSPACE.PETmaps);
+                            end
+                        end
+                       
                         % Setup container for weight storage
                         I1.VCV1{h,n}               = zeros(D, ill,'single'); 
                         I1.VCV1SUM{h,n}            = zeros(D, 1,'single');
@@ -410,7 +415,7 @@ for f=1:ix % Loop through CV2 permutations
                         
                         for h=1:nclass % Loop through binary comparisons
                     
-                            if nclass > 1, fprintf('\n');cprintf('blue*', '*** %s #%g *** ',algostr, h); end
+                            if nclass > 1, fprintf('\n');fprintf('*** %s #%g *** ',algostr, h); end
 
                             switch MODEFL
                                 case 'classification'
@@ -429,7 +434,7 @@ for f=1:ix % Loop through CV2 permutations
                             
                             for m = 1 : nP % parameter combinations
 
-                                if nP>1, fprintf('\n');cprintf(rgb('RoyalBlue'),'Extracing model parameters at parameter node #%g/%g ', m, nP); end
+                                if nP>1, fprintf('\n');fprintf('Extracing model parameters at parameter node #%g/%g ', m, nP); end
                                 % Prepare learning params
                                 cPs = Ps(m,:); sPs = nk_PrepMLParams(Ps, Pdesc, m);
 
@@ -702,6 +707,9 @@ for f=1:ix % Loop through CV2 permutations
                                                 end
                                             else
                                                 [ ~, ~, ~, badcoords ] = getD(FUSION.flag, inp, n); badcoords = ~badcoords;
+                                                if juspaceflag
+                                                    badcoords = zeros(D,1);
+                                                end
                                                 I1.VCV1PERM{h,n}(badcoords & Fpind,il(h)) = Pvals;
                                                 [~,~,~,I1.VCV1PERM_FDR{h,n}(badcoords & Fpind, il(h))] = fdr_bh(Pvals,0.05,'pdep'); 
                                                 I1.VCV1ZSCORE{h,n}(badcoords & Fpind,il(h)) = Zvals;
@@ -747,6 +755,9 @@ for f=1:ix % Loop through CV2 permutations
                                             % original space of modality
                                             [ ~, ~, ~, badcoords] = getD(FUSION.flag, inp, n); badcoords = ~badcoords;
 
+                                            if juspaceflag
+                                                badcoords = zeros(D,1);
+                                            end
                                             % Store results in CV1 container variables                                    
                                             % I1.numCV1parts(h, n) = I1.numCV1parts(h, n) + 1;
                                             I1.VCV1{h,n}(badcoords,il(h)) = Tx{n};

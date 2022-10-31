@@ -26,7 +26,7 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, ...
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 07/2022
 
-global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL CALIB
+global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL CALIB 
 
 % Initialize runtime variables
 i       = inp.f; % Curration permutation
@@ -56,6 +56,8 @@ if isfield(inp, 'C')
     inp.C{1,1}.Y = Cfile{1,1}; % this had to be implemented to overcome memory issues when saving the NM struct with calib loaded (needed for compiling)
     Cocv = inp.C{1,1}.Y;
     CALIB = inp.C{1,1};
+else
+    CALIB.flag = false;
 end
 
 % Set binary/regression or multi-group processing mode
