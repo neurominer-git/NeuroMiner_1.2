@@ -663,11 +663,11 @@ switch act
         NM = nk_DefineOOCVData_config(NM, 2, 'calib');
         [NM, C, oocvind, fldnam, dattype] = nk_SelectOOCVdata(NM, 2, 0);
         CALIBAVAIL = 1;
-        CY = NM.C{1,1}.Y;
+        Cfile = NM.C{1,1}.Y;
         Cfile_path = sprintf('%s/testC', pwd);
-        NM.C{1,1}.calibflag = 1;
+        NM.C.ca
         %save(Cfile_path, 'Cfile');
-        NM.C{1,1}.Y = Cfile_path;
+        %NM.C{1,1}.Y = Cfile_path;
 end
 act = 1;
 

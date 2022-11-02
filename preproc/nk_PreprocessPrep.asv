@@ -225,8 +225,8 @@ switch act
                     end
                     CALIB.calibflag = false;
                     % Check whether calibration data is available 
-                    if isfield(inp, 'C') && inp.C{1,1}.calibflag %&& isfield(PREPROC,'CALIB') && ~isempty(PREPROC.CALIB),
-                        CALIB.calibflag = inp.C{1,1}.calibflag;
+                    if exist('C','var') && ~isempty(C) && isfield(PREPROC,'CALIB') && ~isempty(PREPROC.CALIB),
+                        CALIB.calibflag = C.calibflag;
                         P = inp.X;
                         CYfile = inp.C{1,1}.Y; 
                         load(CYfile, 'CY');
