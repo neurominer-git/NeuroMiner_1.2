@@ -48,7 +48,7 @@ if ~defaultsfl
         else
             if size(ReferenceGroup,1) >1
                 GCSTR_REFG = 'from Matlab workspace';
-            elseif isfield(NM, 'C') && NM.C.calibflag
+            elseif isfield(NM, 'C') && NM.C{1,1}.calibflag
                 GCSTR_REFG = 'calibration data';
             else
                 GCSTR_REFG = ReferenceGroup;
@@ -117,7 +117,7 @@ if ~defaultsfl
                     NM.C.calibflag = false;
                 case 2
                     GRAPHCONSTRUCTION.refGroup = -1;  % flag for calibration data
-                    NM.C.calibflag = true;
+                    NM.C{1,1}.calibflag = true;
             end
         case 4
             GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);

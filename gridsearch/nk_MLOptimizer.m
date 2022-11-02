@@ -243,6 +243,9 @@ if GDfl == -1
     Y = nk_PerfSpatFilt2( inp.Y, PREPROC, inp.P.X );
     % calibration data (Clara)
     if isfield(inp, 'C')
+        CYfile = inp.C{1,1}.Y; 
+        load(CYfile, 'CY');
+        inp.C{1,1}.Y = CY;
         inp.C{1,1}.Y = nk_PerfSpatFilt2(inp.C{1,1}.Y, PREPROC, inp.P.X);
     end
     if isfield(inp,'Yw')
