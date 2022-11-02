@@ -13,7 +13,8 @@ else
     P = load(imaging_init_path); 
     spmrootdir=P.spmrootdir;
     fsrootdir=P.fsrootdir;
-    jurootdir=P.jurootdir;
+    jurootdir=[];
+    if isfield(P,'jurootdir'), jurootdir=P.jurootdir; end
     % Check whether paths exist and update paths accordingly
     if exist('spmrootdir','var') && ~isnumeric(spmrootdir) && ~exist(spmrootdir,'dir') 
         tspmrootdir = fileparts(which('spm'));
