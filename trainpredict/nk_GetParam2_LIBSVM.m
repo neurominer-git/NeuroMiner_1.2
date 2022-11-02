@@ -14,22 +14,27 @@ global SVM EVALFUNC LIBSVMTRAIN MODEFL CMDSTR GK
 
 param = [];flw = 0; GK = struct('gkernelBool',0);
 if strcmp(LIBSVMTRAIN,'svmtrain312'), flw = 1; end
-if SVM.kernel.kerndef == 5, GK.gkernelBool = 1; GK.gkernelFunction = 'WL'; GK.iter = CMDSTR.WLiter; end
-if SVM.kernel.kerndef == 6, GK.gkernelBool = 1; GK.gkernelFunction = 'WLspdelta'; GK.iter = CMDSTR.WLiter; end
-if SVM.kernel.kerndef == 7, GK.gkernelBool = 1; GK.gkernelFunction = 'WLedge'; GK.iter = CMDSTR.WLiter; end
-if SVM.kernel.kerndef == 8 
-    GK.evalStr = strings; 
-    if SVM.kernel.customfunc_nargin > 0
-        for n = 1:SVM.kernel.customfunc_nargin
-            argName = sprintf('customkernel_arg%d', n); 
-            arg_i = CMDSTR.(argName);
-            if CMDSTR.(argName)
-                GK.evalStr = sprintf('%s, %d' , GK.evalStr, arg_i);
+if flw
+    switch SVM.kernel.kerndef 
+        case 5
+            GK.gkernelBool = 1; GK.gkernelFunction = 'WL'; GK.iter = CMDSTR.WLiter; 
+        case 6
+            GK.gkernelBool = 1; GK.gkernelFunction = 'WLspdelta'; GK.iter = CMDSTR.WLiter; 
+        case 7
+            GK.gkernelBool = 1; GK.gkernelFunction = 'WLedge'; GK.iter = CMDSTR.WLiter; 
+        case 8 
+            GK.evalStr = strings; 
+            if SVM.kernel.customfunc_nargin > 0
+                for n = 1:SVM.kernel.customfunc_nargin
+                    argName = sprintf('customkernel_arg%d', n); 
+                    arg_i = CMDSTR.(argName);
+                    if CMDSTR.(argName)
+                        GK.evalStr = sprintf('%s, %d' , GK.evalStr, arg_i);
+                    end
+                end
             end
-        end
-    end
-    %GK.iter = CMDSTR.WLiter; 
-end % function has to be on Matlab path!
+    end 
+end
 
 % Check if weighting is necessary
 cmd = nk_SetWeightStr(SVM, MODEFL, CMDSTR, label, cmd);

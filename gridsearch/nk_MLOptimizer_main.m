@@ -1,6 +1,6 @@
 function analysis = nk_MLOptimizer_main(inp, datid, PreML)
 
-global SVM GRD MODEFL W2AVAIL VERBOSE BATCH inparams
+global SVM GRD MODEFL W2AVAIL VERBOSE BATCH
 
 % Write some info to command line
 clc

@@ -147,6 +147,12 @@ switch act
             fprintf('\n'); fprintf('[ Analysis %g ] ID: %s', f_ind(i), idstr);  
         end
         STACKING.sel_anal = nk_input('Select analyses to provide input features to stacker',0,'i',sel_anal);
+        if strcmp(featname_edit,'Automatic definition')
+            STACKING.featnames = [];
+            for n=1:numel(NM.analysis(STACKING.sel_anal))
+                STACKING.featnames{n} = NM.analysis{STACKING.sel_anal(n)}.desc;
+            end
+        end
     case 3
         STACKING.featname_mode = nk_input('Extract feature names',0,'m','Automatically (Using IDs of selected analyses)|Manually from a variable in the MATLAB workspace',[1 2], featname_mode);
         if STACKING.featname_mode == 2

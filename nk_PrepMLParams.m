@@ -11,8 +11,8 @@ switch SVM.prog
         cParams.val = Params(i,1:5); 
         cParams.desc = Params_desc(1:5);
     case 'GRDBST'
-        cParams.val = Params(i,1:5); 
-        cParams.desc = Params_desc(1:5);
+        cParams.val = Params(i,1:end); 
+        cParams.desc = Params_desc(1:end);
     case 'ROBSVM'
         cParams.val = Params(i,:); 
         cParams.desc = Params_desc;
