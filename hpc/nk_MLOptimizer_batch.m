@@ -25,7 +25,9 @@ CV2x2               = str2double(params{1}{9});     % Range param for CV2 grid d
 CV2y1               = str2double(params{1}{10});	% Range param for CV2 grid definition: Fold start CV2
 CV2y2               = str2double(params{1}{11});	% Range param for CV2 grid definition: Fold end CV2
 
-addpath(NMpath);
+if ~isdeployed
+    addpath(NMpath);
+end
 warning('off','MATLAB:FINITE:obsoleteFunction')
 fprintf('\nLoading NM structure: %s',datpath)
 load(datpath);
@@ -57,6 +59,7 @@ inp = struct('analind',			analind, ...
 				'concatfl', 	[], ...
 				'ovrwrt', 		ovrwrtfl, ...
 				'update', 		true, ...
+                'HideGridAct',  false, ...
                 'batchflag',    true);
 				
 inp.GridAct = nk_GenGridAct_batch(NM.analysis{analind}.params.cv, curCPU, numCPU, CV2x1, CV2x2, CV2y1, CV2y2);

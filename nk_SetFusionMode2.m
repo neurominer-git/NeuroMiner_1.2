@@ -13,7 +13,7 @@ switch FUSION.flag
     
         varstr = ['_var' num2str(F(curmodal))]; tF = F(curmodal);
         disp_str = sprintf('\nPROCESSING OF MODALITY #%g', tF);
-        if isfield(analysis,'GDdims'),
+        if isfield(analysis,'GDdims')
             switch FUSION.flag
                 case 0
                      OUT.analysis = analysis.GDdims{1}; 
@@ -51,7 +51,7 @@ switch FUSION.flag
 end
 
 % Check whether stacking has to be activated
-if stk_flag, 
+if stk_flag
     OUT.analyses = dat.analysis(STACKING.sel_anal); 
     OUT.nD = 0;
     for i=1:numel(OUT.analyses)

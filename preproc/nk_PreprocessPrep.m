@@ -228,7 +228,7 @@ switch act
                     if exist('C','var') && ~isempty(C) && isfield(PREPROC,'CALIB') && ~isempty(PREPROC.CALIB),
                         CALIB.flag = C.calibflag;
                         P = inp.X;
-                        C = load('C');
+                        C = load(C);
                         C = nk_PerfSpatFilt2( C, PREPROC, P ); 
                     elseif isfield(PREPROC,'TEMPLPROC') && ~isempty(PREPROC.TEMPLPROC) && PREPROC.TEMPLPROC
                         % For factorization methods: TEMPLATE MAPPING 

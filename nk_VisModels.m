@@ -741,7 +741,8 @@ for f=1:ix % Loop through CV2 permutations
                                                         I1.VCV1PVAL_ANALYTICAL{h, n}(mj,kil(h)) = nm_nanmean(PAx{n}(Imj));
                                                     end
                                                     if ~memoryprob
-                                                        I1.VCV1CORRMAT{h,n}(mj,mj,kil(h)) = nm_nanmean(Cx{n}(Imj, Imj));
+                                                        mjCx = Cx{n}(Imj, Imj);
+                                                        I1.VCV1CORRMAT{h,n}(mj,mj,kil(h)) = nm_nanmean(mjCx(:));
                                                     end
                                                 end
                                             end

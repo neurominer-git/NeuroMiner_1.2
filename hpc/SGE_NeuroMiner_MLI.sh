@@ -1,19 +1,22 @@
 #!/bin/bash 
 echo
 echo '****************************************'
-echo '*** NeuroMiner Beorn                 ***'
+echo '*** NeuroMiner                       ***'
 echo '*** SGE joblist manager:             ***'
 echo '*** Interpret model predictions      ***'
 echo '*** (c) 2022 N. Koutsouleris         ***'
 echo '****************************************'
-echo '          NM VERSION 1.10 		      '
+echo '          NM VERSION 1.1  		      '
 echo '****************************************'
 echo   
 
-# matlab R2018b was used to compile which is the v95 runtime. This needs to be updated if a different compiler is used. 
-export LD_LIBRARY_PATH=/opt/matlab/v95/runtime/glnxa64:/opt/matlab/v95/bin/glnxa64:/opt/matlab/v95/sys/os/glnxa64:/opt/matlab/v95/sys/
+# compiled with matlab R2022a so MCR main is v912. Needs to change if different MCR is used.
+export LD_LIBRARY_PATH=/opt/matlab/v912/runtime/glnxa64:/opt/matlab/v912/bin/glnxa64:/opt/matlab/v912/sys/os/glnxa64:/opt/matlab/v912/sys/opengl/lib/glnxa64
+# Preload glibc_shim in case of RHEL7 variants
+export LD_PRELOAD=/opt/matlab/R2022a/bin/glnxa64/glibc-2.17_shim.so
+
 export JOB_DIR=$PWD
-export NEUROMINER=/opt/NM/NeuroMinerMCCMain_1.10_alpha_v95/for_testing 
+export NEUROMINER=/opt/NM/NeuroMinerMCCMain_1.1_v912/for_testing
 export ACTION=mli
 read -e -p 'Path to NM structure: ' datpath
 if [ ! -f $datpath ]; then
@@ -149,6 +152,7 @@ cat > $SGEFile <<EOF
 #\$-q $SERVER_ID
 $PMODE
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+export LD_PRELOAD=$LD_PRELOAD
 export OMP_NUM_THREADS=$pnum
 cd $NEUROMINER 
 ./NeuroMinerMCCMain $ACTION $ParamFile
