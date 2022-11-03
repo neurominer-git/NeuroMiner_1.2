@@ -1,4 +1,4 @@
-function [JUSPACE, act ] = JUSPACE_config(JUSPACE, brainmask, parentstr, defaultsfl)
+function [JUSPACE, act ] = JuSpace_config(JUSPACE, brainmask, parentstr, defaultsfl)
 
 % from NM structure
 % brainmask 
