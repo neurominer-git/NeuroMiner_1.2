@@ -28,7 +28,7 @@ function [Y, IN] = PerfGraphConstruction(Y, IN)
                  end
             case "Normative network + 1"
                 if ~isempty(IN.refGroup)
-                    R = graph_constructionREFPLUSP(Y, IN.method, IN.refGroup, IN.simMeasure) %JBE = jackknife bias estimation method
+                    R = graph_constructionREFPLUSP(Y, IN.method, IN.refGroup, IN.simMeasure); %JBE = jackknife bias estimation method
                 end
         end
     else

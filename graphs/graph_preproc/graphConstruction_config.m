@@ -111,10 +111,10 @@ if ~defaultsfl
             switch readRefG
                 case 0
                     GRAPHCONSTRUCTION.refGroup = nk_input('Define reference group dataset (as named in MATLAB workspace)',0,'e',[]);
-                    NM.C.calibflag = false;
+                    NM.C{1,1}.calibflag = false;
                 case 1
                     GRAPHCONSTRUCTION.refGroup = nk_FileSelector(1,0,'Select file with reference group data (in the same format as main data, incl. group and ID column)','.*\.txt$|.*\.csv');
-                    NM.C.calibflag = false;
+                    NM.C{1,1}.calibflag = false;
                 case 2
                     GRAPHCONSTRUCTION.refGroup = -1;  % flag for calibration data
                     NM.C{1,1}.calibflag = true;
