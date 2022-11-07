@@ -1,5 +1,5 @@
-function [GRAPHCONSTRUCTION, PX, act ] = graphConstruction_config(GRAPHCONSTRUCTION, PX, parentstr, defaultsfl)
-global NM 
+function [GRAPHCONSTRUCTION, PX, act ] = graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, defaultsfl)
+global NM
 % what method should be used for the construction of the networks?
 ConstructionMethod = 'Normative network + 1';
 % ParcellationAtlas = 'Hammers.nii';
@@ -10,7 +10,7 @@ SimilarityMeasure = 'Mutual information';
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
-    if isempty(GRAPHCONSTRUCTION), [GRAPHCONSTRUCTION, PX] = graphConstruction_config(GRAPHCONSTRUCTION, PX, parentstr, true); end
+    if isempty(GRAPHCONSTRUCTION), [GRAPHCONSTRUCTION, PX] = graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, true); end
     if isfield(GRAPHCONSTRUCTION,'method'), ConstructionMethod = GRAPHCONSTRUCTION.method; end
     if isfield(GRAPHCONSTRUCTION,'parcellation'), ParcellationAtlas = GRAPHCONSTRUCTION.parcellation; end
     %if isfield(GRAPHCONSTRUCTION, 'variableTypes'), VariableTypesVec = GRAPHCONSTRUCTION.variableTypes; end
@@ -165,9 +165,9 @@ switch act{1}
     case 'KL divergence'
         GRAPHCONSTRUCTION.method = 'KL divergence';
         PX = nk_AddParam([], [], [], PX,'reset');
+        GRAPHCONSTRUCTION.brainmask = brainmask;
         if isfield(GRAPHCONSTRUCTION,'KL divergence')
             ParcellationAtlas = GRAPHCONSTRUCTION.parcellation;
-            
         else
             ParcellationAtlas = '(undefined)';
         end

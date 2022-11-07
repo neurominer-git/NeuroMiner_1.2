@@ -1,4 +1,4 @@
-function [GRAPHCONSTRUCTION, PX, act ] = graphConstruction_config(GRAPHCONSTRUCTION, PX, parentstr, defaultsfl)
+function [GRAPHCONSTRUCTION, PX, act ] = graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, defaultsfl)
 global NM 
 % what method should be used for the construction of the networks?
 ConstructionMethod = 'Normative network + 1';
@@ -167,6 +167,7 @@ switch act{1}
         PX = nk_AddParam([], [], [], PX,'reset');
         if isfield(GRAPHCONSTRUCTION,'KL divergence')
             ParcellationAtlas = GRAPHCONSTRUCTION.parcellation;
+            GRAPHCONSTRUCTION
             
         else
             ParcellationAtlas = '(undefined)';
