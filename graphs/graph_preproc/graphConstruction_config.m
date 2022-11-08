@@ -77,7 +77,7 @@ if ~defaultsfl
 
     switch act
         case 1
-            [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, parentstr);
+            [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, brainmask, parentstr);
             %ConstructionMethod = 'KL divergence';
         case 2
              simMeasureNo = nk_input('Define measure to quantify similarity between variables', 0, 'mq', ...
@@ -126,7 +126,7 @@ if ~defaultsfl
 
 
 else
-    [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION,PX, parentstr, true);
+    [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION,PX, brainmask, parentstr, true);
     act = 0;
 end
 
@@ -141,7 +141,7 @@ end
 end
 
 
-function [GRAPHCONSTRUCTION, PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, parentstr, defaultsfl)
+function [GRAPHCONSTRUCTION, PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, brainmask, parentstr, defaultsfl)
 global NM
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
@@ -191,7 +191,7 @@ switch act{1}
 end
 else
     GRAPHCONSTRUCTION.method = 'Normative network + 1'; 
-    GRAPHCONSTRUCTION.refGroup = 'undefined'; 
+    GRAPHCONSTRUCTION.refGroup = -1; 
     GRAPHCONSTRUCTION.simMeasure = 'Mutual information';
     PX = nk_AddParam([], [], [], PX,'reset');
 end

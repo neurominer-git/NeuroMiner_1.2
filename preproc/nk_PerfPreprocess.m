@@ -51,7 +51,7 @@ cv2flag = false; if isfield(PREPROC,'CV2flag') && (PREPROC.CV2flag - 1) == 1; cv
 tYocv   = []; if exist('Yocv','var') && ~isempty(Yocv), tYocv.Ts = cell(iy,jy); else, Yocv = []; end
 if ~exist('Cocv','var'), Cocv = []; end
 
-if isfield(inp, 'C')
+if isfield(inp, 'C') && inp.C{1,1}.calibflag
 %     load(inp.C{1,1}.Y);
 %     inp.C{1,1}.Y = Cfile{1,1}; % this had to be implemented to overcome memory issues when saving the NM struct with calib loaded (needed for compiling)
     Cocv = inp.C{1,1}.Y;

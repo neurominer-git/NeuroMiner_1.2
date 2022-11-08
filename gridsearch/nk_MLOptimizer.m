@@ -242,7 +242,7 @@ if GDfl == -1
     % Filter the data (imaging only)
     Y = nk_PerfSpatFilt2( inp.Y, PREPROC, inp.P.X );
     % calibration data (Clara)
-    if isfield(inp, 'C')
+    if isfield(inp, 'C') && inp.C{1,1}.calibflag
         CYfile = inp.C{1,1}.Y; 
         load(CYfile, 'CY');
         inp.C{1,1}.Y = CY;
