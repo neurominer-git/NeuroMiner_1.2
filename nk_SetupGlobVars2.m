@@ -113,7 +113,7 @@ switch act
             NM = evalin('base','NM');
         end
 
-        if isfield(NM,'time') && ~isempty(NM.time),
+        if isfield(NM,'time') && ~isempty(NM.time)
             TIME = NM.time;
         end
 
@@ -187,7 +187,7 @@ switch act
                 tPREPROC = PREPROC;
             end
 
-            if isfield(tPREPROC,'LABELMOD'),
+            if isfield(tPREPROC,'LABELMOD')
                 SCALE.LABELMOD = tPREPROC.LABELMOD;
             else
                 SCALE = [];

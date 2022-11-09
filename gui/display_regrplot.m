@@ -155,7 +155,7 @@ end
 xstep = range(xrng)/100;
 ystep = range(yrng)/100;
 rx = (xstep)*5; ry = (ystep)*5;
-xLimitsVec = min(xrng):xstep:max(yrng);
+xLimitsVec = min(xrng):xstep:max(xrng);
 xlim([xLimitsVec(1)-rx xLimitsVec(end)+rx]);
 yLimitsVec = min(yrng):xstep:max(yrng);
 ylim([yLimitsVec(1)-ry yLimitsVec(end)+ry]);

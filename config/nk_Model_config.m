@@ -390,8 +390,13 @@ switch act
         
         
     case 3
-
-        SVM.GridParam = nk_EvalFunc_config(NM, SVM, navistr);
+        
+        if isfield(NM.TrainParam,'LABEL') && NM.TrainParam.LABEL.flag == 1
+            modeflag = NM.TrainParam.LABEL.newmode;
+        else
+            modeflag = [];
+        end
+        SVM.GridParam = nk_EvalFunc_config(NM, SVM, navistr, modeflag);
             
     case 4
         

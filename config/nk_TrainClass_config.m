@@ -219,11 +219,6 @@ if ~exist('act','var') || isempty(act)
     multistr = ''; multiflag = false;
     if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
         modeflag = NM.TrainParam.LABEL.newmode;
-        %         NM.TrainParam.SVM           = nk_LIBSVM_config(NM,[],1,[],[],modeflag);
-        %         NM.TrainParam.SVM.prog      = 'LIBSVM';
-        %         NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
-        %         NM.TrainParam.SVM.GridParam = 1;
-        %         if strcmp(modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
     else
         modeflag = NM.modeflag;
         if isfield(NM.TrainParam, 'LABEL')
@@ -284,7 +279,7 @@ if ~exist('act','var') || isempty(act)
 
     flx = flSVM && flGRD && flPREPROC;
 
-    menustr = [ menustr 'Use different label [ ' STATUS.LABEL ']|']; menuact = [menuact 99] ;
+    menustr = [ menustr 'Use alternative label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
     menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 5:6 ];
 
     if flx
@@ -604,7 +599,7 @@ switch act
     case 99
         nk_PrintLogo
         fprintf('\n*************************************')
-        fprintf('\n*******     DEFINE NEW LABEL     *******')
+        fprintf('\n****  DEFINE ALTERNATIVE LABEL  *****')
         fprintf('\n*************************************')
         fprintf('\n')
         if isfield(NM.TrainParam, 'LABEL')
