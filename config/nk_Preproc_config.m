@@ -39,10 +39,18 @@ if isempty(PREPROC)
     end
 end
 
-if isfield(NM.TrainParam,'LABEL') && NM.TrainParam.LABEL.flag == 1
-    modeflag = NM.TrainParam.LABEL.newmode;
+if isfield(NM.TrainParam,'LABEL')
+    if NM.TrainParam.LABEL.flag == 1
+        modeflag = NM.TrainParam.LABEL.newmode;
+%     else
+%         if strcmp(NM.TrainParam.LABEL.newmode,'classification') 
+%             if isfield(NM.TrainParam.PREPROC{varind},'LABELMOD') && NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE == 1
+%                 NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE = 0;
+%             end
+%         end
+    end
 else
-    modeflag = [];
+    modeflag = NM.modeflag;
 end
 
 if ~exist('enind','var'), enind = []; end 
@@ -131,7 +139,7 @@ if NM.datadescriptor{varind}.type == 1 && NM.TrainParam.STACKING.flag==2
     imganalflag = true;
     if isfield(PREPROC,'SPATIAL') && PREPROC.SPATIAL.cubetype>1
         cmdstr = 'Modify / Disable ';
-        if ~strcmp(d.PREPROC.spatialfiltering,'NA'), 
+        if ~strcmp(d.PREPROC.spatialfiltering,'NA') 
             prestr = sprintf('%s\n* %s', prestr, d.PREPROC.spatialfiltering); 
         end
         spatfltflag = true;

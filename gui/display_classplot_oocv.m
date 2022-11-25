@@ -300,7 +300,11 @@ switch labels_known
             contigmat = ALLPARAM(label_oocv_h(ind0 & SubI), tP_oocv_h);
         else
             if isfield(handles.OOCV(oocvind).data,'BinResults')
-                contigmat = handles.OOCV(oocvind).data.BinResults{1}.contingency{h};
+                if iscell(handles.OOCV(oocvind).data.BinResults{1}.contingency)
+                    contigmat = handles.OOCV(oocvind).data.BinResults{1}.contingency{h};
+                else
+                    contigmat = handles.OOCV(oocvind).data.BinResults{1}.contingency;
+                end
             else
                 contigmat = handles.OOCV(oocvind).data.MultiResults{1}.contingency{h};
             end

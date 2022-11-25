@@ -366,10 +366,10 @@ if RF.found
     indFx                                   = find(Fx{curclass}{k(curclass)}); 
     if iscell(RF.FeatureIndex)
         FI = RF.FeatureIndex{curclass};
-        if isempty(FI), error('Wrapper of model #%g did not returned any features! Relax your wrapper settings', curclass); end
+        if isempty(FI), error('Wrapper of model #%g did not return any features! Relax your wrapper settings', curclass); end
     else
         FI = RF.FeatureIndex;
-        if isempty(FI), error('Wrapper did not returned any features! Relax your wrapper settings'); end
+        if isempty(FI), error('Wrapper did not return any features! Relax your wrapper settings'); end
     end
     indFx                                   = indFx(FI);
     indFx0                                  = zeros( size( Fx{curclass}{k(curclass)}));  

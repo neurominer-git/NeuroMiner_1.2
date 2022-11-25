@@ -1,7 +1,7 @@
 function [GridParam, modeflag] = nk_EvalFunc_config(res, param, parentstr, modeflag) 
 global EXPERT
 
-if ~exist('modeflag', 'var'), modeflag = res.modeflag; end
+if ~exist('modeflag', 'var') || isempty(modeflag), modeflag = res.modeflag; end
 
 deffunc = 1;
 if exist('param','var') && ~isempty(param)

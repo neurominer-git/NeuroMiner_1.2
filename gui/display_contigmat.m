@@ -44,8 +44,10 @@ contig{end+1} = ['\bf Accuracy [%]:\rm ' num2str(contigmat.acc,'%1.1f')];
 contig{end+1} = ['\bf Sensitivity [%]:\rm ' num2str(contigmat.sens,'%1.1f')];
 contig{end+1} = ['\bf Specificity [%]:\rm ' num2str(contigmat.spec,'%1.1f')];
 contig{end+1} = ['\bf Balanced Accuracy [%]:\rm ' num2str(contigmat.BAC,'%1.1f')];
-if isfield(contigmat,'AUC')
+if isfield(contigmat,'AUC') && isfield(contigmat,'AUC_lower')
     contig{end+1} = ['\bf Area-Under-the-Curve [95%-CI]:\rm ' num2str(contigmat.AUC,'%1.2f') ' (' num2str(contigmat.AUC_lower,'%1.2f') '-' num2str(contigmat.AUC_upper,'%1.2f') ')'];
+elseif isfield(contigmat,'AUC') 
+    contig{end+1} = ['\bf Area-Under-the-Curve:\rm ' num2str(contigmat.AUC,'%1.2f')];
 end
 contig{end+1} = ['\bf Matthews Coorelation Coefficient:\rm ' num2str(contigmat.MCC,'%1.1f')];
 contig{end+1} = ['\bf Positive Predictive Value [%]:\rm ' num2str(contigmat.PPV,'%1.1f')];
@@ -66,7 +68,7 @@ else
     stp = 0.45;
 end
 
-switch handles.NM.modeflag
+switch handles.modeflag
     case 'classification'
         y_start = sta;
         y_height = stp;

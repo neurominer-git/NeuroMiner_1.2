@@ -3,12 +3,12 @@ function param = nk_LIBSVM_config(res, param, defaultsfl, cvfl, parentstr, modef
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 if ~exist('cvfl','var') || isempty(cvfl), cvfl = 0; end
 if ~exist('param','var') || ~isfield(param,'LIBSVM'), param.LIBSVM = []; end
-if ~exist('modeflag', 'var'), modeflag = res.modeflag; end
+if ~exist('modeflag', 'var') || isempty(modeflag), modeflag = res.modeflag; end
 
 % DEFAULTS 
 % +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 % LIBSVM version
-if isfield(param.LIBSVM,'LIBSVMver') , 
+if isfield(param.LIBSVM,'LIBSVMver') 
     LIBSVMver = param.LIBSVM.LIBSVMver;     
 else
     LIBSVMver = 0;
