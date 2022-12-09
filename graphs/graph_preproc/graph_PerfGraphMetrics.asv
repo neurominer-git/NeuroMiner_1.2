@@ -74,23 +74,21 @@ for i = 1:length(sel_metrics)
         disp('')
     elseif ismember(thismetric.listidx, local_metrics)
         locm = locm+1;
-        funclist{length(funclist)+1} = netwmetrics{thismetric.listidx}.func;
-        if i == 1
-            metvec_str = sprintf('metrics_vector = [%s', netwmetrics{thismetric.listidx}.id);
-        else
-            metvec_str = sprintf('%s, %s', metvec_str, netwmetrics{thismetric.listidx}.id);
-        end
- 
+        funclist{i} = netwmetrics{thismetric.listidx}.func;
     else
         globm = globm+1;
-        funclist{length(funclist)+1} = netwmetrics{thismetric.listidx}.func;
-        if i == 1
-            metvec_str = sprintf('metrics_vector = [%s', netwmetrics{thismetric.listidx}.id);
-        else
-            metvec_str = sprintf('%s, %s', metvec_str, netwmetrics{thismetric.listidx}.id);
-        end
-
+        funclist{i} = netwmetrics{thismetric.listidx}.func;
     end
+
+    
+
+    if i == 1
+        metvec_str = sprintf('metrics_vector = [%s', netwmetrics{thismetric.listidx}.id);
+    else
+        metvec_str = sprintf('%s, %s', metvec_str, netwmetrics{thismetric.listidx}.id);
+    end
+    metvec_str = sprintf('%s];', metvec_str);
+    %varnamelist{i} = netwmetrics{sel_metrics(i).listidx}.id;
 end
 
 n_nodes = (1+sqrt(1+(8*size(Y,2))))/2; 
@@ -100,10 +98,11 @@ for i = 1:size(Y,1)
     %G = graph(G_struct.am);
     A = G_struct.am;
 
-    for j = 1:length(funclist)
+    for j = 1:length(sel_metrics)
+        fprintf('%s\n',j)
         eval(funclist{j});        
     end
-    eval(sprintf('%s];', metvec_str));
+    eval(sprintf('%s;', metvec_str));
     metricsY(i,:) = metrics_vector;
 end
 Y = metricsY;

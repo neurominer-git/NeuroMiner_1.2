@@ -987,7 +987,7 @@ end
 if paramfl && tsfl 
      tsproc = true;
 elseif trfl
-    if VERBOSE;fprintf('\tGraph metrics computation ...'); end
+    if VERBOSE;fprintf('\tGraph metric computation ...'); end
     [InputParam.Tr, TrParami] = graph_PerfGraphMetrics(InputParam.Tr, InputParam.P{i}.GRAPHMETRICS);
     % All 
     if tsfl, tsproc = true; end
