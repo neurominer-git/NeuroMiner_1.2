@@ -166,10 +166,12 @@ if ~exist('act','var') || isempty(act)
     s = nk_GetNMStatus(NM);
     if ~isempty(s.completed_analyses) && sum(s.completed_analyses)>1 && sum(s.nmodal_analyses)>1
         menustr = [ menustr sprintf('Define meta-learning/stacking options [ %s ]|', STATUS.STACKING) ]; menuact = [ menuact 18 ];
+    else
+        NM.TrainParam.STACKING.flag = 2;
     end
 
     %% Check whether more than one variate are available and make data fusion options available
-    if length(NM.Y)>1 && NM.TrainParam.STACKING.flag == 2
+    if length(NM.Y)>1 && (NM.TrainParam.STACKING.flag == 2 || (~isfield(NM,'analysis') || (isfield(NM,'analysis') && numel(NM.analysis)<2)))
         % Make data fusion option available
         if isfield(NM.TrainParam,'FUSION')
             fusemode = NM.TrainParam.FUSION.flag;

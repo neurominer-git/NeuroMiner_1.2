@@ -317,15 +317,10 @@ if ~isempty(analysis)
             end
             % Run through multiple analyses if needed    
             for i=1:nA
-                nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'setup_main', 0);
                 tNM.runtime.curanal = inp.analind(i);
-                if nA>1
-                    inp = nk_GetAnalModalInfo_config(tNM, inp); 
-                    if inp.HideGridAct
-                        [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd);
-                        inp.GridAct = true(ix,jx);
-                    end
-                end
+                % Configure inp structure according to actual analysis
+                inp = nk_GetAnalModalInfo_config(tNM, inp); 
+                if inp.HideGridAct, [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd); inp.GridAct = true(ix,jx); end
                 inp.analysis_id = tNM.analysis{inp.analind(i)}.id;
                 
                 % check whether alternative label should be used

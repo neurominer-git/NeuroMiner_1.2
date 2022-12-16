@@ -267,12 +267,9 @@ switch act
         end
         nA = 1; if numel(inp.analind)>1, nA = numel(inp.analind); end
         for i=1:nA
-            nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'setup_main', 0); 
             NM.runtime.curanal = inp.analind(i);
-            if nA>1
-                inp = nk_GetAnalModalInfo_config(NM, inp);
-                if inp.HideGridAct, inp.GridAct = NM.analysis{inp.analind(i)}.GDdims{1}.GridAct; end
-            end
+            inp = nk_GetAnalModalInfo_config(NM, inp);
+            if inp.HideGridAct, [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd); inp.GridAct = true(ix,jx); end
             inp.analysis_id = NM.analysis{inp.analind(i)}.id;
             inp.saveoptdir = [ NM.analysis{inp.analind(i)}.rootdir filesep 'opt' ];
             if inp.oocvflag
