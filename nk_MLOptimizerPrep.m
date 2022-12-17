@@ -328,7 +328,6 @@ if ~isempty(analysis)
                     tNM.label = tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.newlabel; 
                     tNM.modeflag = tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.newmode;  
                 end
-
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
                 nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'clear', 0);
             end
@@ -348,6 +347,7 @@ if ~isempty(analysis)
             end
             clear tNM
             h = findobj('Tag','PrintCVBarsBin'); if ~isempty(h), delete(h); end
+            NM = rmfield(NM,'runtime');
     end
 end
 

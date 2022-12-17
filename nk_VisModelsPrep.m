@@ -262,7 +262,7 @@ switch act
             NM.analysis{inp.analind(i)} = VisModelsPrep(NM, inp, NM.analysis{inp.analind(i)});
             nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'clear', 0); 
         end
-        
+        NM = rmfield(NM,'runtime');
 end
 
 function tdir = create_defpath(analysis)

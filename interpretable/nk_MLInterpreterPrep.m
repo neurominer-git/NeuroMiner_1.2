@@ -279,7 +279,7 @@ switch act
             end
             nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'clear', 0); 
         end
-         
+        NM = rmfield(NM,'runtime'); 
 end
 
 function tdir = create_defpath(analysis, oocvind)
