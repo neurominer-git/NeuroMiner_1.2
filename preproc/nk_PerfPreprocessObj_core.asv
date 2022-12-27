@@ -16,7 +16,9 @@
 function [SrcParam, InputParam, TrParam] = ...
               nk_PerfPreprocessObj_core(SrcParam, InputParam, TrParam, act)
 
+
 global VERBOSE TEMPL SVM MODEFL 
+
 
 %% Prepare and check input params
 paramfl = false; tsfl = false; trfl = false; cfl = false;
@@ -40,6 +42,7 @@ if isfield(InputParam,'Tr'), trfl=true; end
 nTs = 0; if isfield(InputParam,'Ts'), tsfl=true; if iscell(InputParam.Ts), nTs = size(InputParam.Ts,2); end; end
 
 % Has calibration data been transferred? [not used currently]
+
 nC = 0; 
 if isfield(InputParam,'C')
    
@@ -48,6 +51,7 @@ if isfield(InputParam,'C')
         nC = size(InputParam.C,2); 
     end
 end
+
 
 if ~trfl && ~tsfl, error('\nNo Preprocessing performed because training and test data are missing.\nCheck your parameters!!!'); end
 
@@ -126,7 +130,9 @@ for i=1:nact
         nComb = nP * nO; 
         Tr = cell(nComb,nL); 
         if isfield(InputParam,'Yw'), Yw = cell(nComb,nL); end
+
         if isfield(InputParam,'C'), C = cell(nComb,nL); end
+
         if nTs>0, Ts = cell(nComb,nTs,nL); end
         TrParamij = cell(nComb,nL); ll = 1;
         
@@ -217,6 +223,7 @@ for i=1:nact
                         end
                     end
                 end
+
                 if isfield(InputParam,'C')
                     InputParam.C = InputParam.C;
                     if i==1    
@@ -226,6 +233,7 @@ for i=1:nact
                    end
                     
                 end
+
                 % ... and now apply multiple parameters to shelf thus creating
                 % multi-shelf versions of the data 
                 for l = 1: nO
@@ -236,11 +244,13 @@ for i=1:nact
                     end
                     if paramfl, llTrParam = TrParami{kl,nl}; else, llTrParam = []; end
                     
+
                     [ SrcParam, Out, TrParamij{kl,nl}, ActParam ] = feval( funcstr, SrcParam, InputParamj, TrParam, llTrParam, ActParam );
                     Tr{kl,nl} = Out.Tr;
                     if adasynfl, TrainLabelSyn{kl,nl} = SrcParam.TrainLabelSyn{ActParam.j}; CovarSyn{kl,nl} = SrcParam.covarsSyn{ActParam.j}; end
                     if isfield(Out,'Yw'), Yw{kl,nl} = Out.Yw; end
                     if isfield(Out, 'C'), C{kl,nl} = Out.C; end
+
                     if nTs>1
                         for k = 1:nTs
                             Ts{kl,k,nl} = Out.Ts{k};
@@ -255,7 +265,9 @@ for i=1:nact
         InputParam.Tr = Tr; 
         if adasynfl, SrcParam.TrainLabelSyn = TrainLabelSyn; SrcParam.covarsSyn = CovarSyn; end
         if isfield(InputParam,'Yw'), InputParam.Yw = Yw; end
+
         if isfield(InputParam,'C'), InputParam.C = C; end
+
 
         if nTs > 0; InputParam.Ts = Ts; end
         TrParami = TrParamij;
@@ -267,6 +279,7 @@ for i=1:nact
         Tr = cell(nO,nL); 
         % Is there are weighting vector?
         if isfield(InputParam,'Yw'), Yw = cell(nO,nL); end
+
         if isfield(InputParam,'C'), C = cell(nO,nL); end
         if nTs > 0, Ts = cell(nO,nTs,nL); end
 
@@ -296,7 +309,9 @@ for i=1:nact
                 if paramfl, llTrParam = TrParami{kl,nl}; else, llTrParam = []; end
                 % -----------------------------------------------------------------------------------------------------------------
                 % PROCESS: Pass everything to processing step (funcstr)
+
                 [ SrcParam, Out, TrParamij{kl,nl}, ActParam ] = feval( funcstr, SrcParam, InputParam, TrParam, llTrParam, ActParam );
+
                 % -----------------------------------------------------------------------------------------------------------------
                 % POST-PROCESS
                 TrParamij{kl,nl}.i_opt = O(l,:); % Save in parameter shelf
@@ -310,7 +325,9 @@ for i=1:nact
                 end
                 % Take care of weighting vector to be also stored in shelf
                 if isfield(Out,'Yw'), Yw{kl,nl} = Out.Yw; end
+
                 if isfield(Out,'C'), C{kl,nl} = Out.C; end
+
                 % Now transfer proper training, CV1 test and CV2 test data to
                 % data shelves
                 if nTs>1
@@ -328,7 +345,9 @@ for i=1:nact
         if adasynfl, SrcParam.TrainLabelSyn = TrainLabelSyn; SrcParam.covarsSyn = CovarSyn; end
         % Save CV1 and CV2 test data in shelves
         if isfield(InputParam,'Yw'), InputParam.Yw = Yw; end
+
         if nC > 0, InputParam.C = C; end
+
         if nTs > 0; InputParam.Ts = Ts; end
         TrParami = TrParamij; % Save processing parameters of curent parameters range loop
     else
@@ -336,7 +355,9 @@ for i=1:nact
             InputParam.Tr = [InputParam.Tr; InputParam.TrSyn];
         end
         if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param{InputParam.curclass}{i}; end
+
         [ SrcParam, InputParam, TrParami, ActParam ] = feval( funcstr, SrcParam, InputParam, TrParam, TrParami, ActParam );
+
     end
     
     % No Out-of-sample mode => build up TrParam structure array
@@ -349,7 +370,9 @@ end
 end
 
 % =========================================================================
+
 function [SrcParam, InputParam, TrParami, actparam] = act_impute(SrcParam, InputParam, ~, TrParami, actparam)
+
 %global VERBOSE
 trfl     = actparam.trfl;
 tsfl     = actparam.tsfl;
@@ -366,7 +389,9 @@ if tsproc, InputParam.Ts = nk_PerfImputeObj(InputParam.Ts, TrParami); end
 end
 
 % =========================================================================
+
 function [ SrcParam, InputParam, TrParami, actparam] = act_labelimpute(SrcParam, InputParam, ~, ~, actparam)
+
 global MODEFL
 i  = actparam.i;
 InputParam.P{i}.LABELIMPUTE.X = InputParam.Tr;
@@ -384,7 +409,9 @@ end
 end
 
 % =========================================================================
+
 function [ SrcParam, InputParam, TrParami, actparam ] = act_scale(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -405,6 +432,7 @@ else
     if tsfl, tsproc = true; end  
 end
 if tsproc, InputParam.Ts = nk_PerfScaleObj(InputParam.Ts, TrParami); end
+
 if isfield(InputParam, 'C') %CALIB.calibflag && CALIB.preprocstep > i
     InputParam.C = nk_PerfScaleObj(InputParam.C, InputParam.P{i}.SCALE);
 end
@@ -412,6 +440,7 @@ end
 
 % =========================================================================
 function [ SrcParam, InputParam, TrParami, actparam ] = act_normalize(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -440,7 +469,9 @@ if tsproc, InputParam.Ts = nk_PerfNormObj(InputParam.Ts, TrParami); end
 
 end
 % =========================================================================
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_copyfeat(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 
 if VERBOSE;fprintf('\tCopy features ...'); end
@@ -448,7 +479,9 @@ if VERBOSE;fprintf('\tCopy features ...'); end
 end
 
 % =========================================================================
+
 function [SrcParam,InputParam, TrParami, actparam ] = act_unitnormalize(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -471,8 +504,10 @@ if tsproc, InputParam.Ts = nk_PerfUnitNormObj(InputParam.Ts, TrParami); end
 end
 
 % =========================================================================
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_remmeandiff(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE CALIB
+
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
@@ -497,6 +532,7 @@ else
     if VERBOSE;fprintf(' not performed.'); end
 end
 if tsproc, InputParam.Ts = nk_PerfRemMeanDiffObj(InputParam.Ts, TrParami); end
+
 if isfield(InputParam,'C') && CALIB.calibflag % && CALIB.preprocstep > i
     INcalib = InputParam.P{i};
     INcalib.sTrInd = SrcParam.covars_cocv(:,INcalib.sIND);
@@ -507,6 +543,7 @@ end
 
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_discretize(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 
 trfl    = actparam.trfl;
@@ -534,7 +571,9 @@ if tsproc, InputParam.Ts = nk_PerfDiscretizeObj(InputParam.Ts, TrParami); end
 end
 
 % =========================================================================
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_symbolize(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -558,7 +597,9 @@ if tsproc, InputParam.Ts = nk_PerfDiscretizeObj(InputParam.Ts, TrParami); end
 end   
 
 % =========================================================================
+
 function [SrcParam,InputParam, TrParami, actparam ] = act_standardize(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -592,7 +633,9 @@ if tsproc, InputParam.Ts = nk_PerfStandardizeObj(InputParam.Ts, TrParami); end
 end
 
 % =========================================================================
+
 function [SrcParam,InputParam, TrParami, actparam ] = act_reducedim(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 
 trfl    = actparam.trfl;
@@ -659,7 +702,9 @@ if tsproc, InputParam.Ts = nk_PerfRedObj(InputParam.Ts, TrParami); end
 
 end
 
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_extdim(SrcParam, InputParam, TrParam, TrParami, actparam)
+
 global VERBOSE
 
 trfl    = actparam.trfl;
@@ -709,8 +754,10 @@ if tsproc, InputParam.Ts = nk_PerfExtDimObj(InputParam.Ts, TrParami); end
 
 end
 % =========================================================================
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_correctnuis(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE CALIB 
+
 
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -756,6 +803,7 @@ else
 end
 
 if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
+
 if CALIB.calibflag && isfield(InputParam, 'C')
     INcalib = IN;
     INcalib.TrCovars = CALIB.covars;
@@ -767,6 +815,7 @@ end
 end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_elimzero(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -794,7 +843,9 @@ if tsproc, InputParam.Ts = nk_PerfElimZeroObj(InputParam.Ts, TrParami); end
 end
 
 % =========================================================================
+
 function [SrcParam,InputParam, TrParami, actparam ] = act_rankfeat(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 
 i  = actparam.i;
@@ -826,7 +877,9 @@ end
 
 end
 % =========================================================================
+
 function [SrcParam,InputParam, TrParami, actparam ] = act_extfeat(SrcParam, InputParam, TrParam, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -880,7 +933,9 @@ if tsproc, InputParam.Ts = nk_PerfWActObj(InputParam.Ts, TrParami ); end
 end
 
 % =========================================================================
+
 function [SrcParam,InputParam, TrParami, actparam ] = act_remvarcomp(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -916,7 +971,9 @@ if tsproc, InputParam.Ts = nk_PerfAdjForCovarsUsingPCAObj(InputParam.Ts, TrParam
 end
 
 % =========================================================================
+
 function [SrcParam,InputParam, TrParami, actparam ] = act_devmap(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -948,7 +1005,9 @@ if tsproc, InputParam.Ts = nk_PerfDevMapObj(InputParam.Ts, TrParami ); end
 end
 
 % =========================================================================
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_graphSparsity(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -972,7 +1031,9 @@ end
 if tsproc, InputParam.Ts = graph_PerfSparsityThres(InputParam.Ts, TrParami); end
 end
 
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_graphMetrics(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -987,7 +1048,9 @@ end
 if paramfl && tsfl 
      tsproc = true;
 elseif trfl
+
     if VERBOSE;fprintf('\tGraph metric computation ...'); end
+
     [InputParam.Tr, TrParami] = graph_PerfGraphMetrics(InputParam.Tr, InputParam.P{i}.GRAPHMETRICS);
     % All 
     if tsfl, tsproc = true; end
@@ -998,8 +1061,10 @@ end
 
 
 
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_graphComputation(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE CALIB
+
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
@@ -1009,6 +1074,7 @@ tsproc  = false;
 if isfield(actparam,'opt')
     InputParam.P{i}.GRAPHCONSTRUCTION.p = actparam.opt;
 end
+
 
 % if calibration data exists, replace refgroup with C
 if CALIB.calibflag && isfield(InputParam, 'C') && strcmp(InputParam.P{i}.GRAPHCONSTRUCTION.method, "Normative network + 1") && InputParam.P{i}.GRAPHCONSTRUCTION.refGroup == -1
@@ -1028,7 +1094,9 @@ if tsproc, InputParam.Ts = graph_PerfGraphConstruction(InputParam.Ts, TrParami);
 end
 % =========================================================================
 
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_customPreproc(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -1053,7 +1121,9 @@ if tsproc, InputParam.Ts = perfCustomPreproc(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_JuSpace(SrcParam, InputParam, ~, TrParami, actparam)
+
 global VERBOSE
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -1077,8 +1147,10 @@ end
 if tsproc, InputParam.Ts = perfJuSpace(InputParam.Ts, TrParami); end
 end
 % =========================================================================
+
 function [SrcParam, InputParam, TrParami, actparam ] = act_ROImeans(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE CALIB
+
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
@@ -1097,11 +1169,13 @@ elseif trfl
 
     if tsfl, tsproc = true; end
 end
+
 % 
 if tsproc, InputParam.Ts = perfROImeans(InputParam.Ts, TrParami); end
 if CALIB.calibflag && isfield(InputParam, 'C') %&& CALIB.preprocstep > i 
     InputParam.C = perfROImeans(InputParam.C, InputParam.P{i}.ROIMEANS);
 end
+
 end
 % =========================================================================
 function [InputParam, SrcParam] = perform_adasyn(InputParam, SrcParam)

@@ -113,7 +113,7 @@ switch act
             NM = evalin('base','NM');
         end
 
-        if isfield(NM,'time') && ~isempty(NM.time),
+        if isfield(NM,'time') && ~isempty(NM.time)
             TIME = NM.time;
         end
 
@@ -187,7 +187,7 @@ switch act
                 tPREPROC = PREPROC;
             end
 
-            if isfield(tPREPROC,'LABELMOD'),
+            if isfield(tPREPROC,'LABELMOD')
                 SCALE.LABELMOD = tPREPROC.LABELMOD;
             else
                 SCALE = [];
@@ -339,8 +339,6 @@ function cvadj = adjust_cv(inp)
 
 cvadj = inp.cv;
 
-
-
 ulb = unique(inp.TrainParam.LABEL.newlabel);
 if any(~isfinite(ulb))
     NaNflag = true; ind = logical(sum(isfinite(ulb),2));
@@ -490,11 +488,3 @@ else
     class.TestLabel = Label(TestInd);
 end
 end
-
-%-------------------------------------------------------------------------
-% function labels = GenLabel(Idx, Label)
-% labels = Label(Idx);
-% end
-% 
-% 
-% end

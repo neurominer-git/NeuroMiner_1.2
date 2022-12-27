@@ -37,7 +37,7 @@ if ~defaultsfl
             fprintf('\n================================')
             for i=1:ncv
                 % determine size of partitions
-                fprintf('\n%g:\t CV2: [%g, &g], CV1: [%g, %g]', ...
+                fprintf('\n%g:\t CV2: [%g, %g], CV1: [%g, %g]', ...
                     i, size(NM.cv{i}.TrainInd,1), size(NM.cv{i}.TrainInd,2), ...
                     size(NM.cv{i}.cvin{1,1}.TrainInd,1), size(NM.cv{i}.cvin{1,1}.TrainInd,2))
             end
@@ -334,7 +334,7 @@ if ~defaultsfl
              groups = []; appendfl=false; oldcv=zeros(0,size(NM.label,2));
 
              % Checkwhether to overwrite or append to current CV structure
-             if isfield(NM,'cv')
+             if isfield(NM,'cv') && ~isempty(NM.cv)
                  if NM.TrainParam.RAND.OuterFold == size(NM.cv(1).TrainInd,2) && ...
                     NM.TrainParam.RAND.InnerFold == size(NM.cv(1).cvin{1,1}.TrainInd,2)
                         appendfl = nk_input('Append to existing CV structure',0,'m', ...
@@ -352,8 +352,8 @@ if ~defaultsfl
              end
              if strcmp(NM.modeflag,'classification')
                  for i=1:size(NM.label,2)
-                     if ~isempty(oldcv), ioldcv = oldcv(i); else ioldcv=[]; end
-                     if size(NM.label,2)>1, grpn = groupnames{i}; else grpn = groupnames; end
+                     if ~isempty(oldcv), ioldcv = oldcv(i); else, ioldcv=[]; end
+                     if size(NM.label,2)>1, grpn = groupnames{i}; else, grpn = groupnames; end
                      cv(i) =  nk_MakeCrossFolds(NM.label(:,i), NM.TrainParam.RAND, NM.modeflag, groups, grpn, ioldcv, appendfl);
                  end
              else
@@ -371,7 +371,11 @@ if ~defaultsfl
                                 NM.cv(i).classnew = [NM.cv(i).classnew; cv(i).classnew];
                             end
                          otherwise
-                            NM.cv(i) = cv(i);
+                             if ~isfield(NM,'cv') || isempty(NM.cv)
+                                NM.cv = cv(i);
+                             else
+                                NM.cv(i) = cv(i);
+                             end
                      end
                  end
              end

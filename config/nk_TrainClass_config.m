@@ -166,10 +166,12 @@ if ~exist('act','var') || isempty(act)
     s = nk_GetNMStatus(NM);
     if ~isempty(s.completed_analyses) && sum(s.completed_analyses)>1 && sum(s.nmodal_analyses)>1
         menustr = [ menustr sprintf('Define meta-learning/stacking options [ %s ]|', STATUS.STACKING) ]; menuact = [ menuact 18 ];
+    else
+        NM.TrainParam.STACKING.flag = 2;
     end
 
     %% Check whether more than one variate are available and make data fusion options available
-    if length(NM.Y)>1 && NM.TrainParam.STACKING.flag == 2
+    if length(NM.Y)>1 && (NM.TrainParam.STACKING.flag == 2 || (~isfield(NM,'analysis') || (isfield(NM,'analysis') && numel(NM.analysis)<2)))
         % Make data fusion option available
         if isfield(NM.TrainParam,'FUSION')
             fusemode = NM.TrainParam.FUSION.flag;
@@ -219,11 +221,6 @@ if ~exist('act','var') || isempty(act)
     multistr = ''; multiflag = false;
     if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
         modeflag = NM.TrainParam.LABEL.newmode;
-        %         NM.TrainParam.SVM           = nk_LIBSVM_config(NM,[],1,[],[],modeflag);
-        %         NM.TrainParam.SVM.prog      = 'LIBSVM';
-        %         NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
-        %         NM.TrainParam.SVM.GridParam = 1;
-        %         if strcmp(modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
     else
         modeflag = NM.modeflag;
         if isfield(NM.TrainParam, 'LABEL')
@@ -285,7 +282,8 @@ if ~exist('act','var') || isempty(act)
     flx = flSVM && flGRD && flPREPROC;
 
     menustr = [ menustr 'Use different label [ ' STATUS.LABEL ']|']; menuact = [menuact 99] ;
-    menustr = [ menustr 'Calibration data [ ' STATUS.CALIB ']|']; menuact = [menuact 1000];
+    %menustr = [ menustr 'Calibration data [ ' STATUS.CALIB ']|']; menuact = [menuact 1000];
+
     menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 5:6 ];
 
     if flx
@@ -605,7 +603,7 @@ switch act
     case 99
         nk_PrintLogo
         fprintf('\n*************************************')
-        fprintf('\n*******     DEFINE NEW LABEL     *******')
+        fprintf('\n****  DEFINE ALTERNATIVE LABEL  *****')
         fprintf('\n*************************************')
         fprintf('\n')
         if isfield(NM.TrainParam, 'LABEL')

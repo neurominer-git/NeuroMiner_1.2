@@ -812,7 +812,7 @@ switch act
         
     case 'def_label_names'
         if isfield(IO,'desc_labels')
-            desc_labels = IO.desc_labels{i};
+            desc_labels = IO.desc_labels;
         else
             desc_labels = repmat({[]},size(IO.L,2),1);
         end

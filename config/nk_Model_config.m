@@ -110,7 +110,7 @@ switch modeflag
             if SVM.ADASYN.flag == 1
                 if ~isfield(SVM.ADASYN,'beta'), SVM.ADASYN.beta = 1; end
                 betadef = SVM.ADASYN.beta; 
-                mnuact = [ mnuact sprintf('Define beta value (defines how much balancing will be applied, 0<->1) [ k=%g ]|',betadef)];
+                mnuact = [ mnuact sprintf('Define beta value (defines how much balancing will be applied, 0<->1) [ beta=%g ]|',betadef)];
                 mnusel = [ mnusel 8 ];
                 if ~isfield(SVM.ADASYN,'kDensity'), SVM.ADASYN.kDensity = 5; end
                 kdensdef = SVM.ADASYN.kDensity; 
@@ -390,8 +390,13 @@ switch act
         
         
     case 3
-
-        SVM.GridParam = nk_EvalFunc_config(NM, SVM, navistr);
+        
+        if isfield(NM.TrainParam,'LABEL') && NM.TrainParam.LABEL.flag == 1
+            modeflag = NM.TrainParam.LABEL.newmode;
+        else
+            modeflag = [];
+        end
+        SVM.GridParam = nk_EvalFunc_config(NM, SVM, navistr, modeflag);
             
     case 4
         
