@@ -39,6 +39,20 @@ if isempty(PREPROC)
     end
 end
 
+if isfield(NM.TrainParam,'LABEL')
+    if NM.TrainParam.LABEL.flag == 1
+        modeflag = NM.TrainParam.LABEL.newmode;
+%     else
+%         if strcmp(NM.TrainParam.LABEL.newmode,'classification') 
+%             if isfield(NM.TrainParam.PREPROC{varind},'LABELMOD') && NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE == 1
+%                 NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE = 0;
+%             end
+%         end
+    end
+else
+    modeflag = NM.modeflag;
+end
+
 if ~exist('enind','var'), enind = []; end 
 if ~isstruct(enind)
     fl = true;
@@ -96,7 +110,7 @@ d = nk_GetParamDescription2(NM, PREPROC, 'PreProc');
 nk_PrintLogo
 
 % Check group processing mode possibilities
-if max(NM.label(:,1)) > 2 && strcmp(NM.modeflag,'classification')
+if max(NM.label(:,1)) > 2 && strcmp(modeflag,'classification')
     fprintf('\n%s\n',d.PREPROC.groupmode);
     cmdstr = 'Define group processing mode in multi-class setting'; cmdmnu = 1;
     [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu); 
@@ -105,7 +119,7 @@ elseif isempty(PREPROC) || ~isfield(PREPROC,'BINMOD')
 end
  
 % Check for target scaling / exponential transformation option
-if strcmp(NM.modeflag,'regression')
+if strcmp(modeflag,'regression')
     if isfield(PREPROC,'LABELMOD') && isfield(PREPROC.LABELMOD,'TARGETSCALE') && ( PREPROC.LABELMOD.TARGETSCALE || isfield(PREPROC.LABELMOD,'POLYNOM') )
         cmdstr = 'Modify / Disable';
         if ~strcmp(d.PREPROC.targetscaling,'NA'), 
@@ -125,7 +139,7 @@ if NM.datadescriptor{varind}.type == 1 && NM.TrainParam.STACKING.flag==2
     imganalflag = true;
     if isfield(PREPROC,'SPATIAL') && PREPROC.SPATIAL.cubetype>1
         cmdstr = 'Modify / Disable ';
-        if ~strcmp(d.PREPROC.spatialfiltering,'NA'), 
+        if ~strcmp(d.PREPROC.spatialfiltering,'NA') 
             prestr = sprintf('%s\n* %s', prestr, d.PREPROC.spatialfiltering); 
         end
         spatfltflag = true;
@@ -299,7 +313,7 @@ switch act
         PREPROC = config_binmod(NM, PREPROC);
     
     case 2 % Add Preprocessing step
-        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, [], 0, EF, navistr);
+        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, [], 0, EF, navistr, modeflag);
         if isfield(PREPROC,'ACTPARAM')
             if strcmp(PREPROC.ACTPARAM{end}.cmd, 'extfeat')
                 stepind = numel(PREPROC.ACTPARAM)-1;
@@ -331,13 +345,13 @@ switch act
             end
         end
     case 4 % Insert Preprocessing step
-        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 2, EF, navistr);
+        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 2, EF, navistr, modeflag);
     
     case 5 % Replace current step
-        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 1, EF, navistr);
+        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 1, EF, navistr, modeflag);
         
     case 6 % Modify current step
-        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 0, EF, navistr);
+        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 0, EF, navistr, modeflag);
     
     case 7 % Go to previous step
         if strcmp(PREPROC.ACTPARAM{stepind-1}.cmd,'extfeat') && stepind - 2 > 0
@@ -413,7 +427,7 @@ end
 
 % -------------------------------------------------------------------------
 function [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, ...
-                                                replflag, EF, navistr)
+                                                replflag, EF, navistr, modeflag)
 
 if ~isempty(PREPROC) && isfield(PREPROC,'ACTPARAM'), ...
     lact = length(PREPROC.ACTPARAM); 
@@ -423,13 +437,13 @@ end
 if ~exist('stepind','var') || isempty(stepind)
     modflag = 0; stepind = lact + 1;
 else
-    if replflag == 2, modflag = 0; else modflag = 1; end
+    if replflag == 2, modflag = 0; else, modflag = 1; end
 end
 
 M = NM.TrainParam.FUSION.M;
 fusefl = NM.TrainParam.FUSION.flag;
                     
-if ~exist('replflag','var') || isempty(replflag) replflag = 0; end
+if ~exist('replflag','var') || isempty(replflag), replflag = 0; end
 
 actstr = []; actmnu = []; CURACT2 = [];
 
@@ -653,14 +667,14 @@ function CURACT = config_binmod(NM, CURACT)
 if isfield(CURACT,'BINMOD') && ~isempty(CURACT.BINMOD)
     switch CURACT.BINMOD, case 1, tBINMOD = 1; case 0, tBINMOD = 2; case 2, tBINMOD = 3; end
 else
-    if max(NM.label(:,1))>2 && strcmp(NM.modeflag,'classification'), 
+    if max(NM.label(:,1))>2 && strcmp(modeflag,'classification'), 
         tBINMOD = 0; % Multi-group
     else
         tBINMOD = 1; % Binary mode
     end
 end
 
-if max(NM.label(:,1))<=2 || ~strcmp(NM.modeflag,'classification')
+if max(NM.label(:,1))<=2 || ~strcmp(modeflag,'classification')
     CURACT.BINMOD = 1;
 else
     CURACT.BINMOD = nk_input('Group processing mode',0, 'm', 'binary|multi-group',[1,0], tBINMOD);

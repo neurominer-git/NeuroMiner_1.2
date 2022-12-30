@@ -6,6 +6,7 @@ dir_tool = '/opt/matlab/JuSpace_v1.3/';
 % create global variable to store atlas matrix
 global JSMEM
 
+
 % create atlas matrix if not already stored in JSMEM
 if ~isfield(JSMEM,'atlas_matrix') || isempty(JSMEM.atlas_matrix)
     atlas_matrix = resize_image_JuSpace(atlas,brainmask);    

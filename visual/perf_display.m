@@ -1,6 +1,13 @@
 function handles = perf_display(handles)
 % Set current analysis
 analind = get(handles.selAnalysis,'Value'); 
+if ~isfield(handles,'modeflag')
+    handles.modeflag = handles.NM.modeflag;
+end
+if ~isfield(handles,'curranal')
+    handles.curranal = 1; 
+end
+
 handles.prevanal = handles.curranal;
 handles.curranal = analind;
 

@@ -201,7 +201,7 @@ switch act
     
                     % For imaging data: DATA FILTERING / SMOOTHING / RESLICING (in the future)
                     Y = nk_PerfSpatFilt2( Y, PREPROC, inp.X );
-                    if isfield(inp,'Yw'),  
+                    if isfield(inp,'Yw') 
                         fprintf('\nSmoothing weighting map')
                         inp.Yw = nk_PerfSpatFilt2( inp.Yw, PREPROC, inp.X ); 
                     else

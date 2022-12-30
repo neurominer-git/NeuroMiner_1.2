@@ -3,7 +3,7 @@ function [L, targscale, Lmin, Lmax, Lfact, Lpolyfact, Llogar] = nk_LabelTransfor
 targscale = 0; Lmin = min(L); Lmax = max(L); Lfact = 1; Lpolyfact = []; Llogar = [];
 
 if isfield(Param,'LABELMOD') && strcmp(MODEFL,'regression')
-    if isfield(Param.LABELMOD,'TARGETSCALE') && Param.LABELMOD.TARGETSCALE && any(L)
+    if isfield(Param.LABELMOD,'TARGETSCALE') && Param.LABELMOD.TARGETSCALE && any(L(:))
         fprintf('\n* Scaling of target labels [0<->1].')
         [L, IN] = nk_PerfScaleObj(L); L=full(L); Lmin = IN.minY; Lmax = IN.maxY; 
         targscale = 1;

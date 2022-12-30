@@ -8,8 +8,8 @@ end
 
 set(handles.pnModelPerf,'Visible',vis);
 set(handles.selModelMeasures,'Enable',vis);
-    
-switch handles.NM.modeflag
+
+switch handles.modeflag
     case 'classification'
          set(handles.popupmenu1,'Enable','on')
          set(handles.txtBinarize,'Enable','off');

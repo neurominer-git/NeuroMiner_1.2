@@ -327,10 +327,6 @@ for cei=1:size(Smin,1)  %cei: current example index
     
 end
 
-
-
-
-
 function [IDX,D] = knnsearch_nonflat(X,Y, varargin)
 %wraps knnsearch from MATLAB's statistics toolbox.
 %knnsearch_nonflat executes knnsearch only on the dimensions with nonzero

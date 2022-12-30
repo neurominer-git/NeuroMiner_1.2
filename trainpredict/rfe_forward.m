@@ -30,7 +30,7 @@ global VERBOSE TRAINFUNC
 
 r = rfe_algo_settings(Y, label, Ynew, labelnew, Ps, FullFeat, FullParam, ActStr);
 S = []; Sind = 1:r.kFea; k = r.kFea; 
-optfound = 0; optparam = r.optparam;
+optfound = 0; optparam = r.optparam; param = nan; 
 
 if VERBOSE
     fprintf('\n-----------------------------')
