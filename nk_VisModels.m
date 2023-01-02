@@ -332,13 +332,13 @@ for f=1:ix % Loop through CV2 permutations
                         
                         % Retrieve dimensionality of target space
                         D                      = getD(FUSION.flag, inp, n);
-                        juspaceflag = false;
-                        for a = 1:numel(iPREPROC.ACTPARAM)
-                            if iPREPROC.ACTPARAM{a}.cmd == 'JuSpace'
-                                juspaceflag = true;
-                                D = numel(iPREPROC.ACTPARAM{a}.JUSPACE.petList);
-                            end
-                        end
+%                         juspaceflag = false;
+%                         for a = 1:numel(iPREPROC.ACTPARAM)
+%                             if iPREPROC.ACTPARAM{a}.cmd == 'JuSpace'
+%                                 juspaceflag = true;
+%                                 D = numel(iPREPROC.ACTPARAM{a}.JUSPACE.petList);
+%                             end
+%                         end
                        
                         % Setup container for weight storage
                         I1.VCV1{h,n}               = zeros(D, ill,'single'); 
@@ -756,9 +756,9 @@ for f=1:ix % Loop through CV2 permutations
                                             % original space of modality
                                             [ ~, ~, ~, badcoords] = getD(FUSION.flag, inp, n); badcoords = ~badcoords;
 
-                                            if juspaceflag
-                                                badcoords = zeros(D,1);
-                                            end
+%                                             if juspaceflag
+%                                                 badcoords = zeros(D,1);
+%                                             end
                                             % Store results in CV1 container variables                                    
                                             % I1.numCV1parts(h, n) = I1.numCV1parts(h, n) + 1;
                                             I1.VCV1{h,n}(badcoords,il(h)) = Tx{n};
