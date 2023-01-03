@@ -1,4 +1,4 @@
-function [ Res, IN ] = nk_SimulateML2(IN, axes)
+function [ Res, IN ] = nk_SimulateML2(IN, axes, batchflag)
 % =========================================================================
 % FORMAT function [ R, P ] = nk_SimulateML(IN)
 % =========================================================================
@@ -77,8 +77,10 @@ if isfield(IN,'Data') && ~isempty(IN.Data)
     %     for i = 1:size(IN.Ncases,2)
     %         xNM.Y{1,i} =
     %     end
+    resdir = analysis.rootdir; 
 else
     fromData = 0;
+    resdir = pwd; 
 end
 
 % Create hyperparameter array
@@ -136,9 +138,9 @@ end
 R = zeros(nP,1);
 R95CI = zeros(2,nP);
 
-if nargin == 2
+if nargin > 1 && ~isempty(axes)
     ax = axes;
-else
+elseif nargin <=1
     figure;
     ax = gca;
 end
@@ -184,17 +186,23 @@ for i=1:nP % Loop through hyperparameter combinations
         [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose, [], [], [], [], IN.reps);
     end
     % Update the simulation plot
-    plot(ax,1:i,R(1:i),'b-');
-    ax.XTick = 1:i;
-    ax.XTickLabel = Xl(1:i);
-    ax.XTickLabelRotation = 90;
-    ax.XAxis.Label.String = 'Parameter combinations'; ax.XAxis.Label.FontWeight='bold';
-    ax.YAxis.Label.String = Crit; ax.YAxis.Label.FontWeight='bold';
-    drawnow
+    if exist("ax")
+        plot(ax,1:i,R(1:i),'b-');
+        ax.XTick = 1:i;
+        ax.XTickLabel = Xl(1:i);
+        ax.XTickLabelRotation = 90;
+        ax.XAxis.Label.String = 'Parameter combinations'; ax.XAxis.Label.FontWeight='bold';
+        ax.YAxis.Label.String = Crit; ax.YAxis.Label.FontWeight='bold';
+        drawnow
+    end
 end
 Res.R = R;
 Res.R95CI = R95CI';
 Res.Params = P;
+uid = datestr(datetime('now'), 'yyyymmdd_HHMMSS');
+resfilename = sprintf("Simulation_results_ID%s.mat", uid); % TO DO: more informative filename
+
+save(sprintf('%s/%s',resdir,resfilename), Res);
 
 function [Rmean, R95CI] = compute_perf(nf, mr, nc, er, auc_max, auc_min, nb, bp, ncm, nfm, algorithm, RAND, varargin)
 global SVM fromData xNM xCV
