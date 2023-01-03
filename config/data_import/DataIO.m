@@ -920,7 +920,7 @@ switch act
         end
         
     case 'sel_img'
-        if varind > 1, t_n_samples = 1; else, t_n_samples = n_samples; end
+        if varind > 1 && ~any(isinf(IO.n_subjects)), t_n_samples = 1; else, t_n_samples = n_samples; end
         IO.PP = []; t_n_subjects = nan(1, t_n_samples);
         for i=1:t_n_samples
             if ~oocvflag
@@ -936,15 +936,17 @@ switch act
                     hdrstr = sprintf('Select %s images for independent test data', IO.datasource );
                 end
             end
-            
+            Pi=[];  
             if isfield(IO,'P') && numel(IO.P)>=i 
+                try
                 if t_n_samples ~= n_samples && (~oocvflag || (oocvflag && IO.labels_known))
                     Pi = char(IO.P');
                 else
                     Pi = IO.P{i}; 
                 end
-            else
-                Pi=[];  
+                catch
+                    Pi=[]; 
+                end
             end
             [P, V, mess] = nk_FileSelector(t_n_subjects(i), datasource, hdrstr, IO.filt, Pi, [], mess);
             if ~isempty(P) && ~isempty(V)    
@@ -953,9 +955,10 @@ switch act
                 break
             end	
         end
-
-        if ~isempty(IO.PP) && (t_n_samples ~= n_samples && (~oocvflag || (oocvflag && IO.labels_known)))
+        % Check this code
+        if ~isempty(IO.PP) && t_n_samples ~= n_samples && (~oocvflag || (oocvflag && IO.labels_known))
             P = IO.P{1}; V = IO.V{1};
+            % This will not work for the first data modality
             cnt1 = 1; cnt2 = IO.n_subjects(1);
             for i=1:n_samples-1
                 IO.P{i} = P( cnt1:cnt2,: ); IO.V{i} = V(cnt1:cnt2);
@@ -964,7 +967,7 @@ switch act
             end
             IO.P{i+1} = P( cnt1:cnt2,: ); IO.V{i+1} = V(cnt1:cnt2);
         end
-
+        % ----
         if ~isempty(IO.PP)
             IO.PP(1,:)=[]; 
             [IO,mess] = RetrieveImageInfo(IO, datasource,mess);

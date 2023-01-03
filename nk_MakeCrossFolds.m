@@ -62,12 +62,12 @@ end
 if ~exist('modeflag','var') || isempty(modeflag), modeflag = 'classification'; end
 if ~exist('appendfl','var') || isempty(appendfl), appendfl = false; end
 
-% if ~CV2LOO && ~CV1LOO
-%     constraintfl = nk_input('Constrain stratification according to some grouping variable', ...
-%         0,'yes|no',[1,0],1);
-% else
+if ~CV2LOO && ~CV1LOO
+     constraintfl = nk_input('Constrain stratification based on a grouping variable', ...
+         0,'yes|no',[1,0],1);
+else
     constraintfl = false;
-%end
+end
 
 if constraintfl
     n_subjects_all = size(label,1);

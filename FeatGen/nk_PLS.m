@@ -32,7 +32,16 @@ if ~IN.trained
             IN.mpp.d = diag(IN.mpp.s)';
         case 'spls'
             % Perform sparse PLS
-            [IN.mpp.u, IN.mpp.v] = spls(mY, mXd, IN.cu, IN.cv);
+            nD = size(mXd,2);
+            IN.mpp.u = zeros(size(mY,2),nD);
+            IN.mpp.v = zeros(nD,nD);
+            IN.mpp.C = [];
+            for i=1:nD
+                % Compute SPLS level i
+                [IN.mpp.u(:,i), IN.mpp.v(:,i), IN.mpp.C] = spls(mY, mXd, IN.cu, IN.cv, IN.mpp.C);
+                % Covariance matrix deflation
+                IN.mpp.C = IN.mpp.C - (IN.mpp.C * IN.mpp.v(:,i)') * IN.mpp.v(:,i)';
+            end
     end
     sY = mY*IN.mpp.u;
     sX = mXd*IN.mpp.v;
