@@ -332,13 +332,13 @@ for f=1:ix % Loop through CV2 permutations
                         
                         % Retrieve dimensionality of target space
                         D                      = getD(FUSION.flag, inp, n);
-%                         juspaceflag = false;
-%                         for a = 1:numel(iPREPROC.ACTPARAM)
-%                             if iPREPROC.ACTPARAM{a}.cmd == 'JuSpace'
-%                                 juspaceflag = true;
-%                                 D = numel(iPREPROC.ACTPARAM{a}.JUSPACE.petList);
-%                             end
-%                         end
+                        juspaceflag = false;
+                        for a = 1:numel(iPREPROC.ACTPARAM)
+                            if strcmp(iPREPROC.ACTPARAM{a}.cmd,'JuSpace')
+                                juspaceflag = true;
+                                D = numel(iPREPROC.ACTPARAM{a}.JUSPACE.petList);
+                            end
+                        end
                        
                         % Setup container for weight storage
                         I1.VCV1{h,n}               = zeros(D, ill,'single'); 

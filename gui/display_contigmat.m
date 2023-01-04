@@ -49,16 +49,16 @@ if isfield(contigmat,'AUC') && isfield(contigmat,'AUC_lower')
 elseif isfield(contigmat,'AUC') 
     contig{end+1} = ['\bf Area-Under-the-Curve:\rm ' num2str(contigmat.AUC,'%1.2f')];
 end
-contig{end+1} = ['\bf Matthews Coorelation Coefficient:\rm ' num2str(contigmat.MCC,'%1.1f')];
+contig{end+1} = ['\bf Matthews Coorelation Coefficient:\rm ' num2str(contigmat.MCC,'%1.2f')];
 contig{end+1} = ['\bf Positive Predictive Value [%]:\rm ' num2str(contigmat.PPV,'%1.1f')];
 contig{end+1} = ['\bf Negative Predictive Value [%]:\rm ' num2str(contigmat.NPV,'%1.1f')];
 contig{end+1} = ['\bf False Positive Rate:\rm ' num2str(contigmat.FPR,'%1.1f')];
-contig{end+1} = ['\bf Positive Likelihood Ratio:\rm ' num2str(contigmat.pLR,'%1.1f')];
-contig{end+1} = ['\bf Negative Likelihood Ratio:\rm ' num2str(contigmat.nLR,'%1.1f')];
+contig{end+1} = ['\bf Positive Likelihood Ratio:\rm ' num2str(contigmat.pLR,'%1.2f')];
+contig{end+1} = ['\bf Negative Likelihood Ratio:\rm ' num2str(contigmat.nLR,'%1.2f')];
 contig{end+1} = ['\bf Prognostic Summary Index:\rm ' num2str(contigmat.PSI,'%1.1f')];
-contig{end+1} = ['\bf Youden''s J statistic:\rm ' num2str(contigmat.Youden,'%1.1f')];
+contig{end+1} = ['\bf Youden''s J statistic:\rm ' num2str(contigmat.Youden,'%1.2f')];
 contig{end+1} = ['\bf # Needed to Predict/Diagnose:\rm ' num2str(contigmat.NNP,'%1.1f') '/' num2str(contigmat.NND,'%1.1f')];
-contig{end+1} = ['\bf Diagnostic Odds Ratio:\rm ' num2str(contigmat.DOR,'%1.1f')];
+contig{end+1} = ['\bf Diagnostic Odds Ratio:\rm ' num2str(contigmat.DOR,'%1.2f')];
 if isfield(contigmat,'ECE') && handles.calibflag
     contig{end+1} = ['\bf Expected calibration error:\rm ' num2str(contigmat.ECE,'%1.2f')];
     sta = 0.49;

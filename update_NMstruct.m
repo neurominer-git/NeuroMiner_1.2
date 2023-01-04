@@ -5,7 +5,7 @@ function NM = update_NMstruct(NM)
 % add label-field to analysis if necessary
 
 % create default label struct
-label.label = NM.labels; 
+label.label = NM.label; 
 label.modeflag = NM.modeflag; 
 label.altlabelflag = 0; 
 
