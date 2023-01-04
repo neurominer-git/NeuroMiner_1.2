@@ -1090,7 +1090,7 @@ if GDfl || ~batchflag
         for g=1:ngroups
             mProb(Ix,:,g) =  nk_cellcat(multi_CV2prob(:,g),[],1);
         end
-        mProbI = squeeze(mean(mProb,2)); mProbI(~Ix,:)=NaN;
+        mProbI = squeeze(nm_nanmean(mProb,2)); mProbI(~Ix,:)=NaN;
         GDanalysis = nk_MultiPerfComp(GDanalysis, mProbI, label, ngroups, 'prob');
     end
 
