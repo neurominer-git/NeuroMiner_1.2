@@ -323,11 +323,13 @@ if ~isempty(analysis)
                 if inp.HideGridAct, [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd); inp.GridAct = true(ix,jx); end
                 inp.analysis_id = tNM.analysis{inp.analind(i)}.id;
                 
-                % check whether alternative label should be used
-                %if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
-                tNM.label = tNM.analysis{inp.analind(i)}.params.label.label; 
-                tNM.modeflag = tNM.analysis{inp.analind(i)}.params.label.modeflag;  
-                %end
+                % check whether alternative label should be used (only
+                % necessary if analysis were set up with older NM structure
+                if isfield(tNM.analysis{inp.analind(i)}.params,'label')
+                    tNM.label = tNM.analysis{inp.analind(i)}.params.label; 
+                    tNM.modeflag = tNM.analysis{inp.analind(i)}.params.modeflag;  
+                end
+
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
                 nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'clear', 0);
             end

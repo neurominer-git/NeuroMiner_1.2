@@ -810,17 +810,27 @@ end
 RANK = InputParam.P{i}.RANK;
 
 if ~isfield(TrParami,'W') || isempty(TrParami.W)
-    if actparam.adasynfl 
-        if iscell(SrcParam.TrainLabelSyn)
-            RANK.curlabel = [InputParam.P{i}.RANK.curlabel(:,actparam.curlabel); SrcParam.TrainLabelSyn{actparam.j}(:,actparam.curlabel)]; 
-        else
-            RANK.curlabel = [InputParam.P{i}.RANK.curlabel(:,actparam.curlabel); SrcParam.TrainLabelSyn(:,actparam.curlabel)]; 
-        end
+    % Modification alllows to compute weights in a user-defined subgroup
+    % (RANK.curglabel)
+    if isfield(InputParam.P{i}.RANK,'curglabel')
+        RANK.curlabel = InputParam.P{i}.RANK.curlabel(InputParam.P{i}.RANK.curglabel,actparam.curlabel);
+        Y = InputParam.Tr(InputParam.P{i}.RANK.curglabel,:);
     else
         RANK.curlabel = InputParam.P{i}.RANK.curlabel(:,actparam.curlabel);
+        Y = InputParam.Tr;
+    end
+    if actparam.adasynfl 
+        % To do: synthetic data generation needs to create also
+        % user-defined RANK.curlabel for artificial data. Currently only
+        % synthetic target label can be created (TrainLabelSyn).
+        if iscell(SrcParam.TrainLabelSyn)
+            RANK.curlabel = [RANK.curlabel; SrcParam.TrainLabelSyn{actparam.j}(:,actparam.curlabel)]; 
+        else
+            RANK.curlabel = [RANK.curlabel; SrcParam.TrainLabelSyn(:,actparam.curlabel)]; 
+        end
     end
     if VERBOSE;fprintf('\tCompute Feature Weighting ...'); end
-    TrParami = nk_PerfFeatRankObj(InputParam.Tr, RANK);
+    TrParami = nk_PerfFeatRankObj(Y, RANK);
     actparam.RANK.W{actparam.curlabel} = TrParami.W;
 end
 
@@ -857,7 +867,7 @@ if VERBOSE,fprintf('\tRanking-based feature extraction ...'); end
 if paramfl && tsfl 
     % Out-of-sample mode, used stored weights 
     tsproc = true;
-elseif trfl, 
+elseif trfl
    % Training mode, learn beta and optionally apply it to
     % out-of-sample data
     [ InputParam.Tr, TrParami ] = nk_PerfWActObj(InputParam.Tr, InputParam.P{i});

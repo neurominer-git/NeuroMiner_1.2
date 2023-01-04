@@ -238,18 +238,16 @@ if ~defaultsfl
                 if isfield(NM.TrainParam.RAND,'CV2Frame') && NM.TrainParam.RAND.CV2Frame == 1 && ~strcmp(CV2prx,' [ LOO ]') && ~strcmp(CV1prx,' [ LOO ]')
                     yesno = {'yes','no'}; Consstr = yesno{ConstrainedCV};
                     constrainstr = ['Constrain Cross-Validation structure based on a group index variable [ ' Consstr ' ]|'];
-                    MenuVec = [MenuVec 21];
-                    if ConstrainedCV == 1
-                        if ~isempty(ConstrainedGroupIndex)
-                            constrindstr = sprintf('%g groups among %g cases', numel(unique(ConstrainedGroupIndex)), numel(ConstrainedGroupIndex));
+                    MenuVec = [MenuVec 19];
+                    if ConstrainedCV 
+                        if ~isempty(ConstrainGroupIndex)
+                            constrindstr = sprintf('%g groups among %g cases', numel(unique(NM.TrainParam.RAND.ConstrainGroupIndex)), numel(NM.TrainParam.RAND.CV1LCO.ind));
                         else
                             constrindstr = 'undefined';
                         end
                         constraingrp = ['Define group index variable [ ' constrindstr ' ]|'];
-                        MenuVec = [MenuVec 22];
+                        MenuVec = [MenuVec 20];
                     end
-                else
-                    NM.TrainParam.RAND.ConstrainedCV=2;
                 end
                 buildstr = 'Build Cross-Validation structure|';
                 loadstr  = 'Load Cross-Validation structure|';
@@ -435,7 +433,7 @@ if ~defaultsfl
              NM.TrainParam.RAND.Eq.enabled = ~NM.TrainParam.RAND.Eq.enabled ;
          case 14
              if isfield(NM,'covars') && ~isempty(NM.covars)
-                eqtarget = nk_input('Perform histogram equalization using the target label or some other covariate', ...
+                eqtarget = nk_input('Perform histogram euqalization using the target label or some other covariate', ...
                                     0,'m','Target label|Covariate',[0,1],1);
                 if eqtarget
                      covind = nk_SelectCovariateIndex(NM);
@@ -475,11 +473,6 @@ if ~defaultsfl
             ylabel('# of observations in bins'); 
             xlabel(NM.TrainParam.RAND.Eq.CovarName); 
             title(['Analysis of equalized histogram of ' Eq.CovarName]);
-        case 21
-            if NM.TrainParam.RAND.ConstrainedCV == 1, NM.TrainParam.RAND.ConstrainedCV = 2; else, NM.TrainParam.RAND.ConstrainedCV = 1 ; end
-        case 22
-            NM.TrainParam.RAND.ConstrainedGroupIndex = ...
-                                 nk_input('Define index vector for constrained, stratified CV',0,'i',[],[numel(NM.cases),1]);
 
     end
 else

@@ -14,24 +14,23 @@ if ~defaultsfl
     cv = PLS.cv;
     UseLabel = PLS.uselabel;
     uselabels = {'NM labels','NM covariate matrix', 'User-defined matrix'};
-    V = PLS.V;
-    
     mn_str = sprintf('Choose PLS algorithm [ %s ]', algostr); mn_act = 1;
     mn_str = sprintf('%s|Define V matrix for covariance computation[ %s ]', mn_str, uselabels{UseLabel}); mn_act = [mn_act 2];
-    if UseLabel == 2
-        if isfield(NM,'covsel') && ~isempty(NM.covsel)
-            colselstr = sprintf('%g indices selected',numel(NM.covsel));
-        else
-            colselstr = 'undefined';
-        end
-        mn_str = sprintf('%s|Provide column indices [ %s ]', mn_str, colselstr); mn_act = [mn_act 3];
-    elseif UseLabel == 3
-        if isfield(NM,'V') && ~isempty(NM.V)
-            matselstr = sprintf('%gx%g matrix provided ',size(NM.V,1), size(NM.V,2));
-        else
-            matselstr = 'undefined';
-        end
-        mn_str = sprintf('%s|Provide user-defined matrix [ %s ]', mn_str, matselstr); mn_act = [mn_act 4];
+    switch UseLabel 
+        case 2
+            if isfield(PLS,'covsel') && ~isempty(PLS.covsel)
+                colselstr = sprintf('%g indices selected',numel(PLS.covsel));
+            else
+                colselstr = 'undefined';
+            end
+            mn_str = sprintf('%s|Provide column indices [ %s ]', mn_str, colselstr); mn_act = [mn_act 3];
+        case 3
+            if isfield(PLS,'V') && ~isempty(PLS.V)
+                matselstr = sprintf('%gx%g matrix provided ',size(PLS.V,1), size(PLS.V,2));
+            else
+                matselstr = 'undefined';
+            end
+            mn_str = sprintf('%s|Provide user-defined matrix [ %s ]', mn_str, matselstr); mn_act = [mn_act 4];
     end
     
  	if strcmp(algostr,'spls')
@@ -58,12 +57,11 @@ if ~defaultsfl
             PLS.covsel = nk_SelectCovariateIndex(NM, covsel, 1);
             PLS.V = NM.covars(:,PLS.covsel);
         case 4
-            PLS.V = nk_input('Provide a side label matrix for covariance matrix computation',0,'e',V,[size(NM.label,1) Inf]); 
+            PLS.V = nk_input('Provide a side label matrix for covariance matrix computation',0,'e',[],[size(NM.label,1) Inf]); 
         case 5
-            PLS.cu = nk_input('Choose parameter (range) for sparsity constraint on U',0,'e',cu);
+            PLS.cu = nk_input('Choose parameter (range) for sparsity constraint on predictive features',0,'e',cu);
         case 6
-            PLS.cv = nk_input('Choose parameter (range) for sparsity constraint on V',0,'e',cv);
-           
+            PLS.cv = nk_input('Choose parameter (range) for sparsity constraint on side label features',0,'e',cv);
     end
 else
     PLS.algostr = algostr;
