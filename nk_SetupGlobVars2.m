@@ -62,7 +62,7 @@ switch act
         end
 
         try
-            MODEFL  = dat.modeflag;
+            MODEFL  = dat.label.modeflag;
         catch
             paramstr = sprintf('%s\n%s',paramstr,'Type of predictor: Classification / Regression model');
         end

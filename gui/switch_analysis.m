@@ -19,11 +19,9 @@ handles.curlabel = get(handles.selLabel,'Value');
 
 
 % set alternative label
-if isfield(handles.NM.analysis{analind}.params.TrainParam, 'LABEL') && handles.NM.analysis{analind}.params.TrainParam.LABEL.flag
-    handles.label = handles.NM.analysis{analind}.params.TrainParam.LABEL.newlabel;
-else
-    handles.label = handles.NM.label;
-end
+handles.label = handles.NM.analysis{1,analind}.params.label.label;
+handles.modeflag = handles.NM.analysis{1,analind}.params.label.modeflag;
+
 
 % Check whether selected analysis has visualisation data
 if isfield(handles.NM.analysis{analind},'visdata')
