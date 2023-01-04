@@ -156,7 +156,7 @@ switch act
                 NM.analysis{A.analdim}.params.TrainParam      = NM.TrainParam;
                 NM.analysis{A.analdim}.params.datadescriptor  = NM.datadescriptor;
                 %NM.analysis{A.analdim}.params.modeflag        = NM.modeflag;
-                %NM.analysis{A.analdim}.params.cv              = NM.cv;
+                NM.analysis{A.analdim}.params.cv              = NM.cv;
                 NM.analysis{A.analdim}.params.id              = NM.id;
                 NM.analysis{A.analdim}.meta.TIME              = datestr(now);
                 if isfield(NM,'C')
@@ -164,12 +164,11 @@ switch act
                 end
                 if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
                     NM.analysis{A.analdim}.params.label       = NM.TrainParam.LABEL.newlabel; 
-                    NM.analysis{A.analdim}.params.modeflag    = NM.TrainParam.LABEL.modeflag;
-                    NM.analysis{A.analdim}.params.cv          = NM.TrainParam.LABEL.cv; 
+                    NM.analysis{A.analdim}.params.modeflag    = NM.TrainParam.LABEL.newmode;
+                    cla NM.analysis{A.analdim}.params.TrainParam.LABEL; 
                 else 
                     NM.analysis{A.analdim}.params.label       = NM.label;
                     NM.analysis{A.analdim}.params.modeflag    = NM.modeflag; 
-                    NM.analysis{A.analdim}.params.cv          = NM.cv;
                 end
                 try
                   NM.analysis{A.analdim}.meta.USER              = java.lang.System.getProperty('user.name');

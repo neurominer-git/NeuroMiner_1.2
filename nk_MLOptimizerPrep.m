@@ -325,8 +325,8 @@ if ~isempty(analysis)
                 
                 % check whether alternative label should be used
                 %if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
-                tNM.label = tNM.analysis{inp.analind(i)}.params.label; 
-                tNM.modeflag = tNM.analysis{inp.analind(i)}.params.modeflag;  
+                tNM.label = tNM.analysis{inp.analind(i)}.params.label.label; 
+                tNM.modeflag = tNM.analysis{inp.analind(i)}.params.label.modeflag;  
                 %end
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
                 nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'clear', 0);

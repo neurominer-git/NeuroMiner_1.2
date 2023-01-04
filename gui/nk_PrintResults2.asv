@@ -158,11 +158,10 @@ handles = load_selAnalysis(handles);
 
 handles.curranal = analind;
 
-% in case alternative label was used, set label and mode 
-handles.label = handles.NM.analysis{1,analind}.params.label.label;
-handles.modeflag = handles.NM.analysis{1,analind}.params.label.modeflag;
+% was an alternative label used for this analysis?
+handles.curmodal = handles.NM.analysis{1,analind}.params.label
 
-if size(handles.label,2) > 1
+if size(handles.NM.label,2) > 1
     handles.multilabel = true;
 else
     handles.multilabel = false;
@@ -811,7 +810,7 @@ try
     if handles.oocvview
         nC = numel(handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
     else
-        nC = size(handles.label,1);
+        nC = size(handles.NM.label,1);
     end
     if nI ~= nC, errordlg(sprintf('The logical subgroup vector must have %g entries.',nC)); end
     handles.SubIndex = I;
