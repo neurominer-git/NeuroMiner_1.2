@@ -126,7 +126,7 @@ for i=1:IN.nperms % loop through CV1 permutations
                 OUT.CVHD(i,j,:) = OUT.CVdecs(i,j,:); 
                 OUT.CVHT(i,j,:) = OUT.CVtargs(i,j,:);
 
-                if MULTI.flag,
+                if MULTI.flag
                     OUT = MultiDichoFoldPerm(IN, OUT, [], LoopParam);
                     OUT.mTrPerf(i,j) = OUT.mtr{i,j};
                     OUT.mCVPerf(i,j) = OUT.mts{i,j};
@@ -211,7 +211,7 @@ for i=1:IN.nperms % loop through CV1 permutations
                         case 0 
                             %% AGGREGATED ENSEMBLE (no classifier selection)
                                 if size(OUT.TrHD{i,j,curclass},2) > 1 
-                                    if VERBOSE, 
+                                    if VERBOSE
                                         switch MODEFL
                                             case 'classification'
 

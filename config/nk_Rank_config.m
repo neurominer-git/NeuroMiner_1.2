@@ -188,7 +188,7 @@ if ~defaultsfl
                             case 'liblin'
                                 RANK.SVM = nk_LIBLIN_config(RANK.SVM, RANK.SVM, [], navistr);
                                 RANK.SVM.kernel.kernstr = 'lin';
-                                if numel(RANK.SVM.LIBLIN.tolerance)>1
+                                if numel(RANK.SVM.LIBLIN.tolerance)>0
                                     PX = nk_AddParam(RANK.SVM.LIBLIN.tolerance, 'TolRank', 1, PX, 'replace');
                                 end
                         end
@@ -198,11 +198,11 @@ if ~defaultsfl
                         switch rtype
                             case 1
                                 if isfield(RANK.SVM,'EpsParam'), EpsParam = RANK.SVM.EpsParam; else, EpsParam = 0.1; end
-                                RANK.SVM.EpsParam = nk_input('Define Epsilon parameter(s)',0,'e',EpsParam);     PX = nk_AddParam(RANK.SVM.EpsParam, 'EpsilonRank', 1, PX, 'replace');
+                                RANK.SVM.EpsParam = nk_input('Define Epsilon parameter(s)',0,'e',EpsParam);     PX = nk_AddParam(RANK.SVM.EpsParam, 'EpsilonRank', 1, PX);
                                 
                             case 2
                                 if isfield(RANK.SVM,'NuParam'), NuParam = RANK.SVM.NuParam; else, NuParam = 0.5; end
-                                RANK.SVM.NuParam = nk_input('Define Nu parameter(s)',0,'e',NuParam);            PX = nk_AddParam(RANK.SVM.NuParam, 'NuRank', 1, PX, 'replace');
+                                RANK.SVM.NuParam = nk_input('Define Nu parameter(s)',0,'e',NuParam);            PX = nk_AddParam(RANK.SVM.NuParam, 'NuRank', 1, PX);
                                 
                         end
                         % This is the slack / nu-SVC parameter of the SVM

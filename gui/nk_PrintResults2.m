@@ -431,9 +431,11 @@ function clickCallback(src, evt)
         if abs(mouseX - figdata.x(indpat)) < 0.035*xrange && abs(mouseY - figdata.y(indpat)) < 0.035*yrange
                 
             handles.selCase.Value = indpat;
-            selCase = handles.selCase.String{handles.selCase.Value};
+            SelCase = handles.selCase.String{handles.selCase.Value};
+            selCaseX2 = strsplit(SelCase,' | ');
+            selCaseX = selCaseX2{2};
             try
-                I = find(~cellfun(@isempty,strfind(figdata.cases,selCase)));
+                I = find(~cellfun(@isempty,strfind(figdata.cases,selCaseX)));
                 x1 = figdata.x(I);
                 y1 = figdata.y(I);
                 figpos = dsxy2figxy(handles.axes1,x1,y1);
@@ -449,7 +451,7 @@ function clickCallback(src, evt)
                 else 
                     handles.thisMLIresult.Visible = 'off';
                 end
-                axesHdl.Legend.String{end} = selCase;
+                axesHdl.Legend.String{end} = selCaseX;
             catch
             end
         end
@@ -1048,9 +1050,11 @@ function selCase_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from selCase
 contents = cellstr(get(hObject,'String'));
 selCase = hObject.String{hObject.Value};
+selCaseX2 = strsplit(selCase,' | ');
+selCaseX = selCaseX2{2};
 CaseId = str2num(contents{get(hObject,'Value')}) ;
 AxesData = handles.axes1.UserData;
-I = find(~cellfun(@isempty,strfind(AxesData.cases,selCase)));
+I = find(~cellfun(@isempty,strfind(AxesData.cases,selCaseX)));
 x1 = AxesData.x(I);
 y1 = AxesData.y(I);
 figpos = dsxy2figxy(handles.axes1,x1,y1);
@@ -1068,7 +1072,7 @@ if isfield(handles, 'MLIdata') && ~isempty(handles.MLIdata)
 else 
     handles.thisMLIresult.Visible = 'off';
 end
-handles.axes1.Legend.String{end} = selCase;
+handles.axes1.Legend.String{end} = selCaseX;
 guidata(handles.figure1,handles);
 
 % --- Executes during object creation, after setting all properties.

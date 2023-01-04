@@ -3,7 +3,7 @@ function PP = nk_AddParam(p, desc, t, PP, actstr)
 if ~exist('actstr','var'), actstr = []; end
 if strcmp(actstr,'reset')
     Px = struct('Params',[],'Params_desc',[],'Typ',[]); PP.Px = Px; PP.opt = []; return
-elseif ~exist('PP','var') || isempty(PP) || strcmp(actstr,'replace');
+elseif ~exist('PP','var') || isempty(PP) || strcmp(actstr,'replace')
     Px = struct('Params',[],'Params_desc',[],'Typ',[]);
 elseif isfield(PP,'Px')
     Px = PP.Px;    
