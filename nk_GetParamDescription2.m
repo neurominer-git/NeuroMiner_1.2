@@ -515,7 +515,19 @@ switch action
                             end
                             %preprocact{i} = sprintf('%s ]', preprocact{i});
                         case 'graphMetrics'
-                            preprocact{i} = 'Compute graph metrics from connectivity matrices';
+                            actparamAUX = params.ACTPARAM{i};
+                            if ~isempty(actparamAUX.GRAPHMETRICS.metricslist) 
+                                for j= 1:size(actparamAUX.GRAPHMETRICS.metricslist,2) 
+                                    if j == 1
+                                        METRICSLISTSTR = actparamAUX.GRAPHMETRICS.metricslist{j}.id;
+                                    else
+                                        METRICSLISTSTR = sprintf('%s, %s', METRICSLISTSTR, actparamAUX.GRAPHMETRICS.metricslist{j}.id);
+
+                                    end
+                                end
+                                preprocact{i} = sprintf('Compute graph metrics from connectivity matrices: %s ', METRICSLISTSTR);
+                            end
+                            
                             
                         case 'graphComputation'
                             preprocact{i} = 'Construct individual networks';
@@ -526,6 +538,7 @@ switch action
                         case 'customPreproc'
                             preprocact{i} = sprintf('Perform custom preprocessing step. Function: %s', params.ACTPARAM{i}.CUSTOMPREPROC.filename); 
                         
+
                         case 'JuSpace'
                             actparamAUX = params.ACTPARAM{i};
                             if ~isempty(actparamAUX.JUSPACE.petList) 

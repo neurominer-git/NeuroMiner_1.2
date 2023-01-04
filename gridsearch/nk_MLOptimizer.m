@@ -241,6 +241,13 @@ if GDfl == -1
     label = nk_LabelTransform(PREPROC,MODEFL,label);
     % Filter the data (imaging only)
     Y = nk_PerfSpatFilt2( inp.Y, PREPROC, inp.P.X );
+    % calibration data (Clara)
+    if isfield(inp, 'C') && inp.C{1,1}.calibflag
+        CYfile = inp.C{1,1}.Y; 
+        load(CYfile, 'CY');
+        inp.C{1,1}.Y = CY;
+        inp.C{1,1}.Y = nk_PerfSpatFilt2(inp.C{1,1}.Y, PREPROC, inp.P.X);
+    end
     if isfield(inp,'Yw')
         % Check for weighting masks which have been read-in during data
         % import

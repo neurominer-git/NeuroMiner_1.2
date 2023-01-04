@@ -18,17 +18,17 @@ for curclass = 1 : ukbin
    
     switch MODEFL
         case 'classification' 
-            SrcParam.TrX = find(inp.labels == CV.class{1,1}{curclass}.groups(1) | inp.labels == CV.class{1,1}{curclass}.groups(2));
+            SrcParam.TrX = find(inp.label == CV.class{1,1}{curclass}.groups(1) | inp.label == CV.class{1,1}{curclass}.groups(2));
             if RAND.Decompose ~=9
                 SrcParam.BinaryTrainLabel   = SrcParam.TrX;
                 SrcParam.BinaryCVLabel      = SrcParam.TrX;
             end
-            SrcParam.MultiTrainLabel    = inp.labels;
-            SrcParam.MultiCVLabel       = inp.labels;
+            SrcParam.MultiTrainLabel    = inp.label;
+            SrcParam.MultiCVLabel       = inp.label;
         case 'regression'
             SrcParam.TrX = true(length(inp.labels),1);
-            SrcParam.TrainLabel         = inp.labels;
-            SrcParam.CVLabel            = inp.labels;
+            SrcParam.TrainLabel         = inp.label;
+            SrcParam.CVLabel            = inp.label;
     end
      if iscell(Y)
         iY = Y{curclass}{1}(SrcParam.TrX,:);

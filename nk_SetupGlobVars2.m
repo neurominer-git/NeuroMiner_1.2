@@ -62,11 +62,7 @@ switch act
         end
 
         try
-            if isfield(dat.TrainParam,'LABEL') && dat.TrainParam.LABEL.flag
-                MODEFL = dat.TrainParam.LABEL.newmode;
-            else
-                MODEFL  = dat.modeflag;
-            end
+            MODEFL  = dat.modeflag;
         catch
             paramstr = sprintf('%s\n%s',paramstr,'Type of predictor: Classification / Regression model');
         end

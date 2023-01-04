@@ -8,7 +8,7 @@ function [act, analdim, p, GridAct, mapY, strout] = nk_PreprocessPrep( act, anal
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris 09/2022
 
-global PREPROC MODEFL CV DR SAV RAND USEPARAMEXIST FUSION TEMPL CALIB MULTI STACKING NM OCTAVE JSMEM
+global PREPROC MODEFL CV DR SAV RAND USEPARAMEXIST FUSION TEMPL CALIB MULTI STACKING NM OCTAVE JSMEM CALIBUSE
 clc
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% SETUP PARAMS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -166,7 +166,7 @@ switch act
                 paramfl.use_exist = false; USEPARAMEXIST = false;
             end
             
-            %CALIBUSE = false;
+            CALIBUSE = false;
             kbin = 1;
             %% Define program parameters
             if strcmp(MODEFL,'classification') && RAND.Decompose ~= 9, kbin = length(CV.class{1,1}); end
@@ -223,10 +223,17 @@ switch act
                             end
                         end
                     end
+                    CALIB.calibflag = false;
                     % Check whether calibration data is available 
-                    if exist('C','var') && ~isempty(C) && isfield(PREPROC,'CALIB') && ~isempty(PREPROC.CALIB),
-                        CALIB.flag = true;
-                        C = nk_PerfSpatFilt2( C, PREPROC, P ); 
+                    if isfield(inp, 'C') && inp.C{1,1}.calibflag %&& isfield(PREPROC,'CALIB') && ~isempty(PREPROC.CALIB),
+                        CALIB.calibflag = inp.C{1,1}.calibflag;
+                        P = inp.X;
+                        CYfile = inp.C{1,1}.Y; 
+                        load(CYfile, 'CY');
+                        inp.C{1,1}.Y = CY;
+                        inp.C{1,1}.Y = nk_PerfSpatFilt2(inp.C{1,1}.Y, PREPROC, P);
+%                         C = CY;
+%                         C = nk_PerfSpatFilt2( C, PREPROC, P ); 
                     elseif isfield(PREPROC,'TEMPLPROC') && ~isempty(PREPROC.TEMPLPROC) && PREPROC.TEMPLPROC
                         % For factorization methods: TEMPLATE MAPPING 
                         if PREPROC.BINMOD

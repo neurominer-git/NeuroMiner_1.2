@@ -631,7 +631,7 @@ switch cmd
     case 18
         CURACT = config_graphMetrics(CURACT, navistr);
     case 19
-        CURACT = config_graphConstruction(CURACT, navistr);
+        CURACT = config_graphConstruction(NM, varind, CURACT, navistr);
     case 20
         CURACT = config_JuSpace(NM, varind, CURACT, navistr);
     case 21
@@ -910,11 +910,13 @@ CURACT.cmd = 'graphMetrics';
 
 end
 
-function CURACT = config_graphConstruction(CURACT, navistr)
+function CURACT = config_graphConstruction(NM, varind, CURACT, navistr)
 
 if ~isfield(CURACT,'GRAPHCONSTRUCTION'), CURACT.GRAPHCONSTRUCTION=[]; end
 if ~isfield(CURACT,'PX'), CURACT.PX = []; end
-act = 1; while act >0, [ CURACT.GRAPHCONSTRUCTION, CURACT.PX, act ] = graphConstruction_config(CURACT.GRAPHCONSTRUCTION, CURACT.PX, navistr); end
+datadesc = NM.datadescriptor{varind}; brainmask = [];
+if datadesc.type, brainmask = NM.brainmask{varind}; end
+act = 1; while act >0, [ CURACT.GRAPHCONSTRUCTION, CURACT.PX, act ] = graphConstruction_config(CURACT.GRAPHCONSTRUCTION, CURACT.PX, brainmask, navistr); end
 CURACT.cmd = 'graphComputation';
 
 end

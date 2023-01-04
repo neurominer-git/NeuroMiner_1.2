@@ -155,10 +155,20 @@ switch act
                 end
                 NM.analysis{A.analdim}.params.TrainParam      = NM.TrainParam;
                 NM.analysis{A.analdim}.params.datadescriptor  = NM.datadescriptor;
-                NM.analysis{A.analdim}.params.modeflag        = NM.modeflag;
+                %NM.analysis{A.analdim}.params.modeflag        = NM.modeflag;
                 NM.analysis{A.analdim}.params.cv              = NM.cv;
                 NM.analysis{A.analdim}.params.id              = NM.id;
                 NM.analysis{A.analdim}.meta.TIME              = datestr(now);
+                if isfield(NM,'C')
+                    NM.analysis{A.analdim}.C                  = NM.C;
+                end
+                if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
+                    NM.analysis{A.analdim}.params.label       = NM.TrainParam.LABEL.newlabel; 
+                    NM.analysis{A.analdim}.params.modeflag    = NM.TrainParam.LABEL.newmode;
+                else 
+                    NM.analysis{A.analdim}.params.label       = NM.label;
+                    NM.analysis{A.analdim}.params.modeflag    = NM.modeflag; 
+                end
                 try
                   NM.analysis{A.analdim}.meta.USER              = java.lang.System.getProperty('user.name');
                   NM.analysis{A.analdim}.meta.OS.name           = java.lang.System.getProperty('os.name');

@@ -1,5 +1,5 @@
-function [GRAPHCONSTRUCTION, PX, act ] = graphConstruction_config(GRAPHCONSTRUCTION, PX, parentstr, defaultsfl)
-global NM 
+function [GRAPHCONSTRUCTION, PX, act ] = graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, defaultsfl)
+global NM
 % what method should be used for the construction of the networks?
 ConstructionMethod = 'Normative network + 1';
 % ParcellationAtlas = 'Hammers.nii';
@@ -10,7 +10,7 @@ SimilarityMeasure = 'Mutual information';
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
-    if isempty(GRAPHCONSTRUCTION), [GRAPHCONSTRUCTION, PX] = graphConstruction_config(GRAPHCONSTRUCTION, PX, parentstr, true); end
+    if isempty(GRAPHCONSTRUCTION), [GRAPHCONSTRUCTION, PX] = graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, true); end
     if isfield(GRAPHCONSTRUCTION,'method'), ConstructionMethod = GRAPHCONSTRUCTION.method; end
     if isfield(GRAPHCONSTRUCTION,'parcellation'), ParcellationAtlas = GRAPHCONSTRUCTION.parcellation; end
     %if isfield(GRAPHCONSTRUCTION, 'variableTypes'), VariableTypesVec = GRAPHCONSTRUCTION.variableTypes; end
@@ -48,6 +48,8 @@ if ~defaultsfl
         else
             if size(ReferenceGroup,1) >1
                 GCSTR_REFG = 'from Matlab workspace';
+            elseif isfield(NM, 'C') && NM.C{1,1}.calibflag
+                GCSTR_REFG = 'calibration data';
             else
                 GCSTR_REFG = ReferenceGroup;
             end
@@ -75,7 +77,7 @@ if ~defaultsfl
 
     switch act
         case 1
-            [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, parentstr);
+            [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, brainmask, parentstr);
             %ConstructionMethod = 'KL divergence';
         case 2
              simMeasureNo = nk_input('Define measure to quantify similarity between variables', 0, 'mq', ...
@@ -95,25 +97,36 @@ if ~defaultsfl
              end
   
         case 3
-            readRefG = nk_input('Read in reference group data externally', 0, 'mq', ...
-                ['From MATLAB workspace |' ...
-                'From file'], [0,1], 0);
+            if isfield(NM, 'C') && ~isempty(NM.C)
+                readRefG = nk_input('Read in reference group data externally', 0, 'mq', ...
+                    ['From MATLAB workspace |' ...
+                    'From file |' ...
+                    'Use calibration data'], [0,1,2], 0);
+            else
+                readRefG = nk_input('Read in reference group data externally', 0, 'mq', ...
+                    ['From MATLAB workspace |' ...
+                    'From file |'], [0,1], 0);
+            end
 
             switch readRefG
                 case 0
                     GRAPHCONSTRUCTION.refGroup = nk_input('Define reference group dataset (as named in MATLAB workspace)',0,'e',[]);
-          
+                    NM.C{1,1}.calibflag = false;
                 case 1
                     GRAPHCONSTRUCTION.refGroup = nk_FileSelector(1,0,'Select file with reference group data (in the same format as main data, incl. group and ID column)','.*\.txt$|.*\.csv');
+                    NM.C{1,1}.calibflag = false;
+                case 2
+                    GRAPHCONSTRUCTION.refGroup = -1;  % flag for calibration data
+                    NM.C{1,1}.calibflag = true;
             end
         case 4
-                       GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
+            GRAPHCONSTRUCTION.parcellation = nk_FileSelector(1,0,'Select parcellation atlas', '.*\.nii$|.*\.img$',pwd);
           
     end
 
 
 else
-    [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION,PX, parentstr, true);
+    [GRAPHCONSTRUCTION,PX] = return_graphconstr(GRAPHCONSTRUCTION,PX, brainmask, parentstr, true);
     act = 0;
 end
 
@@ -128,7 +141,7 @@ end
 end
 
 
-function [GRAPHCONSTRUCTION, PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, parentstr, defaultsfl)
+function [GRAPHCONSTRUCTION, PX] = return_graphconstr(GRAPHCONSTRUCTION, PX, brainmask, parentstr, defaultsfl)
 global NM
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
@@ -152,9 +165,9 @@ switch act{1}
     case 'KL divergence'
         GRAPHCONSTRUCTION.method = 'KL divergence';
         PX = nk_AddParam([], [], [], PX,'reset');
+        GRAPHCONSTRUCTION.brainmask = brainmask;
         if isfield(GRAPHCONSTRUCTION,'KL divergence')
             ParcellationAtlas = GRAPHCONSTRUCTION.parcellation;
-            
         else
             ParcellationAtlas = '(undefined)';
         end
@@ -178,7 +191,7 @@ switch act{1}
 end
 else
     GRAPHCONSTRUCTION.method = 'Normative network + 1'; 
-    GRAPHCONSTRUCTION.refGroup = 'undefined'; 
+    GRAPHCONSTRUCTION.refGroup = -1; 
     GRAPHCONSTRUCTION.simMeasure = 'Mutual information';
     PX = nk_AddParam([], [], [], PX,'reset');
 end

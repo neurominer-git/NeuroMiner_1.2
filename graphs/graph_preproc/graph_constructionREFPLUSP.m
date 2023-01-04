@@ -30,10 +30,11 @@ function CM = graph_constructionREFPLUSP(A, method, referenceGroup, similarityMe
 %
 % OUTPUT: matrix format, dimensions: n people x (m/2-m) edges 
 global NM
+sprintf('Size reference sample: %d * %d', size(referenceGroup,1), size(referenceGroup,2))
 % % read in reference group data 
 if size(referenceGroup,1) >1
-    RG = referenceGroup;
-else 
+    RG = referenceGroup; 
+else
     RG = readtable(referenceGroup);
     RG = table2array(RG);
 end
