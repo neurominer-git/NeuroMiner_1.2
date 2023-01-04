@@ -38,7 +38,6 @@ InFold          = RAND.InnerFold;
 decomposeflag   = RAND.Decompose;
 CV2LCO = []; if isfield(RAND,'CV2LCO'), CV2LCO = RAND.CV2LCO; end
 CV1LCO = []; if isfield(RAND,'CV1LCO'), CV1LCO = RAND.CV1LCO; end
-
 % Check whether leave-group-in or leave-group-out has been selected.
 if isfield(RAND,'CV2Frame') && RAND.CV2Frame == 4 , cv2frame = true; else, cv2frame = false; end
 if ~exist('auto_adjust', 'var'), auto_adjust = false; end
@@ -63,17 +62,14 @@ end
 if ~exist('modeflag','var') || isempty(modeflag), modeflag = 'classification'; end
 if ~exist('appendfl','var') || isempty(appendfl), appendfl = false; end
 
-% Does the user want constrained, stratified CV?
-% (this helps to keep the distribution of e.g. sites across partitions
-% largely constant)
+constraintfl = false;
 Constraint = [];
 if isfield(RAND,'ConstrainedCV') && RAND.ConstrainedCV == 1
-    if isfield(RAND,'ConstrainedGroupIndex') && ~isempty(RAND.ConstrainedGroupIndex)
-        Constraint = RAND.ConstrainedGroupIndex;
+    constraintfl = true;
+    if isfield(RANDConstraintGroupIndex
     end
 end
 
-% Are NaNs in the label?
 ulb = unique(label,'rows');
 if any(~isfinite(ulb)) 
     NaNflag = true; ind = logical(sum(isfinite(ulb),2));
