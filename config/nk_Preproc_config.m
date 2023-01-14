@@ -304,7 +304,7 @@ switch act
         PREPROC = config_targetscaling(PREPROC, navistr);
         
     case 100
-        if ~isfield(PREPROC,'LABELMOD'), 
+        if ~isfield(PREPROC,'LABELMOD')
             PREPROC.LABELMOD=[];
         end
         PREPROC.LABELMOD = config_labelimpute(PREPROC.LABELMOD, navistr);
@@ -337,7 +337,7 @@ switch act
         else
             PREPROC = rmfield(PREPROC,'ACTPARAM');
         end
-        if stepind > 1, 
+        if stepind > 1
             if any(strcmp(PREPROC.ACTPARAM{stepind-1}.cmd,{'extfeat','extdim'})) && stepind - 2 > 0
                 stepind = stepind - 2;
             else
@@ -378,10 +378,10 @@ switch act
             newcmdorder{i} = PREPROC.ACTPARAM{neworder(i)}.cmd; 
         end
         for i = 1:numel(neworder)-1
-            if strcmp(newcmdorder{i},'rankfeat') && ~strcmp(newcmdorder{i},'extfeat'), 
+            if strcmp(newcmdorder{i},'rankfeat') && ~strcmp(newcmdorder{i},'extfeat') 
                 fl(1) = false;  
             end
-            if strcmp(newcmdorder{i},'reducedim') && ~strcmp(newcmdorder{i+1},'extdim')
+            if any(strcmp({'reducedim','remvarcomp'}, newcmdorder{i})) && ~strcmp(newcmdorder{i+1},'extdim')
                 for j=1:numel(neworder)
                     if strcmp(PREPROC.ACTPARAM{j}.cmd,'extdim'), fl(2) = false; break; end 
                 end
@@ -406,14 +406,14 @@ switch act
         
     case 10
         tstepind = nk_input('Go to preprocessing step',0,'w1',stepind);
-        if tstepind > numel(PREPROC.ACTPARAM), 
+        if tstepind > numel(PREPROC.ACTPARAM)
             tstepind = numel(PREPROC.ACTPARAM); 
         elseif tstepind < 1
             tstepind = 1;
         end
         if strcmp(PREPROC.ACTPARAM{tstepind}.cmd,'extfeat') 
             stepind = tstepind -1;
-        elseif strcmp(PREPROC.ACTPARAM{tstepind}.cmd, 'reducedim') && (tstepind+1 == numel(PREPROC.ACTPARAM) && strcmp(PREPROC.ACTPARAM{tstepind+1}.cmd, 'extdim'))
+        elseif any(strcmp({'reducedim','remvarcomp'}, PREPROC.ACTPARAM{tstepind}.cmd)) && (tstepind+1 == numel(PREPROC.ACTPARAM) && strcmp(PREPROC.ACTPARAM{tstepind+1}.cmd, 'extdim'))
             stepind = tstepind -1;
         else
             stepind = tstepind;
@@ -563,7 +563,7 @@ else
                 case 'remvarcomp'
                     cmdstr = 'Extract variance components from data';                               cmdmnu = 14;
                 case 'extdim'
-                    if stepind > 1 && strcmp(PREPROC.ACTPARAM{stepind-1}.cmd,'reducedim')
+                    if stepind > 1 && any(strcmp({'reducedim','remvarcomp'}, PREPROC.ACTPARAM{stepind-1}.cmd))
                         cmdstr = 'Extract subspaces from reduced data projections';                 cmdmnu = 15;
                     end
                 case 'devmap'
@@ -622,8 +622,13 @@ switch cmd
         CURACT = config_unitnorm( CURACT, navistr );
     case 14
         CURACT = config_remvarcomp( NM, varind, CURACT, navistr );
-    case 15    
-        CURACT = config_extdim( CURACT, PREPROC.ACTPARAM{stepind-1}.DR , navistr );
+    case 15
+        switch  PREPROC.ACTPARAM{stepind-1}.cmd
+            case 'reducedim'
+                CURACT = config_extdim( CURACT, PREPROC.ACTPARAM{stepind-1}.DR , navistr );
+            case 'remvarcomp'
+                CURACT = config_extdim( CURACT, PREPROC.ACTPARAM{stepind-1}.REMVARCOMP, navistr );
+        end
     case 16
         CURACT = config_devmap( NM, CURACT, navistr );
     case 17
@@ -815,13 +820,19 @@ end
 %%%% Extraction of dimensionalities %%%%
 function CURACT = config_extdim(CURACT, DR, navistr)
 
-if isfield(CURACT,'PX'), 
+if isfield(CURACT,'PX') 
     PercMode                = CURACT.EXTDIM.PercMode;
     RedMode                 = CURACT.EXTDIM.RedMode;
     dims                    = nk_ReturnParam('dimensions', CURACT.PX.Px.Params_desc, CURACT.PX.opt);
 else
-    PercMode                = DR.PercMode;
-    RedMode                 = DR.RedMode;
+    if ~isfield(DR,'PercMode')
+        PercMode                = DR.dimmode;
+        RedMode                 = 'PCA';
+    else
+        PercMode                = DR.PercMode;
+        RedMode                 = DR.RedMode;
+    end
+    
     CURACT.PX               = nk_AddParam(DR.dims, 'dimensions', 1, []); dims = DR.dims;
 end
 act = 1; while act > 0, [dims, PercMode, act] = nk_ExtDim_config(RedMode, PercMode, dims, 0, navistr); end

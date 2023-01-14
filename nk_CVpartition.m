@@ -43,7 +43,7 @@ permmat = nk_PermInd2(nperms, Labels, Constraint);
 
 for h=1:nperms % Loop through perms
     
-    rInd        = permmat(h,:)'; % randomize indices; can we 
+    rInd        = permmat(h,:)'; % randomize indices; 
     trainidx    = cell(1,K);
     testidx     = cell(1,K);
     

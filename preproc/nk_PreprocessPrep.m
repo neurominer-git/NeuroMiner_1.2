@@ -106,7 +106,7 @@ switch act
         if p.writefl == 1, p.writefl=2; elseif p.writefl == 2, p.writefl = 1; end
     case 5
         %% Get info from user which CV2 partitions to operate upon?   
-        [operms,ofolds] = size(CV.TrainInd);
+        [operms,ofolds] = size(NM.analysis{analdim(1)}.params.cv.TrainInd);
         t_act = 1; while t_act > 0 && t_act < 10, [ t_act, GridAct ] = nk_CVGridSelector(operms, ofolds, GridAct, 0); end
     case {6,7}
         nA=numel(analdim);
@@ -200,10 +200,10 @@ switch act
                     labels = nk_LabelTransform(PREPROC, MODEFL, inp.labels);
     
                     % For imaging data: DATA FILTERING / SMOOTHING / RESLICING (in the future)
-                    Y = nk_PerfSpatFilt2( Y, PREPROC, inp.X );
+                    Y = nk_PerfSpatFilt( Y, PREPROC, inp.X );
                     if isfield(inp,'Yw') 
                         fprintf('\nSmoothing weighting map')
-                        inp.Yw = nk_PerfSpatFilt2( inp.Yw, PREPROC, inp.X ); 
+                        inp.Yw = nk_PerfSpatFilt( inp.Yw, PREPROC, inp.X ); 
                     else
                         if isfield(PREPROC,'ACTPARAM')
                             I = arrayfun( @(j) isfield(PREPROC.ACTPARAM{j},'RANK'), 1:numel( PREPROC.ACTPARAM ));
@@ -216,7 +216,7 @@ switch act
                                         else
                                             inp.Yw = PREPROC.ACTPARAM{I(z)}.RANK.EXTERN;
                                         end
-                                        inp.Yw = nk_PerfSpatFilt2( inp.Yw, PREPROC, inp.X ); 
+                                        inp.Yw = nk_PerfSpatFilt( inp.Yw, PREPROC, inp.X ); 
                                         break
                                     end
                                 end
@@ -231,9 +231,9 @@ switch act
                         CYfile = inp.C{1,1}.Y; 
                         load(CYfile, 'CY');
                         inp.C{1,1}.Y = CY;
-                        inp.C{1,1}.Y = nk_PerfSpatFilt2(inp.C{1,1}.Y, PREPROC, P);
+                        inp.C{1,1}.Y = nk_PerfSpatFilt(inp.C{1,1}.Y, PREPROC, P);
 %                         C = CY;
-%                         C = nk_PerfSpatFilt2( C, PREPROC, P ); 
+%                         C = nk_PerfSpatFilt( C, PREPROC, P ); 
                     elseif isfield(PREPROC,'TEMPLPROC') && ~isempty(PREPROC.TEMPLPROC) && PREPROC.TEMPLPROC
                         % For factorization methods: TEMPLATE MAPPING 
                         if PREPROC.BINMOD

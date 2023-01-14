@@ -37,6 +37,7 @@ nM              = numel(inp.tF);                    % Number of modalities with 
 decompfl        = false(1,nM);                      % flag for factorization methods during preprocessing
 permfl          = false(1,nM);                      % flag for permutation mode 
 sigfl           = false(1,nM);                      % flag for significance estimation mode
+sigPthr         = zeros(1,nM);
 nperms          = ones(1,nM);                       % number of permuations per modality
 pmode           = ones(1,nM);                       % Permutation mode
 memorytested    = false;
@@ -118,8 +119,23 @@ for i = 1 : nM
         if pmode(i)
             permfile = fullfile(inp.rootdir,[SAV.matname '_VISpermmat_ID' id '.mat']);
             if ~exist(permfile,'file')
-                fprintf('\nCreating parent permutation matrix with %g perms', nperms(1))
-                indpermA = nk_VisXPermHelper('genpermlabel', size(inp.labels,1), nperms(1));
+                for h=1:nclass
+                    fprintf('\nCreating parent permutation matrix with %g perms', nperms(1))
+                    if nclass>1
+                        if numel(CV.class{1,1}{1}.groups)==1
+                            I = inp.labels ~= CV.class{1,1}{1}.groups(1);
+                        else
+                            I = inp.labels ~= CV.class{1,1}{1}.groups(1) && inp.labels ~= CV.class{1,1}{1}.groups(2);
+                        end
+                        indpermA{h} = nk_VisXPermHelper('genpermlabel', size(inp.labels,1), nperms(1));
+                        for ii=1:nperms(1)
+                            Iperm = I(indpermA{h}(:,ii));
+                            indpermA{h}(Iperm,ii) = 0;
+                        end
+                    else
+                        indpermA = nk_VisXPermHelper('genpermlabel', size(inp.labels,1), nperms(1));
+                    end
+                end
                 save(permfile,'indpermA');
             else
                 fprintf('\nLoading parent permutation matrix from file: \n%s', permfile);
@@ -137,6 +153,7 @@ for i = 1 : nM
         if decompfl(i) && isfield(iVis.PERM,'sigflag') && iVis.PERM.sigflag
             sigfl(i) = true;
             sigflFDR = false;
+            sigPthr(i) = iVis.PERM.sigPthresh;
         end
     end
     if isfield(iVis,'use_template') && iVis.use_template
@@ -569,10 +586,10 @@ for f=1:ix % Loop through CV2 permutations
                                         whos("Ymodel", "modelTrL")
                                     end
                                     
-%                                     if savemodel
-%                                         xMD = MD{h}{m}{k,l}{u};
-%                                         save(sprintf('VisModels_%s_CV2%g-%g_CV%g-%g.mat', multlabelstr, CVPOS.CV2p, CVPOS.CV2f, CVPOS.CV1p, CVPOS.CV1f ),"xMD");
-%                                     end
+%                                   if savemodel
+%                                       xMD = MD{h}{m}{k,l}{u};
+%                                       save(sprintf('VisModels_%s_CV2%g-%g_CV%g-%g.mat', multlabelstr, CVPOS.CV2p, CVPOS.CV2f, CVPOS.CV1p, CVPOS.CV1f ),"xMD");
+%                                   end
 
                                     if inp.stacking
                                         vec_mj = [];
@@ -586,17 +603,17 @@ for f=1:ix % Loop through CV2 permutations
                                         [Tx, Psel, Rx, SRx, Cx, ~, PAx] = nk_VisXWeight(inp, MD{h}{m}{k,l}{u}, Ymodel, modelTrL, varind, ParamX, Find, Vind, decompfl, memoryprob);
                                     else
                                         fprintf('\n\t%3g | OptModel =>', u);
-                                         % Build permutation index array if
+                                        % Build permutation index array if
                                         % needed and compute further variables
                                         % needed for perm-based stats
                                         if inp.multiflag
-                                            [~, I1.mTS{h}(:,il(h)), I1.mDS{h}(:,il(h))] = nk_GetTestPerf(modelTsm, modelTsmL, Find, MD{h}{m}{k,l}{u}, modelTr); 
+                                            % Here we collect the predicted labels and decision
+                                            % scores of the observed binary classifier for the subsequent multiclass model assessment
+                                            [~, I1.mTS{h}(:,il(h)), I1.mDS{h}(:,il(h))] = nk_GetTestPerf(modelTsm, modelTsmL, Find, MD{h}{m}{k,l}{u}, modelTr, true); 
                                         end
                                         [perf_orig, I1.TS{h}(:,il(h)), I1.DS{h}(:,il(h))] = nk_GetTestPerf(modelTs, modelTsL, Find, MD{h}{m}{k,l}{u}, modelTr); 
                                         fprintf(' %1.2f',perf_orig)
-                                        % if sigfl = true
-                                        % Determine significant components
-                                        % through non-parametric permutation
+                                        % if sigfl = true, determine significant components through non-parametric permutation
                                         if any(sigfl)
                                             fprintf(' | Significant pattern components (%g perms):\t',nperms(1));
                                             % Original weight vector
@@ -624,27 +641,26 @@ for f=1:ix % Loop through CV2 permutations
                                             VxV(inVx) = (sum(bsxfun(@le,Vx_perm(inVx,:),Vx(inVx)),2)/nperms(1))/ul;
                                             I1.VCV1WPERM{il(h),h} = VxV; 
                                             clear VxV
-                                            Fadd   = (I1.VCV1WPERM{il(h),h} <= 0.5);
+                                            Fadd   = (I1.VCV1WPERM{il(h),h} <= sigPthr(1));
                                             FDRstr = '(uncorr) ';
                                             if ~sum(Fadd)
                                                 [minP, Fadd] = min(I1.VCV1WPERM{il(h),h});
-                                                fprintf('\tNo component significant at alpha %s = 0.5 => relaxing to max P = %g\n\t\t\t\t\t\t\t\t',FDRstr, minP );
+                                                fprintf('\tNo component significant at alpha %s = %g => relaxing to max P = %g\n\t\t\t\t\t\t\t\t',FDRstr, sigPthr(1), minP );
                                             else
-                                                fprintf('\t%g / %g components significant at alpha %s = 0.5\n\t\t\t\t\t\t\t\t',sum(Fadd), numel(Fadd),FDRstr);
+                                                fprintf('\t%g / %g components significant at alpha %s = %g\n\t\t\t\t\t\t\t\t',sum(Fadd), numel(Fadd), FDRstr, sigPthr(1));
                                             end
                                         else
                                             Fadd = true(size(F,1),1);
                                         end
                                         
                                         % Compute original weight map in input space
-                                        [Tx, Psel, Rx, SRx, Cx, ~, PAx ] = nk_VisXWeight(inp, MD{h}{m}{k,l}{u}, Ymodel, modelTrL, varind, ParamX, Find, Vind, decompfl, [], Fadd);
+                                        [Tx, Psel, Rx, SRx, Cx, ~, PAx ] = nk_VisXWeight(inp, MD{h}{m}{k,l}{u}, Ymodel, modelTrL, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
 
                                         % Compute permuted weight maps
                                         fprintf(' | Permuting:\t');
                                         Tx_perm = cell(1,nM); Px_perm = zeros(1,nperms(1));
                                         for n=1:nM, Tx_perm{n} = zeros(size(Tx{n},1),nperms(n)); end
                                         for perms = 1:nperms(1)
-                                        %% 
                                             if ~sigfl 
                                                 % Train permuted model
                                                 [ L_perm, Ymodel_perm ] = nk_VisXPermY(Ymodel, inp.labels, pTrInd, pmode(1), indperm, indpermfeat, perms, analysis, inp, paramfl, BINMOD, n, h, k, l, pnt, FullPartFlag, F, u);
@@ -657,18 +673,21 @@ for f=1:ix % Loop through CV2 permutations
                                                 % Retrieve trained permuted model
                                                 MDs = MD_perm{perms};
                                             end
+                                            if inp.multiflag
+                                                % Here we collect the predicted labels and decision
+                                                % scores of the permuted binary classifier for the subsequent multiclass model assessment
+                                                [~, I1.mTS_perm{h}(:,il(h),perms), I1.mDS_perm{h}(:,il(h),perms)] = nk_GetTestPerf(modelTsm, modelTsmL, Find, MDs, modelTr, true); 
+                                            end
                                             % Compute permuted model test performance
                                             [perf_perm, I1.TS_perm{h}(:,il(h),perms), I1.DS_perm{h}(:,il(h),perms)] = nk_GetTestPerf(modelTs, modelTsL, Find, MDs, modelTr);
-                                            if inp.multiflag
-                                                [~, I1.mTS_perm{h}(:,il(h),perms), I1.mDS_perm{h}(:,il(h),perms)] = nk_GetTestPerf(modelTsm, modelTsmL, Find, MDs, modelTr); 
-                                            end
+
                                             % Compare against original model performance
                                             if feval(compfun, perf_perm, perf_orig)
                                                 fprintf('.'); 
                                                 Px_perm(perms) = Px_perm(perms) + 1;
                                             end
                                             % Compute permuted weight map in input space
-                                            TXperms = nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, [], Fadd);
+                                            TXperms = nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
                                             for n=1:nM, Tx_perm{n}(:,perms) = TXperms{n}; end
                                         end
                                         
@@ -756,9 +775,9 @@ for f=1:ix % Loop through CV2 permutations
                                             % original space of modality
                                             [ ~, ~, ~, badcoords] = getD(FUSION.flag, inp, n); badcoords = ~badcoords;
 
-%                                             if juspaceflag
+%                                           if juspaceflag
 %                                                 badcoords = zeros(D,1);
-%                                             end
+%                                           end
                                             % Store results in CV1 container variables                                    
                                             % I1.numCV1parts(h, n) = I1.numCV1parts(h, n) + 1;
                                             I1.VCV1{h,n}(badcoords,il(h)) = Tx{n};
@@ -883,12 +902,13 @@ for f=1:ix % Loop through CV2 permutations
                  for h=1:nclass
                      for il=1:size(I1.mDS{h},2)
                         % Multi-group CV2 array construction for observed
-                        % model
+                        % multi-class model.
                         [mDTs, mTTs, Classes, ~, mcolend] = ...
                             nk_MultiAssemblePredictions( I1.mDS{h}(:,il), I1.mTS{h}(:,il), mDTs, mTTs, Classes, 1, h, mcolend );
                      end
                  end
-                 % compute multi-group performance of observed model
+
+                 % Compute multi-group performance of observed model
                  [ mCV2perf_obs, mCV2pred_obs ] = nk_MultiEnsPerf(mDTs, mTTs, inp.labels(TsIndM, inp.curlabel), Classes, ngroups);
                  I.VCV2MORIG_S_MULTI(TsIndM,f) = mCV2pred_obs;
                  
@@ -899,7 +919,7 @@ for f=1:ix % Loop through CV2 permutations
                      mDTs_perm = []; mTTs_perm = []; Classes_perm = []; mcolend_perm = 0;
                      for h=1:nclass
                          % Multi-group CV2 array construction for permuted
-                         % model
+                         % multi-class model
                          for il=1:size(I1.mDS{h},2)
                             [mDTs_perm, mTTs_perm, Classes_perm, ~, mcolend_perm] = ...
                                 nk_MultiAssemblePredictions( I1.mDS_perm{h}(:,il,perms), I1.mTS_perm{h}(:,il,perms), mDTs_perm, mTTs_perm, Classes_perm, 1, h, mcolend_perm );

@@ -10,8 +10,12 @@ switch SVM.prog
                 xV = nk_GetPrimalW(MD); % Get weight vector over feature space
                 if sum(decompfl==0)>0
                     % Remove cases which are completely NaN
-                    [Yn, Ln] = nk_ManageNanCases(Y, L); 
-                    AnalP = compute_analytical_pvals(Ln,Yn,xV'); 
+                    [Yn, Ln] = nk_ManageNanCases(Y, L);
+                    try
+                        AnalP = compute_analytical_pvals(Ln,Yn,xV'); 
+                    catch
+                        who Ln Yn xV
+                    end
                 end
             otherwise % non-linear
                 %%%%%%%%%% COMPUTE MIN. DIFF. VECTORS %%%%%%%%% 

@@ -28,7 +28,7 @@ if eIN || ~isfield(IN,'indNonRem') || isempty(IN.indNonRem)
                 S = sum(IN.mpp.val)*IN.opt; 
                 cS = cumsum(IN.mpp.val);
                 nD = cS <= S ;
-                if ~sum(nD), 
+                if ~sum(nD) 
                     nD = false(1,numel(cS)); 
                     nD(1) = true;
                 end

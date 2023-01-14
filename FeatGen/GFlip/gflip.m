@@ -42,7 +42,7 @@ if nargin< 4
         cpus =1;
     end
 end
-best_score = realmin;
+best_score = real min;
 labelsSet = unique(Y_train);
 rep = 1;
 while rep <= extra_param.start_points,

@@ -1,4 +1,4 @@
-function [ipos, ind0] = nk_FindGridOpt2(tr, ts, c, action, perc)
+function [ipos, ind0] = nk_FindGridOpt(tr, ts, c, action, perc)
 %
 % function [xpos, ypos] = nk_FindGridOpt(tr, ts, c, action, alttest)
 % 
@@ -31,7 +31,7 @@ end
 %
 % Ensemble diversity:   opt = opt + lambda*
 
-if isfield(GRD,'OptRegul') && GRD.OptRegul.flag
+if isfield(GRD,'OptRegul') && GRD.OptRegul.flag == 1
     
     fac = fmult*GRD.OptRegul.lambda*(c.^GRD.OptRegul.big_gamma);
     
@@ -57,7 +57,7 @@ if isfield(GRD,'NodeSelect')
                     mxc = min(c(ind0));
                     indc = c == mxc;
                     ind0 = ind0 & indc;
-                    if sum(ind0) > 1, 
+                    if sum(ind0) > 1
                         elimind = find(ind0); % take only first
                         ind0(elimind(2:end)) = false;
                     end
@@ -82,8 +82,8 @@ end
 
 ipos = find(ind0 == true);
 
-if VERBOSE;
-    if isfield(GRD,'OptRegul') && GRD.OptRegul.flag   
+if VERBOSE
+    if isfield(GRD,'OptRegul') && GRD.OptRegul.flag == 1  
         if isfield(GRD.OptRegul,'type')
             switch GRD.OptRegul.type
                 case 1
@@ -92,6 +92,8 @@ if VERBOSE;
                     strtype = ['Diversity [' GRD.OptRegul.RegulTypeDiversity ']'];
                 case 3
                     strtype = ['Average of Sparseness [' GRD.OptRegul.RegulTypeComplexity '] & Diversity [' GRD.OptRegul.RegulTypeDiversity ']' ];
+                case 4
+                    strtype = ['Standard deviation of CV1 test performance [' GRD.OptRegul.RegulTypeComplexity ']'];
             end
         else
             strtype = 'Sparseness';
@@ -111,5 +113,5 @@ if VERBOSE;
         fprintf('\nRegularization of model selection disabled.'); 
     end
 else
-    if isfield(GRD,'OptRegul') && GRD.OptRegul.flag, fprintf('\nRegularization of model selection enabled.'); end 
+    if isfield(GRD,'OptRegul') && GRD.OptRegul.flag == 1, fprintf('\nRegularization of model selection enabled.'); end 
 end
