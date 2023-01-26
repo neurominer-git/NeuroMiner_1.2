@@ -109,7 +109,7 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
         case {'pearson', 'spearman'}
             for i = 1:size(IN.G,2)
                 % Determine correlations with covars in the source matrix
-                IN.C(:,i) = abs(nk_CorrMat(dS,IN.G(IN.indX,i),corrmeth)');
+                [IN.C(:,i),~,~,IN.Pvalue(:,i)] = abs(nk_CorrMat(dS,IN.G(IN.indX,i),corrmeth)');
                 IN.C(isinf(IN.C(:,i)) | isnan(IN.C(:,i)),i) = 0;
                 if VERBOSE 
                     maxi = max(IN.C(:,i)); 
@@ -123,6 +123,7 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
             RES.X = [ones(size(IN.G(IN.indX,:),1),1) IN.G(IN.indX,:)];
             RES = nk_PerfANOVAObj(dS, RES);
             IN.C = sqrt(RES.R2);
+            IN.Pvalue = RES.p;
             IN.C(isinf(IN.C) | isnan(IN.C)) = 0;
             if VERBOSE
                 maxi = max(IN.C); 
@@ -131,8 +132,13 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     end
 
     % Threshold eigenvariate correlations with covars
-    IN.subthresh = single(feval(IN.varop, IN.C, IN.corrthresh));
-    
+    switch IN.corrcrit
+        case 'corr'
+            IN.subthresh = single(feval(IN.varop, IN.C, IN.corrthresh));
+        case 'pval'
+            IN.subthresh = single(feval(IN.varop, IN.Pvalue, IN.corrthresh));
+    end
+
     % Check whether correlated factors exist or not!
     if ~sum(IN.subthresh)
         IN.ind0 = true(1,size(dS,2));

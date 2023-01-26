@@ -1,6 +1,6 @@
 function [PREPROC, act, stepind] = nk_Preproc_config(PREPROC, varind, parentstr, stepind, enind)
 % =========================================================================
-% FORMAT [PREPROC, act, stepind] = nk_Preproc2_config(PREPROC, varind, ...
+% FORMAT [PREPROC, act, stepind] = nk_Preproc_config(PREPROC, varind, ...
 %                                                parentstr, stepind, enind)
 % =========================================================================
 % Configuration of Data Preprocessing Pipelines:
@@ -19,7 +19,7 @@ function [PREPROC, act, stepind] = nk_Preproc_config(PREPROC, varind, parentstr,
 % of the pre-processing pipeline in the respective CV1 partition (currently
 % only label imputation in the training samples).
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 08/2022
+% (c) Nikolaos Koutsouleris, 01/2023
 
 % Defaults:
 % ---------
@@ -378,7 +378,7 @@ switch act
             newcmdorder{i} = PREPROC.ACTPARAM{neworder(i)}.cmd; 
         end
         for i = 1:numel(neworder)-1
-            if strcmp(newcmdorder{i},'rankfeat') && ~strcmp(newcmdorder{i},'extfeat') 
+            if strcmp(newcmdorder{i},'rankfeat') && ~strcmp(newcmdorder{i+1},'extfeat') 
                 fl(1) = false;  
             end
             if any(strcmp({'reducedim','remvarcomp'}, newcmdorder{i})) && ~strcmp(newcmdorder{i+1},'extdim')
@@ -672,14 +672,14 @@ function CURACT = config_binmod(NM, CURACT)
 if isfield(CURACT,'BINMOD') && ~isempty(CURACT.BINMOD)
     switch CURACT.BINMOD, case 1, tBINMOD = 1; case 0, tBINMOD = 2; case 2, tBINMOD = 3; end
 else
-    if max(NM.label(:,1))>2 && strcmp(modeflag,'classification'), 
+    if max(NM.label(:,1))>2 && strcmp(modeflag,'classification') 
         tBINMOD = 0; % Multi-group
     else
         tBINMOD = 1; % Binary mode
     end
 end
 
-if max(NM.label(:,1))<=2 || ~strcmp(modeflag,'classification')
+if max(NM.label(:,1))<=2 || ~strcmp(NM.modeflag,'classification')
     CURACT.BINMOD = 1;
 else
     CURACT.BINMOD = nk_input('Group processing mode',0, 'm', 'binary|multi-group',[1,0], tBINMOD);

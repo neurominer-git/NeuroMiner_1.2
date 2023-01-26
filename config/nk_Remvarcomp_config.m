@@ -3,12 +3,14 @@ function [REMVARCOMP, PX] = nk_Remvarcomp_config(NM, varind, REMVARCOMP, PX, par
 [m, ~] = size(NM.Y{varind});
 corrmeth    = 1;
 corrthresh  = 0.5;
+corrcrit = 'corr';
 varop = 'gt';
 recon = 2;
 varops = {'gt','ge','lt','le'};
 recons = {'yes', 'no'};
 corrmeths = {'Pearson','Spearman','ANOVA'};
-dims = 0.9;
+corrcrits = {'corr','pval'};
+dims = 1;
 dimmode = 3;
 SUBGROUP.flag = 1;
 subgroupstr = {'Entire training set', ...
@@ -21,6 +23,7 @@ subgroupstr = {'Entire training set', ...
 %% Define defaults
 if ~isfield(REMVARCOMP,'corrmeth'),     REMVARCOMP.corrmeth = corrmeth; end
 if ~isfield(REMVARCOMP,'corrthresh'),   REMVARCOMP.corrthresh = corrthresh; end
+if ~isfield(REMVARCOMP,'corrcrit'),     REMVARCOMP.corrcrit = corrcrit; end
 if ~isfield(REMVARCOMP,'varop'),        REMVARCOMP.varop = varop; end
 if ~isfield(REMVARCOMP,'recon'),        REMVARCOMP.recon = recon; end
 if ~isfield(REMVARCOMP,'dims'),         REMVARCOMP.dims = dims; end
@@ -54,12 +57,13 @@ REMVARCOMP_subgroup_str = subgroupstr{REMVARCOMP.SUBGROUP.flag};
 
 menustr = [ 'Define target vector / matrix for identification of variance components [ ' RANKVARCOMP_G_str ' ]|', ...
             'Define correlation method for identification of variance components [ ' REMVARCOMP_corrmeth_str ' ]|', ...
-            'Define correlation cutoff for variance extraction [ ' REMVARCOMP_corrthresh_str  ' ]|', ...
+            'Define metric for variance component identification [ ' REMVARCOMP.corrcrit ' ]|', ...
+            'Define metric cutoff for variance extraction [ ' REMVARCOMP_corrthresh_str  ' ]|', ...
             'Define variance extraction operator [ ' REMVARCOMP.varop  ' ]|', ...
             'Back-project adjusted matrices to input space [ ' REMVARCOMP_recon_str ' ]|'...
             'Define % retained variance in PCA projection [ ' REMVARCOMP_dims_str ']|' ...
             'Define training data for PCA model generation [ ' REMVARCOMP_subgroup_str ' ]'];
-menuact = 1:7;
+menuact = 1:8;
 
 %% Print menu
 nk_PrintLogo
@@ -73,12 +77,15 @@ switch act
     case 2
         REMVARCOMP.corrmeth = nk_input('Define method for identifying variance components',0,'m','Pearson|Spearman|ANOVA', [1,2,3], REMVARCOMP.corrmeth);
     case 3
-        REMVARCOMP.corrthresh = nk_input('Define single absolute correlation cutoff or multiple cutoffs for variance extraction',0,'e',REMVARCOMP.corrthresh);
+        corrcritdef = find(strcmp(corrcrits, REMVARCOMP.corrcrit));
+        REMVARCOMP.corrcrit = char(nk_input('Define metric for identifying variance components',0,'m','correlation coefficient|P value',corrcrits,corrcritdef));
     case 4
-        varopnum = nk_input('Define variance extraction operator',0,'>|>=|<|<=',{'gt','ge','lt','le'}, varopdef); REMVARCOMP.varop = char(varopnum);
+        REMVARCOMP.corrthresh = nk_input('Define single absolute correlation cutoff or multiple cutoffs for variance extraction',0,'e',REMVARCOMP.corrthresh);
     case 5
-        if REMVARCOMP.recon == 1, REMVARCOMP.recon = 2; elseif REMVARCOMP.recon == 2, REMVARCOMP.recon = 1; end
+        varopnum = nk_input('Define variance extraction operator',0,'>|>=|<|<=',{'gt','ge','lt','le'}, varopdef); REMVARCOMP.varop = char(varopnum);
     case 6
+        if REMVARCOMP.recon == 1, REMVARCOMP.recon = 2; elseif REMVARCOMP.recon == 2, REMVARCOMP.recon = 1; end
+    case 7
         switch REMVARCOMP.dimmode
             case 1
                 dimmodedef = 1;
@@ -92,7 +99,7 @@ switch act
             case 3
                 REMVARCOMP.dims = nk_input('Percentage of variance components to be returned by PCA (0-1)',0,'e',REMVARCOMP.dims); 
         end
-    case 7
+    case 8
         REMVARCOMP.SUBGROUP = nk_SubgroupOperation_config( NM, REMVARCOMP.SUBGROUP );
 end
 

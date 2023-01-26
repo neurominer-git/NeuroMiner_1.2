@@ -143,9 +143,12 @@ switch IN.algostr
         [~,IN.W] = relieff(Y, L, IN.Relief.k);
         
     case 'anova'
+        if size(L,2)==1
+            L = nk_MakeDummyVariables(L);
+        end
         IN.X = [ones(size(L,1),1) L]; 
-        IN = nk_PerfANOVAObj(Y,IN);
-        IN.W = IN.R2;
+        IN = nk_PerfANOVAObjNew(Y,IN);
+        IN.W = -log10(IN.p);
     
     case 'pls'
         if strcmp(IN.PLS.algostr,'spls')

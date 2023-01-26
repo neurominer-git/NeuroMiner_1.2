@@ -80,8 +80,10 @@ legend(handles.MultiClass.bx, handles.NM.groupnames(:)', 'Location','Best', 'Fon
 % Define textbox info data 
 pss = cell(1,m); subjects = handles.MultiClass.cases;
 figdata.y = zeros(m,1);
+uL = unique(handles.MultiClass.labels);
 for i=1:numel(pss)
-    expgroupi   = handles.NM.groupnames{handles.MultiClass.labels(i)}; 
+    iI = uL == handles.MultiClass.labels(i);
+    expgroupi   = handles.NM.groupnames{iI}; 
     predgroupi  = handles.NM.groupnames{maxI(i)}; 
     pss{i} = sprintf(['Subject ID: %s' ...
                     '\nExpected group: %s' ...

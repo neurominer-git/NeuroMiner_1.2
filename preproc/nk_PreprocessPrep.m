@@ -223,34 +223,18 @@ switch act
                             end
                         end
                     end
+
                     CALIB.calibflag = false;
                     % Check whether calibration data is available 
-                    if isfield(inp, 'C') && inp.C{1,1}.calibflag %&& isfield(PREPROC,'CALIB') && ~isempty(PREPROC.CALIB),
+                    if isfield(inp, 'C') && inp.C{1,1}.calibflag
                         CALIB.calibflag = inp.C{1,1}.calibflag;
                         P = inp.X;
                         CYfile = inp.C{1,1}.Y; 
                         load(CYfile, 'CY');
                         inp.C{1,1}.Y = CY;
                         inp.C{1,1}.Y = nk_PerfSpatFilt(inp.C{1,1}.Y, PREPROC, P);
-%                         C = CY;
-%                         C = nk_PerfSpatFilt( C, PREPROC, P ); 
-                    elseif isfield(PREPROC,'TEMPLPROC') && ~isempty(PREPROC.TEMPLPROC) && PREPROC.TEMPLPROC
-                        % For factorization methods: TEMPLATE MAPPING 
-                        if PREPROC.BINMOD
-                            ukbin = kbin; SrcParam.binmult = 1;
-                        else
-                            ukbin = 1; SrcParam.binmult = 0;
-                        end
-                        SrcParam.CV1perm = 1; SrcParam.CV1fold = 1;
-                        for curclass = 1 : ukbin
-                            SrcParam.u = curclass;
-                            SrcParam.TrX = find(labels == CV.class{1,1}{curclass}.groups(1) | labels == CV.class{1,1}{curclass}.groups(2));
-                            InputParam.Tr = Y(SrcParam.TrX,:);
-                            JSMEM = []; % reset memory for juspace 
-                            [TEMPL.Tr{curclass}, TEMPL.Param{curclass}] = nk_GenPreprocSequence(InputParam, PREPROC, SrcParam);
-                        end
                     end
-    
+                    
                     % ======================== PREPROCESSING PIPELINE ========================
                     % These stepps require cross-validation as they require group-level
                     % information flows
@@ -271,6 +255,7 @@ switch act
                             savnamP = [matname strout inp.varstr '_PreprocDataParam_ID' datid];
                             savmatP = fullfile(tdir,[savnamP '.mat']);
                             paramfl.pth = savmatP; 
+
                             if ~OVRWRT
                                 flg=0;
                                 if exist(savmatY,'file'), fprintf('\n Training / CV file detected:\n%s\nDo not overwrite.', savnamY); flg=1; end
@@ -280,7 +265,7 @@ switch act
     
                             fprintf('\n\n'); fprintf('********************** CV2 partition [%g, %g] ********************** ',ix,jx)
     
-                            % Prepare parameter container, if paramfl = true
+                            %% Prepare parameter container, if paramfl = true
                             paramfl.found = 0;
                             if paramfl.use_exist
                                 try 
@@ -291,7 +276,41 @@ switch act
                                     paramfl.found = 0;
                                 end
                             end
-    
+                            
+                            %% For factorization methods: TEMPLATE MAPPING   
+                            % TEMPLPROC cannot be accessed in the NM parameter configurator 
+                            % in the current version of NM. 
+                            if isfield(PREPROC,'TEMPLPROC') && ~isempty(PREPROC.TEMPLPROC) && PREPROC.TEMPLPROC
+                                if PREPROC.BINMOD
+                                    ukbin = kbin; SrcParam.binmult = 1;
+                                else
+                                    ukbin = 1; SrcParam.binmult = 0;
+                                end
+                                SrcParam.CV1perm = 1; SrcParam.CV1fold = 1;
+                                for curclass = 1 : ukbin
+                                    SrcParam.u = curclass;
+                                    TrI = CV.TrainInd{ix,jx};
+                                    switch MODEFL
+                                        case 'classification'
+                                            SrcParam.TrX = ( labels(TrI) == CV.class{1,1}.groups(1) || labels(TrI) == CV.class{1,1}.groups(2) );
+                                        case 'regression'
+                                            SrcParam.TrX = TrI;    
+                                    end
+                                    TrLX = labels(SrcParam.TrX);
+                                    if iscell(Y) 
+                                        for vu = 1:numel(Y)
+                                             [InputParam.Tr{vu}, InputParam.iTrX] = nk_ManageNanCases(Y{vu}(SrcParam.TrX,:), TrLX);
+                                        end
+                                    else
+                                        [InputParam.Tr, InputParam.iTrX] = nk_ManageNanCases(Y(SrcParam.TrX,:), TrLX);
+                                    end
+                                            
+                                    JSMEM = []; % reset memory for juspace 
+                                    [TEMPL.Tr{curclass}, TEMPL.Param{curclass}] = nk_GenPreprocSequence(InputParam, PREPROC, SrcParam);
+                                end
+                            end
+                            
+                            %% Perform preprocessing
                             [mapY, Param] = nk_PerfPreprocess(Y, inp, labels, paramfl);
     
                             outfold = jx; outperm = ix;
@@ -313,11 +332,10 @@ switch act
                                 end
                                 clear FEAT Param mapY id dimension savmat savnam strout volnum sigflag clustflag signum clustnum
                             end
+                            if ~isempty(TEMPL), clear TEMPL; end
                         end
                     end
-    
                 end
-                if ~isempty(TEMPL), clear TEMPL; end
     
             case 7
                 
