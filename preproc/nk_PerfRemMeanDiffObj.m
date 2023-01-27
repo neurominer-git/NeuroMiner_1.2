@@ -6,12 +6,12 @@ function [sY, IN] = nk_PerfRemMeanDiffObj( Y, IN )
 % (specified in sIND) by first subtracting global mean (meanY) and then 
 % subtracting offsets (meanG) from target data 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2022
+% (c) Nikolaos Koutsouleris, 01/2023
 
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) && exist('IN','var') && ~isempty(IN)
     sY = cell(1,numel(Y)); 
-    for i=1:numel(Y), 
+    for i=1:numel(Y)
         % Define active indices depending on training or testing situation
         if isfield(IN,'meanY') && isfield(IN,'meanG')
            if isfield(IN,'sTsInd'), IN.sIND = IN.sTsInd{i}; else, IN.sIND =[]; end
@@ -51,6 +51,7 @@ if eIN || ~isfield(IN,'dIND') || isempty(IN.dIND), IN.dIND = IN.sIND; end
 % find non-zero entries in source and destination vectors
 indGS = IN.sIND~=0; indGD = IN.dIND~=0;
 
+% Find unque group indices and determine number of groups
 MS = unique(IN.sIND(indGS)); nMS = numel(MS); if ~MS, nMS = 0; end
 MD = unique(IN.dIND(indGD)); nMD = numel(MD); if ~MD, nMD = 0; end
 

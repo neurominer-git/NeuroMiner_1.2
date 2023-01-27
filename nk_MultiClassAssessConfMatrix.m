@@ -39,13 +39,13 @@ end
 performance.confusion_matrix    = confmatrix;
 performance.errors              = errs;
 performance.accuracy            = P*100/sumconf;
-if any(strcmp({'all','BAC'},crit)),
+if any(strcmp({'all','BAC'},crit))
     performance.BAC                 = [];
     for i = 1:numel(performance.class)
         performance.BAC = [ performance.BAC performance.class{i}.BAC];
     end
-    performance.BAC_SD = nanstd(performance.BAC);
-    performance.BAC_Mean = nanmean(performance.BAC);
+    performance.BAC_SD = nm_nanstd(performance.BAC);
+    performance.BAC_Mean = nm_nanmean(performance.BAC);
 end
 
 return

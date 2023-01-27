@@ -7,7 +7,7 @@ if ~exist('perc','var'), perc = []; end
 
 %%%%%%%%%%%%%%%%%%%%%%%% MAX SELECTION %%%%%%%%%%%%%%%%%%%%%%%%%%
 C(isnan(C)) = 0;
-[ipos, ind0] = nk_FindGridOpt2(TR, TS, C, act, perc);
+[ipos, ind0] = nk_FindGridOpt(TR, TS, C, act, perc);
 nipos = numel(ipos); 
 %%%%%%%%%%%%%%%%%%% SELECT PARAMS AT OPTIMUM %%%%%%%%%%%%%%%%%%%%
 if iscell(P) 
@@ -24,7 +24,7 @@ else
 end
 
 nP = 1;
-if iscell(P) && ~combcell, 
+if iscell(P) && ~combcell
     nP = sP(2); 
 elseif ~iscell(P) && (numel(P)==1 && isnan(P))
     P = repmat({nan},nP,1); Pdesc = P;
@@ -88,7 +88,7 @@ fprintf('\nMean CV1 performance: %1.2f, Mean CV2 performance: %g across %g nodes
     mean(GridSelectorResults.bestacc), mean(GridSelectorResults.besttestparam), ...
     numel(GridSelectorResults.Npos))
 
-if ~isempty(C),
+if ~isempty(C)
     GridSelectorResults.bestcomplexity = C(ipos);
 end
 GridSelectorResults.Nodes = length(ipos);

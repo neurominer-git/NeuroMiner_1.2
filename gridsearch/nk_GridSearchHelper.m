@@ -49,10 +49,12 @@ switch Metric
     case 1 % Mean of ensembles (Targets)
 
         GD.TR(i,:,curlabel) = Perf.MeanCVHTperf;
+        GD.sTR(i,:,curlabel) = Perf.SDCVHTperf;
 
     case 2 % Mean of ensembles (Decision Values)
 
         GD.TR(i,:,curlabel) = Perf.MeanCVHDperf;
+        GD.sTR(i,:,curlabel) = Perf.SDCVHDperf;
 
 end
 
@@ -358,5 +360,3 @@ for i=1:ix
         end
     end
 end
-
-return

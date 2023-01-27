@@ -433,7 +433,7 @@ if isfield(TemplParam,'ACTPARAM')
                 InputParam.P{ac}.RANK.curlabel(SrcParam.iTrX,:)=[]; 
                 if isfield( TemplParam.ACTPARAM{ac}.RANK,'glabel' )
                     % glabel is a logical vector
-                    InputParam.P{ac}.RANK.curglabel = TemplParam.ACTPARAM{ac}.RANK.glabel(SrcParam.TrX);
+                    InputParam.P{ac}.RANK.curglabel = TemplParam.ACTPARAM{ac}.RANK.glabel(SrcParam.TrX, :);
                     InputParam.P{ac}.RANK.curglabel(SrcParam.iTrX,:)=[]; 
                 end
                 if isfield(TemplParam.ACTPARAM{ac},'PX') && ~isempty(TemplParam.ACTPARAM{ac}.PX)

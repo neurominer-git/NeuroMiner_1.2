@@ -321,7 +321,7 @@ for n=1:nM
         end
     else
         nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
-        if ~isempty(PA), 
+        if ~isempty(PA) 
              nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI);
         end
         if mM>1 % intermediate / late fusion

@@ -372,7 +372,9 @@ inp1.probflag = false;
 
 % **************************** ANALYSIS SETUP *****************************
 ld = 1; if FUSION.flag == 3, ld = numel(inp1.F); end
-inp1.ngroups = max(dat.label);
+inp1.unique_groups = unique(dat.label); 
+inp1.unique_groups(isnan(inp1.unique_groups))=[];
+inp1.ngroups = numel(inp1.unique_groups);
 hx = size(dat.label,2);
 analysis.Time                               = zeros(ld,1);
 analysis.TrainPerformanceBin                = zeros(ld,inp1.nclass,hx);

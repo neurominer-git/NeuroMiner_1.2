@@ -4,7 +4,7 @@ global NM EXPERT
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 if ~exist('M','var') || isempty(M), M=1; end
 thresh = 0; fwhm = []; flgProj = false; 
-PERM = struct('flag',0,'nperms',1000,'sigflag',0,'mode',1);
+PERM = struct('flag',0,'nperms',1000,'sigflag',0,'sigPthresh',0.05, 'mode',1);
 normfl = false; if any(strcmp({'LIBSVM','LIBLIN'}, NM.TrainParam.SVM.prog)), normfl = true; end
 normdef = 1; if ~isfield(VIS,'norm'), VIS.norm = normdef; end   
 if ~defaultsfl
@@ -80,11 +80,14 @@ if ~defaultsfl
                 zPREPROC = PREPROC;
             end
             for i=1:numel(zPREPROC.ACTPARAM)
-                if strcmp(zPREPROC.ACTPARAM{i}.cmd,'reducedim'), flgProj=true; end
+                if strcmp(zPREPROC.ACTPARAM{i}.cmd,'reducedim') || ...
+                        (strcmp(zPREPROC.ACTPARAM{i}.cmd,'remvarcomp') && zPREPROC.ACTPARAM{i}.REMVARCOMP.recon==2) 
+                    flgProj=true; 
+                end
             end
             if flgProj
                 if isfield(VIS.PERM,'sigflag') && VIS.PERM.sigflag
-                    sigstr = ', back-project significant features only';
+                    sigstr = sprintf(', back-project only significant features (alpha=%g)', VIS.PERM.sigPthresh);
                 else
                     sigstr = ', back-project all features';
                 end
@@ -127,23 +130,34 @@ if ~defaultsfl
             if isfield(VIS,'se'); typ = VIS.se.type; val = VIS.se.val; logop = VIS.se.logop; end
             VIS.se = config_threshold('standard error image', typ, val, logop);
         case 7
-            VIS.PERM.flag = nk_input('Enable permutation mode',0,'yes|no',[1,0],1);
+            if isfield(VIS,'PERM') 
+                PERM = VIS.PERM; 
+            end
+            if ~PERM.flag, permflag = 2; else, permflag = 1; end
+            if ~PERM.sigflag, permsigflag = 2; else, permsigflag = 1; end
+
+            VIS.PERM.flag = nk_input('Enable permutation mode',0,'yes|no',[1,0],permflag);
             if VIS.PERM.flag 
-                VIS.PERM.nperms = nk_input('# of permutations',0,'i',100);
+               
+                VIS.PERM.nperms = nk_input('# of permutations',0,'i', PERM.nperms);
                 if flgProj
-                    VIS.PERM.sigflag = nk_input('Limit pattern generation to combinations of significant weights',0,'yes|no',[1,0],1); 
+                    VIS.PERM.sigflag = nk_input('Limit pattern generation to combinations of significant weights',0,'yes|no',[1,0], permsigflag);
+                    VIS.PERM.sigPthresh = nk_input('Define alpha threshold for determining feature significance',0,'e', PERM.sigPthresh); 
                 else
                     VIS.PERM.sigflag = 0; 
                 end
+
+
+
                 if isfield(NM,'covars') && ~isempty(NM.covars) && EXPERT 
-                    VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features|Covariate(s)',1:4,VIS.PERM.mode);
+                    VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features|Covariate(s)',1:4,PERM.mode);
                 else 
-                    VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features',1:3,VIS.PERM.mode);
+                    VIS.PERM.mode = nk_input('Permutation mode',0,'m','Labels|Features (within-label)|Labels & Features',1:3,PERM.mode);
                 end
 
                 if VIS.PERM.mode == 4
-                    if ~isfield(VIS.PERM, 'covars_idx') || isempty(VIS.PERM.covars_idx), VIS.PERM.covars_idx = 1; end;
-                    VIS.PERM.covars_idx = nk_SelectCovariateIndex(NM,VIS.PERM.covars_idx,1);
+                    if ~isfield(PERM, 'covars_idx') || isempty(PERM.covars_idx), VIS.PERM.covars_idx = 1; end
+                    VIS.PERM.covars_idx = nk_SelectCovariateIndex(NM,PERM.covars_idx,1);
                 end
             end
         case 8

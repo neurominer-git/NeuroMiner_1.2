@@ -158,12 +158,7 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
                     M = IN.mpp.sampleMean;
                     vec = IN.mpp.vec;
             end
-            % Re-order components to map current 
-            % component space to template component space
-            if isfield(IN.DR,'mpp_template') && ~isempty(IN.DR.mpp_template)
-                fprintf(' Reorder components...')
-                
-            end
+
             % Finally, map data to component space
             pY = bsxfun(@minus, Y, M) * vec; 
 
@@ -232,6 +227,12 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
             end
         otherwise
             [pY,IN.mpp] = compute_mapping(Y,IN.DR.RedMode, IN.DR.dims, IN.DR.Modus);
+    end
+    % Re-order components to map current 
+    % component space to template component space
+    if isfield(IN.DR,'mpp_template') && ~isempty(IN.DR.mpp_template)
+        if VERBOSE, fprintf(' Reorder components...'); end
+                
     end
 else
     switch IN.DR.RedMode

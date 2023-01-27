@@ -231,7 +231,7 @@ for i=1:nact
                 for l = 1: nO
                     if ~isempty(O)
                         ActParam.opt = O(l,:);
-                    elseif isfield(ActParam,'opt'), 
+                    elseif isfield(ActParam,'opt') 
                         ActParam = rmfield(ActParam,'opt');
                     end
                     if paramfl, llTrParam = TrParami{kl,nl}; else, llTrParam = []; end
@@ -756,7 +756,7 @@ else
 end
 
 if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
-if CALIB.calibflag && isfield(InputParam, 'C')
+if isfield(CALIB,'calibflag') && CALIB.calibflag && isfield(InputParam, 'C')
     INcalib = IN;
     INcalib.TrCovars = CALIB.covars;
     INcalib = rmfield(INcalib, 'subgroup');
