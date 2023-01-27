@@ -639,7 +639,7 @@ switch act
 %                 NM.TrainParam.PREPROC{i}    = DefPREPROC(modeflag,nan_in_pred,nan_in_label);
 %                 NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC, i, 1);
 %             end
-            NM.TrainParam               = rmfield(NM.TrainParam,'PREPROC');
+            NM                          = rmfield(NM, 'TrainParam');
 
             NM.TrainParam.LABEL         = LABEL;
             NM.modeflag                 = origmodefl;

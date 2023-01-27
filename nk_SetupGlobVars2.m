@@ -43,9 +43,9 @@ switch act
 
         status = 0;
         try
-            if isfield(dat.TrainParam,'LABEL') && ...
-                    dat.TrainParam.LABEL.flag && ...
-                    strcmp(dat.TrainParam.LABEL.newmode,'classification') && ...
+            if isfield(dat,'label') && ...
+                    dat.label.altlabelflag && ...
+                    strcmp(dat.label.newmode,'classification') && ...
                     dat.TrainParam.RAND.Decompose ~= 9
                 CV = adjust_cv(dat);
             else
@@ -62,7 +62,9 @@ switch act
         end
 
         try
+
             MODEFL  = dat.label.modeflag;
+
         catch
             paramstr = sprintf('%s\n%s',paramstr,'Type of predictor: Classification / Regression model');
         end
@@ -335,7 +337,7 @@ function cvadj = adjust_cv(inp)
 
 cvadj = inp.cv;
 
-ulb = unique(inp.TrainParam.LABEL.newlabel);
+ulb = unique(inp.label.label);
 if any(~isfinite(ulb))
     NaNflag = true; ind = logical(sum(isfinite(ulb),2));
     ulb = ulb(ind,:);
@@ -344,13 +346,13 @@ else
 end
 nclass = numel(ulb);
 
-if isfield(inp.TrainParam.LABEL, 'newgroupnames')
-    g = inp.TrainParam.LABEL.newgroupnames;
+if isfield(inp.label, 'altgroupnames')
+    g = inp.label.altgroupnames;
 else
     g = [];
 end
 
-class_wrapper = @(ind) GenClass(g, ulb, nclass, inp.TrainParam.LABEL.newlabel(ind), inp.TrainParam.RAND.Decompose, NaNflag);
+class_wrapper = @(ind) GenClass(g, ulb, nclass, inp.label.label(ind), inp.TrainParam.RAND.Decompose, NaNflag);
 newclass = cellfun(class_wrapper, inp.cv.TrainInd, 'UniformOutput', false);
 
 % class_wrapper2 = @(class) GenClass2(class, )
@@ -362,7 +364,7 @@ for i = 1:size(cvadj.class,1)
             for l = 1:length(cvadj.class{i,j})
                 newclass{i,j}{l}.TrainInd = cvadj.class{i,j}{l}.TrainInd; 
                 newclass{i,j}{l}.TestInd = cvadj.class{i,j}{l}.TestInd; 
-                label_wrapper = @(ind) inp.TrainParam.LABEL.newlabel(ind);
+                label_wrapper = @(ind) inp.label.label(ind);
                 newclass{i,j}{l}.TrainLabel = cellfun(label_wrapper, newclass{i,j}{l}.TrainInd, 'UniformOutput', false);
                 newclass{i,j}{l}.TestLabel = cellfun(label_wrapper, newclass{i,j}{l}.TestInd, 'UniformOutput', false);
             end
@@ -371,8 +373,8 @@ for i = 1:size(cvadj.class,1)
         else
             newclass{i,j}.TrainInd = cvadj.class{i,j}.TrainInd; 
             newclass{i,j}.TestInd = cvadj.class{i,j}.TestInd; 
-            class.TrainLabel = inp.TrainParam.LABEL.newlabel(cvadj.class{i,j}.TrainInd);
-            class.TestLabel = inp.TrainParam.LABEL.newlabel(cvadj.class{i,j}.TestInd);
+            class.TrainLabel = inp.label.label(cvadj.class{i,j}.TrainInd);
+            class.TestLabel = inp.label.label(cvadj.class{i,j}.TestInd);
 %             class_wrapper2 = @(class) GenClass2(class, cvadj.class{i,j}.TrainInd, cvadj.class{i,j}.TestInd, inp.TrainParam.LABEL.newlabel);
 %             newclass{i,j} = cellfun(class_wrapper2, newclass, 'UniformOutput', false);
         end
