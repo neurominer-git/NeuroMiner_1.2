@@ -77,7 +77,10 @@ else
 end
 ALTLAB.flag = altlabflag;
 % check whether new label was entered or only yes
-
+if altlabflag && strcmp(newmode, 'no new mode defined')
+    ALTLAB.flag = 0;
+    newmode = ''
+end 
 ALTLAB.newlabel = newlabel; 
 ALTLAB.newlabelname = newlabelname; 
 ALTLAB.newmode = newmode; 

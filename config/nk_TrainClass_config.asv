@@ -262,7 +262,7 @@ if ~exist('act','var') || isempty(act)
         menustr = [ menustr 'Label selection in multi-label mode [ ' multlabelselstr ' ]|']; menuact = [ menuact 20];
     end
 
-    menustr = [menustr 'Cross-validation settings [ ' STATUS.cv ' ]|']; menuact = [menuact 3];
+    menustr = [menustr 'Cross-validation settings [ ' STATUS.cv  ' ]|']; menuact = [menuact 3];
 
     SVM = [];
     if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
@@ -281,7 +281,7 @@ if ~exist('act','var') || isempty(act)
 
     flx = flSVM && flGRD && flPREPROC;
 
-    menustr = [ menustr 'Use different label [ ' STATUS.LABEL ']|']; menuact = [menuact 99] ;
+    menustr = [ menustr 'Use different label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
     %menustr = [ menustr 'Calibration data [ ' STATUS.CALIB ']|']; menuact = [menuact 1000];
 
     menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 5:6 ];
@@ -639,7 +639,7 @@ switch act
 %                 NM.TrainParam.PREPROC{i}    = DefPREPROC(modeflag,nan_in_pred,nan_in_label);
 %                 NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC, i, 1);
 %             end
-            NM                          = rmfield(NM, 'TrainParam');
+            NM.TrainParam               = rmfield(NM.TrainParam,'PREPROC');
 
             NM.TrainParam.LABEL         = LABEL;
             NM.modeflag                 = origmodefl;

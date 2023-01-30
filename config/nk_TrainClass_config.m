@@ -262,7 +262,7 @@ if ~exist('act','var') || isempty(act)
         menustr = [ menustr 'Label selection in multi-label mode [ ' multlabelselstr ' ]|']; menuact = [ menuact 20];
     end
 
-    menustr = [menustr 'Cross-validation settings [ ' STATUS.cv ' ]|']; menuact = [menuact 3];
+    menustr = [menustr 'Cross-validation settings [ ' STATUS.cv  ' ]|']; menuact = [menuact 3];
 
     SVM = [];
     if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
@@ -617,8 +617,12 @@ switch act
         end
         if LABEL.flag && ~strcmp(LABEL.newmode, modeflag)
             origmodefl                  = NM.modeflag;
+            % check whether a new mode was entered
+            if isempty(LABEL.newmode)
+                LABEL.newmode           = origmodefl;
+            end
             NM.modeflag                 = LABEL.newmode;
-
+            
             % Create default NM parameters space
             nk_CVpartition_config(true);
             NM.TrainParam.STACKING.flag = 2;
