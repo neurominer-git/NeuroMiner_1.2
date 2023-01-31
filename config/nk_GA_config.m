@@ -9,7 +9,7 @@ if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl = false; end
 if ~defaultsfl
     
     if isfield(param,'GA') 
-        if isfield(param.GA,'N') && ~isempty( param.GA.N ), GA.c = param.GA.N; end
+        if isfield(param.GA,'N') && ~isempty( param.GA.N ), GA.N = param.GA.N; end
         if isfield(param.GA,'max_Iter') && ~isempty( param.GA.max_Iter ), GA.max_Iter = param.GA.max_Iter; end
         if isfield(param.GA,'CR') && ~isempty( param.GA.CR), GA.CR = param.GA.CR; end
         if isfield(param.GA,'MR') && ~isempty( param.GA.MR ), GA.MR = param.GA.MR; end

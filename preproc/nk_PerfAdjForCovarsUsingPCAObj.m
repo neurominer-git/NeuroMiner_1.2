@@ -45,10 +45,10 @@ function [adjT, IN, dT] = PerfAdjForCovarsUsingPCAObj(T, IN, S)
 global VERBOSE
 
 % Check existence of paramater structure
-if ~exist('IN','var') || isempty(IN),             
+if ~exist('IN','var') || isempty(IN)          
     error('No parameter structure specified! Abort!');  
 end
-if ~isfield(IN,'recon') || isempty(IN.recon),
+if ~isfield(IN,'recon') || isempty(IN.recon)
     IN.recon = true;
 end
 if ~isfield(IN,'varop') || isempty(IN.varop)
@@ -61,16 +61,16 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     
     compfl = true;
     % The source data matrix to compute the factorized matrix from
-    if ~exist('S','var') || isempty(S), 
+    if ~exist('S','var') || isempty(S)
         error('No training matrix specified in parameter structure'); 
     end
     % The source covariate matrix to compute correlation coefficients with
     % factorized data matrix
-    if (~isfield(IN,'G') || isempty(IN.G)),
+    if (~isfield(IN,'G') || isempty(IN.G))
         error('No target vector / matrix specified in parameter structure'); 
     end
     % The defaults correlation method
-    if ~isfield(IN,'corrmeth') || isempty(IN.corrmeth),
+    if ~isfield(IN,'corrmeth') || isempty(IN.corrmeth)
         IN.corrmeth = 1;                                    
     end
     switch IN.corrmeth
@@ -83,7 +83,7 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     end
 
     % The default correlation strength 
-    if ~isfield(IN,'corrthresh') || isempty(IN.corrthresh),
+    if ~isfield(IN,'corrthresh') || isempty(IN.corrthresh)
         IN.corrthresh = 0.3;                                
     end
     
@@ -109,8 +109,12 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
         case {'pearson', 'spearman'}
             for i = 1:size(IN.G,2)
                 % Determine correlations with covars in the source matrix
-                if VERBOSE, fprintf('\nWorking on covariate #%g', i); end
-                IN.C(:,i) = abs(nk_CorrMat(dS,IN.G(IN.indX,i),corrmeth)');
+                [IN.C(:,i),~,~,IN.Pvalue(:,i)] = abs(nk_CorrMat(dS,IN.G(IN.indX,i),corrmeth)');
+                IN.C(isinf(IN.C(:,i)) | isnan(IN.C(:,i)),i) = 0;
+                if VERBOSE 
+                    maxi = max(IN.C(:,i)); 
+                    fprintf('\nWorking on covariate #%g => max=%g', i, maxi); 
+                end
             end
         case 'anova'
             % This is the more powerful option if we have multiple covars
@@ -119,13 +123,24 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
             RES.X = [ones(size(IN.G(IN.indX,:),1),1) IN.G(IN.indX,:)];
             RES = nk_PerfANOVAObj(dS, RES);
             IN.C = sqrt(RES.R2);
+            IN.Pvalue = RES.p;
+            IN.C(isinf(IN.C) | isnan(IN.C)) = 0;
+            if VERBOSE
+                maxi = max(IN.C); 
+                fprintf('\nDummy matrix => max=%g', maxi); 
+            end
     end
 
     % Threshold eigenvariate correlations with covars
-    IN.subthresh = single(feval(IN.varop, IN.C, IN.corrthresh));
-    
+    switch IN.corrcrit
+        case 'corr'
+            IN.subthresh = single(feval(IN.varop, IN.C, IN.corrthresh));
+        case 'pval'
+            IN.subthresh = single(feval(IN.varop, IN.Pvalue, IN.corrthresh));
+    end
+
     % Check whether correlated factors exist or not!
-    if ~sum(IN.subthresh),
+    if ~sum(IN.subthresh)
         IN.ind0 = true(1,size(dS,2));
         warning('\nNo variance components identified at %g threshold. Returning unchanged matrix!', IN.corrthresh);
         switch IN.recon
@@ -175,12 +190,16 @@ switch IN.recon
         adjT = dT(:,IN.ind0);
 end
 
-if VERBOSE, 
+if VERBOSE
+    mx = IN.C(~IN.ind0); s0 = sum(~IN.ind0);
+    if ~s0
+        fprintf('???')
+    end
     if compfl
         fprintf(['\nProcessing finished. %g/%g components with r %s %g (max: %g) were identified.', ...
-            '\nRespective variance components was extracted from the input matrix.\n'],sum(~IN.ind0),size(IN.mpp.vec,2), IN.varop, IN.corrthresh, max(IN.C(~IN.ind0))); 
+            '\nRespective variance components was extracted from the input matrix.\n'],s0,size(IN.mpp.vec,2), IN.varop, IN.corrthresh, max(mx(:))); 
     else
-        fprintf('\nProcessing finished. %g variance components were removed from input matrix', sum(~IN.ind0))
+        fprintf('\nProcessing finished. %g variance components were removed from input matrix', s0)
     end
 end
 

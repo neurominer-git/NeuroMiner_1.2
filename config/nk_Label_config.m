@@ -1,4 +1,4 @@
-function [ ALTLAB, act ] = nk_Labels_config(ALTLAB)
+function [ ALTLAB, act ] = nk_Label_config(ALTLAB, defaultsfl)
 global NM
 
 altlabflag = 0;
@@ -18,11 +18,11 @@ if ~defaultsfl
     if isfield(ALTLAB,'newgroupnames'), newgroupnames = ALTLAB.newgroupnames; end
 
 
-    if altlabflag == 1, 
+    if altlabflag == 1
         FLAGSTR = 'yes'; 
         
-        if ~isempty(newlabel), NEWLABELSTR = newlabelname; else NEWLABELSTR = 'not provided'; end
-        if ~isempty(newmode), NEWMODESTR = newmode; else NEWMODESTR = 'not provided'; end
+        if ~isempty(newlabel), NEWLABELSTR = newlabelname; else, NEWLABELSTR = 'not provided'; end
+        if ~isempty(newmode), NEWMODESTR = newmode; else, NEWMODESTR = 'not provided'; end
 
         menustr = ['Use alternative label [' FLAGSTR ']|' ...
             'Load new label variable [' NEWLABELSTR ' --> ' NEWMODESTR ']' ];
@@ -33,6 +33,8 @@ if ~defaultsfl
         menustr = ['Use alternative label [' FLAGSTR ']'];
            
         menuact = 1;
+
+        newmode = '';
     end
     
     nk_PrintLogo
@@ -42,6 +44,7 @@ if ~defaultsfl
     switch act
         case 1
             if altlabflag == 1, altlabflag = 0; elseif altlabflag == 0, altlabflag = 1; end
+
         case 2
             newlabel = nk_input('Label variable',0,'r',[],[NM.n_subjects_all 1]);
             newlabelname = nk_input('New label name',0, 's', newlabelname);
@@ -52,7 +55,7 @@ if ~defaultsfl
                 % structure (if one exists)
                 newgroupsN = numel(unique(newlabel));
                 newgroups = unique(newlabel);
-                newgroupnames = nk_input('Groupnames (as vector, no numeric names)',0,'e',[],[newgroupsN 1]);
+                newgroupnames = nk_input('Groupnames (as vector, no numeric names)',0,'e',[],size(newgroupsN,1));
 
                 if isfield(NM, 'cv')
                     cv_ok = check_CV_class(NM.cv, NM.cases, newlabel, newgroups);
@@ -73,6 +76,8 @@ else
     act = 0;
 end
 ALTLAB.flag = altlabflag;
+% check whether new label was entered or only yes
+
 ALTLAB.newlabel = newlabel; 
 ALTLAB.newlabelname = newlabelname; 
 ALTLAB.newmode = newmode; 
@@ -81,6 +86,7 @@ if strcmp(newmode,'classification')
 elseif isfield(ALTLAB, 'newgroupnames')
     ALTLAB = rmfield(ALTLAB, 'newgroupnames');
 end
+
 
 function compatCVflag = check_CV_class(cv, indcases, label, groups)
 compatCVflag = 1;
@@ -101,7 +107,7 @@ for i = 1:numel(groups)
 
     if ~any(containsCases, 'all')
         compatCVflag = 0;
-        warning('New label and CV structure incompatible (each group is not represented in each fold)')
+        warndlg('New label and CV structure incompatible (each group is not represented in each fold)')
         return
     end
     

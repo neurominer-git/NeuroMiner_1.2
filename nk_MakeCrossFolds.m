@@ -38,6 +38,7 @@ InFold          = RAND.InnerFold;
 decomposeflag   = RAND.Decompose;
 CV2LCO = []; if isfield(RAND,'CV2LCO'), CV2LCO = RAND.CV2LCO; end
 CV1LCO = []; if isfield(RAND,'CV1LCO'), CV1LCO = RAND.CV1LCO; end
+
 % Check whether leave-group-in or leave-group-out has been selected.
 if isfield(RAND,'CV2Frame') && RAND.CV2Frame == 4 , cv2frame = true; else, cv2frame = false; end
 if ~exist('auto_adjust', 'var'), auto_adjust = false; end
@@ -62,19 +63,17 @@ end
 if ~exist('modeflag','var') || isempty(modeflag), modeflag = 'classification'; end
 if ~exist('appendfl','var') || isempty(appendfl), appendfl = false; end
 
-% if ~CV2LOO && ~CV1LOO
-%     constraintfl = nk_input('Constrain stratification according to some grouping variable', ...
-%         0,'yes|no',[1,0],1);
-% else
-    constraintfl = false;
-%end
-
-if constraintfl
-    n_subjects_all = size(label,1);
-    Constraint = nk_input('Specify grouping vector',0,'r',[],[n_subjects_all 1]);
-else
-    Constraint = [];
+% Does the user want constrained, stratified CV?
+% (this helps to keep the distribution of e.g. sites across partitions
+% largely constant)
+Constraint = [];
+if isfield(RAND,'ConstrainedCV') && RAND.ConstrainedCV == 1
+    if isfield(RAND,'ConstrainedGroupIndex') && ~isempty(RAND.ConstrainedGroupIndex)
+        Constraint = RAND.ConstrainedGroupIndex;
+    end
 end
+
+% Are NaNs in the label?
 ulb = unique(label,'rows');
 if any(~isfinite(ulb)) 
     NaNflag = true; ind = logical(sum(isfinite(ulb),2));
@@ -147,9 +146,9 @@ switch appendfl
                     cv = nk_LOOpartition(Label);
                 case false
                     % This is stratified k-fold cross-validation
-                    cv = nk_CVpartition2(OutPerms, OutFold, Label, Constraint);
+                    cv = nk_CVpartition(OutPerms, OutFold, Label, Constraint);
                     if ~isstruct(cv)
-                        OutFold = cv; cv = nk_CVpartition2(OutPerms, OutFold, Label, Constraint);
+                        OutFold = cv; cv = nk_CVpartition(OutPerms, OutFold, Label, Constraint);
                         InFold = OutFold - 1;
                     end
             end
@@ -260,7 +259,7 @@ for i=1:ix
                
                 case {0,1}
                     if ~isempty(Constraint)
-                        cv.cvin{i,j} = nk_CVpartition2(InPerms, InFold, ...
+                        cv.cvin{i,j} = nk_CVpartition(InPerms, InFold, ...
                             Label(cv.TrainInd{i,j}), Constraint(cv.TrainInd{i,j}), Eq, auto_adjust);
                     else
                         if CV1LOO
@@ -268,12 +267,12 @@ for i=1:ix
                         elseif ~isempty(CV1LCO)
                             cv.cvin{i,j} = nk_INDEPpartition(CV1LCO.ind(cv.TrainInd{i,j}), Label(cv.TrainInd{i,j}), cv2frame);
                         else
-                            cv.cvin{i,j} = nk_CVpartition2(InPerms, InFold, Label(cv.TrainInd{i,j}), [], Eq, auto_adjust);
+                            cv.cvin{i,j} = nk_CVpartition(InPerms, InFold, Label(cv.TrainInd{i,j}), [], Eq, auto_adjust);
                         end
                     end
                 case 2
                     if ~isempty(Constraint)
-                        cv.cvin{i,j} = nk_CVpartition2(InPerms, InFold, ...
+                        cv.cvin{i,j} = nk_CVpartition(InPerms, InFold, ...
                             Label(cv.TrainInd{i,j}), Constraint(cv.TrainInd{i,j}), Eq, auto_adjust);
                     else
                         if CV1LOO
@@ -281,7 +280,7 @@ for i=1:ix
                         elseif ~isempty(CV1LCO)
                             cv.cvin{i,j} = nk_INDEPpartition(CV1LCO.ind(cv.TrainInd{i,j}), Label(cv.TrainInd{i,j}), cv2frame);
                         else
-                            cv.cvin{i,j} = nk_CVpartition2(InPerms, InFold, Label(cv.TrainInd{i,j}), [], Eq, auto_adjust);
+                            cv.cvin{i,j} = nk_CVpartition(InPerms, InFold, Label(cv.TrainInd{i,j}), [], Eq, auto_adjust);
                         end
                     end
             end
@@ -377,9 +376,9 @@ if appendfl ~=3
     else
         LOOflag = false; if nfolds == -1; LOOflag = true; end
         if ~LOOflag
-            cv = nk_CVpartition2(nperms, nfolds, label, constraint, eq, auto_adjust);
+            cv = nk_CVpartition(nperms, nfolds, label, constraint, eq, auto_adjust);
             if ~isstruct(cv)
-                nfolds = cv; cv = nk_CVpartition2(nperms, nfolds, label, constraint, eq, auto_adjust);
+                nfolds = cv; cv = nk_CVpartition(nperms, nfolds, label, constraint, eq, auto_adjust);
             end
         else
             nfolds = numel(label); nperms = 1;

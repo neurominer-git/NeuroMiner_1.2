@@ -317,21 +317,17 @@ if ~isempty(analysis)
             end
             % Run through multiple analyses if needed    
             for i=1:nA
-                nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'setup_main', 0);
                 tNM.runtime.curanal = inp.analind(i);
-                if nA>1
-                    inp = nk_GetAnalModalInfo_config(tNM, inp); 
-                    if inp.HideGridAct
-                        [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd);
-                        inp.GridAct = true(ix,jx);
-                    end
-                end
+                % Configure inp structure according to actual analysis
+                inp = nk_GetAnalModalInfo_config(tNM, inp); 
+                if inp.HideGridAct, [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd); inp.GridAct = true(ix,jx); end
                 inp.analysis_id = tNM.analysis{inp.analind(i)}.id;
                 
-                % check whether alternative label should be used
-                if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
-                    tNM.label = tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.newlabel; 
-                    tNM.modeflag = tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.newmode;  
+                % check whether alternative label should be used (only
+                % necessary if analysis were set up with older NM structure
+                if isfield(tNM.analysis{inp.analind(i)}.params,'label')
+                    tNM.label = tNM.analysis{inp.analind(i)}.params.label.label; 
+                    tNM.modeflag = tNM.analysis{inp.analind(i)}.params.label.modeflag;  
                 end
 
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
@@ -353,6 +349,7 @@ if ~isempty(analysis)
             end
             clear tNM
             h = findobj('Tag','PrintCVBarsBin'); if ~isempty(h), delete(h); end
+            NM = rmfield(NM,'runtime');
     end
 end
 
@@ -375,7 +372,9 @@ inp1.probflag = false;
 
 % **************************** ANALYSIS SETUP *****************************
 ld = 1; if FUSION.flag == 3, ld = numel(inp1.F); end
-inp1.ngroups = max(dat.label);
+inp1.unique_groups = unique(dat.label); 
+inp1.unique_groups(isnan(inp1.unique_groups))=[];
+inp1.ngroups = numel(inp1.unique_groups);
 hx = size(dat.label,2);
 analysis.Time                               = zeros(ld,1);
 analysis.TrainPerformanceBin                = zeros(ld,inp1.nclass,hx);

@@ -155,7 +155,7 @@ end
 xstep = range(xrng)/100;
 ystep = range(yrng)/100;
 rx = (xstep)*5; ry = (ystep)*5;
-xLimitsVec = min(xrng):xstep:max(yrng);
+xLimitsVec = min(xrng):xstep:max(xrng);
 xlim([xLimitsVec(1)-rx xLimitsVec(end)+rx]);
 yLimitsVec = min(yrng):xstep:max(yrng);
 ylim([yLimitsVec(1)-ry yLimitsVec(end)+ry]);
@@ -214,4 +214,8 @@ if binarizeflag
     % Binarize at median
     m = nm_nanmedian(label); set(handles.txtBinarize,'String',m);
     binarize_regr(handles);
+    handles.axes20.Visible = "on";
+    handles.axes20.Position(4) = 0.28;
+else
+    handles.axes20.Visible = "off";
 end

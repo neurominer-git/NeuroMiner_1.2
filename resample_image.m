@@ -1,10 +1,16 @@
-function resample_image(V)
-voxsiz = [1 1 1]; % new voxel size {mm}
+function resample_image(V, voxsiz)
+
 if ~exist('V','var') || isempty(V)
     V = spm_select([1 Inf],'image');
 end
+
+if ~exist('voxsiz','var') || isempty(voxsiz)
+    voxsiz = [3 3 3]; % new voxel size {mm}
+end
+
 V = spm_vol(V);
 VV = [V(1) V(1)];
+
 for i=1:numel(V)
    bb        = spm_get_bbox(V(i));
    VV(1:2)   = V(i);

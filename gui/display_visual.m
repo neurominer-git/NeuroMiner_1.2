@@ -388,10 +388,10 @@ switch meas{measind}
     case 'Model P value histogram'
 
          set(handles.pn3DView,'Visible','off'); set(handles.axes33,'Visible','on'); cla; hold on;
-         ah=histogram(handles.axes33,y,'Normalization','probability','BinWidth',1,'EdgeColor','none','FaceColor',rgb('SkyBlue'));%,'FaceAlpha',0.5); 
-         [f, xi] = ksdensity(y,'function','pdf','Bandwidth',1); 
-         plot(handles.axes33,xi,f,'Color',rgb('DeepSkyBlue'), 'LineWidth',2);
-         maxah= nanmax(ah.Values); ylim([0 maxah]); 
+         ah=histogram(handles.axes33,y,'Normalization','probability','EdgeColor','none','FaceColor',rgb('SkyBlue'));%,'FaceAlpha',0.5); 
+         maxah= nm_nanmax(ah.Values); ylim([0 maxah]); 
+         [f, xi] = ksdensity(y,'function','pdf'); 
+         plot(handles.axes33,xi, scaledata(f,[],0, maxah),'Color',rgb('DeepSkyBlue'), 'LineWidth',2);
          handles.axes33.YTick = 0:maxah/10:maxah;
          yticklabels(handles.axes33,'auto')
          [xl,xlb]=nk_GetScaleYAxisLabel(handles.NM.analysis{handles.curranal}.params.TrainParam.SVM);

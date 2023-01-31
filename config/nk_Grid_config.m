@@ -452,7 +452,7 @@ switch OptimFlag
                 if strcmp(SVM.prog,'LIBSVM') || strcmp(SVM.prog,'MikRVM') || strcmp(SVM.prog,'MVTRVR')
                     if OptRegul.flag==1, regstr = 'Yes'; else, regstr = 'No'; end
                     menustr = sprintf('%s|Enable regularization of model selection [ %s ]', menustr, regstr);               menuact = [ menuact 7 ];
-                    if OptRegul.flag
+                    if OptRegul.flag == 1
                         if isfield(TrainParam,'RFE') && ...
                                 (isfield(TrainParam.RFE,'Filter') && ...
                                 isfield(TrainParam.RFE.Filter,'EnsembleStrategy') && ...
@@ -478,7 +478,9 @@ switch OptimFlag
                         menustr = sprintf('%s|Define non-linearity (big gamma) of SV ratio [ %g ]', menustr, OptRegul.big_gamma);  menuact = [ menuact 10 ];
                     end
                 else
-                    OptRegul.flag = 2;
+                    if OptRegul.flag==1, regstr = 'Yes'; else, regstr = 'No'; end
+                    menustr = sprintf('%s|Enable regularization of model selection using CV1 test performance variance [ %s ]', menustr, regstr); menuact = [ menuact 7 ];
+                    GRD.OptRegul.type = 4;
                 end
                 switch NodeSelect.mode
                     case 1
@@ -517,9 +519,10 @@ switch OptimFlag
                     OptRegul.type   = nk_input('Regularize with',0,'mq', ...
                                               ['Model complexity|' ...
                                                'Ensemble diversity|' ...
-                                               'Mixed Criterion (Model Complexity & Ensemble diversity)'],1:3,OptRegul.type);
+                                               'Mixed Criterion (Model Complexity & Ensemble diversity)|' ...
+                                               'CV1 test performance variance'],1:4,OptRegul.type);
                     switch OptRegul.type 
-                        case 1
+                        case {1,4}
                             OptRegul.RegulTypeComplexity = nk_RegulFunc_config;
                         case 2
                             OptRegul.RegulTypeDiversity = nk_RegulFunc_config;

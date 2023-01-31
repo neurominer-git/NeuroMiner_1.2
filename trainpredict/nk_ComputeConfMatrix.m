@@ -4,8 +4,11 @@ ind = ~isnan(pred) & ~isnan(label);
 confmatrix = zeros(ngroups);
 lx = size(label,1);
 % Compute confusion matrix
+u=unique(label);
 for i=1:lx
     if ~ind(i), continue, end
-    confmatrix(label(i),pred(i)) = confmatrix(label(i),pred(i)) + 1;
+    iu = u==label(i);
+    ip = u==pred(i);
+    confmatrix(iu,ip) = confmatrix(iu,ip) + 1;
 end
    

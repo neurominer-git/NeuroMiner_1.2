@@ -19,10 +19,12 @@ handles.curlabel = get(handles.selLabel,'Value');
 
 
 % set alternative label
-if isfield(handles.NM.analysis{analind}.params.TrainParam, 'LABEL') && handles.NM.analysis{analind}.params.TrainParam.LABEL.flag
-    handles.label = handles.NM.analysis{analind}.params.TrainParam.LABEL.newlabel;
+if isfield(handles.NM.analysis{1,analind}.params,'label')
+    handles.label = handles.NM.analysis{1,analind}.params.label.label;
+    handles.modeflag = handles.NM.analysis{1,analind}.params.label.modeflag;
 else
     handles.label = handles.NM.label;
+    handles.modeflag = handles.NM.modeflag;
 end
 
 % Check whether selected analysis has visualisation data
@@ -43,7 +45,7 @@ end
 
 % Check whether selected analysis has MLI data
 mlifl='off';
-if handles.oocvview
+if isfield(handles,'oocvview') && handles.oocvview
     if isfield(handles.NM.analysis{analind}.OOCV{handles.oocvind},'MLI')
         mlidata = handles.NM.analysis{analind}.OOCV{handles.oocvind}.MLI;
         mlifl = 'on';

@@ -1,10 +1,9 @@
 % =========================================================================
 % FORMAT res = nk_CVpartition_config(res)
 % =========================================================================
-%
 % Setup repeated nested cross-validation structure 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% NeuroMiner 1.0, (c) Nikolaos Koutsouleris 08/2018
+% (c) Nikolaos Koutsouleris 01/2023
 
 function act = nk_CVpartition_config(defaultsfl, act)
 
@@ -12,6 +11,7 @@ global NM
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl),  defaultsfl = 0; end
 if ~exist('act','var') || isempty(act), act = 0; end
+
 if ~defaultsfl
 
     CV2frm = 1;
@@ -25,6 +25,8 @@ if ~defaultsfl
     Eq.Covar = NM.label;
     Eq.posnegrat = 1.5;
     Decomp = '';
+    ConstrainedCV = 2;
+    ConstrainedGroupIndex = [];
     CV2ps = ['Define no. of CV2 permutations [ P2 = ' CV2ps ' ]|'];
     CV1ps = ['Define no. of CV1 permutations [ P1 = ' CV1ps ' ]|'];
     
@@ -37,7 +39,7 @@ if ~defaultsfl
             fprintf('\n================================')
             for i=1:ncv
                 % determine size of partitions
-                fprintf('\n%g:\t CV2: [%g, &g], CV1: [%g, %g]', ...
+                fprintf('\n%g:\t CV2: [%g, %g], CV1: [%g, %g]', ...
                     i, size(NM.cv{i}.TrainInd,1), size(NM.cv{i}.TrainInd,2), ...
                     size(NM.cv{i}.cvin{1,1}.TrainInd,1), size(NM.cv{i}.cvin{1,1}.TrainInd,2))
             end
@@ -92,8 +94,17 @@ if ~defaultsfl
     else
         NM.TrainParam.RAND.Eq = Eq;
     end
+    if isfield(NM.TrainParam.RAND,'ConstrainedCV')
+        ConstrainedCV = NM.TrainParam.RAND.ConstrainedCV;
+        ConstrainedGroupIndex = NM.TrainParam.RAND.ConstrainedGroupIndex;
+    else
+        NM.TrainParam.RAND.ConstrainedCV = ConstrainedCV;
+        NM.TrainParam.RAND.ConstrainedGroupIndex = ConstrainedGroupIndex;
+    end
+
     buildstr = ''; savestr = ''; loadstr = ''; MenuRem = []; CV2prx = '' ; CV1prx = ''; 
     EQstr = ''; EQcovstr = ''; EQminstr = ''; EQmaxstr = ''; EQbinstr = ''; EQshufflestr = ''; EQposnegstr=''; EQorigstr = ''; EQeqstr = '';
+    constrainstr = ''; constraingrp = '';
 
     %% Define menu options for cross-validation setup
     if isfield(NM,'TrainParam')
@@ -224,6 +235,22 @@ if ~defaultsfl
                             MenuVec = [MenuVec 17 18 ];
                         end
                 end
+                if isfield(NM.TrainParam.RAND,'CV2Frame') && NM.TrainParam.RAND.CV2Frame == 1 && ~strcmp(CV2prx,' [ LOO ]') && ~strcmp(CV1prx,' [ LOO ]')
+                    yesno = {'yes','no'}; Consstr = yesno{ConstrainedCV};
+                    constrainstr = ['Constrain Cross-Validation structure based on a group index variable [ ' Consstr ' ]|'];
+                    MenuVec = [MenuVec 21];
+                    if ConstrainedCV == 1
+                        if ~isempty(ConstrainedGroupIndex)
+                            constrindstr = sprintf('%g groups among %g cases', numel(unique(ConstrainedGroupIndex)), numel(ConstrainedGroupIndex));
+                        else
+                            constrindstr = 'undefined';
+                        end
+                        constraingrp = ['Define group index variable [ ' constrindstr ' ]|'];
+                        MenuVec = [MenuVec 22];
+                    end
+                else
+                    NM.TrainParam.RAND.ConstrainedCV=2;
+                end
                 buildstr = 'Build Cross-Validation structure|';
                 loadstr  = 'Load Cross-Validation structure|';
                 MenuVec = [MenuVec 6 7];
@@ -265,6 +292,8 @@ if ~defaultsfl
                      EQshufflestr ...
                      EQorigstr ...
                      EQeqstr ...
+                     constrainstr ...
+                     constraingrp ...
                      buildstr loadstr savestr], MenuVec,1);
     end
     switch act
@@ -334,7 +363,7 @@ if ~defaultsfl
              groups = []; appendfl=false; oldcv=zeros(0,size(NM.label,2));
 
              % Checkwhether to overwrite or append to current CV structure
-             if isfield(NM,'cv')
+             if isfield(NM,'cv') && ~isempty(NM.cv)
                  if NM.TrainParam.RAND.OuterFold == size(NM.cv(1).TrainInd,2) && ...
                     NM.TrainParam.RAND.InnerFold == size(NM.cv(1).cvin{1,1}.TrainInd,2)
                         appendfl = nk_input('Append to existing CV structure',0,'m', ...
@@ -352,8 +381,8 @@ if ~defaultsfl
              end
              if strcmp(NM.modeflag,'classification')
                  for i=1:size(NM.label,2)
-                     if ~isempty(oldcv), ioldcv = oldcv(i); else ioldcv=[]; end
-                     if size(NM.label,2)>1, grpn = groupnames{i}; else grpn = groupnames; end
+                     if ~isempty(oldcv), ioldcv = oldcv(i); else, ioldcv=[]; end
+                     if size(NM.label,2)>1, grpn = groupnames{i}; else, grpn = groupnames; end
                      cv(i) =  nk_MakeCrossFolds(NM.label(:,i), NM.TrainParam.RAND, NM.modeflag, groups, grpn, ioldcv, appendfl);
                  end
              else
@@ -371,7 +400,11 @@ if ~defaultsfl
                                 NM.cv(i).classnew = [NM.cv(i).classnew; cv(i).classnew];
                             end
                          otherwise
-                            NM.cv(i) = cv(i);
+                             if ~isfield(NM,'cv') || isempty(NM.cv)
+                                NM.cv = cv(i);
+                             else
+                                NM.cv(i) = cv(i);
+                             end
                      end
                  end
              end
@@ -402,7 +435,7 @@ if ~defaultsfl
              NM.TrainParam.RAND.Eq.enabled = ~NM.TrainParam.RAND.Eq.enabled ;
          case 14
              if isfield(NM,'covars') && ~isempty(NM.covars)
-                eqtarget = nk_input('Perform histogram euqalization using the target label or some other covariate', ...
+                eqtarget = nk_input('Perform histogram equalization using the target label or some other covariate', ...
                                     0,'m','Target label|Covariate',[0,1],1);
                 if eqtarget
                      covind = nk_SelectCovariateIndex(NM);
@@ -442,6 +475,11 @@ if ~defaultsfl
             ylabel('# of observations in bins'); 
             xlabel(NM.TrainParam.RAND.Eq.CovarName); 
             title(['Analysis of equalized histogram of ' Eq.CovarName]);
+        case 21
+            if NM.TrainParam.RAND.ConstrainedCV == 1, NM.TrainParam.RAND.ConstrainedCV = 2; else, NM.TrainParam.RAND.ConstrainedCV = 1 ; end
+        case 22
+            NM.TrainParam.RAND.ConstrainedGroupIndex = ...
+                                 nk_input('Define index vector for constrained, stratified CV',0,'i',[],[numel(NM.cases),1]);
 
     end
 else

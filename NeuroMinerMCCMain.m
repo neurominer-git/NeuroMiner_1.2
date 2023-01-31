@@ -16,6 +16,8 @@ switch action
         nk_OOCV_batch(paramfile)
 	case 'mli'
 		nk_MLInterpreter_batch(paramfile)
+    case 'simulate'
+        nk_SimulateML_batch(paramfile)
     otherwise
         error('Action not available')
 end        

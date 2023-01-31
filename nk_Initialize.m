@@ -4,22 +4,22 @@ function nk_Initialize(action)
 % =========================================================================
 % startup script for NeuroMiner 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 09/2022
+% (c) Nikolaos Koutsouleris, 01/2023
 
-global NMinfo NM CALIBAVAIL OOCVAVAIL SPMAVAIL FSAVAIL OCTAVE
+global NMinfo NM CALIBAVAIL OOCVAVAIL SPMAVAIL FSAVAIL JUAVAIL OCTAVE
 
 NMinfo.info.name    = 'NeuroMiner';
 if OCTAVE
-    NMinfo.info.ver     = sprintf('Version 1.1.0 | BEORN [OCTAVE %s]', OCTAVE_VERSION);
+    NMinfo.info.ver     = sprintf('Version 1.2 (alpha) | FEANOR [OCTAVE %s]', OCTAVE_VERSION);
 else
     matver = ver('matlab');
-    NMinfo.info.ver     = sprintf('Version 1.1.0 | BEORN [%s %s]', matver.Name, matver.Release);
+    NMinfo.info.ver     = sprintf('Version 1.2 (alpha) | FEANOR [%s %s]', matver.Name, matver.Release);
 end
 NMinfo.info.author  = 'Nikolaos Koutsouleris, Clara Vetter, Ariane Wiegand';
 NMinfo.info.affil   = 'Section for Precision Psychiatry';
 NMinfo.info.dep     = 'Department of Psychiatry and Psychotherapy';
 NMinfo.info.inst    = 'Ludwig-Maximilian-University';
-NMinfo.info.datever = '09/2022';
+NMinfo.info.datever = '01/2023';
 NMinfo.info.timestamp = date;
 NMinfo.info.email   = 'nm@pronia.eu';
 try
@@ -63,7 +63,7 @@ if action.addrootpath || action.all, addpath(defs.path); end
 SPMAVAIL = false; FSAVAIL=false;
 imaging_init_path = fullfile(neurominerpath,'imaging_init.mat');
 if ~isdeployed
-    [spmrootdir, fsrootdir] = nk_ImagingInit(neurominerpath, imaging_init_path);
+    [spmrootdir, fsrootdir, judir] = nk_ImagingInit(neurominerpath, imaging_init_path);
     if ischar(spmrootdir) && exist(spmrootdir,'dir') 
         SPMAVAIL = true;
         if ~checkpaths(matpaths,spmrootdir) 
@@ -80,8 +80,16 @@ if ~isdeployed
         end  
 
     end
+    if ischar(judir) && exist(judir,'dir')
+        JUAVAIL = true;
+        if ~checkpaths(matpaths,judir)
+            addpath(judir); 
+            fprintf('.');
+        end  
+
+    end
 else
-    if which('spm'), SPMAVAIL=true; spm('Defaults','pet'); FSAVAIL = true; end
+    if which('spm'), SPMAVAIL=true; spm('Defaults','pet'); FSAVAIL = true; JUAVAIL=true; end
 end
 
 % Initialize MEX file repository

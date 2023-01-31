@@ -4,17 +4,18 @@ global MODEFL
 switch permmode
 
     case 1
+
         Lperm = L(indpermrows(:,permind));
-        indN = isnan(Lperm);
-        uL = unique(Lperm(~indN)); nuL = numel(uL);
         Yperm = Y;
+
     case {2,3}
+
         if permmode == 3
             Lperm = L(indpermrows(:,permind));
         else
             Lperm = L(IND);
         end
-        L = L(IND);
+        L = L(IND); Y=Y(IND,:);
         indN = isnan(L);
         uL = unique(L(~indN)); nuL = numel(uL);
         Yperm = zeros(size(Y));
@@ -22,7 +23,6 @@ switch permmode
             indi = L == uL(i);
             Yperm(indi,:) = Y(indi,indpermcols(i,:,permind));
         end
-
 
         if strcmp(MODEFL,'classification')
             tL = Lperm;
@@ -38,6 +38,7 @@ switch permmode
         if sum(indN)
             Lperm(indN)=[]; Yperm(indN,:)=[];
         end
+
     case 4
         % MD: hard coded covar indices
         chosen_covInd = inp.VIS.PERM.covars_idx;
@@ -83,8 +84,6 @@ switch permmode
         Yperm = Ymodel;
         Lperm = L(IND);
 end
-end
-
 
 function covars = md_CovarsPerm_covInd(covars,chosen_covInd)
 % create permutation indices
@@ -95,4 +94,4 @@ p = randperm(cn);
 for ck = 1:size(chosen_covInd,2)
     covars(:,chosen_covInd(ck)) = covars(p,chosen_covInd(ck));
 end
-end
+

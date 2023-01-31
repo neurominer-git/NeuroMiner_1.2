@@ -1,4 +1,4 @@
-function sY = nk_PerfSpatFilt2( Y, CURACT, Param )
+function sY = nk_PerfSpatFilt( Y, CURACT, Param )
 
 if isfield(CURACT,'SPATIAL') && CURACT.SPATIAL.cubetype>1
     % If data fusion has happened before the smoothing
@@ -62,7 +62,7 @@ if isfield(CURACT,'SPATIAL') && CURACT.SPATIAL.cubetype>1
             S.brainmask                  = brainmask;
             S.badcoords                  = badcoords;
             S.Vm                         = spm_vol(S.brainmask);
-            [S.dims, S.indvol, ~, S.vox] = nk_ReadMaskIndVol(S.Vm, [], LABEL, LABELOPERATOR);
+            [S.dims, S.indvol, ~, S.vox] = nk_ReadMaskIndVol(S.Vm, S.Vm, LABEL, LABELOPERATOR);
             if isfield(Param,'indNonRem') && ~isempty(Param.indNonRem) && sum(~Param.indNonRem) > 0
                 indNonRem                = Param.indNonRem;
                 ttY                      = zeros(size(tY,1),size(indNonRem)); 

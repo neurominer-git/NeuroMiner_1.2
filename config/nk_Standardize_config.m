@@ -1,4 +1,5 @@
 function [ STANDARD, act ] = nk_Standardize_config(STANDARD, parentstr, defaultsfl)
+global NM
 
 methodarr = {'standardization using median','standardization using mean','mean-centering','l1-median centering','qn-standardization','sn-standardization'};
 sIND = []; dIND = []; WINSOPT = []; IQRFUN = 1; ZeroOut = 1; CALIBUSE = 2; METHOD = methodarr{1};
@@ -23,14 +24,14 @@ if ~defaultsfl
         if CALIBUSE == 1
             sINDSTR = 'yes, using calibration data'; 
         else
-            sINDSTR = sprintf('yes, using training data [ %g-by-%g matrix ] ',size(STANDARD.sIND,1), size(STANDARD.sIND,2));
+            sINDSTR = sprintf('yes, using training data [ %s ] ', strjoin(NM.covnames(STANDARD.sIND)));
         end
         sINDDEF = 1;
     else
         sINDSTR = 'no'; sINDDEF = 2;
     end
     if isfield(STANDARD,'dIND') && ~isempty(STANDARD.dIND)
-        dINDSTR = sprintf('yes, [ %g-by-%g matrix ]',size(STANDARD.dIND,1), size(STANDARD.dIND,2)); dINDDEF = 1;
+        dINDSTR = sprintf('yes, [ %s ]', strjoin(NM.covnames(STANDARD.dIND))); dINDDEF = 1;
     else
         dINDSTR = 'no'; dINDDEF = 2;
     end

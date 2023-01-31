@@ -1,4 +1,4 @@
-function [u, v, success] = spls(X, Y, cu, cv, e, itr_lim)
+function [u, v, C, success] = spls(X, Y, cu, cv, C, e, itr_lim)
 %
 %   Sparse PLS algorithm, please check Monteiro et al. 2016 for details:
 %   doi:10.1016/j.jneumeth.2016.06.011
@@ -66,8 +66,9 @@ end
 %--------------------------------------------------------------------------
 
 %--- Compute the covariance matrix
-C = X'*Y;
-
+if ~exist('C','var') || isempty(C)
+    C = X'*Y;
+end
 
 %--- Initialise weight vectors
 u_temp = nan(size(X, 2), 2);

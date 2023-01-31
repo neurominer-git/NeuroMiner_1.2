@@ -31,7 +31,7 @@ function [ GD, MD ] = nk_MLOptimizer_ParamCycler(GD, MD, DISP, Ps, Params_desc, 
 % GD (see above)
 % MD (see above)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2021
+% (c) Nikolaos Koutsouleris, 11/2022
 
 global CV MULTILABEL CVPOS
 
@@ -58,12 +58,11 @@ if nPs>1, fprintf('\n === Performing hyperparameter optimization === \n'); else,
      
 % Loop through all available labels
 for curlabel=1:nl
-    cl = MULTILABEL.sel(curlabel);
     if MULTILABEL.flag
         if nl>1
-            labelstr = sprintf('Label #%g: %s | ', cl, MULTILABEL.desc{cl});
+            labelstr = sprintf('Label #%g: %s | ', curlabel, MULTILABEL.desc{curlabel});
         else
-            labelstr = sprintf('Label %s | ', MULTILABEL.desc{cl});
+            labelstr = sprintf('Label %s | ', MULTILABEL.desc{curlabel});
         end
     end
     MULTILABEL.curdim = curlabel;

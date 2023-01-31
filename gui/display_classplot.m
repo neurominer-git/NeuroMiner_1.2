@@ -462,7 +462,7 @@ handles.pnRocCmds.Visible = flg;
 handles.pnPieCmds.Visible = flg;
 handles.pnContigCmds.Visible = flg;
 handles.axes20.Visible = flg;
-%handles.cmdMetricExport.Visible = flg;
+%handles.axes20.Position(4) = 0.38;
 handles.cmdExportAxes20.Visible = flg;
 
 %% Display pie charts

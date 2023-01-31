@@ -88,14 +88,14 @@ OUT.VIS         = VIS;
 OUT.F           = F;
 OUT.tF          = tF;
 OUT.l           = length(OUT.labels);    % # of subjects
-if isfield(dat,'covars'),
+if isfield(dat,'covars')
     OUT.covars      = dat.covars;            % Covariates    
 else
     OUT.covars = [];
 end
 OUT.covars_oocv = [];
 OUT.desc_oocv   = [];
-if ~isempty(oocvind), 
+if ~isempty(oocvind)
     if isfield(dat.OOCV{oocvind},'covars')
         OUT.covars_oocv = dat.OOCV{oocvind}.covars;
     end
@@ -107,7 +107,7 @@ if isfield(dat,'C') && dat.C{1,1}.calibflag
 end
 
 if stk_flag
-    if isfield(STACKING,'featnames'), 
+    if isfield(STACKING,'featnames')
         try 
             OUT.featnames{1} = STACKING.featnames(STACKING.sel_anal); 
         catch

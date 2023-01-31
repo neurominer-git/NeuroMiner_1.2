@@ -1,6 +1,6 @@
 function [PREPROC, act, stepind] = nk_Preproc_config(PREPROC, varind, parentstr, stepind, enind)
 % =========================================================================
-% FORMAT [PREPROC, act, stepind] = nk_Preproc2_config(PREPROC, varind, ...
+% FORMAT [PREPROC, act, stepind] = nk_Preproc_config(PREPROC, varind, ...
 %                                                parentstr, stepind, enind)
 % =========================================================================
 % Configuration of Data Preprocessing Pipelines:
@@ -19,7 +19,7 @@ function [PREPROC, act, stepind] = nk_Preproc_config(PREPROC, varind, parentstr,
 % of the pre-processing pipeline in the respective CV1 partition (currently
 % only label imputation in the training samples).
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 08/2022
+% (c) Nikolaos Koutsouleris, 01/2023
 
 % Defaults:
 % ---------
@@ -37,6 +37,20 @@ if isempty(PREPROC)
             PREPROC = NM.TrainParam.PREPROC{varind_copy};
         end
     end
+end
+
+if isfield(NM.TrainParam,'LABEL')
+    if NM.TrainParam.LABEL.flag == 1
+        modeflag = NM.TrainParam.LABEL.newmode;
+%     else
+%         if strcmp(NM.TrainParam.LABEL.newmode,'classification') 
+%             if isfield(NM.TrainParam.PREPROC{varind},'LABELMOD') && NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE == 1
+%                 NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE = 0;
+%             end
+%         end
+    end
+else
+    modeflag = NM.modeflag;
 end
 
 if ~exist('enind','var'), enind = []; end 
@@ -96,7 +110,7 @@ d = nk_GetParamDescription2(NM, PREPROC, 'PreProc');
 nk_PrintLogo
 
 % Check group processing mode possibilities
-if max(NM.label(:,1)) > 2 && strcmp(NM.modeflag,'classification')
+if max(NM.label(:,1)) > 2 && strcmp(modeflag,'classification')
     fprintf('\n%s\n',d.PREPROC.groupmode);
     cmdstr = 'Define group processing mode in multi-class setting'; cmdmnu = 1;
     [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu); 
@@ -105,7 +119,7 @@ elseif isempty(PREPROC) || ~isfield(PREPROC,'BINMOD')
 end
  
 % Check for target scaling / exponential transformation option
-if strcmp(NM.modeflag,'regression')
+if strcmp(modeflag,'regression')
     if isfield(PREPROC,'LABELMOD') && isfield(PREPROC.LABELMOD,'TARGETSCALE') && ( PREPROC.LABELMOD.TARGETSCALE || isfield(PREPROC.LABELMOD,'POLYNOM') )
         cmdstr = 'Modify / Disable';
         if ~strcmp(d.PREPROC.targetscaling,'NA'), 
@@ -125,7 +139,7 @@ if NM.datadescriptor{varind}.type == 1 && NM.TrainParam.STACKING.flag==2
     imganalflag = true;
     if isfield(PREPROC,'SPATIAL') && PREPROC.SPATIAL.cubetype>1
         cmdstr = 'Modify / Disable ';
-        if ~strcmp(d.PREPROC.spatialfiltering,'NA'), 
+        if ~strcmp(d.PREPROC.spatialfiltering,'NA') 
             prestr = sprintf('%s\n* %s', prestr, d.PREPROC.spatialfiltering); 
         end
         spatfltflag = true;
@@ -290,7 +304,7 @@ switch act
         PREPROC = config_targetscaling(PREPROC, navistr);
         
     case 100
-        if ~isfield(PREPROC,'LABELMOD'), 
+        if ~isfield(PREPROC,'LABELMOD')
             PREPROC.LABELMOD=[];
         end
         PREPROC.LABELMOD = config_labelimpute(PREPROC.LABELMOD, navistr);
@@ -299,7 +313,7 @@ switch act
         PREPROC = config_binmod(NM, PREPROC);
     
     case 2 % Add Preprocessing step
-        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, [], 0, EF, navistr);
+        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, [], 0, EF, navistr, modeflag);
         if isfield(PREPROC,'ACTPARAM')
             if strcmp(PREPROC.ACTPARAM{end}.cmd, 'extfeat')
                 stepind = numel(PREPROC.ACTPARAM)-1;
@@ -323,7 +337,7 @@ switch act
         else
             PREPROC = rmfield(PREPROC,'ACTPARAM');
         end
-        if stepind > 1, 
+        if stepind > 1
             if any(strcmp(PREPROC.ACTPARAM{stepind-1}.cmd,{'extfeat','extdim'})) && stepind - 2 > 0
                 stepind = stepind - 2;
             else
@@ -331,13 +345,13 @@ switch act
             end
         end
     case 4 % Insert Preprocessing step
-        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 2, EF, navistr);
+        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 2, EF, navistr, modeflag);
     
     case 5 % Replace current step
-        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 1, EF, navistr);
+        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 1, EF, navistr, modeflag);
         
     case 6 % Modify current step
-        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 0, EF, navistr);
+        [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, 0, EF, navistr, modeflag);
     
     case 7 % Go to previous step
         if strcmp(PREPROC.ACTPARAM{stepind-1}.cmd,'extfeat') && stepind - 2 > 0
@@ -364,10 +378,10 @@ switch act
             newcmdorder{i} = PREPROC.ACTPARAM{neworder(i)}.cmd; 
         end
         for i = 1:numel(neworder)-1
-            if strcmp(newcmdorder{i},'rankfeat') && ~strcmp(newcmdorder{i},'extfeat'), 
+            if strcmp(newcmdorder{i},'rankfeat') && ~strcmp(newcmdorder{i+1},'extfeat') 
                 fl(1) = false;  
             end
-            if strcmp(newcmdorder{i},'reducedim') && ~strcmp(newcmdorder{i+1},'extdim')
+            if any(strcmp({'reducedim','remvarcomp'}, newcmdorder{i})) && ~strcmp(newcmdorder{i+1},'extdim')
                 for j=1:numel(neworder)
                     if strcmp(PREPROC.ACTPARAM{j}.cmd,'extdim'), fl(2) = false; break; end 
                 end
@@ -392,14 +406,14 @@ switch act
         
     case 10
         tstepind = nk_input('Go to preprocessing step',0,'w1',stepind);
-        if tstepind > numel(PREPROC.ACTPARAM), 
+        if tstepind > numel(PREPROC.ACTPARAM)
             tstepind = numel(PREPROC.ACTPARAM); 
         elseif tstepind < 1
             tstepind = 1;
         end
         if strcmp(PREPROC.ACTPARAM{tstepind}.cmd,'extfeat') 
             stepind = tstepind -1;
-        elseif strcmp(PREPROC.ACTPARAM{tstepind}.cmd, 'reducedim') && (tstepind+1 == numel(PREPROC.ACTPARAM) && strcmp(PREPROC.ACTPARAM{tstepind+1}.cmd, 'extdim'))
+        elseif any(strcmp({'reducedim','remvarcomp'}, PREPROC.ACTPARAM{tstepind}.cmd)) && (tstepind+1 == numel(PREPROC.ACTPARAM) && strcmp(PREPROC.ACTPARAM{tstepind+1}.cmd, 'extdim'))
             stepind = tstepind -1;
         else
             stepind = tstepind;
@@ -413,7 +427,7 @@ end
 
 % -------------------------------------------------------------------------
 function [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, stepind, ...
-                                                replflag, EF, navistr)
+                                                replflag, EF, navistr, modeflag)
 
 if ~isempty(PREPROC) && isfield(PREPROC,'ACTPARAM'), ...
     lact = length(PREPROC.ACTPARAM); 
@@ -423,13 +437,13 @@ end
 if ~exist('stepind','var') || isempty(stepind)
     modflag = 0; stepind = lact + 1;
 else
-    if replflag == 2, modflag = 0; else modflag = 1; end
+    if replflag == 2, modflag = 0; else, modflag = 1; end
 end
 
 M = NM.TrainParam.FUSION.M;
 fusefl = NM.TrainParam.FUSION.flag;
                     
-if ~exist('replflag','var') || isempty(replflag) replflag = 0; end
+if ~exist('replflag','var') || isempty(replflag), replflag = 0; end
 
 actstr = []; actmnu = []; CURACT2 = [];
 
@@ -549,7 +563,7 @@ else
                 case 'remvarcomp'
                     cmdstr = 'Extract variance components from data';                               cmdmnu = 14;
                 case 'extdim'
-                    if stepind > 1 && strcmp(PREPROC.ACTPARAM{stepind-1}.cmd,'reducedim')
+                    if stepind > 1 && any(strcmp({'reducedim','remvarcomp'}, PREPROC.ACTPARAM{stepind-1}.cmd))
                         cmdstr = 'Extract subspaces from reduced data projections';                 cmdmnu = 15;
                     end
                 case 'devmap'
@@ -608,8 +622,13 @@ switch cmd
         CURACT = config_unitnorm( CURACT, navistr );
     case 14
         CURACT = config_remvarcomp( NM, varind, CURACT, navistr );
-    case 15    
-        CURACT = config_extdim( CURACT, PREPROC.ACTPARAM{stepind-1}.DR , navistr );
+    case 15
+        switch  PREPROC.ACTPARAM{stepind-1}.cmd
+            case 'reducedim'
+                CURACT = config_extdim( CURACT, PREPROC.ACTPARAM{stepind-1}.DR , navistr );
+            case 'remvarcomp'
+                CURACT = config_extdim( CURACT, PREPROC.ACTPARAM{stepind-1}.REMVARCOMP, navistr );
+        end
     case 16
         CURACT = config_devmap( NM, CURACT, navistr );
     case 17
@@ -653,7 +672,7 @@ function CURACT = config_binmod(NM, CURACT)
 if isfield(CURACT,'BINMOD') && ~isempty(CURACT.BINMOD)
     switch CURACT.BINMOD, case 1, tBINMOD = 1; case 0, tBINMOD = 2; case 2, tBINMOD = 3; end
 else
-    if max(NM.label(:,1))>2 && strcmp(NM.modeflag,'classification'), 
+    if max(NM.label(:,1))>2 && strcmp(modeflag,'classification') 
         tBINMOD = 0; % Multi-group
     else
         tBINMOD = 1; % Binary mode
@@ -801,13 +820,19 @@ end
 %%%% Extraction of dimensionalities %%%%
 function CURACT = config_extdim(CURACT, DR, navistr)
 
-if isfield(CURACT,'PX'), 
+if isfield(CURACT,'PX') 
     PercMode                = CURACT.EXTDIM.PercMode;
     RedMode                 = CURACT.EXTDIM.RedMode;
     dims                    = nk_ReturnParam('dimensions', CURACT.PX.Px.Params_desc, CURACT.PX.opt);
 else
-    PercMode                = DR.PercMode;
-    RedMode                 = DR.RedMode;
+    if ~isfield(DR,'PercMode')
+        PercMode                = DR.dimmode;
+        RedMode                 = 'PCA';
+    else
+        PercMode                = DR.PercMode;
+        RedMode                 = DR.RedMode;
+    end
+    
     CURACT.PX               = nk_AddParam(DR.dims, 'dimensions', 1, []); dims = DR.dims;
 end
 act = 1; while act > 0, [dims, PercMode, act] = nk_ExtDim_config(RedMode, PercMode, dims, 0, navistr); end

@@ -108,7 +108,7 @@ if ~BINMOD && isfield(paramfl,'PXopt') && numel(paramfl.PXopt)>1
     if VERBOSE; fprintf('\nProcessing Mode: multi-group preprocessing, but no multi-group classifier requested'); end
 end
 
-% Generate template parameters (e.g. for Procrustes rotation)
+% Generate template parameters (e.g. for feature re-ordering)
 if isfield(paramfl,'templateflag') && paramfl.templateflag 
     TEMPL = nk_GenTemplParam(PREPROC, tCV, MODEFL, RAND, sY, inp, kbin);
 else

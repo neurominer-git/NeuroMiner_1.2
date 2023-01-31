@@ -45,6 +45,8 @@ for curlabel=1:nl
                     RegulC = nk_ComputeRegulFunction(GD.C(:,:,curlabel), 0, GRD.OptRegul.RegulTypeComplexity);
                 end
                 Regul = (RegulDiv + RegulC) / 2;
+            case 4
+                Regul = nk_ComputeRegulFunction(GD.sTR(:,:,curlabel), 0, GRD.OptRegul.RegulTypeComplexity);
         end
     else
         Regul =  GD.C(:,:,curlabel);
@@ -205,7 +207,7 @@ for curlabel=1:nl
                Regul = mean(GD.C,2);
            end
            % Now select optimal parameters for the multi-group learning machine
-           if nPerc > 1 ; 
+           if nPerc > 1 
                TransNodeMeanPerf = zeros(nPerc,1);
                TransNodeSDPerf  = zeros(nPerc,1);
            end

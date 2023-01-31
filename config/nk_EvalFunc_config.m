@@ -1,14 +1,16 @@
-function [GridParam, modeflag] = nk_EvalFunc_config(res, param, parentstr) 
+function [GridParam, modeflag] = nk_EvalFunc_config(res, param, parentstr, modeflag) 
 global EXPERT
 
-modeflag = res.modeflag; deffunc = 1;
+if ~exist('modeflag', 'var') || isempty(modeflag), modeflag = res.modeflag; end
+
+deffunc = 1;
 if exist('param','var') && ~isempty(param)
     if isfield(param,'evalfunc')
         deffunc = param.evalfunc;
     elseif isfield(param,'GridParam')
         deffunc = param.GridParam;
     end
-    switch res.modeflag
+    switch modeflag
         case 'classification'
             if EXPERT
                 mn_act = [1 2 4 5 6 7 13 14 17 15 19 20 21];
