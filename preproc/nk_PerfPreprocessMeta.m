@@ -151,7 +151,7 @@ for am = 1:nA
          if ~exist(inp.analyses{am}.GDdims{jm}.RootPath,'dir')
              fprintf('\nRoot path %s of analysis %g not found.', inp.analyses{am}.GDdims{jm}.RootPath, am);
              GDD(cnt).RootPath = cellstr(spm_select(nM,'dir',sprintf('Select the root path(s) [n=%g] of %sanalysis %g [%s]:', ...
-                 nM, bgstr, am, inp.analyses{am}.desc)));
+                 nM, bgstr, am, char(inp.analyses{am}.desc))));
          else
             GDD(cnt).RootPath = inp.analyses{am}.GDdims{jm}.RootPath;
          end
