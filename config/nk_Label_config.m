@@ -33,6 +33,8 @@ if ~defaultsfl
         menustr = ['Use alternative label [' FLAGSTR ']'];
            
         menuact = 1;
+
+        newmode = '';
     end
     
     nk_PrintLogo
@@ -53,7 +55,7 @@ if ~defaultsfl
                 % structure (if one exists)
                 newgroupsN = numel(unique(newlabel));
                 newgroups = unique(newlabel);
-                newgroupnames = nk_input('Groupnames (as vector, no numeric names)',0,'e',[],[newgroupsN 1]);
+                newgroupnames = nk_input('Groupnames (as vector, no numeric names)',0,'e',[],size(newgroupsN,1));
 
                 if isfield(NM, 'cv')
                     cv_ok = check_CV_class(NM.cv, NM.cases, newlabel, newgroups);
@@ -74,6 +76,8 @@ else
     act = 0;
 end
 ALTLAB.flag = altlabflag;
+% check whether new label was entered or only yes
+
 ALTLAB.newlabel = newlabel; 
 ALTLAB.newlabelname = newlabelname; 
 ALTLAB.newmode = newmode; 
@@ -82,6 +86,7 @@ if strcmp(newmode,'classification')
 elseif isfield(ALTLAB, 'newgroupnames')
     ALTLAB = rmfield(ALTLAB, 'newgroupnames');
 end
+
 
 function compatCVflag = check_CV_class(cv, indcases, label, groups)
 compatCVflag = 1;

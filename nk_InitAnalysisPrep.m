@@ -166,11 +166,19 @@ switch act
                     NM.analysis{A.analdim}.params.label.label       = NM.TrainParam.LABEL.newlabel; 
                     NM.analysis{A.analdim}.params.label.modeflag    = NM.TrainParam.LABEL.newmode;
                     NM.analysis{A.analdim}.params.label.altlabelflag = NM.TrainParam.LABEL.flag;
+                    NM.analysis{A.analdim}.params.label.labelname = NM.TrainParam.LABEL.newlabelname;
+                    if strcmp(NM.TrainParam.LABEL.newmode, 'classification')
+                        NM.analysis{A.analdim}.params.label.altgroupnames = NM.TrainParam.LABEL.newgroupnames; 
+                    end
                     NM.analysis{A.analdim}.params.TrainParam = rmfield(NM.analysis{A.analdim}.params.TrainParam, 'LABEL'); % remove LABEL field from analysis' TrainParam to save memory
                 else 
                     NM.analysis{A.analdim}.params.label.label       = NM.label;
                     NM.analysis{A.analdim}.params.label.modeflag    = NM.modeflag; 
+                    NM.analysis{A.analdim}.params.label.labelname   = NM.datadescriptor{1,1}.input_settings.label_edit;
                     NM.analysis{A.analdim}.params.label.altlabelflag = 0;
+                    if isfield(NM.TrainParam, 'LABEL') && strcmp(NM.TrainParam.LABEL.newmode, 'classification')
+                        NM.analysis{A.analdim}.params.label.altgroupnames = NM.groupnames; 
+                    end
                 end
                 try
                   NM.analysis{A.analdim}.meta.USER              = java.lang.System.getProperty('user.name');

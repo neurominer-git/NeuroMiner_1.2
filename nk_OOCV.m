@@ -65,6 +65,8 @@ end
 inp = nk_ApplyLabelTransform( SCALE, MODEFL, inp );
 
 % Check whether oocv labels are available and process them accordingly.
+% Check whether given analysis used alternative label and whether it's
+% available
 if ~isfield(inp,'labelOOCV')
     labelOOCV = zeros(inp.nOOCVsubj,1);
     LabelMode = false;

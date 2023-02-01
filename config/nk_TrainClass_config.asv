@@ -617,12 +617,8 @@ switch act
         end
         if LABEL.flag && ~strcmp(LABEL.newmode, modeflag)
             origmodefl                  = NM.modeflag;
-            % check whether a new mode was entered
-            if isempty(LABEL.newmode)
-                LABEL.newmode           = origmodefl;
-            end
             NM.modeflag                 = LABEL.newmode;
-            
+
             % Create default NM parameters space
             nk_CVpartition_config(true);
             NM.TrainParam.STACKING.flag = 2;

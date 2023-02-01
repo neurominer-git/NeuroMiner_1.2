@@ -117,6 +117,19 @@ if inp.covflag && isfield(NM.(inp.fldnam){inp.oocvind},'Y') && NM.(inp.fldnam){i
     mnusel = [mnusel 7];
 end
 
+% check whether an alternative label was used in one of the locked analyses
+altlabels = [];
+for i=1:length(NM.analysis)
+    if isfield(NM.analysis{1,i}.params, 'label') && NM.analysis{1,i}.params.label.altlabelflag
+        altlabels = [altlabels,NM.analysis{1,i}.params.label.labelname];
+    end
+end
+
+if ~isempty(altlabels)
+    mnuact = [mnuact '|Add alternative label(s)'];
+    mnusel = [mnusel 8]; 
+end
+
 act = nk_input(sprintf('Select action for OOCV container %s',inp.desc),0,'mq',mnuact,mnusel);
 
 switch act
@@ -138,6 +151,10 @@ switch act
     case 7
         % Don't forget the covariates if they are present in the discovery data
         NM.(inp.fldnam){inp.oocvind}.covars = nk_DefineCovars_config(NM.(inp.fldnam){inp.oocvind}.n_subjects_all, NM.covars); 
+    case 8
+        % if alternative labels were used in any of the locked analyses,
+        % new labels have to be input for the validation data too 
+        NM.(inp.fldnam){inp.oocvind}.label = nk_OOCVLabel_config(NM.(inp.fldnam){inp.oocvind}.n_subjects_all, altlabels);
 end
 
 % _________________________________________________________________________
