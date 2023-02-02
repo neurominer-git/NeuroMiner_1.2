@@ -363,6 +363,7 @@ for i = 1:inp1.nF
     
     % **************************** ANALYSIS SETUP *****************************
     inp2 = nk_SetFusionMode2(dat, analysis, F, nF, i, inp1.oocvind);
+    inp2.labels = analysis.params.label.label;
     inp = catstruct(inp1,inp2);
     inp.MLI.Modality = MLI.Modality(inp.tF);
     inp.loadGD = true;

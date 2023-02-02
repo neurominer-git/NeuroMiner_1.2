@@ -9,7 +9,11 @@ if iscell(Y)
                 tY{v} = Y{v};
             else
                 D = size(Y{v},2);
-                Fx = prep_fmask(D, F{v}, indF);
+                try
+                    Fx = prep_fmask(D, F{v}, indF);
+                catch
+                    fprintf('probl')
+                end
                 tY{v} = Y{v}(:,Fx);
             end
         else % Concatenate Training and Test data

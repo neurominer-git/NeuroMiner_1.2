@@ -142,6 +142,7 @@ switch act
                 I1.VCV1SQ{h,n}                  = nm_nansum(I1.VCV1{h,n}.^2,2);
                 %I1.VCV1STD{h,n}                 = (nm_nanstd(I1.VCV1{h,n},2)./sqrt(I1.VCV1NMODEL(h)))*1.96;
                 I1.VCV1STD{h,n}                 = nm_nanstd(I1.VCV1{h,n},2);
+                %I1.VCV1JUSPACE
                 indMEANgrSE                     = abs(I1.VCV1MEAN{h,n}) > I1.VCV1STD{h,n};
                 if isempty(I2.VCV2SUM{h, n})
                     I2.GCV2SUM{h, n}            = nan(D,ix*jx,'double');
@@ -153,6 +154,7 @@ switch act
                     I2.VCV2STD{h, n}            = I1.VCV1STD{h,n};
                     I2.VCV2SEL{h, n}            = I1.VCV1SEL{h, n};
                     I2.VCV2VCV1{h,n}            = I1.VCV1{h,n};
+                    % juspace: concatenate 
                 else
                     I2.GCV2SUM{h, n}(:,ll)      = I1.VCV1SUM{h, n};% ./  I1.VCV1SEL{h,n};  
                     I2.VCV2PROB{h, n}           = [I2.VCV2PROB{h, n}   indMEANgrSE ];

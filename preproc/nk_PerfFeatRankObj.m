@@ -121,7 +121,7 @@ switch IN.algostr
         IN.W = (nk_FScoreFeatRank(Y,L))';
 
     case 'rgs'
-        if ~isempty(opt) && ~isempty(Params_desc); 
+        if ~isempty(opt) && ~isempty(Params_desc) 
             IN.RGS.extra_param.k = nk_ReturnParam('K',Params_desc, opt); 
             IN.RGS.extra_param.beta = nk_ReturnParam('Beta',Params_desc, opt); 
         end
@@ -143,9 +143,12 @@ switch IN.algostr
         [~,IN.W] = relieff(Y, L, IN.Relief.k);
         
     case 'anova'
+        if size(L,2)==1
+            L = nk_MakeDummyVariables(L);
+        end
         IN.X = [ones(size(L,1),1) L]; 
-        IN = nk_PerfANOVAObj(Y,IN);
-        IN.W = IN.R2;
+        IN = nk_PerfANOVAObjNew(Y,IN);
+        IN.W = -log10(IN.p);
     
     case 'pls'
         if strcmp(IN.PLS.algostr,'spls')
@@ -156,11 +159,16 @@ switch IN.algostr
         IN.W = abs(IN.PLS.mpp.u);
         
     case 'extern'
+        % External ranking using weight vectors generated outside of NM.
+        % Use with caution: it is strongly discouraged to use weight
+        % vectors that have been computed on the given NM cases outside of 
+        % the cross-validation loop.
         IN.W = abs(IN.EXTERN);
 		
 	case 'extern2'
+        % This option is not accessible in the configurator
 		W1 = abs(IN.EXTERN);
-		for i=1:numel(IN.algostr2);
+		for i=1:numel(IN.algostr2)
 			IN2 = IN;
 			IN2.algostr = IN.algostr2{i};
 			if VERBOSE, fprintf(' ...adding ranking map using %s',IN2.algostr); end

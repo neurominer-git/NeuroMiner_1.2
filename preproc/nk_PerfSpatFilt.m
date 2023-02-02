@@ -1,4 +1,4 @@
-function sY = nk_PerfSpatFilt2( Y, CURACT, Param )
+function sY = nk_PerfSpatFilt( Y, CURACT, Param )
 
 if isfield(CURACT,'SPATIAL') && CURACT.SPATIAL.cubetype>1
     % If data fusion has happened before the smoothing

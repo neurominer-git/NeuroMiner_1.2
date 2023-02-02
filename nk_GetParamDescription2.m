@@ -469,11 +469,11 @@ switch action
                             end
                             switch params.ACTPARAM{i}.REMVARCOMP.corrmeth
                                 case 1
-                                    REMVARCOMP_corrmeth_str = 'Correlation Method: Pearson';
+                                    REMVARCOMP_corrmeth_str = 'Method: Pearson';
                                 case 2
-                                    REMVARCOMP_corrmeth_str = 'Correlation Method: Spearman';
+                                    REMVARCOMP_corrmeth_str = 'Method: Spearman';
                                 case 3
-                                    REMVARCOMP_corrmeth_str = 'Correlation Method: ANOVA';
+                                    REMVARCOMP_corrmeth_str = 'Method: ANOVA';
                             end
                             if isfield(params.ACTPARAM{i}.REMVARCOMP,'recon')
                                 switch params.ACTPARAM{i}.REMVARCOMP.recon
@@ -491,7 +491,7 @@ switch action
                                 REMVARCOMP_varop_str = 'undefined';
                             end
                             REMVARCOMP_corrthresh_str = nk_ConcatParamstr(params.ACTPARAM{i}.REMVARCOMP.corrthresh);
-                            preprocact{i} = sprintf('Variance extraction [ %s, %s, Correlation cutoff(s): %s, Operator: %s, Back-projection: %s ]', ...
+                            preprocact{i} = sprintf('Variance extraction [ %s, %s, Cutoff(s): %s, Operator: %s, Back-projection: %s ]', ...
                                 REMVARCOMP_G_str, REMVARCOMP_corrmeth_str , REMVARCOMP_corrthresh_str, REMVARCOMP_varop_str, REMVARCOMP_recon_str);
                         case 'devmap'
                             
@@ -515,7 +515,19 @@ switch action
                             end
                             %preprocact{i} = sprintf('%s ]', preprocact{i});
                         case 'graphMetrics'
-                            preprocact{i} = 'Compute graph metrics from connectivity matrices';
+                            actparamAUX = params.ACTPARAM{i};
+                            if ~isempty(actparamAUX.GRAPHMETRICS.metricslist) 
+                                for j= 1:size(actparamAUX.GRAPHMETRICS.metricslist,2) 
+                                    if j == 1
+                                        METRICSLISTSTR = actparamAUX.GRAPHMETRICS.metricslist{j}.id;
+                                    else
+                                        METRICSLISTSTR = sprintf('%s, %s', METRICSLISTSTR, actparamAUX.GRAPHMETRICS.metricslist{j}.id);
+
+                                    end
+                                end
+                                preprocact{i} = sprintf('Compute graph metrics from connectivity matrices: %s ', METRICSLISTSTR);
+                            end
+                            
                             
                         case 'graphComputation'
                             preprocact{i} = 'Construct individual networks';
@@ -526,6 +538,7 @@ switch action
                         case 'customPreproc'
                             preprocact{i} = sprintf('Perform custom preprocessing step. Function: %s', params.ACTPARAM{i}.CUSTOMPREPROC.filename); 
                         
+
                         case 'JuSpace'
                             actparamAUX = params.ACTPARAM{i};
                             if ~isempty(actparamAUX.JUSPACE.petList) 

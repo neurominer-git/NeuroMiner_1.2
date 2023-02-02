@@ -102,6 +102,9 @@ if ~isempty(oocvind)
     OUT.desc_oocv = dat.OOCV{oocvind}.desc;
 end
 OUT.featnames   = [];
+if isfield(dat,'C') && dat.C{1,1}.calibflag
+    OUT.C      = dat.C;  
+end
 
 if stk_flag
     if isfield(STACKING,'featnames')

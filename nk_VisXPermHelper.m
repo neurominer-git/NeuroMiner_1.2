@@ -6,7 +6,7 @@ RandStream.setGlobalStream(s);
 switch act
     case 'genpermlabel'
         indperm = zeros(N, nperms);
-        for perms = 1:nperms,
+        for perms = 1:nperms
             indperm(:,perms) = randperm(N); 
         end
     case 'genpermfeats'

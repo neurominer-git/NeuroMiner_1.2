@@ -113,7 +113,7 @@ switch act
          if ischar(parentdir) && exist(parentdir,'dir')==7, A.parentdir = parentdir; end
              
     case 'def_analysis_id'
-        if isfield(A,'id') && ~isempty(A.id), id_def = A.id;  end
+        if isfield(A,'id') && ~isempty(A.id), id_def = A.id;  else, id_def = []; end
         id = nk_input('Provide an alphanumeric identifier for your analysis',0,'s',id_def);
         if isempty(id) || strcmp(id,''), A.id=na_str; return; end
         A.id = id;
@@ -155,10 +155,31 @@ switch act
                 end
                 NM.analysis{A.analdim}.params.TrainParam      = NM.TrainParam;
                 NM.analysis{A.analdim}.params.datadescriptor  = NM.datadescriptor;
-                NM.analysis{A.analdim}.params.modeflag        = NM.modeflag;
+                %NM.analysis{A.analdim}.params.modeflag        = NM.modeflag;
                 NM.analysis{A.analdim}.params.cv              = NM.cv;
                 NM.analysis{A.analdim}.params.id              = NM.id;
                 NM.analysis{A.analdim}.meta.TIME              = datestr(now);
+                if isfield(NM,'C')
+                    NM.analysis{A.analdim}.C                  = NM.C;
+                end
+                if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
+                    NM.analysis{A.analdim}.params.label.label       = NM.TrainParam.LABEL.newlabel; 
+                    NM.analysis{A.analdim}.params.label.modeflag    = NM.TrainParam.LABEL.newmode;
+                    NM.analysis{A.analdim}.params.label.altlabelflag = NM.TrainParam.LABEL.flag;
+                    NM.analysis{A.analdim}.params.label.labelname = NM.TrainParam.LABEL.newlabelname;
+                    if strcmp(NM.TrainParam.LABEL.newmode, 'classification')
+                        NM.analysis{A.analdim}.params.label.altgroupnames = NM.TrainParam.LABEL.newgroupnames; 
+                    end
+                    NM.analysis{A.analdim}.params.TrainParam = rmfield(NM.analysis{A.analdim}.params.TrainParam, 'LABEL'); % remove LABEL field from analysis' TrainParam to save memory
+                else 
+                    NM.analysis{A.analdim}.params.label.label       = NM.label;
+                    NM.analysis{A.analdim}.params.label.modeflag    = NM.modeflag; 
+                    NM.analysis{A.analdim}.params.label.labelname   = NM.datadescriptor{1,1}.input_settings.label_edit;
+                    NM.analysis{A.analdim}.params.label.altlabelflag = 0;
+                    if isfield(NM.TrainParam, 'LABEL') && strcmp(NM.TrainParam.LABEL.newmode, 'classification')
+                        NM.analysis{A.analdim}.params.label.altgroupnames = NM.groupnames; 
+                    end
+                end
                 try
                   NM.analysis{A.analdim}.meta.USER              = java.lang.System.getProperty('user.name');
                   NM.analysis{A.analdim}.meta.OS.name           = java.lang.System.getProperty('os.name');

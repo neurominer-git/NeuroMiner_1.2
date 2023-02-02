@@ -8,7 +8,7 @@
 % (c) Nikolaos Koutsouleris, 07/2022
 
 function [act, varind] = nk_TrainClass_config(act, varind, parentstr)
-global NM
+global NM CALIBAVAIL
 
 if ~exist('act','var'), act = []; end
 menustr = []; menuact = [];
@@ -141,10 +141,10 @@ end
 
 %% Check data entry status
 if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'LABEL'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'CALIB','LABEL'});
     STATUS = nk_CheckFieldStatus(NM.TrainParam.STRAT{varind},{'PREPROC','SVM','GRD','RFE','MULTI','VIS','MLI'}, [], [], STATUS);
 else
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI', 'LABEL'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI', 'CALIB', 'LABEL'});
 end
 switch STATUS.PREPROC
     case '...'
@@ -262,7 +262,7 @@ if ~exist('act','var') || isempty(act)
         menustr = [ menustr 'Label selection in multi-label mode [ ' multlabelselstr ' ]|']; menuact = [ menuact 20];
     end
 
-    menustr = [menustr 'Cross-validation settings [ ' STATUS.cv ' ]|']; menuact = [menuact 3];
+    menustr = [menustr 'Cross-validation settings [ ' STATUS.cv  ' ]|']; menuact = [menuact 3];
 
     SVM = [];
     if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
@@ -281,7 +281,9 @@ if ~exist('act','var') || isempty(act)
 
     flx = flSVM && flGRD && flPREPROC;
 
-    menustr = [ menustr 'Use alternative label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
+    menustr = [ menustr 'Use different label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
+    %menustr = [ menustr 'Calibration data [ ' STATUS.CALIB ']|']; menuact = [menuact 1000];
+
     menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 5:6 ];
 
     if flx
@@ -608,14 +610,19 @@ switch act
             LABEL = NM.TrainParam.LABEL;
         else
             LABEL = [];
+            LABEL.OrigTrainParam = NM.TrainParam; 
         end
         while act>0  
             [LABEL, act] = nk_Label_config(LABEL);
         end
         if LABEL.flag && ~strcmp(LABEL.newmode, modeflag)
             origmodefl                  = NM.modeflag;
+            % check whether a new mode was entered
+            if isempty(LABEL.newmode)
+                LABEL.newmode           = origmodefl;
+            end
             NM.modeflag                 = LABEL.newmode;
-
+            
             % Create default NM parameters space
             nk_CVpartition_config(true);
             NM.TrainParam.STACKING.flag = 2;
@@ -631,28 +638,49 @@ switch act
             [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
             NM.TrainParam.verbosity     = 1;
 
+%             for i=1:nY
+%                 nan_in_pred = false;        if sum(isnan(NM.Y{i}(:)))>0, nan_in_pred=true; end
+%                 NM.TrainParam.PREPROC{i}    = DefPREPROC(modeflag,nan_in_pred,nan_in_label);
+%                 NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC, i, 1);
+%             end
+            NM.TrainParam               = rmfield(NM.TrainParam,'PREPROC');
+
             NM.TrainParam.LABEL         = LABEL;
             NM.modeflag                 = origmodefl;
         elseif LABEL.flag % but same learning framework
             NM.TrainParam.LABEL         = LABEL;
-        elseif ~LABEL.flag
-             % Create default NM parameters space
-            nk_CVpartition_config(true);
-            NM.TrainParam.STACKING.flag = 2;
-            NM.TrainParam.FUSION.flag   = 0;
-            NM.TrainParam.FUSION.M      = 1;
-            NM.TrainParam.SVM           = nk_LIBSVM_config(NM,[],1);
-            NM.TrainParam.SVM.prog      = 'LIBSVM';
-            NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
-            NM.TrainParam.SVM.GridParam = 1;
-            if strcmp(NM.modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
-            NM.TrainParam.MULTI.flag    = 0;
-            NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
-            [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
-            NM.TrainParam.verbosity     = 1;
-            NM.TrainParam.LABEL         = LABEL;
+        elseif ~LABEL.flag && strcmp(LABEL.newmode, modeflag) % if switched from alternative label to no alt. label but no learning mode switch
+            NM.TrainParam = rmfield(NM.TrainParam, 'LABEL'); 
+        elseif ~LABEL.flag % if either nothing has been changed in submenu or switch from alternative label to no alt. label and learning mode switch 
+            NM.TrainParam = LABEL.OrigTrainParam;
+
+%             nk_CVpartition_config(true);
+%             NM.TrainParam.STACKING.flag = 2;
+%             NM.TrainParam.FUSION.flag   = 0;
+%             NM.TrainParam.FUSION.M      = 1;
+%             NM.TrainParam.SVM           = nk_LIBSVM_config(NM,[],1);
+%             NM.TrainParam.SVM.prog      = 'LIBSVM';
+%             NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
+%             NM.TrainParam.SVM.GridParam = 1;
+%             if strcmp(NM.modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
+%             NM.TrainParam.MULTI.flag    = 0;
+%             NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
+%             [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
+%             NM.TrainParam.verbosity     = 1;
+%             NM.TrainParam.LABEL         = LABEL;
         end
 
+ %% read in calibration data
+    case 1000
+
+        NM = nk_DefineOOCVData_config(NM, 2, 'calib');
+        [NM, C, oocvind, fldnam, dattype] = nk_SelectOOCVdata(NM, 2, 0);
+        CALIBAVAIL = 1;
+        CY = NM.C{1,1}.Y;
+        Cfile_path = sprintf('%s/CY.mat', pwd);
+        NM.C{1,1}.calibflag = 1;
+        save(Cfile_path, 'CY', '-v7.3');
+        NM.C{1,1}.Y = Cfile_path;
 end
 act = 1;
 

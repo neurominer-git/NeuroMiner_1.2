@@ -42,16 +42,25 @@ if W2AVAIL
 end
 
 for curclass = 1 : I.nclass
-    [ix, jx] = size(o.TrHTperf(:,:,curclass));
-    o.MeanTrHTperf(curclass) = nm_nanmean( reshape(o.TrHTperf(:,:,curclass),ix*jx,1) );
-    o.SDTrHTperf(curclass)   = nm_nanstd( reshape(o.TrHTperf(:,:,curclass),ix*jx,1) );
-    o.MeanTrHDperf(curclass) = nm_nanmean( reshape(o.TrHDperf(:,:,curclass),ix*jx,1) );
-    o.SDTrHDperf(curclass)   = nm_nanstd( reshape(o.TrHDperf(:,:,curclass),ix*jx,1) );
     
-    o.MeanCVHTperf(curclass) = nm_nanmean( reshape(o.CVHTperf(:,:,curclass),ix*jx,1) );
-    o.SDCVHTperf(curclass)   = nm_nanstd( reshape(o.CVHTperf(:,:,curclass),ix*jx,1) );
-    o.MeanCVHDperf(curclass) = nm_nanmean( reshape(o.CVHDperf(:,:,curclass),ix*jx,1) );
-    o.SDCVHDperf(curclass)   = nm_nanstd( reshape(o.CVHDperf(:,:,curclass),ix*jx,1) );
+    [ix, jx] = size(o.TrHTperf(:,:,curclass));
+    
+    trhtprf = reshape(o.TrHTperf(:,:,curclass),ix*jx,1);
+    trhdprf = reshape(o.TrHDperf(:,:,curclass),ix*jx,1);
+    cvhtprf = reshape(o.CVHTperf(:,:,curclass),ix*jx,1);
+    cvhdprf = reshape(o.CVHDperf(:,:,curclass),ix*jx,1);
+    
+    o.MeanTrHTperf(curclass) = nm_nanmean( trhtprf );
+    o.SDTrHTperf(curclass)   = nm_nanstd( trhtprf );
+    
+    o.MeanTrHDperf(curclass) = nm_nanmean( trhdprf  );
+    o.SDTrHDperf(curclass)   = nm_nanstd( trhdprf  );
+    
+    o.MeanCVHTperf(curclass) = nm_nanmean( cvhtprf  );
+    o.SDCVHTperf(curclass)   = nm_nanstd( cvhtprf );
+
+    o.MeanCVHDperf(curclass) = nm_nanmean( cvhdprf );
+    o.SDCVHDperf(curclass)   = nm_nanstd( cvhdprf );
     
     if Param.SubSpaceFlag
         o.Ens_MeanTrDiv(curclass) = nm_nanmean(reshape(O.TrDiv(:,:,curclass),numel(O.TrDiv(:,:,curclass)),1));

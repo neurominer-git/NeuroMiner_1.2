@@ -26,7 +26,7 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, ...
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 07/2022
 
-global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL
+global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL CALIB 
 
 % Initialize runtime variables
 i       = inp.f; % Curration permutation
@@ -50,6 +50,15 @@ if ~exist('paramfl','var'), paramfl.use_exist = false; end
 cv2flag = false; if isfield(PREPROC,'CV2flag') && (PREPROC.CV2flag - 1) == 1; cv2flag = true; end
 tYocv   = []; if exist('Yocv','var') && ~isempty(Yocv), tYocv.Ts = cell(iy,jy); else, Yocv = []; end
 if ~exist('Cocv','var'), Cocv = []; end
+
+if isfield(inp, 'C') && inp.C{1,1}.calibflag
+%     load(inp.C{1,1}.Y);
+%     inp.C{1,1}.Y = Cfile{1,1}; % this had to be implemented to overcome memory issues when saving the NM struct with calib loaded (needed for compiling)
+    Cocv = inp.C{1,1}.Y;
+    CALIB = inp.C{1,1};
+else
+    CALIB.flag = false;
+end
 
 % Set binary/regression or multi-group processing mode
 if iscell(PREPROC)
@@ -99,7 +108,7 @@ if ~BINMOD && isfield(paramfl,'PXopt') && numel(paramfl.PXopt)>1
     if VERBOSE; fprintf('\nProcessing Mode: multi-group preprocessing, but no multi-group classifier requested'); end
 end
 
-% Generate template parameters (e.g. for Procrustes rotation)
+% Generate template parameters (e.g. for feature re-ordering)
 if isfield(paramfl,'templateflag') && paramfl.templateflag 
     TEMPL = nk_GenTemplParam(PREPROC, tCV, MODEFL, RAND, sY, inp, kbin);
 else
@@ -372,6 +381,11 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 SrcParam.covars_oocv        = inp.covars_oocv;
             else 
                 inp.covars_oocv = [];
+            end
+            if isfield(inp,'C') && isfield(inp.C{1,1}, 'covars')
+                SrcParam.covars_cocv        = inp.C{1,1}.covars;
+            else 
+                inp.covars_cocv = [];
             end
             SrcParam.iOCV               = iOCV; % To resolve bug in nk_GenPreprocSequence.m reported by Mark Dong (29/09/2021)
 

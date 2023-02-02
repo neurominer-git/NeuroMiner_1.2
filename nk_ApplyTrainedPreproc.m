@@ -136,7 +136,7 @@ else
     % Save parameters to disk
     if isfield(inp,'saveparam') && inp.saveparam
         CV2p = inp.f; CV2f = inp.d; 
-        if isfield(inp,'CV1')
+        if isfield(inp,'CV1') && inp.CV1 == 1
             CV1p = inp.CV1p;  CV1f = inp.CV1f;
         else
             CV1p = []; CV1f = [];

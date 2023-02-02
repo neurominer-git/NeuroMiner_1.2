@@ -18,19 +18,19 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
             uPREPROC = nk_SetParamChain(paramfl, 1, PREPROC);
             tP = nk_ReturnParamChain(uPREPROC, 1); 
             fprintf('\nAll Predictors: Smoothing Training & CV data');
-            tsY = nk_PerfSpatFilt2( Y, uPREPROC, paramfl.PV ); 
-            if isfield(inp.X,'Yw'), inp.Yw = cell(kbin,1); tsYw = nk_PerfSpatFilt2( inp.X.Yw, uPREPROC, paramfl.PV ); end
+            tsY = nk_PerfSpatFilt( Y, uPREPROC, paramfl.PV ); 
+            if isfield(inp.X,'Yw'), inp.Yw = cell(kbin,1); tsYw = nk_PerfSpatFilt( inp.X.Yw, uPREPROC, paramfl.PV ); end
             % Processing of out-of-crossvalidation data (can be multiple containers)
             if ~isempty(Yocv)
                 if iscell(Yocv)
                     tsYocv = cell(numel(Yocv),1);
                     for n=1:numel(Yocv)
                         fprintf('\nSmoothing independent test data (%s)', inp.desc_oocv{n});
-                        tsYocv{n} = nk_PerfSpatFilt2( Yocv{n}, uPREPROC, paramfl.PV ); 
+                        tsYocv{n} = nk_PerfSpatFilt( Yocv{n}, uPREPROC, paramfl.PV ); 
                     end
                 else
                     fprintf('\nSmoothing independent test data (%s)', inp.desc_oocv);
-                    tsYocv = nk_PerfSpatFilt2( Yocv, uPREPROC, paramfl.PV ); 
+                    tsYocv = nk_PerfSpatFilt( Yocv, uPREPROC, paramfl.PV ); 
                 end
             end
             % Processing of calibration data (can be multiple containers)
@@ -39,11 +39,11 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                     tsCocv = cell(numel(Yocv),1);
                     for n=1:numel(Yocv)
                         fprintf('\nSmoothing calibration data (%g)',u, n)
-                        tsCocv{n} = nk_PerfSpatFilt2( Cocv{n}, uPREPROC, paramfl.PV ); 
+                        tsCocv{n} = nk_PerfSpatFilt( Cocv{n}, uPREPROC, paramfl.PV ); 
                     end
                 else
                     fprintf('\nSmoothing calibration data (%g)',u)
-                    tsCocv = nk_PerfSpatFilt2( Cocv, uPREPROC, paramfl.PV ); 
+                    tsCocv = nk_PerfSpatFilt( Cocv, uPREPROC, paramfl.PV ); 
                 end
             end
 
@@ -59,10 +59,10 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                 uPREPROC = nk_SetParamChain(paramfl, u, PREPROC);
                 paramfl.P{u} = nk_ReturnParamChain(uPREPROC, 1); 
                 fprintf('\nPredictor #%g: Smoothing Training & CV data',u)
-                sY{u} = nk_PerfSpatFilt2( Y, uPREPROC, paramfl.PV ); 
+                sY{u} = nk_PerfSpatFilt( Y, uPREPROC, paramfl.PV ); 
                 if isfield(inp,'iYw') && ~isempty(inp.iYw) 
                     fprintf('\nSmoothing weighting map')
-                    inp.Yw{u} = nk_PerfSpatFilt2( inp.iYw, uPREPROC, paramfl.PV ); 
+                    inp.Yw{u} = nk_PerfSpatFilt( inp.iYw, uPREPROC, paramfl.PV ); 
                 else
                     I = arrayfun( @(j) isfield(uPREPROC.ACTPARAM{j},'RANK'), 1:numel( uPREPROC.ACTPARAM ));
                     if any(I)
@@ -70,7 +70,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                         for qx = 1:numel(Ix)
                             if isfield(uPREPROC.ACTPARAM{Ix(qx)}.RANK,'EXTERN')
                                 inp.Yw{u} = uPREPROC.ACTPARAM{Ix(qx)}.RANK.EXTERN;
-                                inp.Yw{u} = nk_PerfSpatFilt2( inp.Yw{u}, uPREPROC, paramfl.PV ); 
+                                inp.Yw{u} = nk_PerfSpatFilt( inp.Yw{u}, uPREPROC, paramfl.PV ); 
                                 %here, we assume that there is only one
                                 %weighting map to be smoothed alongside the
                                 %data. This will obviously not work for
@@ -85,22 +85,22 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                     if iscell(Yocv)
                         for n=1:numel(Yocv)
                            fprintf('\nPredictor #%g: Smoothing independent test data (%s)', u, inp.desc_oocv{n});
-                           sYocv{u,n} = nk_PerfSpatFilt2( Yocv{n}, uPREPROC, paramfl.PV ); 
+                           sYocv{u,n} = nk_PerfSpatFilt( Yocv{n}, uPREPROC, paramfl.PV ); 
                         end
                     else
                         fprintf('\nPredictor #%g: Smoothing independent test data (%s)', u, inp.desc_oocv);
-                        sYocv{u} = nk_PerfSpatFilt2( Yocv, uPREPROC, paramfl.PV ); 
+                        sYocv{u} = nk_PerfSpatFilt( Yocv, uPREPROC, paramfl.PV ); 
                     end
                 end
                 if ~isempty(Cocv), 
                     if iscell(Yocv)
                         for n=1:numel(cocv)
                             fprintf('\nPredictor #%g: Smoothing calibration data (%g)',u, n)
-                            sCocv{u,n} = nk_PerfSpatFilt2( Cocv{n}, uPREPROC, paramfl.PV ); 
+                            sCocv{u,n} = nk_PerfSpatFilt( Cocv{n}, uPREPROC, paramfl.PV ); 
                         end
                     else
                         fprintf('\nPredictor #%g: Smoothing calibration data',u)
-                        sCocv{u} = nk_PerfSpatFilt2( Cocv, uPREPROC, paramfl.PV ); 
+                        sCocv{u} = nk_PerfSpatFilt( Cocv, uPREPROC, paramfl.PV ); 
                     end
                 end
             end

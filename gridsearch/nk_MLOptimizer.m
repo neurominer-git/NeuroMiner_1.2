@@ -240,11 +240,18 @@ if GDfl == -1
     % Scale the labels
     label = nk_LabelTransform(PREPROC,MODEFL,label);
     % Filter the data (imaging only)
-    Y = nk_PerfSpatFilt2( inp.Y, PREPROC, inp.P.X );
+    Y = nk_PerfSpatFilt( inp.Y, PREPROC, inp.P.X );
+    % calibration data (Clara)
+    if isfield(inp, 'C') && inp.C{1,1}.calibflag
+        CYfile = inp.C{1,1}.Y; 
+        load(CYfile, 'CY');
+        inp.C{1,1}.Y = CY;
+        inp.C{1,1}.Y = nk_PerfSpatFilt(inp.C{1,1}.Y, PREPROC, inp.P.X);
+    end
     if isfield(inp,'Yw')
         % Check for weighting masks which have been read-in during data
         % import
-        inp.Yw = nk_PerfSpatFilt2( inp.Yw, PREPROC, inp.P.X ); 
+        inp.Yw = nk_PerfSpatFilt( inp.Yw, PREPROC, inp.P.X ); 
     else
         % Check for ranking modules which uses external weighting masks
         if isfield(PREPROC,'ACTPARAM')
@@ -253,7 +260,7 @@ if GDfl == -1
                 Ix = find(I);
                 for qx = 1:numel(Ix)
                     if isfield(PREPROC.ACTPARAM{Ix(qx)}.RANK,'EXTERN')
-                        inp.Yw = nk_PerfSpatFilt2( PREPROC.ACTPARAM{Ix(qx)}.RANK.EXTERN, PREPROC, inp.P.X ); 
+                        inp.Yw = nk_PerfSpatFilt( PREPROC.ACTPARAM{Ix(qx)}.RANK.EXTERN, PREPROC, inp.P.X ); 
                         % here, we assume that there is only one
                         % weighting map to be smoothed alongside the
                         % data. This will obviously not work for
@@ -404,6 +411,7 @@ for f=1:ix % Loop through CV2 permutations
             % %%%%%%%%%%%%%%%%%%%%% PREPARATIONS %%%%%%%%%%%%%%%%%%%%%%
             % CV1 test data performance measures
             GD.TR       = zeros(nPs(1),nclass,nl);
+            GD.sTR     = zeros(nPs(1),nclass,nl);
 
             % CV2 test data performance measures
             GD.TS       = zeros(nPs(1),nclass,nl); 
@@ -1083,7 +1091,7 @@ if GDfl || ~batchflag
         for g=1:ngroups
             mProb(Ix,:,g) =  nk_cellcat(multi_CV2prob(:,g),[],1);
         end
-        mProbI = squeeze(mean(mProb,2)); mProbI(~Ix,:)=NaN;
+        mProbI = squeeze(nm_nanmean(mProb,2)); mProbI(~Ix,:)=NaN;
         GDanalysis = nk_MultiPerfComp(GDanalysis, mProbI, label, ngroups, 'prob');
     end
 

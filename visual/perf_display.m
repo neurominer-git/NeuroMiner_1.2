@@ -32,7 +32,7 @@ else
     set(handles.selModal,'Enable','off')  
 end
 
-if handles.multilabel
+if isfield(handles,'multilabel') && handles.multilabel
     if isfield(handles.NM.analysis{analind}.params.TrainParam,'MULTILABEL')
         if handles.curlabel > numel(handles.NM.analysis{handles.curranal}.params.TrainParam.MULTILABEL.sel)
             handles.selLabel.Value = 1;
@@ -73,6 +73,8 @@ end
 
 if isfield(handles,'MultiClass'), load_selOneVsAll_Info(handles); end
 handles = display_main(handles);
+
+
 
 
 

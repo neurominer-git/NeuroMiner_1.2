@@ -16,7 +16,7 @@
 function [SrcParam, InputParam, TrParam] = ...
               nk_PerfPreprocessObj_core(SrcParam, InputParam, TrParam, act)
 
-global VERBOSE TEMPL SVM MODEFL
+global VERBOSE TEMPL SVM MODEFL 
 
 %% Prepare and check input params
 paramfl = false; tsfl = false; trfl = false; cfl = false;
@@ -40,7 +40,14 @@ if isfield(InputParam,'Tr'), trfl=true; end
 nTs = 0; if isfield(InputParam,'Ts'), tsfl=true; if iscell(InputParam.Ts), nTs = size(InputParam.Ts,2); end; end
 
 % Has calibration data been transferred? [not used currently]
-nC = 0; if isfield(InputParam,'C'), cfl=true; if iscell(InputParam.C), nC = size(InputParam.C,2); end; end
+nC = 0; 
+if isfield(InputParam,'C')
+   
+    cfl=true; 
+    if iscell(InputParam.C)
+        nC = size(InputParam.C,2); 
+    end
+end
 
 if ~trfl && ~tsfl, error('\nNo Preprocessing performed because training and test data are missing.\nCheck your parameters!!!'); end
 
@@ -119,6 +126,7 @@ for i=1:nact
         nComb = nP * nO; 
         Tr = cell(nComb,nL); 
         if isfield(InputParam,'Yw'), Yw = cell(nComb,nL); end
+        if isfield(InputParam,'C'), C = cell(nComb,nL); end
         if nTs>0, Ts = cell(nComb,nTs,nL); end
         TrParamij = cell(nComb,nL); ll = 1;
         
@@ -209,13 +217,21 @@ for i=1:nact
                         end
                     end
                 end
-
+                if isfield(InputParam,'C')
+                    InputParam.C = InputParam.C;
+                    if i==1    
+                        InputParamj.C = InputParam.C{jj}; 
+                    else
+                        InputParamj.C = InputParam.C{jj,nl}; 
+                   end
+                    
+                end
                 % ... and now apply multiple parameters to shelf thus creating
                 % multi-shelf versions of the data 
                 for l = 1: nO
                     if ~isempty(O)
                         ActParam.opt = O(l,:);
-                    elseif isfield(ActParam,'opt'), 
+                    elseif isfield(ActParam,'opt') 
                         ActParam = rmfield(ActParam,'opt');
                     end
                     if paramfl, llTrParam = TrParami{kl,nl}; else, llTrParam = []; end
@@ -224,6 +240,7 @@ for i=1:nact
                     Tr{kl,nl} = Out.Tr;
                     if adasynfl, TrainLabelSyn{kl,nl} = SrcParam.TrainLabelSyn{ActParam.j}; CovarSyn{kl,nl} = SrcParam.covarsSyn{ActParam.j}; end
                     if isfield(Out,'Yw'), Yw{kl,nl} = Out.Yw; end
+                    if isfield(Out, 'C'), C{kl,nl} = Out.C; end
                     if nTs>1
                         for k = 1:nTs
                             Ts{kl,k,nl} = Out.Ts{k};
@@ -238,6 +255,8 @@ for i=1:nact
         InputParam.Tr = Tr; 
         if adasynfl, SrcParam.TrainLabelSyn = TrainLabelSyn; SrcParam.covarsSyn = CovarSyn; end
         if isfield(InputParam,'Yw'), InputParam.Yw = Yw; end
+        if isfield(InputParam,'C'), InputParam.C = C; end
+
         if nTs > 0; InputParam.Ts = Ts; end
         TrParami = TrParamij;
     
@@ -248,7 +267,9 @@ for i=1:nact
         Tr = cell(nO,nL); 
         % Is there are weighting vector?
         if isfield(InputParam,'Yw'), Yw = cell(nO,nL); end
+        if isfield(InputParam,'C'), C = cell(nO,nL); end
         if nTs > 0, Ts = cell(nO,nTs,nL); end
+
         TrParamij = cell(nO,nL); ll = 1;
         %Do we have to use Adasyn ?
         if adasynfl 
@@ -289,6 +310,7 @@ for i=1:nact
                 end
                 % Take care of weighting vector to be also stored in shelf
                 if isfield(Out,'Yw'), Yw{kl,nl} = Out.Yw; end
+                if isfield(Out,'C'), C{kl,nl} = Out.C; end
                 % Now transfer proper training, CV1 test and CV2 test data to
                 % data shelves
                 if nTs>1
@@ -306,6 +328,7 @@ for i=1:nact
         if adasynfl, SrcParam.TrainLabelSyn = TrainLabelSyn; SrcParam.covarsSyn = CovarSyn; end
         % Save CV1 and CV2 test data in shelves
         if isfield(InputParam,'Yw'), InputParam.Yw = Yw; end
+        if nC > 0, InputParam.C = C; end
         if nTs > 0; InputParam.Ts = Ts; end
         TrParami = TrParamij; % Save processing parameters of curent parameters range loop
     else
@@ -382,7 +405,9 @@ else
     if tsfl, tsproc = true; end  
 end
 if tsproc, InputParam.Ts = nk_PerfScaleObj(InputParam.Ts, TrParami); end
-
+if isfield(InputParam, 'C') %CALIB.calibflag && CALIB.preprocstep > i
+    InputParam.C = nk_PerfScaleObj(InputParam.C, InputParam.P{i}.SCALE);
+end
 end
 
 % =========================================================================
@@ -447,7 +472,7 @@ end
 
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_remmeandiff(SrcParam, InputParam, ~, TrParami, actparam)
-global VERBOSE
+global VERBOSE CALIB
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
@@ -472,7 +497,12 @@ else
     if VERBOSE;fprintf(' not performed.'); end
 end
 if tsproc, InputParam.Ts = nk_PerfRemMeanDiffObj(InputParam.Ts, TrParami); end
-
+if isfield(InputParam,'C') && CALIB.calibflag % && CALIB.preprocstep > i
+    INcalib = InputParam.P{i};
+    INcalib.sTrInd = SrcParam.covars_cocv(:,INcalib.sIND);
+    INcalib.dTrInd = SrcParam.covars_cocv(:,INcalib.dIND);
+    InputParam.C = nk_PerfRemMeanDiffObj(InputParam.C, INcalib);
+end
 end
 
 % =========================================================================
@@ -680,7 +710,7 @@ if tsproc, InputParam.Ts = nk_PerfExtDimObj(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_correctnuis(SrcParam, InputParam, ~, TrParami, actparam)
-global VERBOSE
+global VERBOSE CALIB 
 
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
@@ -726,8 +756,15 @@ else
 end
 
 if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
+if isfield(CALIB,'calibflag') && CALIB.calibflag && isfield(InputParam, 'C')
+    INcalib = IN;
+    INcalib.TrCovars = CALIB.covars;
+    INcalib = rmfield(INcalib, 'subgroup');
+    %if isfield(InputParam, 'C') %CALIB.calibflag && CALIB.preprocstep > i
+    InputParam.C = nk_PartialCorrelationsObj(InputParam.C, INcalib);
+    %end
 end
-
+end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_elimzero(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
@@ -773,17 +810,27 @@ end
 RANK = InputParam.P{i}.RANK;
 
 if ~isfield(TrParami,'W') || isempty(TrParami.W)
-    if actparam.adasynfl 
-        if iscell(SrcParam.TrainLabelSyn)
-            RANK.curlabel = [InputParam.P{i}.RANK.curlabel(:,actparam.curlabel); SrcParam.TrainLabelSyn{actparam.j}(:,actparam.curlabel)]; 
-        else
-            RANK.curlabel = [InputParam.P{i}.RANK.curlabel(:,actparam.curlabel); SrcParam.TrainLabelSyn(:,actparam.curlabel)]; 
-        end
+    % Modification alllows to compute weights in a user-defined subgroup
+    % (RANK.curglabel)
+    if isfield(InputParam.P{i}.RANK,'curglabel')
+        RANK.curlabel = InputParam.P{i}.RANK.curlabel(InputParam.P{i}.RANK.curglabel,actparam.curlabel);
+        Y = InputParam.Tr(InputParam.P{i}.RANK.curglabel,:);
     else
         RANK.curlabel = InputParam.P{i}.RANK.curlabel(:,actparam.curlabel);
+        Y = InputParam.Tr;
+    end
+    if actparam.adasynfl 
+        % To do: synthetic data generation needs to create also
+        % user-defined RANK.curlabel for artificial data. Currently only
+        % synthetic target label can be created (TrainLabelSyn).
+        if iscell(SrcParam.TrainLabelSyn)
+            RANK.curlabel = [RANK.curlabel; SrcParam.TrainLabelSyn{actparam.j}(:,actparam.curlabel)]; 
+        else
+            RANK.curlabel = [RANK.curlabel; SrcParam.TrainLabelSyn(:,actparam.curlabel)]; 
+        end
     end
     if VERBOSE;fprintf('\tCompute Feature Weighting ...'); end
-    TrParami = nk_PerfFeatRankObj(InputParam.Tr, RANK);
+    TrParami = nk_PerfFeatRankObj(Y, RANK);
     actparam.RANK.W{actparam.curlabel} = TrParami.W;
 end
 
@@ -820,7 +867,7 @@ if VERBOSE,fprintf('\tRanking-based feature extraction ...'); end
 if paramfl && tsfl 
     % Out-of-sample mode, used stored weights 
     tsproc = true;
-elseif trfl, 
+elseif trfl
    % Training mode, learn beta and optionally apply it to
     % out-of-sample data
     [ InputParam.Tr, TrParami ] = nk_PerfWActObj(InputParam.Tr, InputParam.P{i});
@@ -950,7 +997,7 @@ end
 if paramfl && tsfl 
      tsproc = true;
 elseif trfl
-    if VERBOSE;fprintf('\tGraph metrics computation ...'); end
+    if VERBOSE;fprintf('\tGraph metric computation ...'); end
     [InputParam.Tr, TrParami] = graph_PerfGraphMetrics(InputParam.Tr, InputParam.P{i}.GRAPHMETRICS);
     % All 
     if tsfl, tsproc = true; end
@@ -962,7 +1009,7 @@ end
 
 
 function [SrcParam, InputParam, TrParami, actparam ] = act_graphComputation(SrcParam, InputParam, ~, TrParami, actparam)
-global VERBOSE
+global VERBOSE CALIB
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
@@ -971,6 +1018,11 @@ tsproc  = false;
 
 if isfield(actparam,'opt')
     InputParam.P{i}.GRAPHCONSTRUCTION.p = actparam.opt;
+end
+
+% if calibration data exists, replace refgroup with C
+if CALIB.calibflag && isfield(InputParam, 'C') && strcmp(InputParam.P{i}.GRAPHCONSTRUCTION.method, "Normative network + 1") && InputParam.P{i}.GRAPHCONSTRUCTION.refGroup == -1
+    InputParam.P{i}.GRAPHCONSTRUCTION.refGroup = InputParam.C;
 end
 
 if paramfl && tsfl 
@@ -1036,7 +1088,7 @@ if tsproc, InputParam.Ts = perfJuSpace(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_ROImeans(SrcParam, InputParam, ~, TrParami, actparam)
-global VERBOSE 
+global VERBOSE CALIB
 trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
@@ -1055,8 +1107,11 @@ elseif trfl
 
     if tsfl, tsproc = true; end
 end
-
+% 
 if tsproc, InputParam.Ts = perfROImeans(InputParam.Ts, TrParami); end
+if CALIB.calibflag && isfield(InputParam, 'C') %&& CALIB.preprocstep > i 
+    InputParam.C = perfROImeans(InputParam.C, InputParam.P{i}.ROIMEANS);
+end
 end
 % =========================================================================
 function [InputParam, SrcParam] = perform_adasyn(InputParam, SrcParam)

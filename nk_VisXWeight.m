@@ -234,6 +234,13 @@ for n=1:nM
                         tlFuVI = false(length(pIND),1); tlFuVI(lFuVI) = true; lFuVI = tlFuVI;
                         tlVI = false(length(pIND),1); tlVI(fVI) = true; fVI = tlVI;
                     end
+               % case 'juspace'
+               % features zurückgeben; in atlas-Raum zurück projezieren?
+               % columns nicht images
+               % braucht man das? 
+               % ist das Problem, dass NM von image Daten ausgeht?
+               % nk_VisModels!
+
             end
 
         end
@@ -244,6 +251,7 @@ for n=1:nM
         
         % Run univariate correlation analysis if no factorization method
         % had been applied to the data
+        % juspace: decompfl = FALSE 
         if ~decompfl(n)
             tY = zeros(size(Y,1),numel(nmP)); 
             if nM > 1
@@ -267,7 +275,7 @@ for n=1:nM
         if nM == 1 && mM>1
             for m=1:numel(varind)
                 if procfl
-                    % Estract indices to modality
+                    % Extract indices to modality
                     indX = inp.X.dimvecx(m)+1:inp.X.dimvecx(m+1);
                     mW{m} = nmW(indX);
                     mP{m} = nmP(indX);
@@ -313,7 +321,7 @@ for n=1:nM
         end
     else
         nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
-        if ~isempty(PA), 
+        if ~isempty(PA) 
              nmPA = zeros(numel(fVI),1); nmPA(nmP) = PA(lFuVI);
         end
         if mM>1 % intermediate / late fusion

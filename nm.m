@@ -173,9 +173,10 @@ try
                     if s.analyses_ready
                         if s.analyses_nondeterministic
                              mn_str = [mn_str ...
+                                'Visualize ' mdltypestr ' (non-deterministic analysis - NM may crash)|' ...
                                 'Interpret predictions of ' mdltypestr ' in discovery data|' ...
                                 'Open NM Results Viewer (cross-validation results)|'];
-                            mn_act = [mn_act 18 7];
+                            mn_act = [mn_act 6 18 7];
                         else
                             mn_str = [mn_str ...
                                 'Visualize ' mdltypestr '|' ...
@@ -443,7 +444,7 @@ if isfield(NM.defs,'JTextArea')
 end
 if ~isequal(filename,0) && ~isequal(pathname,0)
     fprintf('\nSaving %s ... please wait',filename)
-    save(fullfile(pathname,filename),'NM')
+    save(fullfile(pathname,filename),'NM','-v7.3')
 end
 
 end

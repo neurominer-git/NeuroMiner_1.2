@@ -8,7 +8,7 @@ atlas = [];
 if ~exist('atlas','var') || isempty(atlas)
     maskVec = nk_Vol2Vec(brainmask);
 else 
-    ROI_matrix = resize_img_useTemp_imcalc(char(atlas),image_for_size); %from JuSpace Toolbox
+    ROI_matrix = resize_img_useTemp_imcalc_NM(char(atlas),image_for_size); %from JuSpace Toolbox
     maskVec = reshape(ROI_matrix,size(ROI_matrix,1)*size(ROI_matrix,2)*size(ROI_matrix,3),1)';
 end 
 thres = 0; % should be possible to configure in menu

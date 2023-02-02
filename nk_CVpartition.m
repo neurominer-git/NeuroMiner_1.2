@@ -1,11 +1,11 @@
 % =========================================================================
-% FORMAT cv = nk_CVpartition2(nperms, K, Labels, Constraint)
+% FORMAT cv = nk_CVpartition(nperms, K, Labels, Constraint, Eq, AutoAdjust)
 % =========================================================================
 % This function generates nperms*K partitions of data
 % using cross-validation resampling
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris 01/2012
-function cv = nk_CVpartition2(nperms, K, Labels, Constraint, Eq, AutoAdjust)
+% (c) Nikolaos Koutsouleris 01/2023
+function cv = nk_CVpartition(nperms, K, Labels, Constraint, Eq, AutoAdjust)
 global NM
 
 trainidxs = cell(nperms,K); testidxs = cell(nperms,K); 
@@ -43,7 +43,7 @@ permmat = nk_PermInd2(nperms, Labels, Constraint);
 
 for h=1:nperms % Loop through perms
     
-    rInd        = permmat(h,:)'; % randomize indices; can we 
+    rInd        = permmat(h,:)'; % randomize indices; 
     trainidx    = cell(1,K);
     testidx     = cell(1,K);
     
@@ -64,7 +64,7 @@ for h=1:nperms % Loop through perms
             if (numel(ConstrXClass) / K) < numel(uConstraint)
                 % There are less subjects in current constraint x class group then K folds
                 CXfl = true;
-                fprintf('\tNot enough observations in current constraint x group class')
+                fprintf('|')
             else
                 CXfl = false;
             end
@@ -80,14 +80,13 @@ for h=1:nperms % Loop through perms
              
             % number of members (examples) in the class    
             % ie: nmem >= K
-            if testsize > 0,
+            if testsize > 0
                 if ~isempty(uConstraint)
                    
                     % Loop through constraint classes
-                    endpos = 1;
                     for hu = 1:mC
                         indC = find(ConstrXClass == uConstraint(hu));
-                        if ~CXfl, 
+                        if ~CXfl 
                             testsizeC = floor(numel(indC)/K);
                         else
                             testsizeC = 1;
@@ -95,7 +94,7 @@ for h=1:nperms % Loop through perms
                         startpos = (i-1)*testsizeC + 1;
                         endpos = i*testsizeC;
                         if CXfl
-                            fprintf('\tRepeating test subjects at fold %g', i)
+                            fprintf('\nAdding left-over test subjects to fold %g', i)
                             if endpos > numel(indC); endpos = numel(indC); end
                             if startpos > numel(indC); startpos = numel(indC); end
                         end
@@ -130,7 +129,7 @@ for h=1:nperms % Loop through perms
                 % We let all points of this class participate in training but no point in test:
                 % We could have let only the ith member of this class (if any) be for test and the rest for train.
             end
-            end
+        end
         
         %% Create stratified cross-validation scheme
         if ~isempty(indClassCX) 
@@ -184,4 +183,4 @@ end
 cv.TrainInd = trainidxs;
 cv.TestInd = testidxs;
 
-return
+

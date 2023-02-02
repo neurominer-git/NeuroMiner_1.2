@@ -45,6 +45,8 @@ for curlabel=1:nl
                     RegulC = nk_ComputeRegulFunction(GD.C(:,:,curlabel), 0, GRD.OptRegul.RegulTypeComplexity);
                 end
                 Regul = (RegulDiv + RegulC) / 2;
+            case 4
+                Regul = nk_ComputeRegulFunction(GD.sTR(:,:,curlabel), 0, GRD.OptRegul.RegulTypeComplexity);
         end
     else
         Regul =  GD.C(:,:,curlabel);

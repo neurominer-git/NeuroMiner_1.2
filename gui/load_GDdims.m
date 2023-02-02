@@ -187,11 +187,12 @@ if isfield(GDdims,'BinClass') || isfield(GDdims,'MultiClass')
         handles.MultiClass.probabilities            = GDdims.(fld).multi_probabilitiesCV2(indn , :, handles.curlabel);
         handles.MultiClass.onevsall_labels          = zeros(numel(indn),handles.ngroups);
         handles.MultiClass.onevsall_scores          = zeros(numel(indn),handles.ngroups);
+        uL = unique(handles.MultiClass.labels);
+        uL(isnan(uL)) = [];
         for j = 1:handles.ngroups
             ind = true(1,handles.ngroups); ind(j) = false;
-            probrest = nanmean(handles.MultiClass.probabilities(:,ind),2);
-            %probone  = handles.MultiClass.probabilities(:,j);
-            handles.MultiClass.onevsall_labels(:,j) = handles.MultiClass.labels == j;     
+            probrest = nm_nanmean(handles.MultiClass.probabilities(:,ind),2);
+            handles.MultiClass.onevsall_labels(:,j) = handles.MultiClass.labels == uL(j);     
             handles.MultiClass.onevsall_scores(:,j) = 1-probrest;
         end
         handles.MultiClass.onevsall_labels(handles.MultiClass.onevsall_labels == 0) = -1;
@@ -247,12 +248,14 @@ if isfield(GDdims,'BinClass') || isfield(GDdims,'MultiClass')
         handles.MultiClass.tbl_cont.rownames   = fieldnames(handles.MultiClass.class{1});
         handles.MultiClass.tbl_cont.colnames   = {'Metric'};
         handles.MultiClass.tbl_cont.array      = [];
-        remind = find(  strcmp('FPRvec',handles.MultiClass.tbl_cont.rownames) | ...
-                        strcmp('TPRvec',handles.MultiClass.tbl_cont.rownames) | ...
-                        strcmp('X',handles.MultiClass.tbl_cont.rownames));
+       
         for j = 1:handles.ngroups
+            fldnm =  fieldnames(handles.MultiClass.class{j});
+            remind = find(  strcmp('FPRvec',fldnm) | ...
+                        strcmp('TPRvec',fldnm) | ...
+                        strcmp('X',fldnm));
             handles.MultiClass.tbl_cont.colnames{j+1} = sprintf('%s vs REST',handles.NM.groupnames{j});
-            arr = struct2cell( handles.MultiClass.class{j});
+            arr = struct2cell( handles.MultiClass.class{j });
             arr(remind)=[];
             handles.MultiClass.tbl_cont.array = [handles.MultiClass.tbl_cont.array arr];
         end
