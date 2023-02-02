@@ -432,7 +432,7 @@ for f=1:ix % Loop through CV2 permutations
             else
                 hdx_ll = nm_nanmedian(binOOCVDh{1},2); hdx_ll(indnan) = nan;
                 hdx = nm_nanmedian(binOOCVD{1},2); hdx(indnan) = nan;
-                if ll==1, Results.RegrLabels = labelOOCV; Results.RegrLabels(indnan) = nan; end
+                if ll==1 || batchflag, Results.RegrLabels = labelOOCV; Results.RegrLabels(indnan) = nan; end
                 Results.CV2Performance_PredictedValues(ll) = EVALFUNC(Results.RegrLabels, hdx_ll);
                 Results.CV2Performance_PredictedValues_History(ll) = EVALFUNC(Results.RegrLabels, hdx);
             end
