@@ -1,4 +1,4 @@
-function [status, paramstr] = nk_SetupGlobVars2(dat, act, dispflag, varind)
+function [status, paramstr] = nk_SetupGlobalVariables(dat, act, dispflag, varind)
 
 global ...
     PREPROC ...
@@ -127,7 +127,7 @@ switch act
             end
         else
             MULTILABEL.flag = false;
-            MULTILABEL.dim = 1;paramstr
+            MULTILABEL.dim = 1;
             MULTILABEL.desc = [];
         end
 

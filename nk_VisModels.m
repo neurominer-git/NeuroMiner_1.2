@@ -1106,7 +1106,7 @@ if ~batchflag
             % Compute empirical multivariate p values (corrected and
             % uncorrected as well as Z scores
             if any(permfl)
-                I.VCV2ZSCORE{h,n}   = nm_nansum(I.VCV2ZSCORE{h,n},2);% ./ I.VCV2SEL{h,n};
+                I.VCV2ZSCORE{h,n}   = nm_nansum(I.VCV2ZSCORE{h,n},2) ./ ol;
                 % Uncorrected p values
                 Pvals = nm_nansum(I.VCV2PERM{h,n},2)./ol ;
                 Pvals(Pvals==0) = realmin;

@@ -300,8 +300,8 @@ if isfield(inp1.OO,'groups') && size(inp1.OO.groups,1)==numel(inp1.OO.cases)
     end
     inp1.groupvec = unique(inp1.groupind);
     inp1.ngroups = numel(unique(inp1.groupind));
-    if isfield(inp1.OO,'grpnames') && numel(inp1.OO.grpnames) == inp1.ngroups
-        inp1.groupnames = inp1.OO.grpnames;
+    if isfield(inp1.OO,'grpnames') && numel(inp1.OO.groupnames) == inp1.ngroups
+        inp1.groupnames = inp1.OO.groupnames;
     else
         inp1.groupnames = cellstr([repmat('Group #',inp1.ngroups,1) num2str((1:inp1.ngroups)')]);
     end

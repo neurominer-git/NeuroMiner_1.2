@@ -40,7 +40,7 @@ if numel(NM.analysis) > 1
     menustr = ['Select analysis to operate on [ ' AnalSelStr ' ]|']; menuact = 1;
 else
     analdim = 1; menuact = []; menustr = [];
-    analysis = NM.analysis{analdim}; nk_SetupGlobVars2(analysis.params, 'setup_main', 0); 
+    analysis = NM.analysis{analdim}; nk_SetupGlobalVariables(analysis.params, 'setup_main', 0); 
     [operms,ofolds] = size(CV.TrainInd);
     if (~exist('GridAct','var') || isempty(GridAct)) || ~isequal(size(GridAct), [operms ofolds]) 
         GridAct = true(operms,ofolds);
@@ -79,7 +79,7 @@ switch act
         while tact>0, [ tact, tanaldim,~, showmodalvec, brief ] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> PREPROCESSING MODULE', tanaldim, [], 0, showmodalvec, brief); end;
         if ~isempty(tanaldim) 
             analdim = tanaldim;
-            analysis = NM.analysis{analdim}; nk_SetupGlobVars2(analysis.params, 'setup_main', 0); 
+            analysis = NM.analysis{analdim}; nk_SetupGlobalVariables(analysis.params, 'setup_main', 0); 
 
             nA = numel(analdim);
             if nA>1
@@ -120,7 +120,7 @@ switch act
             fprintf('**********************************\n')
             fprintf('\nWorking on analysis #%g: %s', analdim(i), analysis.id);
 
-            nk_SetupGlobVars2(analysis.params, 'setup_main', 0); 
+            nk_SetupGlobalVariables(analysis.params, 'setup_main', 0); 
             if p.HideGridAct
                 [ operms, ofolds] = size(NM.analysis{analdim(i)}.params.cv.TrainInd);
                 GridAct = true(operms,ofolds);
@@ -176,7 +176,7 @@ switch act
                 for j = 1:nM
     
                     %% Get Training / CV data (Y) & Build modality suffix
-                    inp = nk_SetFusionMode2(NM, analysis, F, nM, j);
+                    inp = nk_DefineFusionModeParams(NM, analysis, F, nM, j);
     
                     %fprintf('\nWORKING ON MODALITY #%g', j);
                     if numel(inp.PREPROC)>1
@@ -340,10 +340,10 @@ switch act
             case 7
                 
                 % LABEL SCALING (regression only)
-                nk_SetupGlobVars2(analysis.params, 'setup_strat', 1); 
+                nk_SetupGlobalVariables(analysis.params, 'setup_strat', 1); 
                 labels = nk_LabelTransform(PREPROC, MODEFL, NM.label);
                 %% Get Training / CV data (Y) & Build modality suffix
-                inp = nk_SetFusionMode2(NM, analysis, F, nM, 1);
+                inp = nk_DefineFusionModeParams(NM, analysis, F, nM, 1);
                 inp.nM = nM;
                 inp.multiflag = 0; if ~isempty(MULTI) && MULTI.flag, inp.multiflag = nk_input('Select models at multi-group optimum', 0,'yes|no',[1,0],1); end
                 if isfield(NM,'covars'); inp.covars = NM.covars; else inp.covars = []; end
@@ -399,7 +399,7 @@ switch act
                         end
                 end
             end
-            nk_SetupGlobVars2(NM.analysis{analdim(i)}.params, 'clear', 0);
+            nk_SetupGlobalVariables(NM.analysis{analdim(i)}.params, 'clear', 0);
         end
 end
 

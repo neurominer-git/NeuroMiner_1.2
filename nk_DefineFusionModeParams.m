@@ -1,4 +1,4 @@
-function OUT  = nk_SetFusionMode2(dat, analysis, F, nF, curmodal, oocvind)
+function OUT  = nk_DefineFusionModeParams(dat, analysis, F, nF, curmodal, oocvind)
 global FUSION PREPROC VIS STACKING
 
 if ~exist('oocvind','var'), oocvind = []; end; varstr = [];
@@ -74,9 +74,9 @@ end
 switch FUSION.flag
     case {0,1,3}
         % Here only the first modality params will be initialized
-        nk_SetupGlobVars2(analysis.params, 'setup_strat', 0, tF(1)); 
+        nk_SetupGlobalVariables(analysis.params, 'setup_strat', 0, tF(1)); 
     case 2
-        nk_SetupGlobVars2(analysis.params, 'setup_strat', 0, tF); 
+        nk_SetupGlobalVariables(analysis.params, 'setup_strat', 0, tF); 
 end
 
 % Check whether stacking is active and allow user to compute 

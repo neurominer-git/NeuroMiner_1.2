@@ -15,7 +15,7 @@ if isfield(NM.defs,'import_finished') && NM.defs.import_finished
    status.import_finished = true;
 end
 if isfield(NM,'Y')
-    [pstatus, paramstr] = nk_SetupGlobVars2(NM,'check');
+    [pstatus, paramstr] = nk_SetupGlobalVariables(NM,'check');
     if ~pstatus
        status.setup_ok = true;
     end

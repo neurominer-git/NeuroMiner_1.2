@@ -225,7 +225,7 @@ end
 [~, ~, ~, ~, act] = nk_ReturnEvalOperator(SVM.GridParam);
 
 if ~batchflag && RFE.dispres
-   DISP.binwintitle = sprintf('NM Optimization Viewer => Analysis: %s', inp.P.analysis_id);
+   DISP.binwintitle = sprintf('NM Optimization Viewer => Analysis [#%g]: %s', inp.P.analind, inp.P.analysis_id);
 end
 
 % Parameter flag structure for preprocessing
@@ -744,13 +744,16 @@ for f=1:ix % Loop through CV2 permutations
                         end
                     end
                     
+                    % Choose Metric (hard or soft predictions):
+                    % Metric = 1 => use hard labels for aggregation
+                    % Metric = 2 => use decision scores/probability for aggregation
                     if RFE.CV2Class.EnsembleStrategy.Metric == 1 && ...
                             ~strcmp(MODEFL,'regression') && RAND.Decompose ~=9        
                             EnsDat = sign(EnsDat); 
                     end
-                    % Check Aggregation Level
-                    % 0 = compute mean of ensemble decision
-                    % 1 = concatenate base learners' decision into big ensemble!
+                    % Check aggregation level:
+                    % 0 = Mean of CV1 ensemble decision (grand mean approach)
+                    % 1 = Concatenate CV1 base learners' decision into big ensemble!
                     if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel, EnsDat = nm_nanmedian(EnsDat,2); end
 
                     % Concatenate (averaged) CV1 ensemble decisions along the 

@@ -92,7 +92,7 @@ end
 
 % Perform error handling if needed
 if ~isempty(ERR)
-    nk_SetupGlobVars2(NM,'clear')
+    nk_SetupGlobalVariables(NM,'clear')
     fprintf('\n========================================================== \n');
     fprintf('>>> OOOops... NM crashed :-(( <<<');
     fprintf('\nError: %s\nStack:', ERR.message);
