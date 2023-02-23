@@ -31,7 +31,10 @@ if analysis.Model.NumPreMLParams > 0
         if ~iscell(analysis.bestP{1})
             paramfl.PXopt{u} = analysis.(fld){u}(ll, pnt_vec, curlabel);
         else
-            paramfl.PXopt{u} = analysis.(fld){u}{ll,curlabel}(:, pnt_vec);
+            paramfl.PXopt{u} =[];
+            for uu = 1:numel(ll)
+                paramfl.PXopt{u} = [paramfl.PXopt{u} ; analysis.(fld){u}{ll(uu),curlabel}(:, pnt_vec) ];
+            end
         end
         % Retrieve unique combinations
         paramfl.PXunique{u} = unique(paramfl.PXopt{u},'rows','stable');

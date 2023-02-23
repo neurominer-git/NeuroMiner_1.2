@@ -124,20 +124,31 @@ end
 BINMOD = iPREPROC.BINMOD;
 
 CVPOS.fFull = FullPartFlag;
-
 FileNames = cell(ix,jx); fnd=false;
+
+% Parameter flag structure for preprocessing
+paramfl = struct('use_exist',inp.loadparam, ...
+                 'found', false, ...
+                 'write', inp.saveparam, ...
+                 'writeCV1', inp.saveCV1, ...
+                 'multiflag', multiflag);
+
+%Pre-smooth data, if needed, to save computational time
+inp.ll=inp.GridAct';inp.ll=find(inp.ll(:));
+inp = nk_PerfInitSpatial(analysis, inp, paramfl);
+
 % =========================================================================
 for f=1:ix % Loop through CV2 permutations
 
     for d=1:jx % Loop through CV2 folds
         
         fprintf('\n--------------------------------------------------------------------------')
-        if ~GridAct(f,d), 
+        if ~GridAct(f,d)
             ll=ll+1;
             fprintf('\nSkipping CV2 [%g,%g] (user-defined).',f,d)
             continue 
         end
-        if ~fnd, 
+        if ~fnd
             ll_start=ll; fnd=true; 
         end
         CVPOS.CV2p = f;
@@ -176,13 +187,6 @@ for f=1:ix % Loop through CV2 permutations
                 end
                    
                 if ~loadfl 
-
-                    % Parameter flag structure for preprocessing
-                    paramfl = struct('use_exist',inp.loadparam, ...
-                                     'found', false, ...
-                                     'write', inp.saveparam, ...
-                                     'writeCV1', inp.saveCV1, ...
-                                     'multiflag', multiflag);
 
                     [ inp, contfl, analysis, mapY, GD, MD, Param, paramfl, mapYocv ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
 
