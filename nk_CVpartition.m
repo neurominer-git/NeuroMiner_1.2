@@ -117,7 +117,7 @@ for h=1:nperms % Loop through perms
                     cv = nClassMem; return;
                 else
                     AdjStr = ['Adjust to N<=' num2str(nClassMem)];
-                    choice = questdlg(sprintf('Not enough members to send to test data.\nNumber of CV2 folds has to be <=%g',nClassMem), ...
+                    choice = questdlg(sprintf('Not enough observations to send to test data.\nNumber of CV2 folds has to be <=%g',nClassMem), ...
                         'Cross-validation structure generator','Abort', AdjStr,2);
                     switch choice
                         case 'Abort'
@@ -153,9 +153,13 @@ for h=1:nperms % Loop through perms
                 testidx{pInd(i)} = [testidx{pInd(i)}; indRem(i)];
             end
         end
-        for i = 1:K
-            trainidx{i} = [trainidx{i}; setdiff(indLabels, testidx{i})];
-        end        
+        if K>1
+            for i = 1:K
+                trainidx{i} = [trainidx{i}; setdiff(indLabels, testidx{i})];
+            end        
+        else
+            trainidx = testidx;
+        end
     end
     % Add NaN labels to each training population
     if NaNflag

@@ -348,14 +348,15 @@ for f=1:ix % Loop through CV2 permutations
         end
         
         for h=1:nclass
-            if meanflag == 2
+            if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel
                 fprintf('\nCompute mean of base learners'' outputs of current CV2 partition and add them to the ensemble matrix.')
-                binOOCVD{h} = [binOOCVD{h} nm_nanmedian(binOOCVDh{h},2)];
+                binOOCVDh{h} = nm_nanmedian(binOOCVDh{h},2);
             else
                 fprintf('\nAdd all base learners'' outputs to the ensemble matrix without averaging.')
-                binOOCVD{h} = [binOOCVD{h} binOOCVDh{h}];
             end
         end
+
+        binOOCVD{h} = [binOOCVD{h} binOOCVDh{h}];
         
         %% Step 4: Compute OOCV multi-group prediction from current binary classifier arrays
         if MULTI.flag && multiflag
@@ -372,7 +373,7 @@ for f=1:ix % Loop through CV2 permutations
             [MultiCV2PerformanceLL, MultiCV2PredictionsLL] = ...
                 nk_MultiEnsPerf(multiOOCVll, sign(multiOOCVll), labelOOCV, multiClassll, ngroups);
 
-            if LabelMode,    
+            if LabelMode
                 Results.MultiCV2PerformanceLL = [ Results.MultiCV2PerformanceLL MultiCV2PerformanceLL ]; 
             end
             Results.MultiCV2PredictionsLL = [ Results.MultiCV2PredictionsLL MultiCV2PredictionsLL ];
@@ -411,12 +412,28 @@ for f=1:ix % Loop through CV2 permutations
             %% Step 5: Assess binary classifier performance, if OOCV Label has been specified
             if strcmp(MODEFL,'classification')
                 for curclass=1:nclass
+                    
+                    % These are the algorithm outputs at the current CV2
+                    % partition which are stored in binOOCVDh
                     binOOCVDhx_ll = binOOCVDh{curclass}(indDicho{curclass},:);
+                    
+                    % ... and binOOCVD contains the outputs produced by the
+                    % ensemble across the CV2 partitions processed so far
                     binOOCVDhx = binOOCVD{curclass}(indDicho{curclass},:);
-                    hrx_ll = sign(nm_nansum(sign(binOOCVDhx_ll),2)); 
-                    hdx_ll = nm_nanmedian(binOOCVDhx_ll,2); hdx_ll(indnan) = nan;
-                    hrx = sign(nm_nansum(sign(binOOCVDhx),2)); 
-                    hdx = nm_nanmedian(binOOCVDhx,2); hdx(indnan) = nan;
+
+                    if size(binOOCVDhx,2)>1
+                        if size(binOOCVDhx_ll hrx_ll = sign(nm_nansum(sign(binOOCVDhx_ll),2)); 
+                        hdx_ll = nm_nanmedian(binOOCVDhx_ll,2); hdx_ll(indnan) = nan;
+                        hrx = sign(nm_nansum(sign(binOOCVDhx),2)); 
+                        hdx = nm_nanmedian(binOOCVDhx,2); hdx(indnan) = nan;
+                    else
+                        hrx_ll = sign(binOOCVDhx_ll);
+                        hdx_ll = binOOCVDhx_ll;
+                        hrx = sign(binOOCVDhx);
+                        hdx = binOOCVDhx;
+                        hdx_ll(indnan) = nan;
+                        hdx(indnan) = nan;
+                    end
                     if ll==1 
                         Results.BinLabels{curclass} = labelDicho{curclass}; 
                         if inp.multiflag, Results.Labels = labelOOCV; end
@@ -485,7 +502,7 @@ for f=1:ix % Loop through CV2 permutations
                     end
                 end
                 hu.Name = sprintf('NM Application Viewer: %s => %s [OOCV #%g]',inp.analysis_id, inp.desc_oocv, inp.oocvind);
-                set(0,'CurrentFigure',hu); 
+                set(0,'CurrentFigure',hu); if ll==1, clf ; end
                 if ll==1; ha = tight_subplot(2,inp.ngroups,0.03,[.1 .05],[.1 .05]); end
                 lg = cell(inp.ngroups,nclass); hc = zeros(inp.ngroups, nclass); lh = lg; hd = hc;
                 for curgroup=1:inp.ngroups
@@ -528,14 +545,16 @@ for f=1:ix % Loop through CV2 permutations
                         end
                     end
                     if MULTI.flag && multiflag,plot(Results.MultiCV2Performance_History,'k+'); end
-                    ylim(ha(curgroup),ylm); ylabel(ha(curgroup),ylb); ha(curgroup).YTickLabelMode='auto';
-                    ylim(ha(curgroup+inp.ngroups),ylm); ylabel(ha(curgroup+inp.ngroups),ylb); ha(curgroup+inp.ngroups).YTickLabelMode='auto';
+                    ylim(ha(curgroup),ylm); ha(curgroup).YTickLabelMode='auto';
+                    ylim(ha(curgroup+inp.ngroups),ylm); ha(curgroup+inp.ngroups).YTickLabelMode='auto';
                     if ll_start+nCV2-1 > ll_start
                         xlim(ha(curgroup),[ll_start ll_start+nCV2-1]); ha(curgroup).XTickLabelMode='auto';
                         xlim(ha(curgroup+inp.ngroups),[ll_start ll_start+nCV2-1]); ha(curgroup+inp.ngroups).XTickLabelMode='auto';
                     end
-                    
-                    xlabel(ha(curgroup+inp.ngroups),sprintf('%g/%g [ %3.1f%% ] of CV_2 partitions processed',ll,nCV2,ll*100/nCV2)); 
+                    if curgroup == 1 
+                        ylabel(ha(curgroup),ylb); ylabel(ha(curgroup+inp.ngroups),ylb); 
+                        xlabel(ha(curgroup+inp.ngroups),sprintf('%g/%g [ %3.1f%% ] of CV_2 partitions processed',ll,nCV2,ll*100/nCV2)); 
+                    end
                     legend(ha(curgroup), lg{curgroup,:},'Location','Best'); 
                     legend(ha(curgroup+inp.ngroups), lh{curgroup,:},'Location','Best'); 
                     box(ha(curgroup),'on'); ha(curgroup).YGrid='on';
@@ -568,8 +587,13 @@ for curclass = 1: nclass
         case 'classification'
             Results.BinCV2Predictions_DecisionValues{curclass}  = binOOCVD{curclass};
             Results.BinCV2Predictions_Targets{curclass}         = sign(binOOCVD{curclass});
-            Results.MeanCV2PredictedValues{curclass}            = nm_nanmedian(Results.BinCV2Predictions_DecisionValues{curclass},2);
-            Results.StdCV2PredictedValues{curclass}             = nm_nanstd(Results.BinCV2Predictions_DecisionValues{curclass},2);
+            if size(Results.BinCV2Predictions_DecisionValues{curclass},2) > 1
+                Results.MeanCV2PredictedValues{curclass}            = nm_nanmedian(Results.BinCV2Predictions_DecisionValues{curclass},2);
+                Results.StdCV2PredictedValues{curclass}             = nm_nanstd(Results.BinCV2Predictions_DecisionValues{curclass},2);
+            else
+                Results.MeanCV2PredictedValues{curclass}            = Results.BinCV2Predictions_DecisionValues{curclass};
+                Results.StdCV2PredictedValues{curclass}             = zeros(size(Results.BinCV2Predictions_DecisionValues{curclass}));
+            end
             Results.CICV2PredictedValues{curclass}              = cell2mat(arrayfun( @(i) percentile(Results.BinCV2Predictions_DecisionValues{curclass}(i,:),[2.5 97.5]), ...
                                                                     1:length(Results.MeanCV2PredictedValues{curclass}),'UniformOutput',false)');
             [Results.BinProbPredictions{curclass},...

@@ -754,8 +754,10 @@ for f=1:ix % Loop through CV2 permutations
                     % Check aggregation level:
                     % 0 = Mean of CV1 ensemble decision (grand mean approach)
                     % 1 = Concatenate CV1 base learners' decision into big ensemble!
-                    if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel, EnsDat = nm_nanmedian(EnsDat,2); end
-
+                    if size(EnsDat,2)>1
+                        if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel, EnsDat = nm_nanmedian(EnsDat,2); end
+                    end
+                    
                     % Concatenate (averaged) CV1 ensemble decisions along the 
                     % column dimension for each hold-out CV2 test sample
                     GDanalysis.predictions(TsI, curclass, curlabel) = ...
