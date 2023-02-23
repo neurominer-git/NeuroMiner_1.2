@@ -302,7 +302,7 @@ for f=1:ix % Loop through CV2 permutations
                                         % Extract features according to mask
                                         Ymodel = nk_ExtractFeatures(TR, F, [], u);
                                         
-                                        if ~fndMD, 
+                                        if ~fndMD
                                             fprintf('Computing OptModel');
                                             [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(Ymodel, modelTrL, sPs, 1);
                                         end
@@ -312,7 +312,7 @@ for f=1:ix % Loop through CV2 permutations
                                        
                                         % Detrend regressor predictions, if
                                         % required by user input
-                                        if detrendfl, 
+                                        if detrendfl
                                             beta = GD.Detrend{Pspos(m)}.beta;
                                             p = GD.Detrend{Pspos(m)}.p;
                                             uD(:,u) = nk_DetrendPredictions2(beta, p, uD(:,u)); 
@@ -422,8 +422,14 @@ for f=1:ix % Loop through CV2 permutations
                     binOOCVDhx = binOOCVD{curclass}(indDicho{curclass},:);
 
                     if size(binOOCVDhx,2)>1
-                        if size(binOOCVDhx_ll hrx_ll = sign(nm_nansum(sign(binOOCVDhx_ll),2)); 
-                        hdx_ll = nm_nanmedian(binOOCVDhx_ll,2); hdx_ll(indnan) = nan;
+                        if size(binOOCVDhx_ll,2)>1
+                            hrx_ll = sign(nm_nansum(sign(binOOCVDhx_ll),2)); 
+                            hdx_ll = nm_nanmedian(binOOCVDhx_ll,2); 
+                        else
+                            hrx_ll = sign(binOOCVDhx_ll);
+                            hdx_ll = binOOCVDhx_ll;
+                        end
+                        hdx_ll(indnan) = nan;
                         hrx = sign(nm_nansum(sign(binOOCVDhx),2)); 
                         hdx = nm_nanmedian(binOOCVDhx,2); hdx(indnan) = nan;
                     else

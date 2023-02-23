@@ -302,7 +302,7 @@ for f=1:ix % Loop through CV2 permutations
                                         % Extract features according to mask
                                         Ymodel = nk_ExtractFeatures(TR, F, [], u);
                                         
-                                        if ~fndMD, 
+                                        if ~fndMD
                                             fprintf('Computing OptModel');
                                             [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(Ymodel, modelTrL, sPs, 1);
                                         end
@@ -312,7 +312,7 @@ for f=1:ix % Loop through CV2 permutations
                                        
                                         % Detrend regressor predictions, if
                                         % required by user input
-                                        if detrendfl, 
+                                        if detrendfl
                                             beta = GD.Detrend{Pspos(m)}.beta;
                                             p = GD.Detrend{Pspos(m)}.p;
                                             uD(:,u) = nk_DetrendPredictions2(beta, p, uD(:,u)); 
@@ -513,6 +513,9 @@ for f=1:ix % Loop through CV2 permutations
                 lg = cell(inp.ngroups,nclass); hc = zeros(inp.ngroups, nclass); lh = lg; hd = hc;
                 for curgroup=1:inp.ngroups
                     hold(ha(curgroup),'on');hold (ha(curgroup+inp.ngroups),'on');
+                    if ll==1 && inp.ngroups>1
+                        title(ha(curgroup), Results.Group{curgroup}.GroupName, 'FontWeight', 'bold', 'Interpreter', 'none');
+                    end
                     for curclass=1:nclass
                         switch MODEFL
                             case 'classification'
@@ -521,10 +524,10 @@ for f=1:ix % Loop through CV2 permutations
                                     yvalDH = Results.Group{curgroup}.BinCV2Performance_DecisionValues_History(curclass,:);
                                     yvalTC = Results.Group{curgroup}.BinCV2Performance_Targets(curclass,:);
                                     yvalDC = Results.Group{curgroup}.BinCV2Performance_DecisionValues(curclass,:);
-                                    lgH = cellstr([sprintf("Cl#%g [%s]: target perf [overall]",curclass, Results.Group{curgroup}.GroupName); ... 
-                                                        sprintf("Cl#%g [%s]: score perf [overall]",curclass, Results.Group{curgroup}.GroupName)]); 
-                                    lgC = cellstr([sprintf("Cl#%g [%s]: target perf [current]",curclass, Results.Group{curgroup}.GroupName); ...
-                                                        sprintf("Cl#%g [%s]: score perf [current]",curclass, Results.Group{curgroup}.GroupName)]); 
+                                    lgH = cellstr([sprintf("Cl#%g: target perf [overall]",curclass); ... 
+                                                        sprintf("Cl#%g: score perf [overall]",curclass)]); 
+                                    lgC = cellstr([sprintf("Cl#%g: target perf [current]",curclass); ...
+                                                        sprintf("Cl#%g: score perf [current]",curclass)]); 
                                 else
                                     yvalTH = Results.BinCV2Performance_Targets_History(curclass,:);
                                     yvalDH = Results.BinCV2Performance_DecisionValues_History(curclass,:);
@@ -560,9 +563,9 @@ for f=1:ix % Loop through CV2 permutations
                     if curgroup == 1 
                         ylabel(ha(curgroup),ylb); ylabel(ha(curgroup+inp.ngroups),ylb); 
                         xlabel(ha(curgroup+inp.ngroups),sprintf('%g/%g [ %3.1f%% ] of CV_2 partitions processed',ll,nCV2,ll*100/nCV2)); 
+                        legend(ha(curgroup), lg{curgroup,:},'Location','Best'); 
+                        legend(ha(curgroup+inp.ngroups), lh{curgroup,:},'Location','Best'); 
                     end
-                    legend(ha(curgroup), lg{curgroup,:},'Location','Best'); 
-                    legend(ha(curgroup+inp.ngroups), lh{curgroup,:},'Location','Best'); 
                     box(ha(curgroup),'on'); ha(curgroup).YGrid='on';
                     box(ha(curgroup+inp.ngroups),'on'); ha(curgroup+inp.ngroups).YGrid='on';
                     hold(ha(curgroup),'off');hold (ha(curgroup+inp.ngroups),'off');
