@@ -159,12 +159,12 @@ void do_find_parameters()
 	else
 		start_p = -1.0;
 
-	printf("Doing parameter search with %d-fold cross validation.\n", nr_fold);
+	//printf("Doing parameter search with %d-fold cross validation.\n", nr_fold);
 	find_parameters(&prob, &param, nr_fold, start_C, start_p, &best_C, &best_p, &best_score);
-	if(param.solver_type == L2R_LR || param.solver_type == L2R_L2LOSS_SVC)
-		printf("Best C = %g  CV accuracy = %g%%\n", best_C, 100.0*best_score);
-	else if(param.solver_type == L2R_L2LOSS_SVR)
-		printf("Best C = %g Best p = %g  CV MSE = %g\n", best_C, best_p, best_score);
+	//if(param.solver_type == L2R_LR || param.solver_type == L2R_L2LOSS_SVC)
+	//	printf("Best C = %g  CV accuracy = %g%%\n", best_C, 100.0*best_score);
+	//else if(param.solver_type == L2R_L2LOSS_SVR)
+	//	printf("Best C = %g Best p = %g  CV MSE = %g\n", best_C, best_p, best_score);
 }
 
 void do_cross_validation()

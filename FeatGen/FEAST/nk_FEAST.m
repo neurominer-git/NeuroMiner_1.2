@@ -36,8 +36,8 @@ switch params.cmd
         end    
 end
 
-if isempty(k), 
-    if isfield(params,'NumFeat') && ~isempty(params.NumFeat), 
+if isempty(k)
+    if isfield(params,'NumFeat') && ~isempty(params.NumFeat) && ~isinf(params.NumFeat)
         k = params.NumFeat; 
     else
         k = size(Y,2);
@@ -85,4 +85,3 @@ else
     R=[];
 end
 
-end

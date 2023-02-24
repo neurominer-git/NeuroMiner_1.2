@@ -109,27 +109,22 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
             end
         end
     else
-        % Check whether the data has been pre-smoothed. If so extract the
-        % smoothed data shelves needed for the current CV2 partition
-        uPREPROC = nk_SetParamChain(paramfl, 1, PREPROC);
-        if numel(Y) ~= uPREPROC.SPATIAL.PX.opt
-            for u=1:kbin
-                idx=ismember(inp.smoothing_kernels,uPREPROC.SPATIAL.PX.opt);
-                uPREPROC = nk_SetParamChain(paramfl, u, PREPROC);
-                sY{u} = Y{u}(idx);
-                if ~isempty(Yocv), sYocv{u} = Yocv{u}(idx); end
-                if ~isempty(Cocv), sCocv{u} = Cocv{u}(idx); end
-                if isfield(inp,'X') && isfield(inp.X,'Yw') && ~isfield(inp,'Yw'), inp.Yw{u} = inp.X.Yw{u}(idx); end
-            end
-        else
-            sY = Y;
-            if ~isempty(Yocv), sYocv = Yocv; end
-            if ~isempty(Cocv), sCocv = Cocv; end
-            if isfield(inp,'X') && isfield(inp.X,'Yw') && ~isfield(inp,'Yw'), inp.Yw = inp.X.Yw; end
-        end
+       
+        sY = Y;
+        if ~isempty(Yocv), sYocv = Yocv; end
+        if ~isempty(Cocv), sCocv = Cocv; end
+        if isfield(inp,'X') && isfield(inp.X,'Yw') && ~isfield(inp,'Yw'), inp.Yw = inp.X.Yw; end
     end
 else
+    %uBINMOD = BINMOD;
     optfl = false;
+    uPREPROC = nk_SetParamChain(paramfl, 1, PREPROC);
+    if numel(Y) ~= uPREPROC.SPATIAL.PX.opt
+        for u
+        find(inp.smoothing_kernels==uPREPROC.SPATIAL.PX.opt)
+        uPREPROC = nk_SetParamChain(paramfl, u, PREPROC);
+        sY = 
+    end
     sY = Y;
     if ~isempty(Yocv), sYocv = Yocv; end
     if ~isempty(Cocv), sCocv = Cocv; end

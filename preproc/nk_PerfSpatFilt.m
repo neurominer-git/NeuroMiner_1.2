@@ -76,9 +76,9 @@ if isfield(CURACT,'SPATIAL') && CURACT.SPATIAL.cubetype>1
             clear ttY
             % Transfer smoothed data into container and handle NaNs
             % properly
-            for zv = 1:nP, 
+            for zv = 1:nP
                 fY{zv,zu} = tY{zv};
-                if any(indnan), 
+                if any(indnan)
                     fY{zv,zu}(nanMask) = nan; 
                 end
             end

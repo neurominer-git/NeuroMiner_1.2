@@ -14,7 +14,7 @@ function [pY, IN] = PerfExtDimObj(Y, IN)
 global VERBOSE
 
 % Defaults
-if isempty(IN),eIN=true; else eIN=false; end
+if isempty(IN),eIN=true; else, eIN=false; end
 [m,n] = size(Y);
 % Check for and eliminate zero variance attributes
 if eIN || ~isfield(IN,'indNonRem') || isempty(IN.indNonRem)

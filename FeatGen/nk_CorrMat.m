@@ -43,9 +43,9 @@ for i=1:n2
                 C(i,j) = fastcorr(tY,tG);
                 if nargout > 1, [T(i,j), P(i,j)] = pvalPearson('b',C(i,j),m1); end
             case 'spearman'
-                C(i,j) = corr(tY,tG,'type',typ);
+                [C(i,j), P(i,j)] = corr(tY,tG,'type',typ);
             case 'spearman_fast'
-                C(i,j) = spear(tY,tG);
+                [C(i,j),P(i,j)] = spear(tY,tG);
         end   
     end
 end

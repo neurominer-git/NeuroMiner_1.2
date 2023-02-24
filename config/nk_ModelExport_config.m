@@ -12,7 +12,7 @@ analysis = dat.analysis{complvec(analind)};
 if ~isfield(analysis,'GDdims'), errordlg('No results detected for the selected analysis.\nRecreate analysis structure!'), end
 
 % Define training parameters of current analysis as global variables
-nk_SetupGlobVars2(analysis.params, 'setup_main', 0); 
+nk_SetupGlobalVariables(analysis.params, 'setup_main', 0); 
 
 if ~isempty(FUSION)        
     F = analysis.params.TrainParam.FUSION.M;
@@ -31,7 +31,7 @@ end
 % Loop through modalities
 for i = 1:nF
     
-    inp2 = nk_SetFusionMode2(dat, analysis, F, nF, i, oocvind);
+    inp2 = nk_DefineFusionModeParams(dat, analysis, F, nF, i, oocvind);
     inp = catstruct(inp1,inp2);
     
     for j = 1:MULTILABEL.dim

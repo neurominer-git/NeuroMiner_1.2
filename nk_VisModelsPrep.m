@@ -56,7 +56,7 @@ if ~isempty(analysis)
     YesNo_opts  = {'yes', 'no'};   
     
     % Initialize global parameters for the selected analysis
-    nk_SetupGlobVars2(analysis.params, 'setup_main', 0); 
+    nk_SetupGlobalVariables(analysis.params, 'setup_main', 0); 
     MULTI = analysis.params.TrainParam.MULTI;
     
     % Compute from scratch or use pre-computed datamats ?
@@ -260,7 +260,7 @@ switch act
             inp.analysis_id = NM.analysis{inp.analind(i)}.id;
             inp.saveoptdir = [ NM.analysis{inp.analind(i)}.rootdir filesep 'opt' ];
             NM.analysis{inp.analind(i)} = VisModelsPrep(NM, inp, NM.analysis{inp.analind(i)});
-            nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'clear', 0); 
+            nk_SetupGlobalVariables(NM.analysis{inp.analind(i)}.params, 'clear', 0); 
         end
         NM = rmfield(NM,'runtime');
 end
@@ -333,7 +333,7 @@ if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
 nL = nk_GetLabelDim(MULTILABEL);
 analysis.visdata = cell(nF,nL);
 for i = 1:nF
-    inp2            = nk_SetFusionMode2(dat, analysis, F, nF, i);
+    inp2            = nk_DefineFusionModeParams(dat, analysis, F, nF, i);
     inp2.labels     = analysis.params.label.label;
     inp             = catstruct(inp1,inp2); clear inp2;
     inp.curlabel    = 1;

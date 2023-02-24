@@ -85,7 +85,7 @@ end
 if ~isempty(analysis)
     
     % Initialize global parameters for the selected analysis
-    nk_SetupGlobVars2(analysis.params, 'setup_main', 0); 
+    nk_SetupGlobalVariables(analysis.params, 'setup_main', 0); 
     
     % Compute from scratch or use pre-computed datamats ?
     LFL_opts        = {'Compute from scratch',sprintf('Use precomputed %s',inp.datatype)};                                      
@@ -277,7 +277,7 @@ switch act
             else
                 NM.analysis{inp.analind(i)}.MLI = MLInterpreterPrep(NM, inp, NM.analysis{inp.analind(i)});
             end
-            nk_SetupGlobVars2(NM.analysis{inp.analind(i)}.params, 'clear', 0); 
+            nk_SetupGlobalVariables(NM.analysis{inp.analind(i)}.params, 'clear', 0); 
         end
         NM = rmfield(NM,'runtime'); 
 end
@@ -362,7 +362,7 @@ inp1.MLI = MLI;
 for i = 1:inp1.nF
     
     % **************************** ANALYSIS SETUP *****************************
-    inp2 = nk_SetFusionMode2(dat, analysis, F, nF, i, inp1.oocvind);
+    inp2 = nk_DefineFusionModeParams(dat, analysis, F, nF, i, inp1.oocvind);
     inp2.labels = analysis.params.label.label;
     inp = catstruct(inp1,inp2);
     inp.MLI.Modality = MLI.Modality(inp.tF);

@@ -304,24 +304,27 @@ for curclass = 1 : nclass
                     hdx = hrx;
                     
                 otherwise
-            
-                    switch ENSMETHOD
 
-                        case 1 % This is the simple majority vote
-                            % Hard label decision:
-                            hrx = sign(nm_nansum(dTTs,2));
-                            hdx = nm_nanmedian(dDTs,2);
-
-                        case 2 % Product majority vote
-                            hrx = sign(prod(dTTs,2));
-                            hdx = prod(dDTs,2);
-
-                        case 3 % Error Correcting Output Codes
-                            coding=1; decoding=1;
-                            classes = ones(1,size(dTTs,2));
-                            %hrs(hrs==-1) = ;
-                            hrx = nk_ErrorCorrOutCodes(dTTs, classes, coding, decoding);
-                            hrx(hrx==2) = -1; hdx = hrx;
+                    if size(dTTs,2)<2
+                        hrx = dTTs; hdx = dDTs;
+                    else
+                        switch ENSMETHOD
+    
+                            case 1 % This is the simple majority vote
+                                % Hard label decision:
+                                hrx = sign(nm_nansum(dTTs,2));
+                                hdx = nm_nanmedian(dDTs,2);
+    
+                            case 2 % Product majority vote
+                                hrx = sign(prod(dTTs,2));
+                                hdx = prod(dDTs,2);
+    
+                            case 3 % Error Correcting Output Codes
+                                coding=1; decoding=1;
+                                classes = ones(1,size(dTTs,2));
+                                hrx = nk_ErrorCorrOutCodes(dTTs, classes, coding, decoding);
+                                hrx(hrx==2) = -1; hdx = hrx;
+                        end
                     end
             end
             % Check for zeros

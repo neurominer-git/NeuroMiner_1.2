@@ -103,13 +103,15 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     % Run dimensionality reduction on the source matrix
     [dS, IN] = nk_PerfRedObj(S(IN.indX,:),IN);
     IN.C = zeros(size(dS,2),size(IN.G,2));
-    
+    IN.Pvalue = IN.C;
+
     % Identify correlated factors in the factorized source matrix
     switch corrmeth
         case {'pearson', 'spearman'}
             for i = 1:size(IN.G,2)
                 % Determine correlations with covars in the source matrix
-                [IN.C(:,i),~,~,IN.Pvalue(:,i)] = abs(nk_CorrMat(dS,IN.G(IN.indX,i),corrmeth)');
+                [Cvalues,~,~,Pvalues] = nk_CorrMat(dS,IN.G(IN.indX,i),corrmeth);
+                IN.C(:,i)=abs(Cvalues); IN.Pvalue(:,i)=Pvalues;
                 IN.C(isinf(IN.C(:,i)) | isnan(IN.C(:,i)),i) = 0;
                 if VERBOSE 
                     maxi = max(IN.C(:,i)); 
@@ -134,9 +136,9 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     % Threshold eigenvariate correlations with covars
     switch IN.corrcrit
         case 'corr'
-            IN.subthresh = single(feval(IN.varop, IN.C, IN.corrthresh));
+            IN.subthresh = any(single(feval(IN.varop, IN.C, IN.corrthresh)),2);
         case 'pval'
-            IN.subthresh = single(feval(IN.varop, IN.Pvalue, IN.corrthresh));
+            IN.subthresh = any(single(feval(IN.varop, IN.Pvalue, IN.corrthresh)),2);
     end
 
     % Check whether correlated factors exist or not!
@@ -158,7 +160,7 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     end
 
     % Determine which eigenvariates have to be extracted
-    IN.ind0 = ~sum(IN.subthresh,2);
+    IN.ind0 = ~IN.subthresh;
 end
 if ~any(IN.ind0) 
     warning('All eigenvariates meet threshold criterion [%s %g]!\nCheck your data and your settings.',IN.varop,IN.corrthresh);
@@ -191,7 +193,7 @@ switch IN.recon
 end
 
 if VERBOSE
-    mx = IN.C(~IN.ind0); s0 = sum(~IN.ind0);
+    mx = IN.C(~IN.ind0,:); s0 = sum(~IN.ind0);
     if ~s0
         fprintf('???')
     end

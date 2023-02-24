@@ -190,7 +190,7 @@ if ~defaultsfl
                             (NM.TrainParam.RAND.InnerFold == -1 || ...
                             NM.TrainParam.RAND.InnerFold == numel(NM.label) - floor(numel(NM.label) / CV2fn))
                         CV1ps = ''; CV1prx = ' [ LOO ]';
-                         if strcmp(NM.modeflag,'classification'), NM.SVM.GridParam = 1; end
+                        if strcmp(NM.modeflag,'classification'), NM.SVM.GridParam = 1; end
                         MenuRem = [MenuRem 4];
                     else
                         CV1pn = NM.TrainParam.RAND.InnerPerm; CV1ps = num2str(CV1pn);
@@ -319,7 +319,7 @@ if ~defaultsfl
         case 2
              OuterFold = nk_input('Number of folds for Outer (CV2) cross-validation ',0,'i',CV2fn);
              if OuterFold <= 1 && OuterFold ~= -1
-                 errordlg('Specify at least two Outer (CV2) folds for k-fold cross-validation!');
+                 errordlg('Specify at least 2 outer (CV2) folds for k-fold cross-validation and 1 for training-only mode!');
              else
                  NM.TrainParam.RAND.OuterFold = OuterFold;
              end
@@ -342,8 +342,8 @@ if ~defaultsfl
              
         case 4
              InnerFold = nk_input('Number of folds for Inner cross-validation (CV1)',0,'i',CV1fn);
-             if InnerFold <= 1 && InnerFold ~= -1
-                 errordlg('Specify at least two CV1 folds for k-fold cross-validation!');
+             if InnerFold < 1 && InnerFold ~= -1
+                 errordlg('Specify at least 2 inner (CV1) folds for k-fold cross-validation and 1 for training-only mode!');
              else
                  NM.TrainParam.RAND.InnerFold = InnerFold;
              end
@@ -362,7 +362,7 @@ if ~defaultsfl
         case 6
              groups = []; appendfl=false; oldcv=zeros(0,size(NM.label,2));
 
-             % Checkwhether to overwrite or append to current CV structure
+             % Check whether to overwrite or append to current CV structure
              if isfield(NM,'cv') && ~isempty(NM.cv)
                  if NM.TrainParam.RAND.OuterFold == size(NM.cv(1).TrainInd,2) && ...
                     NM.TrainParam.RAND.InnerFold == size(NM.cv(1).cvin{1,1}.TrainInd,2)

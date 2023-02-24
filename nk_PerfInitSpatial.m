@@ -44,5 +44,6 @@ for n=1:nM
     inp.X(n).sY = sY;
     if ~isempty(sYocv), inp.X(n).sYocv = sYocv; end
     if ~isempty(sCocv), inp.X(n).sCocv = sCocv; end
-
+    inp.issmoothed = true;
+    
 end

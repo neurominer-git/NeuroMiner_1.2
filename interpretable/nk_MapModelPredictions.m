@@ -44,8 +44,3 @@ for i=1:n
     Y_mapped(i) = median(tY_mapped(idx,i));
 end
 
-% idx = ~isfinite(Y_mapped);
-% Y_mapped(idx) = 0;
-% Y_mapped_cil(idx)=0;
-% Y_mapped_ciu(idx)=0;
-% Y_mapped_std(idx)=0;

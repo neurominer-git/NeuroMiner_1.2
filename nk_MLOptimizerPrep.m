@@ -101,10 +101,10 @@ if ~isempty(analysis)
     inp.sfieldnames = {'','preprocmat','gdmat','gdanalmat'};
 
     if ~isfield(inp,'simFlag') || ~inp.simFlag
-        nk_SetupGlobVars2(NM.analysis{inp.analind(1)}.params, 'setup_main', 0);
+        nk_SetupGlobalVariables(NM.analysis{inp.analind(1)}.params, 'setup_main', 0);
         [ix, jx] = size(CV(1).TrainInd);
     else
-        nk_SetupGlobVars2(xNM.analysis{inp.analind(1)}.params, 'setup_main', 0);
+        nk_SetupGlobalVariables(xNM.analysis{inp.analind(1)}.params, 'setup_main', 0);
         [ix, jx] = size(xNM.cv(1).TrainInd);
     end
 
@@ -331,7 +331,7 @@ if ~isempty(analysis)
                 end
 
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
-                nk_SetupGlobVars2(tNM.analysis{inp.analind(i)}.params, 'clear', 0);
+                nk_SetupGlobalVariables(tNM.analysis{inp.analind(i)}.params, 'clear', 0);
             end
             % Copy back results to NM/xNM
             if ~isfield(inp,'simFlag') || ~inp.simFlag
@@ -363,7 +363,7 @@ function analysis = MLOptimizerPrep(dat, analysis, inp1)
 
 global PARMODE MULTI SAV MODEFL CV PREPROC RAND FUSION META SVM
 
-nk_SetupGlobVars2(analysis.params, 'setup_strat', 0, inp1.varind(1));
+nk_SetupGlobalVariables(analysis.params, 'setup_strat', 0, inp1.varind(1));
 strout = nk_Preprocess_StrCfg([], []);
 
 % Define # of classifiers to train (1 for multi-group classification & regression)
@@ -419,7 +419,7 @@ if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir);end
 for i = 1:inp1.nF
 
     %% Get Training / CV data (Y) & Build modality suffix
-    inp2  = nk_SetFusionMode2(dat, analysis, inp1.F, inp1.nF, i);
+    inp2  = nk_DefineFusionModeParams(dat, analysis, inp1.F, inp1.nF, i);
     inp   = catstruct(inp1,inp2); clear inp2
     if isfield(dat,'time'), inp.time2event = dat.time; end
     if inp.lfl == 2, inp.preprocmat = preprocmat{i,:,:}; end

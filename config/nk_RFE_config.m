@@ -114,7 +114,7 @@ switch CV2Mode
         RFE.CV2Class.EnsembleStrategy.DataType = 0;
         
         if flgWrp || flgFlt
-            if flgWrp, 
+            if flgWrp
                 RFE.CV2Class.EnsembleStrategy.Metric = RFE.Wrapper.EnsembleStrategy.Metric;
             else
                 RFE.CV2Class.EnsembleStrategy.Metric = RFE.Filter.EnsembleStrategy.Metric;

@@ -16,17 +16,15 @@ if ~defaultsfl
     
     if ~strcmp(sourcestr,'matrix')
         %% Gaussian smoothing setup
-        if ~isfield(PREPROC,'SPATIAL') || isempty(PREPROC.SPATIAL)
-            if isfield(VIS,'fwhm') && ~isempty(VIS.fwhm)
-                fwhmstr = sprintf('yes (FHWM = %g)', VIS.fwhm);
-                fwhmdef = VIS.fwhm; fwhmflagdef = 1;
-            else
-                fwhmstr = 'no';
-                fwhmdef = 8; fwhmflagdef = 2;
-            end
-            menustr = sprintf('%sApply gaussian smoothing to weight vectors [ %s ]|', menustr, fwhmstr);
-            menuact = [menuact 3];
+        if isfield(VIS,'fwhm') && ~isempty(VIS.fwhm)
+            fwhmstr = sprintf('yes (FHWM = %g)', VIS.fwhm);
+            fwhmdef = VIS.fwhm; fwhmflagdef = 1;
+        else
+            fwhmstr = 'no';
+            fwhmdef = 8; fwhmflagdef = 2;
         end
+        menustr = sprintf('%sApply gaussian smoothing to weight vectors [ %s ]|', menustr, fwhmstr);
+        menuact = [menuact 3];
         
         %% Thresholding setup
         meanthreshstr = 'undefined'; sethreshstr = 'undefined'; threshstr = 'undefined'; threshdef = 0;
@@ -97,7 +95,7 @@ if ~defaultsfl
         end
     end
     
-    menustr = sprintf('%sDerive Z scores and P values using permuatation analysis [ %s%s%s ]', menustr, permstr, permmodestr, sigstr); menuact = [ menuact 7 ];
+    menustr = sprintf('%sPerform permutation analysis [ %s%s%s ]', menustr, permstr, permmodestr, sigstr); menuact = [ menuact 7 ];
 
     %% CONFIGURATION
     nk_PrintLogo

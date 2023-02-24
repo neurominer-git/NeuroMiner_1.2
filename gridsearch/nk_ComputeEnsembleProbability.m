@@ -1,6 +1,6 @@
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FORMAT: results = nk_ComputeEnsembleProbability(predictions, label)
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% =======================================================================================================
+% results = nk_ComputeEnsembleProbability(predictions, label, noscale, optcutoff, optcutoffperc, meanfun)
+% =======================================================================================================
 % (c) Nikolaos Koutsouleris, 4/2012
 function results = nk_ComputeEnsembleProbability(predictions, label, noscale, optcutoff, optcutoffperc, meanfun)
 

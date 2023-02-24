@@ -89,4 +89,4 @@ inp.GridAct = nk_GenGridAct_batch(NM.analysis{analind}.params.cv, ...
 inp.optpreprocmat = optparammaster;
 inp.optmodelmat = optmodelsmaster;
 
-nk_OOCVPrep( 10, inp, 'NM:HPC:OOCVANALYSIS');
+nk_OOCVPrep(NM, 10, inp, 'NM:HPC:OOCVANALYSIS');
