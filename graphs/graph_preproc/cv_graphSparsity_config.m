@@ -1,4 +1,4 @@
-function [ GRAPHSPARSITY, PX, act ] = graphSparsity_config(GRAPHSPARSITY, PX, parentstr, defaultsfl)
+function [ GRAPHSPARSITY, PX, act ] = cv_graphSparsity_config(GRAPHSPARSITY, PX, parentstr, defaultsfl)
 
 SparsityPerc = []; 
 

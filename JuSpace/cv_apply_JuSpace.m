@@ -1,4 +1,4 @@
-function Ypet = apply_JuSpace(Yimg, brainmask, atlas, cortype, autocorcorrect, petlist)
+function Ypet = cv_apply_JuSpace(Yimg, brainmask, atlas, cortype, autocorcorrect, petlist)
 
 % add JuSpace path
 dir_tool = '/opt/matlab/JuSpace_v1.3/';

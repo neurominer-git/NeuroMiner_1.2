@@ -1,4 +1,4 @@
-function [sY, IN] = perfJuSpace(Y, IN)
+function [sY, IN] = cv_perfJuSpace(Y, IN)
 % =========================================================================
 
 % =========================== WRAPPER FUNCTION ============================ 
@@ -17,7 +17,7 @@ function [Y, IN] = PerfJuSpace(Y, IN)
     inputStr = '';
     
     if ~isempty(IN.brainmask) && ~isempty(IN.atlas) && ~isempty(IN.cortype) && ~isempty(IN.autocorcorrect) && ~isempty(IN.petList)
-        Y = apply_JuSpace(Y, IN.brainmask, IN.atlas, IN.cortype, IN.autocorcorrect, IN.petList);
+        Y = cv_apply_JuSpace(Y, IN.brainmask, IN.atlas, IN.cortype, IN.autocorcorrect, IN.petList);
     end
         
     

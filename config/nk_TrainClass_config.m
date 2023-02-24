@@ -613,7 +613,7 @@ switch act
             LABEL.OrigTrainParam = NM.TrainParam; 
         end
         while act>0  
-            [LABEL, act] = nk_Label_config(LABEL);
+            [LABEL, act] = cv_Label_config(LABEL);
         end
         if LABEL.flag && ~strcmp(LABEL.newmode, modeflag)
             origmodefl                  = NM.modeflag;

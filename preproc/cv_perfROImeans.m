@@ -1,4 +1,4 @@
-function [sY, IN] = perfROImeans(Y, IN)%, PREPROC, prevP)
+function [sY, IN] = cv_perfROImeans(Y, IN)%, PREPROC, prevP)
 % =========================================================================
 
 % =========================== WRAPPER FUNCTION ============================ 
@@ -17,7 +17,7 @@ function [Y, IN] = PerfROImeans(Y, IN)%, PREPROC, prevP)
     inputStr = '';
     
     if isfield(IN, 'brainmask') && isfield(IN, 'atlas') 
-        Y = compute_ROImeans(Y, IN.brainmask, IN.atlas);%, PREPROC, prevP);
+        Y = cv_compute_ROImeans(Y, IN.brainmask, IN.atlas);%, PREPROC, prevP);
     end
         
     

@@ -1,4 +1,4 @@
-function [sY, IN] = graph_PerfGraphConstruction(Y, IN)
+function [sY, IN] = cv_graph_PerfGraphConstruction(Y, IN)
 % =========================================================================
 
 % =========================== WRAPPER FUNCTION ============================ 
@@ -24,11 +24,11 @@ function [Y, IN] = PerfGraphConstruction(Y, IN)
         switch IN.method 
             case "KL divergence" 
                  if ~isempty(IN.parcellation) %&& (IN.parcellation == "Hammers.nii") 
-                    R = graph_constructionKLS(Y, IN.method, IN.parcellation, IN.brainmask); % KLS = symmetric KL divergence method
+                    R = cv_graph_constructionKLS(Y, IN.method, IN.parcellation, IN.brainmask); % KLS = symmetric KL divergence method
                  end
             case "Normative network + 1"
                 if ~isempty(IN.refGroup)
-                    R = graph_constructionREFPLUSP(Y, IN.method, IN.refGroup, IN.simMeasure); %JBE = jackknife bias estimation method
+                    R = cv_graph_constructionREFPLUSP(Y, IN.method, IN.refGroup, IN.simMeasure); %JBE = jackknife bias estimation method
                 end
         end
     else

@@ -1,4 +1,4 @@
-function CM = graph_constructionKLS(A, method, brainmask, atlas)
+function CM = cv_graph_constructionKLS(A, method, brainmask, atlas)
 % KL divergence method following Kong et al. 2014
 %
 % INPUT: nii images (already smoothed, it's another preprocessing step of
