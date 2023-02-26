@@ -492,9 +492,19 @@ switch action
                             else
                                 REMVARCOMP_varop_str = 'undefined';
                             end
+                            if isfield(params.ACTPARAM{i}.REMVARCOMP,'SUBGROUP')
+                                switch params.ACTPARAM{i}.REMVARCOMP.SUBGROUP.flag
+                                    case 1
+                                        REMVARCOMP_subgroup_str = 'all';
+                                    case 2
+                                        REMVARCOMP_subgroup_str = sprintf('%g cases',sum(params.ACTPARAM{i}.REMVARCOMP.SUBGROUP.ind));
+                                    case 3
+                                        REMVARCOMP_subgroup_str = sprintf('%g%% of cases random selected', params.ACTPARAM{i}.REMVARCOMP.SUBGROUP.indperc);
+                                end
+                            end
                             REMVARCOMP_corrthresh_str = nk_ConcatParamstr(params.ACTPARAM{i}.REMVARCOMP.corrthresh);
-                            preprocact{i} = sprintf('Variance extraction [ %s, %s, Cutoff(s): %s, Operator: %s, Back-projection: %s ]', ...
-                                REMVARCOMP_G_str, REMVARCOMP_corrmeth_str , REMVARCOMP_corrthresh_str, REMVARCOMP_varop_str, REMVARCOMP_recon_str);
+                            preprocact{i} = sprintf('Variance extraction [ %s, %s, Cutoff(s): %s, Operator: %s, Back-projection: %s, Training sample: %s ]', ...
+                                REMVARCOMP_G_str, REMVARCOMP_corrmeth_str , REMVARCOMP_corrthresh_str, REMVARCOMP_varop_str, REMVARCOMP_recon_str, REMVARCOMP_subgroup_str);
                         case 'devmap'
                             
                             if ~isempty(params.ACTPARAM{i}.DEVMAP.glabel)
