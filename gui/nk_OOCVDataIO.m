@@ -95,6 +95,13 @@ if(nargin > 3)
                  set(handles.chkLabelKnown,'Visible',vis_str);
                  set(handles.chkCalibrationDataAvail,'Visible',vis_str);
                  set(handles.cmdSave,'Visible',vis_str);
+            case 'multiselection'
+                switch varargin{index+1}
+                    case 0
+                        set(handles.lstData,'Max', 1,'Min',0);
+                    case 1
+                        set(handles.lstData,'Max', numel(handles.Data.Items),'Min',0);
+                end
         end
     end
 end

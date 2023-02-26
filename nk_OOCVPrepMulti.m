@@ -52,7 +52,15 @@ end
 
 analysis      = NM.analysis{inp.analind(1)}; 
 % Select independent test data container
-if isfield(inp,'oocvind'), OOCVSelStr = sprintf('New data #%g: %s', inp.oocvind, inp.OO.desc); else, OOCVSelStr = na_str; end
+if isfield(inp,'oocvind')
+    if numel(inp.oocvind)==1
+        OOCVSelStr = sprintf('New data #%g: %s', inp.oocvind, inp.OO.desc);
+    else
+        OOCVSelStr = sprintf('%g new datasets selected', numel(inp.oocvind));
+    end
+else
+    OOCVSelStr = na_str; 
+end
 OOCVSelectStr = sprintf('Choose independent data to work on [ %s ]|', OOCVSelStr);                                          OOCVSelectAct = 2;   
 if DATASCRAM, inp.loadparam = 1; inp.saveparam = 2; end
 if ~isempty(analysis)
@@ -190,7 +198,7 @@ switch act
        
     % Select OOCV data
     case 2    
-        [ NM, OO, oocvind ] = nk_SelectOOCVdata(NM, 1, 0);  
+        [ NM, OO, oocvind ] = nk_SelectOOCVdata(NM, true, false, true);  
         if ~isempty(oocvind), inp.OO = OO; inp.oocvind = oocvind; end 
     case 3
          lfl = nk_input('Define run-time mode of independent test module',0,'mq',strjoin(LFL_opts, '|'),[1,2],inp.lfl);
@@ -201,8 +209,10 @@ switch act
             case 1
                 if inp.ovrwrt == 1, inp.ovrwrt = 2; elseif inp.ovrwrt  == 2, inp.ovrwrt = 1; end
             case 2
-                tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind);
-                inp.oocvmat = nk_GenDataMaster(NM.id, 'OOCVdatamat', CV, [], tdir);
+                for i=1:numel(inp.oocvind)
+                    tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind(i));
+                    inp.oocvmat{i} = nk_GenDataMaster(NM.id, 'OOCVdatamat', CV, [], tdir);
+                end
         end
     case 5
         [operms,ofolds] = size(CV.TrainInd);
@@ -212,15 +222,17 @@ switch act
     case 7
         if inp.loadparam == 1, inp.loadparam = 2; elseif inp.loadparam == 2,  inp.loadparam = 1; end
     case 8
-        tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind);
+        tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind(1));
         optpreprocmat = nk_GenDataMaster(NM.id, 'OptPreprocParam', CV, [], tdir);
         if ~isempty(optpreprocmat), inp.optpreprocmat = optpreprocmat; end
     case 9
-        tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind);
+        tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind(1));
         optmodelmat = nk_GenDataMaster(NM.id, 'OptModel', CV, [], tdir);
         if ~isempty(optmodelmat), inp.optmodelmat = optmodelmat; end
     case {10,11}
-         inp.oocvname = sprintf('OOCV_%g',inp.oocvind);
+         for j=1:numel(inp.oocvind)
+            inp.oocvname = sprintf('OOCV_%g',inp.oocvind(j));
+         end
          nA = 1; if numel(inp.analind)>1, nA = numel(inp.analind); end
          for i=1:nA
             NM.runtime.curanal = inp.analind(i);
@@ -228,7 +240,10 @@ switch act
             if inp.HideGridAct, [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd); inp.GridAct = true(ix,jx); end
             inp.analysis_id = NM.analysis{inp.analind(i)}.id;
             inp.saveoptdir = [ NM.analysis{inp.analind(i)}.rootdir filesep 'opt' ];
-            NM.analysis{inp.analind(i)}.OOCV{inp.oocvind} = OOCVPrep(NM, inp, NM.analysis{inp.analind(i)});
+            tOOCV = OOCVPrep(NM, inp, NM.analysis{inp.analind(i)});
+            for j=1:numel(inp.oocvind)
+                NM.analysis{inp.analind(i)}.OOCV{inp.oocvind(j)} = tOOCV{i};
+            end
             nk_SetupGlobalVariables(NM.analysis{inp.analind(i)}.params, 'clear', 0); 
          end
          NM = rmfield(NM,'runtime');
@@ -300,8 +315,8 @@ if isfield(inp1.OO,'groups') && size(inp1.OO.groups,1)==numel(inp1.OO.cases)
     end
     inp1.groupvec = unique(inp1.groupind);
     inp1.ngroups = numel(unique(inp1.groupind));
-    if isfield(inp1.OO,'grpnames') && numel(inp1.OO.groupnames) == inp1.ngroups
-        inp1.groupnames = inp1.OO.groupnames;
+    if isfield(inp1.OO,'grpnames') && numel(inp1.OO.grpnames) == inp1.ngroups
+        inp1.groupnames = inp1.OO.grpnames;
     else
         inp1.groupnames = cellstr([repmat('Group #',inp1.ngroups,1) num2str((1:inp1.ngroups)')]);
     end
@@ -313,6 +328,7 @@ if isfield(inp1.OO,'groups') && size(inp1.OO.groups,1)==numel(inp1.OO.cases)
 else
     inp1.ngroups=1;
 end
+
 if isfield(inp1,'targdir') 
     inp1.rootdir = fullfile(inp1.targdir, inp1.oocvname);
 elseif isfield(analysis,'rootdir') && exist(analysis.rootdir,'dir')
