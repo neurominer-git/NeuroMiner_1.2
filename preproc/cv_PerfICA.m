@@ -1,4 +1,4 @@
-function [pY, IN.mpp] = cv_PerfICA(Y, varargin)
+function [pY, mapping] = cv_PerfICA(Y, varargin)
 % function to extract independent components from data 
 % Input: Y - input data (N*D) 
 % Output: pY - output data (N*IC) 
@@ -6,7 +6,7 @@ function [pY, IN.mpp] = cv_PerfICA(Y, varargin)
 % projected onto the unseen data
 
 % in training mode 
-if nargin > 1
+if nargin <= 1
     [icasig, A, W] = fastica(Y');
     % Y = projection of original data on the ICs
     % A = ICs are represented in the columns 
@@ -14,11 +14,12 @@ if nargin > 1
     % W*Xn) 
 
     pY = icasig';
-    IN.mpp.A = A; 
-    IN.mpp.W = W;
+    mapping.A = A; 
+    mapping.W = W;
 else % test mode
-    mapping = varargin(1);
+    mapping = varargin{1};
     pY = mapping.W * Y';
+    pY = pY';
 end
 
 

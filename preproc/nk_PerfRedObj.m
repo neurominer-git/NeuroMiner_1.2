@@ -225,7 +225,7 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
                 case 'poly'
                     [pY,IN.mpp] = compute_mapping(Y, IN.DR.RedMode, IN.DR.dims, IN.DR.kernel.type, IN.DR.kernel.d, IN.DR.kernel.R);
             end
-        case 'ICA'
+        case 'fastICA'
             [pY, IN.mpp] = cv_PerfICA(Y); 
         otherwise
             [pY,IN.mpp] = compute_mapping(Y,IN.DR.RedMode, IN.DR.dims, IN.DR.Modus);
@@ -255,7 +255,7 @@ else
             pY = AUtoPhysicalUnits(Y',IN.mpp.W); pY=pY';
         case 'SPCA'
             pY = nk_PerfSPCA(Y, IN.mpp);
-        case 'ICA'
+        case 'fastICA'
             pY = cv_PerfICA(Y, IN.mpp);
 %         case 'LMNN2.5'
 %             pY = (IN.mpp.L * Y')';

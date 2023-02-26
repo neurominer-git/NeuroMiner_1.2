@@ -305,8 +305,10 @@ switch action
                                 ', #SDs: ' num2str(params.ACTPARAM{i}.SYMBOL.symStdNum) ')' ];
 
                         case 'reducedim'
-
-                            if strcmp(params.ACTPARAM{i}.DR.RedMode,'PLS')
+                            if strcmp(params.ACTPARAM{i}.DR.RedMode,'fastICA')
+                                RedMode = 'fastICA';
+                                
+                            elseif strcmp(params.ACTPARAM{i}.DR.RedMode,'PLS')
                                 if isfield(params.ACTPARAM{i}.DR.PLS,'algostr')
                                     PLSalgo = sprintf('PLS (%s)',params.ACTPARAM{i}.DR.PLS.algostr);
                                 else
