@@ -907,7 +907,7 @@ function CURACT = config_graphSparsity(CURACT, navistr)
 
 if ~isfield(CURACT,'GRAPHSPARSITY'), CURACT.GRAPHSPARSITY=[]; end
 if ~isfield(CURACT,'PX'), CURACT.PX = []; end
-act = 1; while act >0, [ CURACT.GRAPHSPARSITY, CURACT.PX, act ] = graphSparsity_config(CURACT.GRAPHSPARSITY, CURACT.PX, navistr); end
+act = 1; while act >0, [ CURACT.GRAPHSPARSITY, CURACT.PX, act ] = cv_graphSparsity_config(CURACT.GRAPHSPARSITY, CURACT.PX, navistr); end
 CURACT.cmd = 'graphSparsity';
 
 end
@@ -916,7 +916,7 @@ function CURACT = config_graphMetrics(CURACT, navistr)
 
 if ~isfield(CURACT,'GRAPHMETRICS'), CURACT.GRAPHMETRICS=[]; end
 if ~isfield(CURACT,'PX'), CURACT.PX = []; end
-act = 1; while act >0, [ CURACT.GRAPHMETRICS, CURACT.PX, act ] = graphMetrics_config(CURACT.GRAPHMETRICS, CURACT.PX, navistr); end
+act = 1; while act >0, [ CURACT.GRAPHMETRICS, CURACT.PX, act ] = cv_graphMetrics_config(CURACT.GRAPHMETRICS, CURACT.PX, navistr); end
 CURACT.cmd = 'graphMetrics';
 
 end
@@ -927,7 +927,7 @@ if ~isfield(CURACT,'GRAPHCONSTRUCTION'), CURACT.GRAPHCONSTRUCTION=[]; end
 if ~isfield(CURACT,'PX'), CURACT.PX = []; end
 datadesc = NM.datadescriptor{varind}; brainmask = [];
 if datadesc.type, brainmask = NM.brainmask{varind}; end
-act = 1; while act >0, [ CURACT.GRAPHCONSTRUCTION, CURACT.PX, act ] = graphConstruction_config(CURACT.GRAPHCONSTRUCTION, CURACT.PX, brainmask, navistr); end
+act = 1; while act >0, [ CURACT.GRAPHCONSTRUCTION, CURACT.PX, act ] = cv_graphConstruction_config(CURACT.GRAPHCONSTRUCTION, CURACT.PX, brainmask, navistr); end
 CURACT.cmd = 'graphComputation';
 
 end
@@ -939,7 +939,7 @@ if ~isfield(CURACT,'JUSPACE'), CURACT.JUSPACE=[]; end
 %if ~isfield(CURACT,'PX'), CURACT.PX = []; end
 datadesc = NM.datadescriptor{varind}; brainmask = [];
 if datadesc.type, brainmask = NM.brainmask{varind}; end
-act = 1; while act >0, [ CURACT.JUSPACE, act ] = JuSpace_config(CURACT.JUSPACE, brainmask, navistr); end
+act = 1; while act >0, [ CURACT.JUSPACE, act ] = cv_JuSpace_config(CURACT.JUSPACE, brainmask, navistr); end
 CURACT.cmd = 'JuSpace';
 
 end
@@ -951,7 +951,7 @@ if ~isfield(CURACT,'ROIMEANS'), CURACT.ROIMEANS=[]; end
 %if ~isfield(CURACT,'PX'), CURACT.PX = []; end
 datadesc = NM.datadescriptor{varind}; brainmask = [];
 if datadesc.type, brainmask = NM.brainmask{varind}; end
-act = 1; while act >0, [ CURACT.ROIMEANS, act ] = ROImeans_config(CURACT.ROIMEANS, brainmask, navistr); end
+act = 1; while act >0, [ CURACT.ROIMEANS, act ] = cv_ROImeans_config(CURACT.ROIMEANS, brainmask, navistr); end
 CURACT.cmd = 'ROImeans';
 
 end
@@ -961,7 +961,7 @@ function CURACT = config_customPreproc(CURACT, navistr)
 
 if ~isfield(CURACT,'CUSTOMPREPROC'), CURACT.CUSTOMPREPROC=[]; end
 if ~isfield(CURACT,'PX'), CURACT.PX = []; end
-act = 1; while act >0, [ CURACT.CUSTOMPREPROC, CURACT.PX, act ] = customPreproc_config(CURACT.CUSTOMPREPROC, CURACT.PX, navistr); end
+act = 1; while act >0, [ CURACT.CUSTOMPREPROC, CURACT.PX, act ] = cv_customPreproc_config(CURACT.CUSTOMPREPROC, CURACT.PX, navistr); end
 CURACT.cmd = 'customPreproc';
 
 end

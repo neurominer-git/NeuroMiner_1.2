@@ -29,12 +29,12 @@ inp = struct('analind',			analind, ...
 				'ovrwrt', 		ovrwrtfl, ...
 				'update', 		true, ...
                 'HideGridAct',  false, ...
-                'batchflag',    true);
+                'batchflag',    false);
 				
 inp.GridAct = true(CV2x1,CV2x2);
 inp.preprocmat = preprocmat;                            
 inp = nk_GetAnalModalInfo_config(NM, inp);
                                 
-nk_MLOptimizerPrep(6, inp, 'train model');
+[inp, act, NM_out] = nk_MLOptimizerPrep(6, inp, 'train model');
 
 end

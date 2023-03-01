@@ -974,12 +974,12 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tGraph sparsity thresholding ...'); end
-    [InputParam.Tr, TrParami] = graph_PerfSparsityThres(InputParam.Tr, InputParam.P{i}.GRAPHSPARSITY);
+    [InputParam.Tr, TrParami] = cv_graph_PerfSparsityThres(InputParam.Tr, InputParam.P{i}.GRAPHSPARSITY);
 
     if tsfl, tsproc = true; end
 end
 
-if tsproc, InputParam.Ts = graph_PerfSparsityThres(InputParam.Ts, TrParami); end
+if tsproc, InputParam.Ts = cv_graph_PerfSparsityThres(InputParam.Ts, TrParami); end
 end
 
 function [SrcParam, InputParam, TrParami, actparam ] = act_graphMetrics(SrcParam, InputParam, ~, TrParami, actparam)
@@ -998,12 +998,12 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tGraph metric computation ...'); end
-    [InputParam.Tr, TrParami] = graph_PerfGraphMetrics(InputParam.Tr, InputParam.P{i}.GRAPHMETRICS);
+    [InputParam.Tr, TrParami] = cv_graph_PerfGraphMetrics(InputParam.Tr, InputParam.P{i}.GRAPHMETRICS);
     % All 
     if tsfl, tsproc = true; end
 end
 
-if tsproc, InputParam.Ts = graph_PerfGraphMetrics(InputParam.Ts, TrParami); end
+if tsproc, InputParam.Ts = cv_graph_PerfGraphMetrics(InputParam.Ts, TrParami); end
 end
 
 
@@ -1029,12 +1029,12 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tGraph computation ...'); end
-    [InputParam.Tr, TrParami] = graph_PerfGraphConstruction(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
+    [InputParam.Tr, TrParami] = cv_graph_PerfGraphConstruction(InputParam.Tr, InputParam.P{i}.GRAPHCONSTRUCTION);
     % All 
     if tsfl, tsproc = true; end
 end
 
-if tsproc, InputParam.Ts = graph_PerfGraphConstruction(InputParam.Ts, TrParami); end
+if tsproc, InputParam.Ts = cv_graph_PerfGraphConstruction(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 
@@ -1054,12 +1054,12 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tCustom preprocessing function ...'); end
-    [InputParam.Tr, TrParami] = perfCustomPreproc(InputParam.Tr, InputParam.P{i}.CUSTOMPREPROC);
+    [InputParam.Tr, TrParami] = cv_perfCustomPreproc(InputParam.Tr, InputParam.P{i}.CUSTOMPREPROC);
 
     if tsfl, tsproc = true; end
 end
 
-if tsproc, InputParam.Ts = perfCustomPreproc(InputParam.Ts, TrParami); end
+if tsproc, InputParam.Ts = cv_perfCustomPreproc(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 
@@ -1079,12 +1079,12 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tJuSpace function ...'); end
-    [InputParam.Tr, TrParami] = perfJuSpace(InputParam.Tr, InputParam.P{i}.JUSPACE);
+    [InputParam.Tr, TrParami] = cv_perfJuSpace(InputParam.Tr, InputParam.P{i}.JUSPACE);
 
     if tsfl, tsproc = true; end
 end
 
-if tsproc, InputParam.Ts = perfJuSpace(InputParam.Ts, TrParami); end
+if tsproc, InputParam.Ts = cv_perfJuSpace(InputParam.Ts, TrParami); end
 end
 % =========================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_ROImeans(SrcParam, InputParam, ~, TrParami, actparam)
@@ -1103,14 +1103,14 @@ if paramfl && tsfl
      tsproc = true;
 elseif trfl
     if VERBOSE;fprintf('\tROI means computation ...'); end
-    [InputParam.Tr, TrParami] = perfROImeans(InputParam.Tr, InputParam.P{i}.ROIMEANS);%,PREPROC,{InputParam.P{1:i-1}}); % prevPREPROC %prevP
+    [InputParam.Tr, TrParami] = cv_perfROImeans(InputParam.Tr, InputParam.P{i}.ROIMEANS);%,PREPROC,{InputParam.P{1:i-1}}); % prevPREPROC %prevP
 
     if tsfl, tsproc = true; end
 end
 % 
-if tsproc, InputParam.Ts = perfROImeans(InputParam.Ts, TrParami); end
+if tsproc, InputParam.Ts = cv_perfROImeans(InputParam.Ts, TrParami); end
 if CALIB.calibflag && isfield(InputParam, 'C') %&& CALIB.preprocstep > i 
-    InputParam.C = perfROImeans(InputParam.C, InputParam.P{i}.ROIMEANS);
+    InputParam.C = cv_perfROImeans(InputParam.C, InputParam.P{i}.ROIMEANS);
 end
 end
 % =========================================================================

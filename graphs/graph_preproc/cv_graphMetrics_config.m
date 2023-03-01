@@ -1,4 +1,4 @@
-function [ GRAPHMETRICS, PX, act ] = graphMetrics_config(GRAPHMETRICS, PX, parentstr, defaultsfl)
+function [ GRAPHMETRICS, PX, act ] = cv_graphMetrics_config(GRAPHMETRICS, PX, parentstr, defaultsfl)
 
 MetricsYes = 1; 
 MetricsList = [];

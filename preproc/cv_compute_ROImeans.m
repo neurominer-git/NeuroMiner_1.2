@@ -1,4 +1,4 @@
-function Ymean = compute_ROImeans(Yimg, brainmask, atlas)%, PREPROC, prevP)
+function Ymean = cv_compute_ROImeans(Yimg, brainmask, atlas)%, PREPROC, prevP)
 
 S.Vm                         = spm_vol(brainmask);
 [S.dims, S.indvol, ~, S.vox] = nk_ReadMaskIndVol(S.Vm, []);

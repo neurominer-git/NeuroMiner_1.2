@@ -1,4 +1,4 @@
-function [ ALTLAB, act ] = nk_Label_config(ALTLAB, defaultsfl)
+function [ ALTLAB, act ] = cv_Label_config(ALTLAB, defaultsfl)
 global NM
 
 altlabflag = 0;

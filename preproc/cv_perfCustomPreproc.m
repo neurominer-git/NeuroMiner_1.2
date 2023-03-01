@@ -1,4 +1,4 @@
-function [sY, IN] = perfCustomPreproc(Y, IN)
+function [sY, IN] = cv_perfCustomPreproc(Y, IN)
 % =========================================================================
 
 % =========================== WRAPPER FUNCTION ============================ 

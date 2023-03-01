@@ -1,4 +1,4 @@
-function [sY,IN] = graph_PerfGraphMetrics(Y,IN)
+function [sY,IN] = cv_graph_PerfGraphMetrics(Y,IN)
 
 % =========================== WRAPPER FUNCTION ============================
 if ~exist('IN','var'), IN = []; end

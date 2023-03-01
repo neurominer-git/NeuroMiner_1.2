@@ -1,4 +1,4 @@
-function S = apply_sparsity_thres(A, thres)
+function S = cv_apply_sparsity_thres(A, thres)
 % if mod(sqrt(size(A,2),1)) == 0 % the full connectivity matrix is entered
 %     nEdges = (size(A,2)*thres)-size(A,2); % number of edges minus diagonal
 % else % only upper triangle (without diagonal was entered)

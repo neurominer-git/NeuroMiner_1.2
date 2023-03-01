@@ -1,4 +1,4 @@
-function [GRAPHCONSTRUCTION, PX, act ] = graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, defaultsfl)
+function [GRAPHCONSTRUCTION, PX, act ] = cv_graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, defaultsfl)
 global NM
 % what method should be used for the construction of the networks?
 ConstructionMethod = 'Normative network + 1';

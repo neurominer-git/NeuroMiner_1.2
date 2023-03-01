@@ -1,4 +1,4 @@
-function [sY, IN] = graph_PerfSparsityThres(Y, IN)
+function [sY, IN] = cv_graph_PerfSparsityThres(Y, IN)
 % =========================================================================
 % FORMAT function [sY, IN] = nk_PerfElimZeroObj(Y, IN)
 % =========================================================================
@@ -28,7 +28,7 @@ function [Y, IN] = PerfSparsityThres(Y, IN)
 %if eIN  
 
     if ~isempty(IN.perc)
-        R = apply_sparsity_thres(Y, IN.p); 
+        R = cv_apply_sparsity_thres(Y, IN.p); 
     else
         R = Y;
     end

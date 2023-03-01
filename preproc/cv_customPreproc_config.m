@@ -1,4 +1,4 @@
-function [CUSTOMPREPROC, PX, act ] = customPreproc_config(CUSTOMPREPROC, PX, parentstr, defaultsfl)
+function [CUSTOMPREPROC, PX, act ] = cv_customPreproc_config(CUSTOMPREPROC, PX, parentstr, defaultsfl)
 
 funcFile = '';
 funcParams = [];

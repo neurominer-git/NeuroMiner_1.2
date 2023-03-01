@@ -1,4 +1,4 @@
-function [ROIMEANS, act ] = ROImeans_config(ROIMEANS, brainmask, parentstr, defaultsfl)
+function [ROIMEANS, act ] = cv_ROImeans_config(ROIMEANS, brainmask, parentstr, defaultsfl)
 
 
 Atlas = [];
