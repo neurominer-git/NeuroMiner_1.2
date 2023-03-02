@@ -52,7 +52,11 @@ end
 
 analysis      = NM.analysis{inp.analind(1)}; 
 % Select independent test data container
-if isfield(inp,'oocvind'), OOCVSelStr = sprintf('New data #%g: %s', inp.oocvind, inp.OO.desc); else, OOCVSelStr = na_str; end
+if isfield(inp,'oocvind')
+    OOCVSelStr = sprintf('New data #%g: %s', inp.oocvind, inp.OO.desc);
+else
+    OOCVSelStr = na_str; 
+end
 OOCVSelectStr = sprintf('Choose independent data to work on [ %s ]|', OOCVSelStr);                                          OOCVSelectAct = 2;   
 if DATASCRAM, inp.loadparam = 1; inp.saveparam = 2; end
 if ~isempty(analysis)
@@ -190,7 +194,7 @@ switch act
        
     % Select OOCV data
     case 2    
-        [ NM, OO, oocvind ] = nk_SelectOOCVdata(NM, 1, 0);  
+        [ NM, OO, oocvind ] = nk_SelectOOCVdata(NM, true, false, false);  
         if ~isempty(oocvind), inp.OO = OO; inp.oocvind = oocvind; end 
     case 3
          lfl = nk_input('Define run-time mode of independent test module',0,'mq',strjoin(LFL_opts, '|'),[1,2],inp.lfl);
@@ -212,15 +216,17 @@ switch act
     case 7
         if inp.loadparam == 1, inp.loadparam = 2; elseif inp.loadparam == 2,  inp.loadparam = 1; end
     case 8
-        tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind);
+        tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind(1));
         optpreprocmat = nk_GenDataMaster(NM.id, 'OptPreprocParam', CV, [], tdir);
         if ~isempty(optpreprocmat), inp.optpreprocmat = optpreprocmat; end
     case 9
-        tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind);
+        tdir = create_defpath(NM.analysis{inp.analind}, inp.oocvind(1));
         optmodelmat = nk_GenDataMaster(NM.id, 'OptModel', CV, [], tdir);
         if ~isempty(optmodelmat), inp.optmodelmat = optmodelmat; end
     case {10,11}
-         inp.oocvname = sprintf('OOCV_%g',inp.oocvind);
+         for j=1:numel(inp.oocvind)
+            inp.oocvname = sprintf('OOCV_%g',inp.oocvind(j));
+         end
          nA = 1; if numel(inp.analind)>1, nA = numel(inp.analind); end
          for i=1:nA
             NM.runtime.curanal = inp.analind(i);
