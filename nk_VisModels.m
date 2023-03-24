@@ -185,6 +185,17 @@ multlabelstr = '';  if MULTILABEL.flag, multlabelstr = sprintf('_t%g',inp.curlab
  % Do we have to scale the labels?
 [ inp ] = nk_ApplyLabelTransform( inp.PREPROC, MODEFL, inp );
 
+% Parameter flag structure for preprocessing
+paramfl = struct('use_exist',   loadparam, ...
+                 'found',       false, ... 
+                 'write',       true, ... % has to be set to true otherwise no params will be returned from the preproc module
+                 'CV1op',       CV1op, ...
+                 'multiflag',   multiflag);
+
+%Pre-smooth data, if needed, to save computational time
+inp.ll=inp.GridAct';inp.ll=find(inp.ll(:));
+inp = nk_PerfInitSpatial(analysis, inp, paramfl);
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%% PROCESSING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for f=1:ix % Loop through CV2 permutations
@@ -257,13 +268,7 @@ for f=1:ix % Loop through CV2 permutations
                 % but only with those chosen by the NM training process.
                 
                 inp.f = f; inp.d = d; inp.ll = ll;  
-                % Parameter flag structure for preprocessing
-                paramfl = struct('use_exist',   loadparam, ...
-                                 'found',       false, ... 
-                                 'write',       true, ... % has to be set to true otherwise no params will be returned from the preproc module
-                                 'CV1op',       CV1op, ...
-                                 'multiflag',   multiflag);
-                
+
                 % Apply prerpocessing on the entire data and use these
                 % parameters to adjust for arbitrary PCA rotations through 
                 % the Procrustes transform 
@@ -273,6 +278,12 @@ for f=1:ix % Loop through CV2 permutations
                 inp.loadGD = true;
                 if isfield(inp,'CV1') && inp.CV1 == 1, inp.smoothonly = true; end
                 
+                paramfl = struct('use_exist',   loadparam, ...
+                                 'found',       false, ... 
+                                 'write',       true, ... % has to be set to true otherwise no params will be returned from the preproc module
+                                 'CV1op',       CV1op, ...
+                                 'multiflag',   multiflag);
+                                
                 % find range of feature in current CV1 partition 
                 [ inp, contfl, analysis, mapY, GD, MD, Param, paramfl ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
                 inp.loadGD = false;

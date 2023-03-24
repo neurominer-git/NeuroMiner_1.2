@@ -24,7 +24,7 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, ...
 % paramfl   = modified script execution parameters
 % tYocv     = the preprocessed independent test data
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2022
+% (c) Nikolaos Koutsouleris, 03/2023
 
 global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL CALIB 
 
@@ -96,16 +96,22 @@ tY.TrInd = cell(iy,jy);
 tY.CVInd = cell(iy,jy);
 multoocv = false; if iscell(Yocv) && numel(Yocv)>1, multoocv = true; end
 
-% Eventually, apply spatial operations to image data
+% Eventually, apply spatial operations to imaging data
 % (This function will be extended beyond smoothing ops on nifti data)
-[sY, sYocv, sCocv, inp, optfl, ukbin, uBINMOD, BINMOD] = ...
-    nk_PerfPreprocessSpatial( Y, Yocv, Cocv, inp, paramfl, BINMOD, kbin, ukbin);
+% sY => smoothed, pre-smoothed, or non-smoothed training & CV data
+% sYocv => smoothed or pre-smoothed, or non-smoothed external data
+% sCocv => smoothed or pre-smoothed, or non-smoothed calibration data
+% sYw => smoothed or pre-smoothed, or non-smoothed ranking map
+[sY, sYocv, sCocv, sYw, inp, optfl] = nk_PerfPreprocessSpatial( Y, Yocv, Cocv, inp, paramfl, kbin);
 
 if ~BINMOD && isfield(paramfl,'PXopt') && numel(paramfl.PXopt)>1
     % Here, we force a multi-group processing mode but map the multi-group processed data into binary containers
     uBINMOD = 0; 
     ukbin = 1; 
     if VERBOSE; fprintf('\nProcessing Mode: multi-group preprocessing, but no multi-group classifier requested'); end
+else
+    uBINMOD = BINMOD;
+    ukbin = kbin;
 end
 
 % Generate template parameters (e.g. for feature re-ordering)
@@ -200,12 +206,12 @@ for k=sta_iy:stp_iy % Inner permutation loop
                 if ~isempty(Cocv) 
                     usCocv = sCocv{u}; 
                 end
-                if isfield(inp,'Yw'), InputParam.Yw = inp.Yw{u}; end
+                if ~isempty(sYw), InputParam.Yw = sYw{u}; end
             else
                 usY = sY;
                 if ~isempty(Yocv), usYocv = sYocv; end
                 if ~isempty(Cocv), usCocv = sCocv; end
-                if isfield(inp,'Yw'), InputParam.Yw = inp.Yw; end
+                if ~isempty(sYw), InputParam.Yw = sYw; end
             end
             paramfl.P{u} = nk_ReturnParamChain(PREPROC, 1); 
             

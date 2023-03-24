@@ -77,7 +77,6 @@ if nargout == 2
     % Create weight vector
     W = (k:-1:1)'./k;
     R = zeros(n,size(ind,2));
-
     for i=1:size(ind,2)
         R(ind(:,i)) = W;
     end
