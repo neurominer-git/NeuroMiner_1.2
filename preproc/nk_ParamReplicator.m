@@ -64,7 +64,7 @@ if ~emptfl
     prevec = ones(nU,1);
     while zz <= nA
         if cnt > 0
-            if strcmp(PREPROC.ACTPARAM{zz}.cmd, P.cmd{cnt}) || strcmp(P.cmd{cnt},'spatialfilter') 
+            if (strcmp(PREPROC.ACTPARAM{zz}.cmd, P.cmd{cnt}) && P.steps(cnt) == zz) || strcmp(P.cmd{cnt},'spatialfilter') 
                 prevec = tindmat(:,cnt); cnt = cnt-1;
             end
         end

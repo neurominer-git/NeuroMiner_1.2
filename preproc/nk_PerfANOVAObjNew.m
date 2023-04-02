@@ -6,7 +6,10 @@ global VERBOSE
 %IN.R2 = zeros(n,1);
 if VERBOSE, fprintf('\t running ANOVA on %g variables ',n); end
 
-IN.beta = pinv(IN.X)*Y; 
+notnan = sum(isnan(Y),2)==0;
+X = IN.X(notnan,:); Y=Y(notnan,:);
+
+IN.beta = pinv(X)*Y; 
 % here we use a pseudoinverse:
 % X is rank deficient, i.e. regressors are not independent, since any linear combination of
 % 3 columns can give us the 4th one, thus X'X is also rank deficient and singular ie inv(X'*X)
@@ -16,8 +19,8 @@ IN.beta = pinv(IN.X)*Y;
 % http://mathworld.wolfram.com/Moore-PenroseMatrixInverse.html
 % http://en.wikipedia.org/wiki/Moore_Penrose_pseudoinverse
 
-IN.Yhat = IN.X*IN.beta;
-IN.df = rank(IN.X)-1;
+IN.Yhat = X*IN.beta;
+IN.df = rank(X)-1;
 
 IN.Res = Y - IN.Yhat;
 IN.SStotal = vecnorm(Y - nm_nanmean(Y)).^2;
