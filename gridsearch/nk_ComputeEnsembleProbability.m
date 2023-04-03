@@ -108,9 +108,9 @@ for curlabel=1:nl
             if ~isempty(logar)
                 predi       = exp(predi);
             end
-            if ~isempty(polyfact), 
+            if ~isempty(polyfact)
                 predi       = predi.^(1/polyfact); end
-            if targscale, 
+            if targscale
                 IN.minY = minX(curlabel); IN.maxY = maxX(curlabel);
                 
                 predi       = nk_PerfScaleObj(predi, IN); 

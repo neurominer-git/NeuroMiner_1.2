@@ -22,11 +22,11 @@ if iscell(Y) && exist('IN','var') && ~isempty(IN)
     for i=1:numel(Y), 
         % Define active indices depending on training or testing situation
         if isfield(IN,'trained') && IN.trained 
-           if isfield(IN,'sTsInd'), IN.sIND = IN.sTsInd{i}; else IN.sIND =[]; end
-           if isfield(IN,'dTsInd'), IN.dIND = IN.dTsInd{i}; else IN.dIND = []; end
+           if isfield(IN,'sTsInd'), IN.sIND = IN.sTsInd{i}; else, IN.sIND =[]; end
+           if isfield(IN,'dTsInd'), IN.dIND = IN.dTsInd{i}; else, IN.dIND = []; end
         else
-           if isfield(IN,'sTrInd'), IN.sIND = IN.sTrInd{i}; else IN.sIND = []; end
-           if isfield(IN,'dTrInd'), IN.dIND = IN.dTrInd{i}; else IN.dIND =[]; end
+           if isfield(IN,'sTrInd'), IN.sIND = IN.sTrInd{i}; else, IN.sIND = []; end
+           if isfield(IN,'dTrInd'), IN.dIND = IN.dTrInd{i}; else, IN.dIND =[]; end
         end
         sY{i} = PerfStandardizeObj(Y{i}, IN ); 
     end
@@ -34,11 +34,11 @@ else
     if ~exist('IN','var'), IN=[]; end
     % Define active indices depending on training or testing situation
     if isfield(IN,'trained') && IN.trained
-       if isfield(IN,'sTsInd'), IN.sIND = IN.sTsInd; else IN.sIND =[]; end
-       if isfield(IN,'dTsInd'), IN.dIND = IN.dTsInd; else IN.dIND =[]; end
+       if isfield(IN,'sTsInd'), IN.sIND = IN.sTsInd; else, IN.sIND =[]; end
+       if isfield(IN,'dTsInd'), IN.dIND = IN.dTsInd; else, IN.dIND =[]; end
     else
-       if isfield(IN,'sTrInd'), IN.sIND = IN.sTrInd; else IN.sIND = []; end
-       if isfield(IN,'dTrInd'), IN.dIND = IN.dTrInd; else IN.dIND = []; end
+       if isfield(IN,'sTrInd'), IN.sIND = IN.sTrInd; else, IN.sIND = []; end
+       if isfield(IN,'dTrInd'), IN.dIND = IN.dTrInd; else, IN.dIND = []; end
     end
     [ sY, IN ] = PerfStandardizeObj(Y, IN );
 end
@@ -67,7 +67,6 @@ if eIN || ~IN.trained
     nG = size(IN.sIND,2);
     
     switch IN.method
-        
      
         case {'standardization using median', 'standardization using mean'}
             
@@ -130,8 +129,8 @@ else
     if isempty(IN.sIND), IN.sIND = true(mY,1); end
 end
 % with dIND the user defined which cases in the matrix are normalized 
-if eIN ||~isfield(IN,'dIND')  || isempty(IN.dIND), 
-    if size(IN.sIND,2) > 1,
+if eIN ||~isfield(IN,'dIND')  || isempty(IN.dIND)
+    if size(IN.sIND,2) > 1
         error('Destination [%g-by-%g] matrix is missing in IN structure', mY, nG);
     else
         IN.dIND = true(mY,1);
@@ -286,7 +285,7 @@ end
 s=cn*s;
 
 %-----------------------------
-function [mX]=L1median(X,tol);
+function [mX]=L1median(X,tol)
 
 % L1MEDIAN calculates the multivariate L1-median 
 % I/O: [mX]=L1median(X,tol);

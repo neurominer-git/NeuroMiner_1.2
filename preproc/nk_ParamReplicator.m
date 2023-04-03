@@ -22,7 +22,7 @@ nP = size(PXopt,1);
 nU = 1; emptfl = true;
 
 % check whether parameters have to be replicated at all
-if ~isempty(P); 
+if ~isempty(P)
     Popt = P.opt;
     nU = size(Popt,1); 
     emptfl = false; 
@@ -64,7 +64,7 @@ if ~emptfl
     prevec = ones(nU,1);
     while zz <= nA
         if cnt > 0
-            if strcmp(PREPROC.ACTPARAM{zz}.cmd, P.cmd{cnt}) || strcmp(P.cmd{cnt},'spatialfilter'), 
+            if (strcmp(PREPROC.ACTPARAM{zz}.cmd, P.cmd{cnt}) && P.steps(cnt) == zz) || strcmp(P.cmd{cnt},'spatialfilter') 
                 prevec = tindmat(:,cnt); cnt = cnt-1;
             end
         end
@@ -81,10 +81,10 @@ if nP == 1 || emptfl
     data_ind(1:nP) = 1;
     train_ind(1:nP,1:nA) = 1;
 else
-    if size(PXopt,2) > size(Popt,2), 
+    if size(PXopt,2) > size(Popt,2)
         PXopt = rem_unique_cols(PXopt);
     end
-    if size(PXopt,2) < size(Popt,2), 
+    if size(PXopt,2) < size(Popt,2)
         Popt = rem_unique_cols(Popt);
     end
     for z = 1:nU

@@ -56,7 +56,7 @@ for i=1:mL % Loop through classes
 
            % Check whether permutation occured before
            if j > 1
-               if ~sum(ismember(permmat(1:j-1,indcl(1):indcl(end)),rindcl,'rows'))
+               if ~sum(ismember(permmat(1:j-1,indcl),rindcl,'rows'))
                    j = j + 1;    
                else
                    fprintf('\nReplicated permutation indices detected. Skip current permutation.')

@@ -129,7 +129,7 @@ if ~isempty(analysis)
     if inp.lfl>1
         % precomputed
         nTargFiles = na_str; mT=1;
-        if isfield(inp,inp.sfieldnames{inp.lfl}) && ~isempty(inp.(inp.sfieldnames{inp.lfl})),
+        if isfield(inp,inp.sfieldnames{inp.lfl}) && ~isempty(inp.(inp.sfieldnames{inp.lfl}))
             if iscell(inp.(inp.sfieldnames{inp.lfl}){1})
                 nT = sum(sum(~cellfun(@isempty, inp.(inp.sfieldnames{inp.lfl}){1})));
                 if numel(inp.(inp.sfieldnames{inp.lfl})) == numel(inp.varind)
@@ -460,9 +460,9 @@ for i = 1:inp1.nF
             analysis.TestPerformanceBin(i,j) = maxtestacc(j);
             switch MODEFL
                 case 'regression'
-                    analysis.TestPerformanceBinPermAggr(i,j,:)        = GDdims{i}.Regr.costfun_crit;
+                    analysis.TestPerformanceBinPermAggr(i,j,:)            = GDdims{i}.Regr.costfun_crit;
                 case 'classification'
-                    analysis.TestPerformanceBinPermAggr(i,j,:)        = GDdims{i}.BinClass{j}.costfun_crit;
+                    analysis.TestPerformanceBinPermAggr(i,j,:)            = GDdims{i}.BinClass{j}.costfun_crit;
                     if RAND.Decompose ~= 9
                         analysis.TestPerformanceBinPermAggrMajVote(i,j,:) = GDdims{i}.BinClass{j}.prob_contigency.BAC;
                     end

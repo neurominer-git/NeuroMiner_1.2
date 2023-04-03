@@ -893,7 +893,7 @@ for f=1:ix % Loop through CV2 permutations
                     % Concatenate multi-group prediction across CV2 perms
                     GDanalysis.multi_predictions(TsInd,curlabel) = cellmat_mergecols(GDanalysis.multi_predictions(TsInd,curlabel), num2cell(MEnsDat,2));
                     for g=1:ngroups
-                        if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel, 
+                        if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel
                             MEnsDat = MultiProb(:,g,:); 
                         else
                             if iscell(MultiCV2Prob)

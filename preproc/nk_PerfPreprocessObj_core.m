@@ -22,7 +22,7 @@ global VERBOSE TEMPL SVM MODEFL
 paramfl = false; tsfl = false; trfl = false; cfl = false;
 
 % Check if training params are empty and therefore have to be computed.
-if ~exist('TrParam','var') || isempty(TrParam),
+if ~exist('TrParam','var') || isempty(TrParam)
     if VERBOSE; fprintf('\nNo Training parameters found. Training mode enabled.'); end
     TrParam = []; 
 else

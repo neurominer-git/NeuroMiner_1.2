@@ -278,14 +278,14 @@ for f=1:ix % Loop through CV2 permutations
                 inp.loadGD = true;
                 if isfield(inp,'CV1') && inp.CV1 == 1, inp.smoothonly = true; end
                 
-                paramfl = struct('use_exist',   loadparam, ...
+                paramflx = struct('use_exist',   loadparam, ...
                                  'found',       false, ... 
                                  'write',       true, ... % has to be set to true otherwise no params will be returned from the preproc module
                                  'CV1op',       CV1op, ...
                                  'multiflag',   multiflag);
                                 
                 % find range of feature in current CV1 partition 
-                [ inp, contfl, analysis, mapY, GD, MD, Param, paramfl ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
+                [ inp_x, contfl_x, analysis_x, mapY_x, GD_x, MD_x, Param_x, paramflx ] = nk_ApplyTrainedPreproc(analysis, inp, paramflx);
                 inp.loadGD = false;
                 
                 if contfl, continue; end
@@ -521,7 +521,11 @@ for f=1:ix % Loop through CV2 permutations
                                             [~,~,~,~, ParamX{n} ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, [], Param{n}(k,l,hix), pnt); 
                                         end
                                     otherwise
+                                        try
                                         [~,~,~,~, ParamX ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, [], Param{1}(k,l,hix), pnt); 
+                                        catch
+                                            fprintf('problem');
+                                        end
                                 end      
 
                                 % Get label info
