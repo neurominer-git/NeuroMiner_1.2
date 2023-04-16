@@ -1,6 +1,8 @@
-function [Out1, Out2, Out3] = fastica(mixedsig, varargin)
+function [Out1, Out2, Out3, whiteningMatrix, mixedmean] = fastica(mixedsig, varargin)
 %FASTICA - Fast Independent Component Analysis
-%
+
+% ADAPTED by Clara Vetter (add mixedmean as output) 
+
 % FastICA for Matlab 7.x and 6.x
 % Version 2.5, October 19 2005
 % Copyright (c) Hugo Gävert, Jarmo Hurri, Jaakko Särelä, and Aapo Hyvärinen.

@@ -10,6 +10,6 @@ function [newVectors, meanValue] = remmean(vectors);
 
 % @(#)$Id: remmean.m,v 1.2 2003/04/05 14:23:58 jarmo Exp $
 
-newVectors = zeros (size (vectors));
-meanValue = mean (vectors')';
+newVectors = zeros(size (vectors));
+meanValue = mean(vectors')';
 newVectors = vectors - meanValue * ones (1,size (vectors, 2));
