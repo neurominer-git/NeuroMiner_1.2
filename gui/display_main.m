@@ -41,10 +41,21 @@ switch h_list{h_val}
                 handles = display_classplot_oocv(h_class, handles);
                 handles.oocvind = handles.selCVoocv.Value - 1;
                 load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
+                if isfield(handles.OOCV(handles.oocvind).data.BinResults{h_class},'Group')
+                    Groups = handles.OOCV(handles.oocvind).data.BinResults{h_class}.Group;
+                    GroupNames = cell(numel(Groups)+1,1);
+                    GroupNames{1} = 'Show entire OOCV sample';
+                    for g=2:numel(Groups)+1
+                        GroupNames{g} = Groups{g-1}.GroupName;
+                    end
+                    handles.selSubGroupOOCV.String = GroupNames;
+                    handles.selSubGroupOOCV.Visible = 'on';
+                end
             else
                 handles.oocvview = false;
                 handles = display_classplot(h_class, handles);
                 load_selCase(handles,handles.BinClass{h_class}.cases)
+                handles.selSubGroupOOCV.Visible = 'off';
             end
         end
         

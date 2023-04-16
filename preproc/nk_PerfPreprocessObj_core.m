@@ -876,7 +876,7 @@ elseif trfl
         actparam.PRUNE.NonPruneVec = actparam.PRUNE.NonPruneVec(ind);
     end
     if tsfl, tsproc = true; end
-    if isfield(InputParam,'Yw') && isfield(TrParami,'ind') && isnumeric(InputParam.Yw)
+    if isfield(InputParam,'Yw') && isnumeric(InputParam.Yw) && ~isempty(InputParam.Yw) && isfield(TrParami,'ind') 
         Yw = [];
         for i=1:size(TrParami.ind,2)
             Yw = [ Yw InputParam.Yw(TrParami.ind(:,i))];

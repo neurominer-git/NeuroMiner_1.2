@@ -587,14 +587,11 @@ for f=1:ix % Loop through CV2 permutations
                                     end
                                     
                                     % Model computation
-                                    try
+                                    
                                     if isfield(mapY,'VI')
                                         if ~fndMD, [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(Ymodel, modelTrL, sPs, 1, mapY.VI{k,l}{hix}{u}); end
                                     else
                                         if ~fndMD, [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(Ymodel, modelTrL, sPs, 1); end
-                                    end
-                                    catch
-                                        whos("Ymodel", "modelTrL")
                                     end
                                     
 %                                   if savemodel
