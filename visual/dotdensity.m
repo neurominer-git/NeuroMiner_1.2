@@ -124,7 +124,7 @@ end
 % Draw plot
 
 % Draw dot density plot.
-dotHandles = plot(ax, newX, newY, 'o');
+dotHandles = scatter(ax, newX, newY, 'o');
 
 % Set marker for dots.
 if ~ isempty(optionalArgs.dotMarker)
@@ -144,6 +144,11 @@ end
 % Set face color of dots.
 if ~isempty(optionalArgs.dotFaceColor)
     setFaceColor(optionalArgs.dotFaceColor, dotHandles)
+end
+
+% Set alpha of dots
+if ~ isempty(optionalArgs.dotAlpha)
+    setAlpha(optionalArgs.dotAlpha, dotHandles)
 end
 
 % Draw median line.
@@ -203,6 +208,13 @@ set(handles,'LineWidth',lineWidth)
 end
 
 %% 
+% Set alpha of dots.
+function setAlpha(alpha, handles)
+set(handles,'MarkerFaceAlpha',alpha)
+set(handles,'MarkerEdgeAlpha',alpha)
+end
+
+%% 
 %  Set line color for mean and/or median lines.
 function setLineColor(lineColor, handles)
    index = 1;
@@ -236,7 +248,7 @@ end
 %% 
 % Set the dot size.
 function setDotSize(size, handles)
-set(handles, 'MarkerSize', size)
+set(handles, 'SizeData', size)
 end
 
 %% 
@@ -356,6 +368,7 @@ defaultEdgeColor = '';
 defaultFaceColor = ''; 
 defaultMarker = 'o';
 defaultDotSize = 0; 
+defaultAlpha = 1;
 defaultLineColor = '';
 defaultLineWidth = ''; 
 
@@ -381,6 +394,7 @@ addParamValue(p, 'dotEdgeColor', defaultEdgeColor);
 addParamValue(p, 'dotFaceColor', defaultFaceColor);
 addParamValue(p, 'dotMarker',defaultMarker);
 addParamValue(p, 'dotSize', defaultDotSize);
+addParamValue(p, 'dotAlpha', defaultAlpha);
 addParamValue(p, 'lineColor', defaultLineColor);
 addParamValue(p, 'lineWidth', defaultLineWidth);
 

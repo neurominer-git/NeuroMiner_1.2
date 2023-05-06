@@ -95,7 +95,7 @@ for i=1:nW
             
             switch IN.W_ACT.softflag
                 case 2
-                    t = nk_ReturnParam('Thresholds',Params_desc, opt); 
+                    t = nk_ReturnParam('Thresholds', Params_desc, opt); 
                     IN.Thresh(i) = percentile(IN.W(:,i), t);
                 case 3
                     IN.Thresh(i) = nk_ReturnParam('Absolute thresholds',Params_desc, opt); 
@@ -116,7 +116,7 @@ for i=1:nW
                 if VERBOSE, fprintf('\tClusterizing F into %g mean cluster values', nk_Range(IN.WMask{i})); end
             else
                 % Here we simply extract features above the given threshold
-                IN.ind(:,i) = IN.W(:,i) > IN.Thresh(i);
+                IN.ind(:,i) = IN.W(:,i) >= IN.Thresh(i);
                 Yi = Y(:, IN.ind(:,i)); 
                 if VERBOSE, fprintf('\tSelecting %g / %g feats at %g', size(Yi,2), numel(IN.W(:,i)), IN.Thresh(i)); end
             end
