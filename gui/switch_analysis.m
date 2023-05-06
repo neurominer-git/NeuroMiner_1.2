@@ -17,6 +17,7 @@ if isfield(handles,'SubIndex') && ~handles.oocvview, I = handles.SubIndex; else,
 if size(handles.NM.label,2)>1, handles.multilabel = true; else, handles.multilabel=false; end
 handles.curlabel = get(handles.selLabel,'Value');
 
+% Check whether subindex is activated
 
 % set alternative label
 if isfield(handles.NM.analysis{1,analind}.params,'label')
@@ -33,6 +34,10 @@ if isfield(handles.NM.analysis{analind},'visdata')
     
 elseif isfield(handles,'visdata')
     handles = rmfield(handles,'visdata');
+end
+
+if isfield(handles,'SubIndex') 
+    handles = rmfield(handles,'SubIndex');
 end
 
 % Check whether selected analysis has OOCV data

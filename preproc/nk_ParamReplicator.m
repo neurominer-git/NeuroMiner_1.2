@@ -64,6 +64,16 @@ if ~emptfl
     prevec = ones(nU,1);
     while zz <= nA
         if cnt > 0
+            % Bug-fix 02/04/2023:
+            % The new second logical argument [P.steps(cnt) == zz] makes sure 
+            % that the right switch is used if multiple identical preprocessing 
+            % steps are executed in one preprocessing sequence (e.g.
+            % feature ranking). So the logic gues as follows:
+            % Does the current preprocessing step contain hyperparameters? 
+            % => [strcmp(PREPROC.ACTPARAM{zz}.cmd, P.cmd{cnt}]
+            % Is this hyperparameter-optimized step actually the current
+            % one?
+            % => [P.steps(cnt) == zz]   
             if (strcmp(PREPROC.ACTPARAM{zz}.cmd, P.cmd{cnt}) && P.steps(cnt) == zz) || strcmp(P.cmd{cnt},'spatialfilter') 
                 prevec = tindmat(:,cnt); cnt = cnt-1;
             end

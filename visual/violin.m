@@ -125,9 +125,8 @@ if isempty(find(strcmp(varargin,'medc')))==0
     end
 end
 if isempty(find(strcmp(varargin,'bw')))==0
-    b = varargin{find(strcmp(varargin,'bw'))+1}
+    b = varargin{find(strcmp(varargin,'bw'))+1};
     if length(b)==1
-        disp(['same bandwidth bw = ',num2str(b),' used for all cols'])
         b=repmat(b,size(Y,2),1);
     elseif length(b)~=size(Y,2)
         warning('length(b)~=size(Y,2)')
@@ -145,7 +144,6 @@ if size(fc,1)==1
     fc=repmat(fc,size(Y,2),1);
 end
 %% Calculate the kernel density
-i=1;
 for i=1:size(Y,2)
     
     if isempty(b)==0
@@ -157,8 +155,8 @@ for i=1:size(Y,2)
     f=f/max(f)*0.3; %normalize
     F(:,i)=f;
     U(:,i)=u;
-    MED(:,i)=nanmedian(Y{i});
-    MX(:,i)=nanmean(Y{i});
+    MED(:,i)=nm_nanmedian(Y{i});
+    MX(:,i)=nm_nanmean(Y{i});
     bw(:,i)=bb;
     
 end
@@ -215,13 +213,13 @@ for i=i:size(Y,2)
     end
 end
 %% Add legend if requested
-if plotlegend==1 & plotmean==1 | plotlegend==1 & plotmedian==1
+if plotlegend==1 && plotmean==1 || plotlegend==1 && plotmedian==1
     
-    if plotmean==1 & plotmedian==1
+    if plotmean==1 && plotmedian==1
         L=legend([p(1) p(2)],'Mean','Median');
-    elseif plotmean==0 & plotmedian==1
+    elseif plotmean==0 && plotmedian==1
         L=legend([p(2)],'Median');
-    elseif plotmean==1 & plotmedian==0
+    elseif plotmean==1 && plotmedian==0
         L=legend([p(1)],'Mean');
     end
     
@@ -232,17 +230,16 @@ end
 %% Set axis
 if setX == 0
     axis([0.5 size(Y,2)+0.5, min(U(:)) max(U(:))]);
-elseif setX == 1
+elseif setX == 1 && numel(x)>1
     axis([min(x)-0.05*range(x) max(x)+0.05*range(x), min(U(:)) max(U(:))]);
 end
 %% Set x-labels
 xL2={''};
-i=1;
 for i=1:size(xL,2)
     xL2=[xL2,xL{i},{''}];
 end
-set(gca,'TickLength',[0 0],'FontSize',12)
-box on
+%set(gca,'TickLength',[0 0],'FontSize',12)
+%box on
 if isempty(xL)==0
     set(gca,'XtickLabel',xL2)
 end
