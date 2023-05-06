@@ -5,7 +5,10 @@ import uuid
 
 # train 
 if mode == 'train':
-    ica = FastICA(n_components=3, whiten="arbitrary-variance", random_state = 1234)
+    if num_ics == 0
+        ica = FastICA(whiten="arbitrary-variance", random_state = 1234)
+    else 
+        ica = FastICA(n_components=num_ics, whiten="arbitrary-variance", random_state = 1234)
     S = ica.fit_transform(data)  # Reconstruct signals
     random_name = uuid.uuid4().hex
     model_file = f'{rootdir}/ica_model_{random_name}.sav'
