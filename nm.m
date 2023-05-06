@@ -175,14 +175,16 @@ try
                              mn_str = [mn_str ...
                                 'Visualize ' mdltypestr ' (non-deterministic analysis - NM may crash)|' ...
                                 'Interpret predictions of ' mdltypestr ' in discovery data|' ...
-                                'Open NM Results Viewer (cross-validation results)|'];
-                            mn_act = [mn_act 6 18 7];
+                                'Open NM Results Viewer (cross-validation results)|' ...
+                                'Save model parameters to disk|'];
+                            mn_act = [mn_act 6 18 7 19];
                         else
                             mn_str = [mn_str ...
                                 'Visualize ' mdltypestr '|' ...
                                 'Interpret predictions of ' mdltypestr ' in discovery data|' ...
-                                'Open NM Results Viewer (cross-validation results)|'];
-                            mn_act = [mn_act 6 18 7];
+                                'Open NM Results Viewer (cross-validation results)|' ...
+                                'Save model parameters to disk|'];
+                            mn_act = [mn_act 6 18 7 19];
                         end
                     end
                     
@@ -410,8 +412,8 @@ try
         case 'savemodels'
              if isfield(NM,'analysis')
                  inp = []; act = 1; 
-                 while act > 1
-                     [act, inp] = nk_ExportModelsPrep(NM, act, inp, "EXPORT MODEL PARAMETERS");
+                 while act > 0
+                     [act, inp] = cv_ExportModelsPrep(NM, act, inp, "EXPORT MODEL PARAMETERS");
                  end
              end
     end

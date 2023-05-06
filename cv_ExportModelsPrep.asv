@@ -6,7 +6,6 @@ global CV
 % Detect completed analyses
 as = nk_GetAnalysisStatus(NM); complvec = find(as.completed_analyses);
 
-
 % Initialize runtime parameters
 if ~exist('inp','var') || isempty(inp)
     inp = struct( 'analind', complvec(1), ...   % Index to analysis
@@ -25,8 +24,9 @@ if ~exist('inp','var') || isempty(inp)
         'batchflag', 0);            % 1 = Run in batchmode (without graphics outputs)
     % 0 = run in interactive mode
 end
-
-
+if ~isfield(inp, 'analind')
+    inp.analind = complvec(1);
+end
 na_str = '?'; %inp.datatype = 'OOCVdatamat';
 OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; LoadStr = []; SaveStr = []; SaveCV1Str = [];
 OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = []; SaveCV1Act = [];
@@ -178,14 +178,7 @@ if ~inp.batchflag && act<13, act = nk_input(mestr, 0, 'mq', menustr, menuact); e
                 end
             end
 
-            % Select OOCV data
-            %     case 2
-            %         [ NM, OO, oocvind ] = nk_SelectOOCVdata(NM, true, false, false);
-            %         if ~isempty(oocvind), inp.OO = OO; inp.oocvind = oocvind; end
-            %     case 3
-            %          lfl = nk_input('Define run-time mode of independent test module',0,'mq',strjoin(LFL_opts, '|'),[1,2],inp.lfl);
-            %          if lfl, inp.lfl = lfl; end
-            % Overwrite?
+           
         case 4
             switch inp.lfl
                 case 1
@@ -210,9 +203,7 @@ if ~inp.batchflag && act<13, act = nk_input(mestr, 0, 'mq', menustr, menuact); e
             optmodelmat = nk_GenDataMaster(NM.id, 'OptModel', CV, [], tdir);
             if ~isempty(optmodelmat), inp.optmodelmat = optmodelmat; end
         case {10,11}
-            for j=1:numel(inp.oocvind) %%TO DO EXPORTMODELS NECESSARY???
-                inp.oocvname = sprintf('OOCV_%g',inp.oocvind(j));
-            end
+            
             nA = 1; if numel(inp.analind)>1, nA = numel(inp.analind); end
             for i=1:nA
                 NM.runtime.curanal = inp.analind(i);
@@ -227,7 +218,6 @@ if ~inp.batchflag && act<13, act = nk_input(mestr, 0, 'mq', menustr, menuact); e
         case 12
             if inp.saveCV1 == 1, inp.saveCV1 = 2; elseif inp.saveCV1 == 2,  inp.saveCV1 = 1; end
     end
-    act = 0; 
 end
 
 function tdir = create_defpath(analysis, oocvind)
