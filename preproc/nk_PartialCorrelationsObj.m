@@ -19,6 +19,8 @@ function [sY, IN] = nk_PartialCorrelationsObj( Y, IN )
 method = @PartialCorrelationsObj; methodsel = 1;
 if exist('IN','var') && ~isempty(IN) && isfield(IN,'METHOD') && IN.METHOD == 2
     method = @CombatObj; methodsel = 2;
+elseif exist('IN','var') && ~isempty(IN) && isfield(IN,'METHOD') && IN.METHOD == 3
+    method = @FastICAObj; methodsel = 3;
 end
 
 % =========================== WRAPPER FUNCTION ============================ 
@@ -39,6 +41,16 @@ if iscell(Y) && exist('IN','var') && ~isempty(IN)
                 else
                     IN.G = IN.TrCovars{i};
                     IN.M = IN.TrMod{i};
+                end
+            case 3
+                if isfield(IN,'sigICs') && ~isempty(IN.sigICs)
+                        IN.G = IN.TsCovars{i};
+                else
+                    if size(IN.TrCovars,2) > 1
+                        IN.G = IN.TrCovars{i};
+                    else
+                        IN.G = IN.TrCovars; 
+                    end
                 end
         end
         [sY{i}, IN] = method (Y{i}, IN); 
@@ -69,6 +81,19 @@ else
                 IN.G = IN.TrCovars;
                 IN.M = IN.TrMod;
             end
+        case 3
+            if isfield(IN, 'sigICs') && ~isempty(IN.sigICs)
+                if iscell(IN.TsCovars)
+                    IN.G = IN.TrCovars;
+                else
+                    IN.G = IN.TsCovars;
+                end
+            else
+                IN.G = IN.TrCovars;
+            end
+
+
+
     end
 
     [ sY, IN ] = method( Y, IN );
@@ -137,3 +162,25 @@ end
 Y = combat( Y, G, M, IN.estimators);
 
 Y=Y';
+
+% =========================================================================
+function [ Y, IN ] = FastICAObj( Y, IN )
+
+if isempty(IN),eIN=true; else, eIN=false; end
+
+if eIN|| ~isfield(IN,'G') || isempty(IN.G), error('No covariates defined in parameter structure'), end
+
+
+if eIN || ~isfield(IN, 'sigICs') || isempty(IN.sigICs)
+
+    if ~isfield(IN, 'subgroup') || isempty(IN.subgroup)
+        [Y,IN] = cv_icaHarmonize(Y, 1, IN);
+    else
+        [Y,IN] = cv_icaHarmonize(Y, 1, IN);
+    end
+  
+else
+
+    Y = cv_icaHarmonize(Y, 2, IN);
+    
+end

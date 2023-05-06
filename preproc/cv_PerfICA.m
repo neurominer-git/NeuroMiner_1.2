@@ -1,4 +1,4 @@
-function [pY, mapping] = cv_PerfICA(Y, varargin)
+function [pY, mapping] = cv_PerfICA(Y, opt, mode)
 % function to extract independent components from data 
 % Input: Y - input data (N*D) 
 % Output: pY - output data (N*IC) 
@@ -6,23 +6,29 @@ function [pY, mapping] = cv_PerfICA(Y, varargin)
 % projected onto the unseen data (after unseen data is whitened)
 global MODELDIR
 
-% in training mode 
-if nargin <= 1
+if strcmp(mode, 'train') % in training mode 
+
+    if isfield(opt, 'dims')
+        n_ics = opt.dims; % potentially add more options here, then opt should be struct with fields
+    else 
+        n_ics = 0;
+    end
+
 
     pY = pyrunfile('cv_py_PerfICA.py', 'ica_model', 'S', ...
-        mode = 'train', ...
+        mode = mode, ...
         data = Y, ...
-        num_ics = 10, ...
+        num_ics = n_ics, ...
         rootdir = MODELDIR); 
   
 
-    pY = icasig'; % transpose so that nrows = nsamples, ncols = nICs
+    pY = S'; % transpose so that nrows = nsamples, ncols = nICs
     mapping.ica_model = ica_model;
     
 else % test mode
     mapping = varargin{1};
     pY = pyrunfile('cv_py_PerfICA.py', 'S' , ...
-        mode = 'test', ...
+        mode = mode, ...
         ica_model = mapping.ica_model, ...
         data = Y); 
  

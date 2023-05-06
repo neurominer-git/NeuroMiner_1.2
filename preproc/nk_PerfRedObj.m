@@ -226,7 +226,8 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
                     [pY,IN.mpp] = compute_mapping(Y, IN.DR.RedMode, IN.DR.dims, IN.DR.kernel.type, IN.DR.kernel.d, IN.DR.kernel.R);
             end
         case 'fastICA'
-            [pY, IN.mpp] = cv_PerfICA(Y); 
+            fastICAoptions.dims = IN.DR.dims
+            [pY, IN.mpp] = cv_PerfICA(Y, fastICAoptions, 'train'); 
         otherwise
             [pY,IN.mpp] = compute_mapping(Y,IN.DR.RedMode, IN.DR.dims, IN.DR.Modus);
     end
@@ -256,7 +257,7 @@ else
         case 'SPCA'
             pY = nk_PerfSPCA(Y, IN.mpp);
         case 'fastICA'
-            pY = cv_PerfICA(Y, IN.mpp);
+            pY = cv_PerfICA(Y, IN.mpp, 'test');
 %         case 'LMNN2.5'
 %             pY = (IN.mpp.L * Y')';
         otherwise

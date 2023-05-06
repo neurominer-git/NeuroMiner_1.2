@@ -741,7 +741,7 @@ end
 if paramfl && tsfl && isfield(TrParami,'beta') 
     % Out-of-sample mode, used TsCovars and stored beta
     tsproc = true;
-elseif trfl, 
+elseif trfl 
     if actparam.adasynfl 
         if iscell(SrcParam.covarsSyn)
             IN.TrCovars = [ InputParam.P{i}.TrCovars; SrcParam.covarsSyn{actparam.j}(:, IN.COVAR)]; 

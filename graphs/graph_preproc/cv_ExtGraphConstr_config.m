@@ -7,7 +7,7 @@ if ~defaultsfl
     if (~exist('ParcellationAtlas','var') || isempty(ParcellationAtlas)); 
          ParcellationAtlas = cv_ExtGraphConstr_config(ConstructionMethod, [], [], 1);
     end
-    mn_str = []; ParcellationAtlasStr = {'Hammers','Schaeffer100'}; mn_act=[];
+    mn_str = []; ParcellationAtlasStr = {'Hammers','Schaefer100'}; mn_act=[];
     switch ConstructionMethod
         case {'KL divergence'}
             mn_str = [mn_str sprintf('Define atlas for %s [ %s ]|',ConstructionMethod, ParcellationAtlasStr{ParcellationAtlas})]; mn_act = 1;

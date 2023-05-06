@@ -408,12 +408,7 @@ try
                 %simulationRes = simulate_sampleSize();
             end
         case 'savemodels'
-             if isfield(NM,'analysis')
-                 inp = []; act = 1; 
-                 while act > 1
-                     [act, inp] = nk_ExportModelsPrep(NM, act, inp, "EXPORT MODEL PARAMETERS");
-                 end
-             end
+             if isfield(NM,'analysis'),  [act, inp] = nk_ExportModelsPrep(NM, act, inp, parentstr)
     end
 
 catch ERR

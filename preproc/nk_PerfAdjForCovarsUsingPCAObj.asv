@@ -96,15 +96,14 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     % sum(eigenvalues) mode'
 
     % CV Note: this can potentially also be adjusted so that DR.RedMode is
-    % directly set in _config
+    % dir
     if ~isfield(IN,'DR') || isempty(IN.DR) || ~isfield(IN.DR,'RedMode') || ~isfield(IN, 'redmethod') || IN.redmethod == 1
         IN.DR.DRsoft = 1; 
         IN.DR.RedMode = 'PCA';
         IN.DR.PercMode = IN.dimmode;  
     elseif (~isfield(IN,'DR') || isempty(IN.DR) || ~isfield(IN.DR,'RedMode')) && IN.redmethod == 2 
         IN.DR.RedMode = 'fastICA'; 
-        IN.DR.PercMode = IN.dimmode; % unecessary, might affect nk_PerfRedObj
-        IN.DR.DRsoft = 1; % unused, might affect nk_PerfRedPbj
+        IN.DR.PercMode = IN.dimmode; 
     end
     
     % Run dimensionality reduction on the source matrix
