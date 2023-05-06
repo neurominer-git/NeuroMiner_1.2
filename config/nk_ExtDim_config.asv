@@ -10,15 +10,15 @@ if ~defaultsfl
     defdims = dims; if size(defdims,2)==1 && numel(defdims)>1, defdims=defdims'; end
     mn_str = []; PercModeStr = {'Absolute range','Percentage range','Energy range'}; mn_act=[];
     switch RedMode
-        case {'PCA', 't-SNE', 'SparsePCA'}
+        case {'PCA', 't-SNE', 'SparsePCA', 'fastICA'}
             mn_str = [mn_str sprintf('Define extaction mode for %s [ %s ]|',RedMode, PercModeStr{PercMode})]; mn_act = 1;
         case {'LDA', 'GDA'}
             PercMode = 1; L = NM.label; L(isnan(L))=[]; dims = numel(unique(L)); act=0; return
+        case 'fastICA'
+            PercMode = 1; 
         otherwise
             PercMode = 1;
     end
-    % CV Note: add PercMode 2 (and 3) for fastICA, currently only N of ICs
-    % can be defned
     
     mn_str = [mn_str sprintf('Define extraction range [ %s ]',nk_ConcatParamstr(dims))]; mn_act = [mn_act 2];
     if numel(mn_act)>1

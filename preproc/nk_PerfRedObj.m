@@ -226,7 +226,7 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
                     [pY,IN.mpp] = compute_mapping(Y, IN.DR.RedMode, IN.DR.dims, IN.DR.kernel.type, IN.DR.kernel.d, IN.DR.kernel.R);
             end
         case 'fastICA'
-            fastICAoptions.dims = IN.DR.dims
+            fastICAoptions.dims = IN.DR.dims;
             [pY, IN.mpp] = cv_PerfICA(Y, fastICAoptions, 'train'); 
         otherwise
             [pY,IN.mpp] = compute_mapping(Y,IN.DR.RedMode, IN.DR.dims, IN.DR.Modus);
