@@ -6,7 +6,7 @@ function [act, analdim, p, GridAct, mapY, strout] = nk_PreprocessPrep( act, anal
 % This function allows the interactive and batch use of the preprocessing
 % module of NM.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris 09/2022
+% (c) Nikolaos Koutsouleris 03/2023
 
 global PREPROC MODEFL CV DR SAV RAND USEPARAMEXIST FUSION TEMPL CALIB MULTI STACKING NM OCTAVE JSMEM CALIBUSE
 clc
@@ -182,10 +182,10 @@ switch act
                     if numel(inp.PREPROC)>1
                         Y = inp.X(j).Y; 
                         PREPROC = inp.PREPROC{j};
-                        if isfield(inp.X(j),'Yw'); inp.Yw = inp.X(j).Yw; end
+                        if isfield(inp.X(j),'Yw'); inp.iYw = inp.X(j).Yw; end
                     else
                         Y = inp.X.Y; 
-                        if isfield(inp.X,'Yw'); inp.Yw = inp.X.Yw; end
+                        if isfield(inp.X,'Yw'); inp.iYw = inp.X.Yw; end
                         PREPROC = inp.PREPROC; 
                     end
     
@@ -203,23 +203,12 @@ switch act
                     Y = nk_PerfSpatFilt( Y, PREPROC, inp.X );
                     if isfield(inp,'Yw') 
                         fprintf('\nSmoothing weighting map')
-                        inp.Yw = nk_PerfSpatFilt( inp.Yw, PREPROC, inp.X ); 
+                        inp.iYw = nk_PerfSpatFilt( inp.Yw, PREPROC, inp.X ); 
                     else
                         if isfield(PREPROC,'ACTPARAM')
-                            I = arrayfun( @(j) isfield(PREPROC.ACTPARAM{j},'RANK'), 1:numel( PREPROC.ACTPARAM ));
-                            if any(I) 
-                                I = find(I);
-                                for z=1:numel(I)
-                                    if isfield(PREPROC.ACTPARAM{I(z)}.RANK,'EXTERN')
-                                        if iscell(PREPROC.ACTPARAM{I(z)}.RANK.EXTERN)
-                                            inp.Yw = PREPROC.ACTPARAM{I(z)}.RANK.EXTERN{j};
-                                        else
-                                            inp.Yw = PREPROC.ACTPARAM{I(z)}.RANK.EXTERN;
-                                        end
-                                        inp.Yw = nk_PerfSpatFilt( inp.Yw, PREPROC, inp.X ); 
-                                        break
-                                    end
-                                end
+                            iYw = nk_SmoothMaskInActParam( PREPROC, inp.X );
+                            if ~isempty(iYw)
+                                inp.iYw=iYw;
                             end
                         end
                     end
@@ -260,7 +249,7 @@ switch act
                                 flg=0;
                                 if exist(savmatY,'file'), fprintf('\n Training / CV file detected:\n%s\nDo not overwrite.', savnamY); flg=1; end
                                 if WRITEPARAM, if exist(savmatP,'file'), fprintf('\n Parameter file detected:\n%s\n%s\nDo not overwrite.', savnamP); end; end
-                                if flg, continue; end;
+                                if flg, continue; end
                             end
     
                             fprintf('\n\n'); fprintf('********************** CV2 partition [%g, %g] ********************** ',ix,jx)

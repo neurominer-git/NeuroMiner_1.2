@@ -1,8 +1,7 @@
-function [sY, sYocv, sCocv, inp, optfl, ukbin, uBINMOD, BINMOD] = ...
-    nk_PerfPreprocessSpatial( Y, Yocv, Cocv, inp, paramfl, BINMOD, kbin, ukbin)
+function [sY, sYocv, sCocv, sYw, inp, optfl] = nk_PerfPreprocessSpatial( Y, Yocv, Cocv, inp, paramfl, kbin)
 
 global PREPROC
-sYocv = []; sCocv = []; 
+sYocv = []; sCocv = []; sYw = [];
 
 %Eventually, apply spatial operations on image data
 if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.PREPROC.SPATIAL.cubetype>1 
@@ -11,7 +10,8 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
     sY = cell(kbin,1); 
     if ~isempty(Yocv), sYocv = cell(kbin,1); end
     if ~isempty(Cocv), sCocv = cell(kbin,1); end
-    optfl = true; ukbin = kbin; 
+    if isfield(inp,'iYw'), sYw = cell(kbin,1); end
+    optfl = true; 
 
     if smoothfl
         if inp.multiflag
@@ -21,7 +21,16 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
             % Smooth data
             tsY = nk_PerfSpatFilt( Y, uPREPROC, paramfl.PV ); 
             % Is there a weighting mask that must be smoothed, too?
-            if isfield(inp.X,'Yw'), inp.Yw = cell(kbin,1); tsYw = nk_PerfSpatFilt( inp.X.Yw, uPREPROC, paramfl.PV ); end
+            if isfield(inp,'iYw')
+                % Here a weighting mask for a given modality "i" has been
+                % extracted from inp.X(n).Yw to inp.iYw by a parent function
+                tsYw = nk_PerfSpatFilt( inp.iYw, uPREPROC, paramfl.PV ); 
+            else
+                % Here a weighting mask needs to be found in the
+                % preprocessing parameters (e.g. as part of the ranking
+                % function)
+                tsYw = nk_SmoothMaskInActParam(uPREPROC, paramfl.PV);
+            end
             % Processing of out-of-crossvalidation data (can be multiple containers)
             if ~isempty(Yocv)
                 if iscell(Yocv)
@@ -52,7 +61,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
             for u=1:kbin
                 paramfl.P{u} = tP;
                 sY{u} = tsY;
-                if isfield(inp.X,'Yw'), inp.Yw{u} = tsYw; end
+                if isfield(inp,'iYw'), sYw{u} = tsYw; end
                 if ~isempty(Yocv), sYocv{u} = tsYocv; end
                 if ~isempty(Cocv), sCocv{u} = tsCocv; end
             end
@@ -63,25 +72,12 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                 fprintf('\nPredictor #%g: Smoothing Training & CV data',u)
                 inp.smoothing_kernels = uPREPROC.SPATIAL.PX.opt;
                 sY{u} = nk_PerfSpatFilt( Y, uPREPROC, paramfl.PV ); 
+
                 if isfield(inp,'iYw') && ~isempty(inp.iYw) 
                     fprintf('\nSmoothing weighting map')
-                    inp.Yw{u} = nk_PerfSpatFilt( inp.iYw, uPREPROC, paramfl.PV ); 
+                    sYw{u} = nk_PerfSpatFilt( inp.iYw, uPREPROC, paramfl.PV ); 
                 else
-                    I = arrayfun( @(j) isfield(uPREPROC.ACTPARAM{j},'RANK'), 1:numel( uPREPROC.ACTPARAM ));
-                    if any(I)
-                        Ix = find(I);
-                        for qx = 1:numel(Ix)
-                            if isfield(uPREPROC.ACTPARAM{Ix(qx)}.RANK,'EXTERN')
-                                inp.Yw{u} = uPREPROC.ACTPARAM{Ix(qx)}.RANK.EXTERN;
-                                inp.Yw{u} = nk_PerfSpatFilt( inp.Yw{u}, uPREPROC, paramfl.PV ); 
-                                %here, we assume that there is only one
-                                %weighting map to be smoothed alongside the
-                                %data. This will obviously not work for
-                                %multiple weighting maps...
-                                break
-                            end
-                        end
-                    end
+                    sYw{u} = nk_SmoothMaskInActParam(uPREPROC, paramfl.PV);
                 end
                 
                 if ~isempty(Yocv)
@@ -95,7 +91,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                         sYocv{u} = nk_PerfSpatFilt( Yocv, uPREPROC, paramfl.PV ); 
                     end
                 end
-                if ~isempty(Cocv), 
+                if ~isempty(Cocv)
                     if iscell(Yocv)
                         for n=1:numel(cocv)
                             fprintf('\nPredictor #%g: Smoothing calibration data (%g)',u, n)
@@ -109,23 +105,20 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
             end
         end
     else
-        % Check whether the data has been pre-smoothed. If so extract the
-        % smoothed data shelves needed for the current CV2 partition
-        uPREPROC = nk_SetParamChain(paramfl, 1, PREPROC);
-        if numel(Y) ~= uPREPROC.SPATIAL.PX.opt
-            for u=1:kbin
+        % Check whether only some of the pre-smoothed data shelves are needed. 
+        % If so extract, extract only the smoothed data shelves needed for the 
+        % current CV2 partition
+        for u=1:kbin
+            uPREPROC = nk_SetParamChain(paramfl, u, PREPROC);
+            if numel(Y{u}) ~= numel(uPREPROC.SPATIAL.PX.opt)
                 idx=ismember(inp.smoothing_kernels,uPREPROC.SPATIAL.PX.opt);
-                uPREPROC = nk_SetParamChain(paramfl, u, PREPROC);
-                sY{u} = Y{u}(idx);
-                if ~isempty(Yocv), sYocv{u} = Yocv{u}(idx); end
-                if ~isempty(Cocv), sCocv{u} = Cocv{u}(idx); end
-                if isfield(inp,'X') && isfield(inp.X,'Yw') && ~isfield(inp,'Yw'), inp.Yw{u} = inp.X.Yw{u}(idx); end
+            else
+                idx= true(numel(Y{u}),1);
             end
-        else
-            sY = Y;
-            if ~isempty(Yocv), sYocv = Yocv; end
-            if ~isempty(Cocv), sCocv = Cocv; end
-            if isfield(inp,'X') && isfield(inp.X,'Yw') && ~isfield(inp,'Yw'), inp.Yw = inp.X.Yw; end
+            sY{u} = Y{u}(idx);
+            if ~isempty(Yocv), sYocv{u} = Yocv{u}(idx); end
+            if ~isempty(Cocv), sCocv{u} = Cocv{u}(idx); end
+            if isfield(inp,'iYw'), sYw{u} = inp.iYw{u}(idx); end
         end
     end
 else
@@ -133,6 +126,5 @@ else
     sY = Y;
     if ~isempty(Yocv), sYocv = Yocv; end
     if ~isempty(Cocv), sCocv = Cocv; end
-    if isfield(inp,'X') && isfield(inp.X,'Yw') && ~isfield(inp,'Yw'), inp.Yw = inp.X.Yw; end
+    if isfield(inp,'iYw'), sYw = inp.iYw; end
 end
-uBINMOD = BINMOD;

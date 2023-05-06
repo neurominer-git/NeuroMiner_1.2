@@ -94,6 +94,7 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     
     % if not otherwise specified use PCA in the 'percentage of
     % sum(eigenvalues) mode'
+<<<<<<< HEAD
 
     % CV Note: this can potentially also be adjusted so that DR.RedMode is
     % dir
@@ -104,6 +105,12 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     elseif (~isfield(IN,'DR') || isempty(IN.DR) || ~isfield(IN.DR,'RedMode')) && IN.redmethod == 2 
         IN.DR.RedMode = 'fastICA'; 
         IN.DR.PercMode = IN.dimmode; 
+=======
+    if ~isfield(IN,'DR') || isempty(IN.DR) || ~isfield(IN.DR,'RedMode')
+        IN.DR.DRsoft = 1; 
+        IN.DR.RedMode = 'PCA';
+        IN.DR.PercMode = IN.dimmode;  
+>>>>>>> refs/remotes/origin/main
     end
     
     % Run dimensionality reduction on the source matrix

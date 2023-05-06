@@ -19,7 +19,7 @@ function IN  = nk_PerfFeatRankObj(oY, IN)
 % IN.weightmethod     :     Upweight (=1) or downweight (=2) features
 % IN.W                :     The ranking vector/matrix over the features
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 04/2022
+% (c) Nikolaos Koutsouleris, 03/2023
 
 global VERBOSE
 
@@ -103,7 +103,7 @@ switch IN.algostr
         
     case 'auc'
         % Area-under-the-Curve ooperator
-        IN.W = (nk_AUCFeatRank(Y, L))'; 
+        IN.W = nk_AUCFeatRank(Y, L, 0.5); 
 
     case {'pearson','spearman'}
         % simple univariate correlation using Pearson's or Spearman's
@@ -117,8 +117,20 @@ switch IN.algostr
         IN.W = abs(nk_CorrMat(Y,L,type));
 
     case 'fscore'
-        if VERBOSE; fprintf(' F-Score'); end
-        IN.W = (nk_FScoreFeatRank(Y,L))';
+        % simple measure for binary classification providing a ration of
+        % between-group distance to cross-group scatter. Two versions are
+        % available , one based on mean/SD and the other based on
+        % median/IQR. Latter one can only be accessed by adding the
+        % FScoreType flag to NM.TrainParam.PREPROC{x}.ACTPARAM{y}.RANK 
+        if ~isfield(IN,'FScoreType'), IN.FScoreType = 'mean'; end 
+        switch IN.FScoreType 
+            case 'mean'
+                if VERBOSE; fprintf(' F-Score [Mean/SD]'); end
+                IN.W = nk_FScoreFeatRank(Y,L);
+            case 'median'
+                if VERBOSE; fprintf(' F-Score [Median/IQR]'); end
+                IN.W = nk_FScoreFeatRankMdIqr(Y,L);
+        end
 
     case 'rgs'
         if ~isempty(opt) && ~isempty(Params_desc) 
