@@ -10,8 +10,7 @@ if mode == 'train':
     else: 
         ica = FastICA(n_components=num_ics, whiten="arbitrary-variance", random_state = 1234)
     ica_model = ica.fit(data)  # Reconstruct signals
-    S = ica_model.transform(data)
-    ICs = ica_model.components_
+    ICs = ica.fit(data).components_
     random_name = uuid.uuid4().hex
     model_file = f'{rootdir}/ica_model_{random_name}.sav'
     pickle.dump(ica, open(model_file, 'wb'))

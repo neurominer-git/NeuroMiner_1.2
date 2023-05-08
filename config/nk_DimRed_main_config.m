@@ -39,7 +39,7 @@ if ~defaultsfl
     else
         DRSTR_DIM = [ nk_ConcatParamstr(dims) DRSTR_PERCMODE ];
     end
-    if strcmp(DRSTR_REDMODE,'PLS') || strcmp(DRSTR_REDMODE, 'fastICA')
+    if strcmp(DRSTR_REDMODE,'PLS') 
         menustr = ['Select dimensionality reduction method [ ' DRSTR_REDMODE ' ]'];
         menuact = 1;
     else

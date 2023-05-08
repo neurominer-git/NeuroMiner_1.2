@@ -22,7 +22,7 @@ atlasVec = reshape(atlas_matrix,size(atlas_matrix,1)*size(atlas_matrix,2)*size(a
 S.Vm                         = spm_vol(brainmask);
 [S.dims, S.indvol, ~, S.vox] = nk_ReadMaskIndVol(S.Vm, []);
 
-% resize Yimg to to brainmask
+% resize Yimg to brainmask
 V = zeros(S.dims);
 C = zeros(size(Yimg,1),numel(V));
 for i = 1:size(Yimg,1)

@@ -4,19 +4,21 @@ if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
     
-    if (~exist('dims','var') || isempty(dims)) || (~exist('PercMode','var') || isempty(PercMode)); 
+    if (~exist('dims','var') || isempty(dims)) || (~exist('PercMode','var') || isempty(PercMode))
          [PercMode, dims] = nk_ExtDim_config(RedMode, [], [], 1);
     end
     defdims = dims; if size(defdims,2)==1 && numel(defdims)>1, defdims=defdims'; end
     mn_str = []; PercModeStr = {'Absolute range','Percentage range','Energy range'}; mn_act=[];
     switch RedMode
-        case {'PCA', 't-SNE', 'SparsePCA', 'fastICA'}
+        case {'PCA', 't-SNE', 'SparsePCA'}
             mn_str = [mn_str sprintf('Define extaction mode for %s [ %s ]|',RedMode, PercModeStr{PercMode})]; mn_act = 1;
         case {'LDA', 'GDA'}
             PercMode = 1; L = NM.label; L(isnan(L))=[]; dims = numel(unique(L)); act=0; return
         otherwise
             PercMode = 1;
     end
+    % CV Note: add PercMode 2 (and 3) for fastICA, currently only N of ICs
+    % can be defned
     
     mn_str = [mn_str sprintf('Define extraction range [ %s ]',nk_ConcatParamstr(dims))]; mn_act = [mn_act 2];
     if numel(mn_act)>1
@@ -63,7 +65,7 @@ else
         case {'LDA','GDA'}
             L = NM.label; L(isnan(L))=[]; dims = numel(unique(L)); 
         case {'fastICA'}
-            dims = 0;
+            dims = floor(size(NM.Y{NM.TrainParam.FUSION.M(1)},2)/10); PercMode = 1; 
         otherwise
             dims = floor(size(NM.Y{NM.TrainParam.FUSION.M(1)},2)/10); PercMode = 1;
     end

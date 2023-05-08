@@ -12,6 +12,7 @@ corrmeths = {'Pearson','Spearman','ANOVA'};
 corrcrits = {'corr','pval'};
 dims = 1;
 dimmode = 3;
+redmethod = 1; % 1= PCA, 2= fastICA
 SUBGROUP.flag = 1;
 subgroupstr = {'Entire training set', ...
                 'User-defined subset of CV1 training partition', ...
@@ -29,6 +30,7 @@ if ~isfield(REMVARCOMP,'recon'),        REMVARCOMP.recon = recon; end
 if ~isfield(REMVARCOMP,'dims'),         REMVARCOMP.dims = dims; end
 if ~isfield(REMVARCOMP,'dimmode'),      REMVARCOMP.dimmode = dimmode; end
 if ~isfield(REMVARCOMP,'SUBGROUP'),     REMVARCOMP.SUBGROUP = SUBGROUP; end
+if ~isfield(REMVARCOMP,'redmethod'),     REMVARCOMP.redmethod = redmethod; end
 if ~exist('PX','var'),                  PX = []; end
 
 %% Define menu
@@ -43,6 +45,11 @@ else
     RANKVARCOMP_G_str = 'No covariate vector or matrix specified!';
 end
 
+if isfield(REMVARCOMP, 'redmethod') && REMVARCOMP.redmethod == 1
+    REMVARCOMP_redmethod_str = 'PCA';
+elseif isfield(REMVARCOMP, 'redmethod') && REMVARCOMP.redmethod == 2
+    REMVARCOMP_redmethod_str = 'fastICA';
+end
 REMVARCOMP_corrmeth_str = corrmeths{REMVARCOMP.corrmeth};
 REMVARCOMP_corrthresh_str = nk_ConcatParamstr(REMVARCOMP.corrthresh);
 varopdef = find(strcmp(varops, REMVARCOMP.varop));
@@ -55,15 +62,23 @@ switch REMVARCOMP.dimmode
 end
 REMVARCOMP_subgroup_str = subgroupstr{REMVARCOMP.SUBGROUP.flag};
 
-menustr = [ 'Define target vector / matrix for identification of variance components [ ' RANKVARCOMP_G_str ' ]|', ...
+menustr = [ 'Define dimensionality redution method [ ' REMVARCOMP_redmethod_str ']|', ...
+            'Define target vector / matrix for identification of variance components [ ' RANKVARCOMP_G_str ' ]|', ...
             'Define correlation method for identification of variance components [ ' REMVARCOMP_corrmeth_str ' ]|', ...
             'Define metric for variance component identification [ ' REMVARCOMP.corrcrit ' ]|', ...
             'Define metric cutoff for variance extraction [ ' REMVARCOMP_corrthresh_str  ' ]|', ...
             'Define variance extraction operator [ ' REMVARCOMP.varop  ' ]|', ...
             'Back-project adjusted matrices to input space [ ' REMVARCOMP_recon_str ' ]|'...
-            'Define % retained variance in PCA projection [ ' REMVARCOMP_dims_str ']|' ...
-            'Define training data for PCA model generation [ ' REMVARCOMP_subgroup_str ' ]'];
-menuact = 1:8;
+            'Define training data for dimensionality reduction model generation [ ' REMVARCOMP_subgroup_str ' ]'];
+menuact = [9,1,2,3,4,5,6,8];
+
+if REMVARCOMP.redmethod == 2
+    menustr = [menustr, '|Define fixed number of independen components in ICA projection [ ' REMVARCOMP_dims_str ']'];
+    menuact = [9,1,2,3,4,5,6,8,10];
+else
+    menustr = [menustr, '|Define % retained variance in PCA projection [ ' REMVARCOMP_dims_str ']'];
+    menuact = [9,1,2,3,4,5,6,7,8];
+end
 
 %% Print menu
 nk_PrintLogo
@@ -101,6 +116,11 @@ switch act
         end
     case 8
         REMVARCOMP.SUBGROUP = nk_SubgroupOperation_config( NM, REMVARCOMP.SUBGROUP );
+    case 9
+        REMVARCOMP.redmethod = nk_input('Choose dimensionality reduction method', 0, 'm', 'PCA|fastICA',[1,2], REMVARCOMP.redmethod);
+    case 10
+        REMVARCOMP.dimmode = 1;
+        REMVARCOMP.dims = nk_input('Fixed number of independent components to be returned by fastICA (1-num(dims))',0,'e',REMVARCOMP.dims); 
 end
 
 % Register correlation threshold to parameter space if numel(thresholds) > 1 

@@ -53,6 +53,12 @@ if ~defaultsfl
             MCOVARUSE_STR = 'no'; 
         end
         BETAEXT_DEF = [];
+    elseif METHOD_DEF == 3
+        % fastICA
+        menuact = [menuact 51]; 
+        METHOD_STR = 'fastICA'; 
+        % possibly, add parameters such as non-linearity, iterations, ...
+        % add threshold for correlation with significant ICs 
     end
     
     % Do we have to deal with external betas for partial correlations?
@@ -104,7 +110,13 @@ if ~defaultsfl
                MCOVAR_MNU ...
                MCOVARLABEL_MNU ...
                SUBGROUP_MNU1 ...
-               SUBGROUP_MNU2];        
+               SUBGROUP_MNU2];   
+        case 3
+            menustr = ['Select method [ ' METHOD_STR ' ]', ...
+               '|Select site covariate from NM covariate matrix [ ' COVAR_STR ' ]', ...
+               '|Define number of independent components (default = min(dim(X)))', ...
+               SUBGROUP_MNU1 ...
+               SUBGROUP_MNU2];
     end
            
     nk_PrintLogo
@@ -114,7 +126,13 @@ if ~defaultsfl
     switch act
         
         case 1
-            if METHOD_DEF == 1, METHOD_DEF= 2; else, METHOD_DEF= 1; end
+            if METHOD_DEF == 1 % TO DO: change to menu selection 
+                METHOD_DEF = 2; 
+            elseif METHOD_DEF == 2
+                METHOD_DEF = 3;
+            else 
+                METHOD_DEF = 1; 
+            end
         
         case 2
             COVAR_DEF = nk_SelectCovariateIndex(NM, COVAR_DEF, 1);

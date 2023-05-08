@@ -94,10 +94,17 @@ if ~isfield(IN,'ind0') || isempty(IN.ind0)
     
     % if not otherwise specified use PCA in the 'percentage of
     % sum(eigenvalues) mode'
-    if ~isfield(IN,'DR') || isempty(IN.DR) || ~isfield(IN.DR,'RedMode')
+
+    % CV Note: this can potentially also be adjusted so that DR.RedMode is
+    % directly set in _config
+    if (~isfield(IN,'DR') || isempty(IN.DR) || ~isfield(IN.DR,'RedMode')) && (~isfield(IN, 'redmethod') || IN.redmethod == 1)
         IN.DR.DRsoft = 1; 
         IN.DR.RedMode = 'PCA';
         IN.DR.PercMode = IN.dimmode;  
+    elseif (~isfield(IN,'DR') || isempty(IN.DR) || ~isfield(IN.DR,'RedMode')) && IN.redmethod == 2 
+        IN.DR.RedMode = 'fastICA'; 
+        IN.DR.PercMode = IN.dimmode; % unecessary, might affect nk_PerfRedObj
+        IN.DR.DRsoft = 1; % unused, might affect nk_PerfRedPbj
     end
     
     % Run dimensionality reduction on the source matrix
@@ -166,8 +173,8 @@ if ~any(IN.ind0)
     warning('All eigenvariates meet threshold criterion [%s %g]!\nCheck your data and your settings.',IN.varop,IN.corrthresh);
 end
     
-% Now project target matrix to source matrix PCA space
-if VERBOSE, fprintf('\nProjecting target matrix to source PCA space'); end
+% Now project target matrix to source matrix embedding space
+if VERBOSE, fprintf(sprintf('\nProjecting target matrix to source %s space', IN.DR.RedMode)); end
 if isempty(T) ||(exist('S','var') && isequal(T, S) && sum(IN.indX) == size(S,1))
     if exist('dS','var')
         dT = dS; 

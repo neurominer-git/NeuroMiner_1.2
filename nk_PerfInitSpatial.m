@@ -27,7 +27,9 @@ for n=1:nM
     end
     
     tparamfl.PV = inp.X(n);
-    if VERBOSE, fprintf('\nGenerate pre-processing parameter array for CV2 partition [%g,%g].\n',inp.f,inp.d); end
+    if isfield(inp, 'f') && isfield(inp, 'd')
+        if VERBOSE, fprintf('\nGenerate pre-processing parameter array for CV2 partition [%g,%g].\n',inp.f,inp.d); end
+    end
     tparamfl = nk_PrepPreprocParams(PREPROC, tparamfl, analysis, n, inp.ll, inp.curlabel);
     
     if iscell(PREPROC)

@@ -177,9 +177,12 @@ if isfield(TemplParam,'ACTPARAM')
                                     InputParam.P{ac}.TsMod{tscnt+1}(SrcParam.iOCV,:)=[]; 
                                 end
                             end
-                        else
-                            if VERBOSE, fprintf('\n\t- Method: Partial correlations analysis'); end
-                            InputParam.P{ac}.METHOD = 1;
+                    elseif isfield(TemplParam.ACTPARAM{ac},'METHOD') && TemplParam.ACTPARAM{ac}.METHOD==3
+                        if VERBOSE, fprintf('\n\t- Method: fastICA analysis'); end
+                        InputParam.P{ac}.METHOD = 3;
+                    else
+                        if VERBOSE, fprintf('\n\t- Method: Partial correlations analysis'); end
+                        InputParam.P{ac}.METHOD = 1;
                     end
                     
                 end
@@ -215,10 +218,17 @@ if isfield(TemplParam,'ACTPARAM')
                             if VERBOSE,fprintf('\n\t-> Beta parameter(s) will be computed from a specific subgroup.'); end
                         end
                     end
-                else
+                elseif InputParam.P{ac}.METHOD == 2
                     if isfield(TemplParam.ACTPARAM{ac},'SUBGROUP') && ~isempty(TemplParam.ACTPARAM{ac}.SUBGROUP)
                         InputParam.P{ac}.SUBGROUP = TemplParam.ACTPARAM{ac}.SUBGROUP(SrcParam.TrX,:);
                         if VERBOSE,fprintf('\n\t-> Combat parameter(s) will be computed from a specific subgroup.'); end
+                    end
+                     InputParam.P{ac}.COVDIR=0;
+                     InputParam.P{ac}.INTERCEPT=0;
+                elseif InputParam.P{ac}.METHOD == 3
+                    if isfield(TemplParam.ACTPARAM{ac},'SUBGROUP') && ~isempty(TemplParam.ACTPARAM{ac}.SUBGROUP)
+                        InputParam.P{ac}.SUBGROUP = TemplParam.ACTPARAM{ac}.SUBGROUP(SrcParam.TrX,:);
+                        if VERBOSE,fprintf('\n\t-> FastICA parameter(s) will be computed from a specific subgroup.'); end
                     end
                      InputParam.P{ac}.COVDIR=0;
                      InputParam.P{ac}.INTERCEPT=0;
