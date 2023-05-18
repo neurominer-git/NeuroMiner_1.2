@@ -51,6 +51,7 @@ end
 
 % Find NaNs in x and nm_nanmean(x)
 nans = isnan(x);
+fullnans = sum(nans,dim) == size(x,2);
 avg = nm_nanmean(x,dim);
 
 % create array indicating number of element 
@@ -64,8 +65,7 @@ x = x - repmat(avg,tile);
 count = size(x,dim) - sum(nans,dim);
 
 % Replace NaNs with zeros.
-x(isnan(x)) = 0; 
-
+x(nans) = 0; 
 
 % Protect against a  all NaNs in one dimension
 i = find(count==0);
@@ -76,5 +76,5 @@ else
 	y = sqrt(sum(x.*x,dim)./max(count,1));
 end
 y(i) = i + NaN;
-
+y(fullnans) = nan;
 % $Id: nm_nanstd.m,v 1.1 2004/07/15 22:42:15 glaescher Exp glaescher $

@@ -433,14 +433,15 @@ function clickCallback(src, evt)
         xrange = nk_Range(get(axesHdl, 'Xlim'),2);
         yrange = nk_Range(get(axesHdl, 'Ylim'),2);
         if abs(mouseX - figdata.x(indpat)) < 0.035*xrange && abs(mouseY - figdata.y(indpat)) < 0.035*yrange
-                
-            selCase = figdata.cases{indpat};
             x1 = figdata.x(indpat);
             y1 = figdata.y(indpat);
             axes(handles.axes1); 
-            if isfield(handles,'caseplot'), delete(handles.caseplot); end
-            handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
-            handles.selCase.Value = find(~cellfun(@isempty,strfind(handles.selCase.String,selCase)));
+            if isfield(figdata,'cases')
+                selCase = figdata.cases{indpat};
+                if isfield(handles,'caseplot'), delete(handles.caseplot); end
+                handles.caseplot = plot(x1,y1,'ko','MarkerSize',20, 'LineWidth',1.5);
+                handles.selCase.Value = find(~cellfun(@isempty,strfind(handles.selCase.String,selCase)));
+            end
             try
                 if isfield(handles, 'MLIdata') && ~isempty(handles.MLIdata)
                     handles.thisMLIresult.Visible = 'on';
@@ -451,7 +452,7 @@ function clickCallback(src, evt)
                 else 
                     handles.thisMLIresult.Visible = 'off';
                 end
-                axesHdl.Legend.String{end} = selCase;
+                if isfield(figdata,'cases'), axesHdl.Legend.String{end} = selCase; end
             catch
             end
         end

@@ -215,12 +215,14 @@ if isfield(TemplParam,'ACTPARAM')
                     else
                         if isfield(TemplParam.ACTPARAM{ac},'SUBGROUP') && ~isempty(TemplParam.ACTPARAM{ac}.SUBGROUP)
                             InputParam.P{ac}.SUBGROUP = TemplParam.ACTPARAM{ac}.SUBGROUP(SrcParam.TrX,:);
+                            InputParam.P{ac}.SUBGROUP(SrcParam.iTrX) = []; 
                             if VERBOSE,fprintf('\n\t-> Beta parameter(s) will be computed from a specific subgroup.'); end
                         end
                     end
                 elseif InputParam.P{ac}.METHOD == 2
                     if isfield(TemplParam.ACTPARAM{ac},'SUBGROUP') && ~isempty(TemplParam.ACTPARAM{ac}.SUBGROUP)
                         InputParam.P{ac}.SUBGROUP = TemplParam.ACTPARAM{ac}.SUBGROUP(SrcParam.TrX,:);
+                        InputParam.P{ac}.SUBGROUP(SrcParam.iTrX) = [];
                         if VERBOSE,fprintf('\n\t-> Combat parameter(s) will be computed from a specific subgroup.'); end
                     end
                      InputParam.P{ac}.COVDIR=0;
@@ -228,6 +230,7 @@ if isfield(TemplParam,'ACTPARAM')
                 elseif InputParam.P{ac}.METHOD == 3
                     if isfield(TemplParam.ACTPARAM{ac},'SUBGROUP') && ~isempty(TemplParam.ACTPARAM{ac}.SUBGROUP)
                         InputParam.P{ac}.SUBGROUP = TemplParam.ACTPARAM{ac}.SUBGROUP(SrcParam.TrX,:);
+                        InputParam.P{ac}.SUBGROUP(SrcParam.iTrX) = [];
                         if VERBOSE,fprintf('\n\t-> FastICA parameter(s) will be computed from a specific subgroup.'); end
                     end
                      InputParam.P{ac}.COVDIR=0;
@@ -283,7 +286,6 @@ if isfield(TemplParam,'ACTPARAM')
                             InputParam.P{ac}.dTsInd{tscnt+1}(SrcParam.iOCV,:) = [];
                         end
                     end
-                    
                 end
                 
             case 'standardize' 

@@ -68,7 +68,7 @@ if ~emptfl
             % The new second logical argument [P.steps(cnt) == zz] makes sure 
             % that the right switch is used if multiple identical preprocessing 
             % steps are executed in one preprocessing sequence (e.g.
-            % feature ranking). So the logic gues as follows:
+            % feature ranking). So the logic goes as follows:
             % Does the current preprocessing step contain hyperparameters? 
             % => [strcmp(PREPROC.ACTPARAM{zz}.cmd, P.cmd{cnt}]
             % Is this hyperparameter-optimized step actually the current
