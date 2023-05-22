@@ -189,7 +189,7 @@ end
 switch IN.recon
     case 1
         % Reconstruct target matrix only with / without extracted variance
-        % components
+        % componentsp
         if VERBOSE, fprintf('\nReconstructing target matrix based on selected components.'); end
         tT = bsxfun(@plus, IN.mpp.vec(:,IN.ind0)* dT(:,IN.ind0)' , IN.mpp.sampleMean')';
         adjT = zeros(size(dT,1),numel(IN.indNonRem)); adjT(:,IN.indNonRem) = tT;

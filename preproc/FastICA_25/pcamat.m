@@ -93,14 +93,14 @@ covarianceMatrix = cov(vectors', 1);
 
 % Calculate the eigenvalues and eigenvectors of covariance
 % matrix.
-[E, D] = eig (covarianceMatrix);
+[E, D] = eig(covarianceMatrix);
 
 % The rank is determined from the eigenvalues - and not directly by
 % using the function rank - because function rank uses svd, which
 % in some cases gives a higher dimensionality than what can be used
 % with eig later on (eig then gives negative eigenvalues).
 rankTolerance = 1e-7;
-maxLastEig = sum (diag (D) > rankTolerance);
+maxLastEig = sum (diag(D) > rankTolerance);
 if maxLastEig == 0,
   fprintf (['Eigenvalues of the covariance matrix are' ...
 	    ' all smaller than tolerance [ %g ].\n' ...
