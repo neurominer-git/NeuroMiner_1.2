@@ -1,10 +1,13 @@
 function [ Y, IN ] = cv_icaHarmonize(Y, mode, IN)
 
 if mode == 1
-    if isfield(IN,'subroup') && ~isempty(IN.subgroup)
+
+    if isfield(IN,'subgroup') && ~isempty(IN.subgroup)
         Ytemp = Y; 
         Y = Y(IN.subgroup,:);
         G = IN.G(IN.subgroup,:);
+    else
+        G = IN.G; 
     end
 
     [icasig, A, W] = fastica(Y');
@@ -23,7 +26,8 @@ if mode == 1
     % Identify the independent components significantly associated with the covariate
     significantComponents = find(abs(pvals) < 0.05);
 
-    if isfield(IN,'subroup') && ~isempty(IN.subgroup)
+
+    if isfield(IN,'subgroup') && ~isempty(IN.subgroup)
         % Remove the significant components from the original data
         Ysub = Y - (W(significantComponents, :)' * icasig(significantComponents, :))';
 
