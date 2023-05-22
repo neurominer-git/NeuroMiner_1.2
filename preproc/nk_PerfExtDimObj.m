@@ -38,8 +38,10 @@ if eIN || ~isfield(IN,'indNonRem') || isempty(IN.indNonRem)
 end
 if VERBOSE, fprintf(' extracting %g components.', sum(IN.indNonRem)); end
 try
-pY = Y(:,IN.indNonRem);
+    pY = Y(:,IN.indNonRem);
 catch
-    fprintf('dimensions problem')
+    fprintf('\n');
+    warning(sprintf('There is dimensions mismatch in the data!\nThe matrix has a dimensionality of %g while the column index for data extraction has %g entries.\nReturning the full matrix but reconsider you extraction settings!', size(Y,2), numel(IN.indNonRem)))
+    pY = Y; 
 end
 
