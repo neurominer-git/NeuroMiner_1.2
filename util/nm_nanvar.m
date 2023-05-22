@@ -62,10 +62,11 @@ tile(dim) = size(x,dim);
 x = x - repmat(avg,tile);
 
 count = size(x,dim) - sum(nans,dim);
+nans = isnan(x); 
+fullnans = sum(nans,dim) == size(x,2);
 
 % Replace NaNs with zeros.
-x(isnan(x)) = 0; 
-
+x(nans) = 0; 
 
 % Protect against a  all NaNs in one dimension
 i = find(count==0);
@@ -76,5 +77,5 @@ else
 	y = sum(x.*x,dim)./max(count,1);
 end
 y(i) = i + NaN;
-
+y(fullnans) = nan;
 % $Id: nm_nanvar.m,v 1.1 2008/05/02 21:46:17 glaescher Exp glaescher $

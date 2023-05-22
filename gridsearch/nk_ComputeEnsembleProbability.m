@@ -127,7 +127,7 @@ for curlabel=1:nl
             end
             ci1(i)          = ci(1); 
             ci2(i)          = ci(2);
-            if ~isempty(optcutoff), 
+            if ~isempty(optcutoff)
                 mean_optcutoffs(i) = meanfun(optcutoffi); 
                 std_optcutoffs(i) = nm_nanstd(optcutoffi); 
                 mean_optcutoffpercs(i) = meanfun(optcutoffperci); 

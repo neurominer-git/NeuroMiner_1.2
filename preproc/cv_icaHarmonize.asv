@@ -1,19 +1,16 @@
 function [ Y, IN ] = cv_icaHarmonize(Y, mode, IN)
 
 if mode == 1
-
-    if isfield(IN,'subgroup') && ~isempty(IN.subgroup)
+    if ~isempty(IN.subgroup)
         Ytemp = Y; 
         Y = Y(IN.subgroup,:);
         G = IN.G(IN.subgroup,:);
-    else
-        G = IN.G; 
     end
 
     [icasig, A, W] = fastica(Y');
     % icasig = projection of original data on the ICs
     % A = ICs are represented in the columns
-    % W = separating matrix W can be used to project new data on ICs (Yn =
+    % W = separating matrix W can be used to project a new data on ICs (Yn =
     % W*Xn)
 
     % Correlate each independent component with the covariate
@@ -26,8 +23,7 @@ if mode == 1
     % Identify the independent components significantly associated with the covariate
     significantComponents = find(abs(pvals) < 0.05);
 
-
-    if isfield(IN,'subgroup') && ~isempty(IN.subgroup)
+    if ~isempty(IN.subgroup)
         % Remove the significant components from the original data
         Ysub = Y - (W(significantComponents, :)' * icasig(significantComponents, :))';
 
@@ -48,7 +44,7 @@ if mode == 1
     IN.icasig = icasig;
     IN.A = A;
     IN.sigICs = significantComponents;
-    IN.pvals = pvals;
+    IN.pvals =
 else
     % project new data on ICs
     Yn = IN.W * Y';

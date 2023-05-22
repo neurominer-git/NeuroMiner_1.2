@@ -39,6 +39,7 @@ end
 
 siz  = size(x);
 n    = size(x,dim);
+fullnans = sum(isnan(x),dim) == size(x,2);
 
 % Permute and reshape so that DIM becomes the row dimension of a 2-D array
 perm = [dim:max(length(size(x)),dim) 1:dim-1];
@@ -50,10 +51,7 @@ x = sort(x,1);
 
 % identify and replace NaNs
 nans = isnan(x);
-x(isnan(x)) = 0;
-
-% new dimension of x
-[n m] = size(x);
+x(nans) = 0;
 
 % number of non-NaN element in each column
 s = size(x,1) - sum(nans);
@@ -78,4 +76,5 @@ end
 % permute and reshape back
 siz(dim) = 1;
 y = ipermute(reshape(y,siz(perm)),perm);
+y(fullnans) = nan;
 % $Id: nm_nanmedian.m,v 1.2 2007/07/30 17:19:19 glaescher Exp glaescher $

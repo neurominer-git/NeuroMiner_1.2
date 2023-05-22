@@ -198,8 +198,9 @@ end
 %Transpose weights if needed
 if size(IN.W,1) < size(IN.W,2); IN.W = IN.W'; end
 
-% Scale from 0 to 1
+% Scale from realmin to 1
 IN.W = nk_PerfScaleObj(IN.W);
+IN.W(IN.W==0)=realmin;
 
 % If downweighting has been selected invert the weight vector
 if IN.weightmethod == 2, IN.W = 1-IN.W; end
