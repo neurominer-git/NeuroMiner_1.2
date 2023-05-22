@@ -16,11 +16,11 @@ if ~exist('G','var') || isempty(G), error('Group vector missing or undefined'); 
 if ~exist('V','var') || isempty(V), error('Overlap search vector missing or undefined'); end
 if ~exist('Y','var') || isempty(Y), error('Data matrix missing or undefined'); end
 
-if ndims(G) == 1% Check if G is a single vector with number indiciating centers / groups
+if ndims(G) == 1 || size(G,1) == 1 || size(G,2) == 1% Check if G is a single vector with number indiciating centers / groups
    U = unique(G); lx = length(G); nclass = length(U); 
-   tO = false(lx,nclass); tO(sub2ind([lx nclass], 1:lx, G')) = true;
+   tO = false(lx,nclass); tO(sub2ind([lx nclass], 1:lx, G)) = true;
    G = tO;
-elseif exist('flags', 'var') && flags.corrmethod == 1 && ~islogical(G)
+elseif ~islogical(G)
     G = logical(G);
 end
 
@@ -106,6 +106,6 @@ end
 if flags.display
     figure; 
     plot(mean(Y,2),'b'); hold on
-    %plot(mean(sY,2),'r')
+   % plot(mean(sY,2),'r')
 end
 fprintf('\nDone.\n')
