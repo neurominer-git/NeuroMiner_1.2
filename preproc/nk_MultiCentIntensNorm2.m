@@ -106,6 +106,6 @@ end
 if flags.display
     figure; 
     plot(mean(Y,2),'b'); hold on
-    %plot(mean(sY,2),'r')
+    plot(mean(sY,2),'r')
 end
 fprintf('\nDone.\n')
