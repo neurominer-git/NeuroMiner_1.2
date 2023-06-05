@@ -37,7 +37,8 @@ end
 
 % Replace NaNs with zeros.
 nans = isnan(x);
-x(isnan(x)) = 0; 
+fullnans = sum(nans,dim) == size(x,2);
+x(nans) = 0; 
 
 % denominator
 count = size(x,dim) - sum(nans,dim);
@@ -49,6 +50,6 @@ count(i) = ones(size(i));
 y = sum(x,dim)./count;
 y(i) = i + NaN;
 
-
+y(fullnans) = nan;
 
 % $Id: nm_nanmean.m,v 1.1 2004/07/15 22:42:13 glaescher Exp glaescher $

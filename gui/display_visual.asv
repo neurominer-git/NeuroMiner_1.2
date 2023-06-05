@@ -212,8 +212,8 @@ switch meas{measind}
             y = v.PermModel_Crit_Global(curclass,:); 
             vp = v.ObsModel_Eval_Global(curclass);
             ve = v.PermModel_Eval_Global(curclass,:);
-            vp_cv2 = nm_nanmean(v.ObsModel_Crit_CV2(:));
-            ve_cv2 = nm_nanmean(v.PermModel_CV2(:));
+            vp_cv2 = nm_nanmean(v.ObsModel_Crit_CV2(curclass,:));
+            ve_cv2 = nm_nanmean(v.PermModel_CV2(curclass,:));
             vp_ci_cv2 = nm_95confint(v.ObsModel_Crit_CV2(:));
         end
         perms = length(v.PermModel_Eval_Global(1,:));
@@ -408,23 +408,20 @@ switch meas{measind}
          Pval = sum(ve)/size(ve,2);
          xp = [ vp vp ]; yp = [ 0 maxah ];
          if Pval ~= 0
-            Pvalstr = sprintf('OOT %s=%1.2f\nOOT Significance: P=%g', xlb, vp, Pval);
+            Pvalstr = sprintf('OOT %s=%1.2f\nSignificance: P=%g', xlb, vp, Pval);
          else
-            Pvalstr = sprintf('OOT %s=%1.2f\nOOT Significance: P<%g', xlb, vp, 1/perms);
+            Pvalstr = sprintf('OOT %s=%1.2f\nSignificance: P<%g', xlb, vp, 1/perms);
          end
          if exist("vp_cv2","var")
             xp_cv2 = [ vp_cv2 vp_cv2 ];
-            patch('Faces', [1 2 3 4], 'Vertices', ...
-                [ [ vp_cv2-vp_ci_cv2(1) 0 ]; [ vp_cv2-vp_ci_cv2(1) maxah ] ; [vp_cv2+vp_ci_cv2(1) maxah] ; [vp_cv2+vp_ci_cv2(1) 0 ] ], ...
-                'FaceColor', rgb('LightSalmon'), 'EdgeColor', 'none', 'FaceAlpha', 0.3 );
             line( xp_cv2, yp ,'LineWidth',1,'Color',rgb('LightSalmon') );
-            Pvalstr_cv2 = sprintf('Mean CV2 %s=%1.2f\nMean CV2 Significance: P=%g', xlb, vp_cv2, ve_cv2);
+            Pvalstr_cv2 = sprintf('Mean %s=%1.2f\nSignificance: P=%g', xlb, vp_cv2, ve_cv2);
          end
          line(xp, yp ,'LineWidth',2,'Color','r');
          if exist("vp_cv2","var")
-             legend({'Binned null distribution', 'Fitted null distribution', sprintf('95%%-CI Mean %s',xlb), Pvalstr_cv2, Pvalstr }, 'Location', 'northwest');
+             legend({'Binned null distribution', 'Fitted null distribution', Pvalstr_cv2, Pvalstr });
          else
-            legend({'Binned null distribution', 'Fitted null distribution', Pvalstr}, 'Location', 'northwest');
+            legend({'Binned null distribution', 'Fitted null distribution', Pvalstr});
          end
 
     case NetworkCorrMatStr

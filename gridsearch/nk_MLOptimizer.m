@@ -754,8 +754,8 @@ for f=1:ix % Loop through CV2 permutations
                     % Check aggregation level:
                     % 0 = Mean of CV1 ensemble decision (grand mean approach)
                     % 1 = Concatenate CV1 base learners' decision into big ensemble!
-                    if size(EnsDat,2)>1
-                        if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel, EnsDat = nm_nanmedian(EnsDat,2); end
+                    if size(EnsDat,2)>1 && ~RFE.CV2Class.EnsembleStrategy.AggregationLevel 
+                        EnsDat = nm_nanmedian(EnsDat,2);
                     end
                     
                     % Concatenate (averaged) CV1 ensemble decisions along the 
@@ -885,10 +885,10 @@ for f=1:ix % Loop through CV2 permutations
                             MultiCV2Prob = GD.MultiGroupGridSelection{curlabel}.bestCV2prob;
                         end
                     end
-                    if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel, 
+                    if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel
                         MEnsDat = MultiPred; 
                     else
-                        if iscell(MultiCV2Pred), MEnsDat = nk_cellcat(MultiCV2Pred,[],2); else MEnsDat = MultiCV2Pred; end
+                        if iscell(MultiCV2Pred), MEnsDat = nk_cellcat(MultiCV2Pred,[],2); else, MEnsDat = MultiCV2Pred; end
                     end
                     % Concatenate multi-group prediction across CV2 perms
                     GDanalysis.multi_predictions(TsInd,curlabel) = cellmat_mergecols(GDanalysis.multi_predictions(TsInd,curlabel), num2cell(MEnsDat,2));
@@ -1016,7 +1016,7 @@ if GDfl || ~batchflag
 
                 labelhx = labelh(:,h); labelhx(labelh(:,h)<0)=0; Ix = find(labelh(:,h)); nIx = numel(Ix); 
                 if ix>1
-                    Px = GDanalysis.CV2grid.predictions; [Mx, Nx, ~] = size(Px); 
+                    Px = GDanalysis.CV2grid.predictions; [~, Nx, ~] = size(Px); 
                     GDanalysis.CV2grid.mean_predictions(:,h) = nm_nanmean(Px(:,:,h),2);
                     GDanalysis.CV2grid.std_predictions(:,h)  = nm_nanstd(Px(:,:,h),2);
                     % I love anonymous functions - Compute performance measures

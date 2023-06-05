@@ -179,7 +179,6 @@ for k=sta_iy:stp_iy % Inner permutation loop
         
         tElapsed = tic;
         fprintf('\nWorking on CV1 [%2g, %2g ]: Prepare data', k, l);
-        
         for u=1:ukbin % Binary comparison loop depending on PREPROC.BINMOD & FBINMOD
             
             if ischar(Pnt(k,l,u).TrainedParam) && exist(Pnt(k,l,u).TrainedParam,'file')

@@ -88,7 +88,6 @@ end
 nan_in_label=false;         if sum(isnan(NM.label(:)))>0, nan_in_label=true; end
 nY = numel(NM.Y);
 
-
 if ~isfield(NM.TrainParam,'MLI')
     NM.TrainParam.MLI=[];
     for i=1:nY
