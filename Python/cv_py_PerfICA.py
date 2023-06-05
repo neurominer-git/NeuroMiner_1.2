@@ -4,7 +4,7 @@ import pickle
 import uuid
 
 # train 
-if mode == 'train':
+if mode == "train":
     if num_ics == 0:
         ica = FastICA(whiten="arbitrary-variance", random_state = 1234)
     else: 
@@ -13,12 +13,16 @@ if mode == 'train':
     S = ica_model.transform(data)
     ICs = ica_model.components_
     random_name = uuid.uuid4().hex
-    model_file = f'{rootdir}/ica_model_{random_name}.sav'
-    pickle.dump(ica, open(model_file, 'wb'))
+    model_file = f"{rootdir}/ica_model_{random_name}.sav"
+    pickle.dump(ica, open(model_file, "wb"))
 # test
-else: 
-    ica = pickle.load(open(ica_model, 'rb'))
+elif mode == "test": 
+    ica = pickle.load(open(ica_model, "rb"))
     S = ica.transform(data)
+elif mode == "inverse_transform":
+    ica = pickle.load(open(ica_mode, "rb"))
+    S = ica.inverse_transform(data)
+                      
 
 
 
