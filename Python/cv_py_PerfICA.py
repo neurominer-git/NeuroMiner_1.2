@@ -20,7 +20,11 @@ elif mode == "test":
     ica = pickle.load(open(ica_model, "rb"))
     S = ica.transform(data)
 elif mode == "inverse_transform":
-    ica = pickle.load(open(ica_mode, "rb"))
+    data = np.asarray(data)
+    print(data.ndim)
+    if data.ndim == 1:
+        data = data.reshape(-1, 1)
+    ica = pickle.load(open(ica_model, "rb"))
     S = ica.inverse_transform(data)
                       
 

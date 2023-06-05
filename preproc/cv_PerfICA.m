@@ -23,7 +23,7 @@ if strcmp(mode, 'train') % in training mode
     pY = py2mat(S); % transpose so that nrows = nsamples, ncols = nICs
     mapping.ica_py_model_file = model_file;
     mapping.vec = py2mat(ICs)';
-    mapping.sampleMean = mean(data,1);
+    mapping.sampleMean = mean(Y,1);
 elseif strcmp(mode, 'test') % test mode
     mapping = opt;
     S = pyrunfile('cv_py_PerfICA.py', 'S' , ...
@@ -34,7 +34,7 @@ elseif strcmp(mode, 'test') % test mode
 elseif strcmp(mode, 'inverse_transform')
     mapping = opt; 
     S = pyrunfile('cv_py_PerfICA.py', 'S' , ...
-        mode = 'test', ...
+        mode = 'inverse_transform', ...
         ica_model = mapping.ica_py_model_file, ...
         data = Y); 
     pY = py2mat(S);
