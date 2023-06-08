@@ -30,7 +30,7 @@ function CM = cv_graph_constructionREFPLUSP(A, method, referenceGroup, similarit
 %
 % OUTPUT: matrix format, dimensions: n people x (m/2-m) edges 
 global NM
-sprintf('Size reference sample: %d * %d', size(referenceGroup,1), size(referenceGroup,2))
+sprintf('Dimensions of reference dataset: %d * %d', size(referenceGroup,1), size(referenceGroup,2))
 % % read in reference group data 
 if size(referenceGroup,1) >1
     RG = referenceGroup; 

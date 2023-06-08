@@ -19,13 +19,18 @@ else
 end
 trainwithCV2Ts = 1;
 
-if ~isfield(NM.TrainParam,'OOCV')
-    NM.TrainParam.OOCV.meanflag = meanflag;
-    NM.TrainParam.OOCV.groupmode = groupmode;
-    NM.TrainParam.OOCV.multiflag = multiflag;
-    NM.TrainParam.OOCV.trainwithCV2Ts = trainwithCV2Ts;
+% changed by CV (23.05.2023)
+if ~isfield(param,'OOCV') 
+    param.OOCV.meanflag = meanflag;
+    param.OOCV.groupmode = groupmode;
+    param.OOCV.multiflag = multiflag;
+    param.OOCV.trainwithCV2Ts = trainwithCV2Ts;
+else 
+    meanflag = param.OOCV.meanflag;
+    groupmode =  param.OOCV.groupmode;
+    trainwithCV2Ts = NM.TrainParam.OOCV.trainwithCV2Ts;
 end
-o = nk_GetParamDescription2(NM,NM.TrainParam,'oocv');
+o = nk_GetParamDescription2(NM,param,'oocv');
 
 nk_PrintLogo
 
@@ -67,4 +72,9 @@ param.OOCV.trainwithCV2Ts   = trainwithCV2Ts;
 param.OOCV.savemodels       = savemodels;
 param.OOCV.saveoocvdata     = saveoocvdata;
 
+% changed by CV (23.05.2023)
+% should params not be set to NM.TrainParam.OOCV = param.OOCV otherwise it
+% will always be overwritten by the default at the beginning of the
+% function 
+NM.TrainParam.OOCV = param.OOCV;
 end

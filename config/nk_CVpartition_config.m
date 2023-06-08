@@ -412,6 +412,11 @@ if ~defaultsfl
              loadcv = nk_FileSelector(1,'matrix','Select cross-validation structure', 'CVstruct_.*\.mat');
              load(loadcv,'cv');
              NM.cv = cv;
+             % Note CV (24.05.2023): 
+             % to do: update RAND: 
+             % RAND: CV2Frame, OuterFold, OuterPerm, InnerFold, InnerPerm,
+             % Decompose, Eq (what information can we get from 'cv', what
+             % else do we need?) 
         case 8
              savecv = nk_input('Path & filename for cross-validation structure',0,'s');
              cv =  NM.cv;
