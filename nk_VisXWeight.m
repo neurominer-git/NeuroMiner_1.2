@@ -223,7 +223,11 @@ for n=1:nM
                         pIND = naPX.(IND);
                     end
                     % Eliminated features have to be re-introduced
-                    tmW = zeros(length(pIND),1); tmW(pIND) = nmW; nmW = tmW;   
+                    try
+                        tmW = zeros(length(pIND),1); tmW(pIND) = nmW; nmW = tmW;   
+                    catch
+                        fprintf('problem');
+                    end
                     tmP = false(length(pIND),1); tmP(pIND) = nmP; nmP = tmP;
                     if ~isempty(PA)
                          tmPA = tmW; tmPA(naPX.(IND)) = nmPA; nmPA = tmPA; 

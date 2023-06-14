@@ -227,7 +227,6 @@ if ~inp.batchflag && act<13, act = nk_input(mestr, 0, 'mq', menustr, menuact); e
         case 12
             if inp.saveCV1 == 1, inp.saveCV1 = 2; elseif inp.saveCV1 == 2,  inp.saveCV1 = 1; end
     end
-    act = 0; 
 end
 
 function tdir = create_defpath(analysis, oocvind)

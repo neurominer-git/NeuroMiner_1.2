@@ -108,7 +108,7 @@ switch IN.method
                 % column 
                 indnan_Xi = find(~isnan(tX(:,ind_Yi(j))));
                 if ~sum(indnan_Xi)
-                    fprintf('\n');warning('I did not find observations with non-missing values for feature %g. Check your settings!', j)
+                    fprintf('\nNo observations found with non-missing values for feature %g. Check your settings!', j)
                 end
                 indi_Yi = 1:size(tX,2); indi_Yi(ind_Yi(j))=[];
                 
@@ -138,7 +138,7 @@ switch IN.method
 
                         idx_c = sum(isnan(tX(indnan_Xi(ind_r), indi_Yi(ind_c))))==0;
                         if numel(indnan_Xi)<IN.k
-                            warning('Remaining no. of samples in training data < user-defined k ');
+                            fprintf('\nRemaining no. of samples in training data < user-defined k ');
                         end
                     end
                     indi_Yi = indi_Yi(ind_c(idx_c));
@@ -152,12 +152,10 @@ switch IN.method
                         S = nm_nanstd(Xj); S(S==0) = min(S(S~=0));
                         D = pdist2(Xj, tY(i,indi_Yi), 'seuclidean',S)';
                     case 'mahalanobis'
-                        %C = nancov(Xj(:,indi_Yi)); C(C==0) = min(C(C~=0));
                         D = pdist2(Xj, tY(i,indi_Yi), 'mahalanobis')';
                     case 'hybrid'
                         % Identify nominal features using predefined
-                        % variable
-                        % Compute distances in nominal features
+                        % variable. Compute distances in nominal features
                         indZ1 = indi_Yi & indNom;
                         indZ2 = indi_Yi & ~indNom; 
                         D1 =  pdist2(tX(indnan_Xi, indZ1), tY(i,indZ1),IN.hybrid.method1);
@@ -175,7 +173,7 @@ switch IN.method
                 % training cases
                 mn = median( tX(indnan_Xi(ind(1:kx)), ind_Yi(j)) );
                 if isnan(mn)
-                    fprintf('\n');warning('NaNs remain in the the current observation. Check your settings!')
+                    fprintf('\nNaNs remain in the the current observation. Check your settings!')
                 end
                 stY(i,ind_Yi(j)) = mn;
                 %if VERBOSE,fprintf('+'), end
@@ -188,8 +186,6 @@ switch IN.method
 end
 if VERBOSE, fprintf('\n\t\t\t%g subject(s) with NaNs, total of %g NaN replaced.',sum(~snan),ll); end
 sY(:,IN.blockind) = stY;
-if sum(isnan(sY(:))) 
-    warning(sprintf('\nNot all NaNs imputed!'))
-end
+if sum(isnan(sY(:))), fprintf('\nNot all NaNs imputed!'); end
 % If you remove completely NaN cases temporarily add them back now to the imputed data.
 sY = nk_ManageNanCases(sY, [], IxNaN);
