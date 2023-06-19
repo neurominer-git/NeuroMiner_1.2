@@ -94,7 +94,8 @@ if ~isfield(IO,'t_Y') || isempty(IO.t_Y) || IO.reread_mat
         return
     end
     if IO.oocvflag 
-        if IO.labels_known, Li = 2; else, Li=[]; end
+        if IO.labels_known, Li = find(strcmp(s_featnames, IO.label_edit)); else, Li=[]; end
+        IDi = find(strcmp(s_featnames, IO.case_edit));
         ind_feat=nan(1,numel(IO.featnames_cv)); notfnd = false;
         for f=1:numel(IO.featnames_cv)
             fI = find(strcmp(s_featnames,IO.featnames_cv{f}));
@@ -113,7 +114,7 @@ if ~isfield(IO,'t_Y') || isempty(IO.t_Y) || IO.reread_mat
                 case {1,2}
                     IO.t_Y = IO.t_Y(:,ind_feat);
                 case {3,4}
-                    IO.t_Y = [IO.t_Y(:,1) IO.t_Y(:,Li) IO.t_Y(:,ind_feat)];
+                    IO.t_Y = [IO.t_Y(:,IDi) IO.t_Y(:,Li) IO.t_Y(:,ind_feat)];
             end
            
             IO.featnames = s_featnames(ind_feat);
