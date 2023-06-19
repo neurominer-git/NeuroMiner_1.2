@@ -64,6 +64,11 @@ linsvmfl = determine_linsvm_flag(SVM);
 % been intergrated in NM)
 BINMOD = iPREPROC.BINMOD; 
 clc
+fprintf('***************************\n')
+fprintf('**  MODEL VISUALIZATION  **\n')
+fprintf('***************************\n')
+fprintf('\n');
+%fprintf('\nWorking on analysis #%g: %s', inp.analdim, inp.analysis.id);
 
 inp.id = id;
 CVPOS.fFull = FullPartFlag;
@@ -104,11 +109,6 @@ for i = 1 : nM
         else
             pmode(i) = iVis.PERM.mode;
         end
-%         if isfield(iVis.PERM,'covars_idx')
-%             covidx(i) = iVis.PERM.covars_idx;
-%         else
-%             covidx = [];
-%         end
 
         permfl(i)      = true; 
         nperms(i)      = iVis.PERM.nperms;

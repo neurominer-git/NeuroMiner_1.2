@@ -33,7 +33,7 @@ for n=1:nP
             end
         end
         % Finally, check for pre-chain parameter arrays
-        if isfield(PREPROC,'SPATIAL') && isfield(PREPROC.SPATIAL,'PX') && ~isempty(PREPROC.SPATIAL.PX.opt)
+        if isfield(PREPROC,'SPATIAL') && isfield(PREPROC.SPATIAL,'PX') && ~isempty(PREPROC.SPATIAL.PX) && ~isempty(PREPROC.SPATIAL.PX.opt)
              [cParams, cParams_desc, cTyp] = retrieve_from_struct(PREPROC.SPATIAL.PX.Px, optimonly);
              if ~isempty(cParams)
                  Params = [Params cParams];
