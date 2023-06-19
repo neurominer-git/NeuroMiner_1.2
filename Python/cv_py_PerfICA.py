@@ -20,7 +20,7 @@ elif mode == "test":
     ica = pickle.load(open(ica_model, "rb"))
     S = ica.transform(data)
 elif mode == "inverse_transform":
-    ica = pickle.load(open(ica_mode, "rb"))
+    ica = pickle.load(open(ica_model, "rb"))
     S = ica.inverse_transform(data)
                       
 
