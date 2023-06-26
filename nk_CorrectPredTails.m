@@ -1,6 +1,6 @@
 function [ sY, Y, IN ] = nk_CorrectPredTails( Y, X, IN )
 % =========================================================================
-% function [ sY, Y, IN ] = nk_CorrectPredTails( Y, IN )
+% function [ sY, Y, IN ] = nk_CorrectPredTails( Y, X, IN )
 % =========================================================================
 % Regression models usually produce higher prediction errors at the tails
 % of the label distribution. This functon corrects for this effect by

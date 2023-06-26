@@ -232,16 +232,9 @@ for f=1:ix % Loop through CV2 permutations
                     if filefound
                         if isfield(I1,'PCV1SUM'), PCV1SUMflag=true; else, PCV1SUMflag = false; end
                         if any(permfl)
-                            for h=1:nclass
-                                switch MODEFL
-                                    case 'classification'
-                                        TsInd2 = CV.TestInd{f,d}(CV.classnew{f,d}{h}.ind);
-                                    case 'regression'
-                                        TsInd2 = CV.TestInd{f,d};
-                                end
-                                I.VCV2MORIG_S(TsInd2,h) = cellmat_mergecols(I.VCV2MORIG_S(TsInd2,h), num2cell(I1.DS{h},2));
-                                for perms = 1:nperms(1), I.VCV2MPERM_S(TsInd2,h,perms) = cellmat_mergecols(I.VCV2MPERM_S(TsInd2,h,perms), num2cell(I1.DS_perm{h}(:,:,perms),2)); end
-                            end
+                            I = ComputeObsPermPerf(inp, I, I1, CV, f, d, ll, ...
+                                                                nclass, ngroups, nperms, ...
+                                                                operm, ofold, MODEFL, RFE);
                         end
                         ll=ll+1;
                         ind0(ll) = true;
@@ -889,65 +882,9 @@ for f=1:ix % Loop through CV2 permutations
         % Assemble observed and permuted model predictions of current CV2
         % partition into overall prediction matrix
         if any(permfl)
-            for h=1:nclass
-                 fprintf('\nCV2 [%g, %g]: Observed performance [ model #%g ]: %1.2f; P[CV2] = %1.3f', operm, ofold, h, I1.VCV1MORIG_EVALFUNC_CV2{h}, I.VCV2MPERM_CV2(h,ll) ); 
-                 if strcmp(MODEFL,'classification')
-                    TsInd2 = CV.TestInd{f,d}(CV.classnew{f,d}{h}.ind);
-                 else
-                    TsInd2 = CV.TestInd{f,d};
-                 end
-                 I.VCV2MORIG_EVAL(f,d,h) =  I1.VCV1MORIG_EVALFUNC_CV2{h};
-                 I.VCV2MORIG_S(TsInd2,h) = cellmat_mergecols(I.VCV2MORIG_S(TsInd2,h), num2cell(I1.DS{h},2));
-                 for perms = 1:nperms(1), I.VCV2MPERM_S(TsInd2,h,perms) = ...
-                         cellmat_mergecols(I.VCV2MPERM_S(TsInd2,h,perms), num2cell(I1.DS_perm{h}(:,:,perms),2)); end
-            end
-            % Perform multi-class permutation testing
-            if inp.multiflag
-                 if ~isfield(I1,'mDS'), fprintf('\n');error('You requested multi-class significance but the current VISDATAMAT contains only binary classifier data. Rerun visualization with multi-group optimization.'); end
-                 fprintf('\nComputing CV2 multi-class model significance\n\tMulti-class perfomance: '); 
-                 mDTs = []; mTTs = []; Classes = []; mcolend = 0;
-                 TsIndM = CV.TestInd{f,d};
-                 for h=1:nclass
-                     for il=1:size(I1.mDS{h},2)
-                        % Multi-group CV2 array construction for observed
-                        % multi-class model.
-                        [mDTs, mTTs, Classes, ~, mcolend] = ...
-                            nk_MultiAssemblePredictions( I1.mDS{h}(:,il), I1.mTS{h}(:,il), mDTs, mTTs, Classes, 1, h, mcolend );
-                     end
-                 end
-
-                 % Compute multi-group performance of observed model
-                 [ mCV2perf_obs, mCV2pred_obs ] = nk_MultiEnsPerf(mDTs, mTTs, inp.labels(TsIndM, inp.curlabel), Classes, ngroups);
-                 I.VCV2MORIG_S_MULTI(TsIndM,f) = mCV2pred_obs;
-                 
-                 % now assess observed model's significance
-                 mPx_perm = zeros(1,nperms(1));
-                 fprintf(' %1.2f | Permuting:\t', mCV2perf_obs);
-                 for perms = 1:nperms(1)
-                     mDTs_perm = []; mTTs_perm = []; Classes_perm = []; mcolend_perm = 0;
-                     for h=1:nclass
-                         % Multi-group CV2 array construction for permuted
-                         % multi-class model
-                         for il=1:size(I1.mDS{h},2)
-                            [mDTs_perm, mTTs_perm, Classes_perm, ~, mcolend_perm] = ...
-                                nk_MultiAssemblePredictions( I1.mDS_perm{h}(:,il,perms), I1.mTS_perm{h}(:,il,perms), mDTs_perm, mTTs_perm, Classes_perm, 1, h, mcolend_perm );
-                         end
-                     end
-                     % Compute multi-group performance of permuted
-                     % model
-                     [ mCV2perf_perm, mCV2pred_perm ] = nk_MultiEnsPerf(mDTs_perm, mTTs_perm, inp.labels(TsIndM, inp.curlabel), Classes_perm, ngroups);
-                     I.VCV2MPERM_S_MULTI(TsIndM,f,perms) = mCV2pred_perm;
-                     % Compare against original model performance
-                     if feval(compfun, mCV2perf_perm, mCV2perf_obs)
-                        fprintf('.'); 
-                        mPx_perm(perms) = mPx_perm(perms) + 1;
-                     end
-                 end
-                 I.VCV2MPERM_MULTI(ll) = (sum(mPx_perm) / nperms(1));
-                 fprintf('P[CV2] = %1.3f', I.VCV2MPERM_MULTI(ll));
-            else
-                if isfield(I1,'mDS'), fprintf('\nNot computing CV2 multi-class model significance'); end
-            end
+            I = ComputeObsPermPerf(inp, I, I1, CV, f, d, ll, ...
+                                                nclass, ngroups, nperms, ...
+                                                operm, ofold, MODEFL, RFE);
         end
         if isfield(inp,'issmoothed'), inp.issmoothed = false; end
         ll=ll+1; clear GDFEAT
@@ -1392,6 +1329,7 @@ if ~batchflag
     end
 end
 
+% _________________________________________________________________________
 function WriteCV2Data(inp, nM, FUSION, SAV, operm, ofold, I1)
 
 if inp.writeCV2 == 1
@@ -1411,4 +1349,85 @@ if inp.writeCV2 == 1
             end
         end
     end
+end
+
+% _________________________________________________________________________
+function I = ComputeObsPermPerf(inp, I, I1, CV, f, d, ll, ...
+                                                nclass, ngroups, nperms, ...
+                                                operm, ofold, MODEFL, RFE)
+for h=1:nclass
+
+    fprintf('\nCV2 [%g, %g]: Observed performance [ model #%g ]: %1.2f; P[CV2] = %1.3f', ...
+        operm, ofold, h, I1.VCV1MORIG_EVALFUNC_CV2{h}, I.VCV2MPERM_CV2(h,ll) ); 
+    switch MODEFL
+        case 'classification'
+            TsInd2 = CV.TestInd{f,d}(CV.classnew{f,d}{h}.ind);
+        case 'regression'
+            TsInd2 = CV.TestInd{f,d};
+    end
+    if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel && size(I1.DS{h},2)>1
+         EnsDat = nm_nanmedian(I1.DS{h},2);
+    else
+         EnsDat = I1.DS{h};
+    end
+    I.VCV2MORIG_S(TsInd2,h) = cellmat_mergecols(I.VCV2MORIG_S(TsInd2,h), num2cell(EnsDat,2));
+    for perms = 1:nperms(1)
+        if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel && size(I1.DS_perm{h}(:,:,perms),2)>1
+             EnsDat = nm_nanmedian(I1.DS_perm{h}(:,:,perms),2);
+        else
+             EnsDat = I1.DS_perm{h}(:,:,perms);
+        end
+        I.VCV2MPERM_S(TsInd2,h,perms) = cellmat_mergecols(I.VCV2MPERM_S(TsInd2,h,perms), num2cell(EnsDat,2)); 
+    end
+
+end
+
+% Perform multi-class permutation testing
+if inp.multiflag
+     if ~isfield(I1,'mDS'), fprintf('\n');
+         error('You requested multi-class significance but the current VISDATAMAT contains only binary classifier data. Rerun visualization with multi-group optimization.'); 
+     end
+     fprintf('\nComputing CV2 multi-class model significance\n\tMulti-class perfomance: '); 
+     mDTs = []; mTTs = []; Classes = []; mcolend = 0;
+     TsIndM = CV.TestInd{f,d};
+     for h=1:nclass
+         for il=1:size(I1.mDS{h},2)
+            % Multi-group CV2 array construction for observed
+            % multi-class model.
+            [mDTs, mTTs, Classes, ~, mcolend] = ...
+                nk_MultiAssemblePredictions( I1.mDS{h}(:,il), I1.mTS{h}(:,il), mDTs, mTTs, Classes, 1, h, mcolend );
+         end
+     end
+
+     % Compute multi-group performance of observed model
+     [ mCV2perf_obs, mCV2pred_obs ] = nk_MultiEnsPerf(mDTs, mTTs, inp.labels(TsIndM, inp.curlabel), Classes, ngroups);
+     I.VCV2MORIG_S_MULTI(TsIndM,f) = mCV2pred_obs;
+     
+     % now assess observed model's significance
+     mPx_perm = zeros(1,nperms(1));
+     fprintf(' %1.2f | Permuting:\t', mCV2perf_obs);
+     for perms = 1:nperms(1)
+         mDTs_perm = []; mTTs_perm = []; Classes_perm = []; mcolend_perm = 0;
+         for h=1:nclass
+             % Multi-group CV2 array construction for permuted
+             % multi-class model
+             for il=1:size(I1.mDS{h},2)
+                [mDTs_perm, mTTs_perm, Classes_perm, ~, mcolend_perm] = ...
+                    nk_MultiAssemblePredictions( I1.mDS_perm{h}(:,il,perms), I1.mTS_perm{h}(:,il,perms), mDTs_perm, mTTs_perm, Classes_perm, 1, h, mcolend_perm );
+             end
+         end
+         % Compute multi-group performance of permuted
+         % model
+         [ mCV2perf_perm, mCV2pred_perm ] = nk_MultiEnsPerf(mDTs_perm, mTTs_perm, inp.labels(TsIndM, inp.curlabel), Classes_perm, ngroups);
+         I.VCV2MPERM_S_MULTI(TsIndM,f,perms) = mCV2pred_perm;
+         % Compare against original model performance
+         if feval(compfun, mCV2perf_perm, mCV2perf_obs)
+            fprintf('.'); 
+            mPx_perm(perms) = mPx_perm(perms) + 1;
+         end
+     end
+     I.VCV2MPERM_MULTI(ll) = (sum(mPx_perm) / nperms(1));
+     fprintf('P[CV2] = %1.3f', I.VCV2MPERM_MULTI(ll));
+else
+    if isfield(I1,'mDS'), fprintf('\nNot computing CV2 multi-class model significance'); end
 end
