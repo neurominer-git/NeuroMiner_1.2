@@ -159,25 +159,25 @@ if eIN|| ~isfield(IN,'G') || isempty(IN.G), error('No covariates defined in para
 Y=Y'; G = IN.G'; if islogical(G), [~,G] = max(G); end
 M = []; if isfield(IN,'M'), M = IN.M; end
 
+if eIN || (~isfield(IN,'estimators') || isempty(IN.estimators) ) 
+
+    if ~isfield(IN,'subgroup') || isempty(IN.subgroup)
+        % Compute IN.beta from entire population
+        [~,IN.estimators] = combat( Y, G, M );
+    else
+        % Compute IN.beta from a subgroup of observations
+        idxSubgroup = logical(IN.subgroup);
+        [~,IN.estimators] = combat( Y(idxSubgroup,:), G(idxSubgroup,:), M );
+    end
+end
+
 if isfield(IN,'featind')
     featind = IN.featind;
 else
     featind = true(1,size(Y,2));
 end
 
-if eIN || (~isfield(IN,'estimators') || isempty(IN.estimators) ) 
-
-    if ~isfield(IN,'subgroup') || isempty(IN.subgroup)
-        % Compute IN.beta from entire population
-        [~,IN.estimators] = combat( Y(:,featind), G, M );
-    else
-        % Compute IN.beta from a subgroup of observations
-        idxSubgroup = logical(IN.subgroup);
-        [~,IN.estimators] = combat( Y(idxSubgroup,featind), G(idxSubgroup,:), M );
-    end
-end
-
-Y = combat( Y(:,featind), G, M, IN.estimators);
+Y = combat( Y(:,, G, M, IN.estimators);
 
 Y=Y';
 
@@ -188,22 +188,17 @@ if isempty(IN),eIN=true; else, eIN=false; end
 
 if eIN|| ~isfield(IN,'G') || isempty(IN.G), error('No covariates defined in parameter structure'), end
 
-if isfield(IN,'featind')
-    featind = IN.featind;
-else
-    featind = true(1,size(Y,2));
-end
 
 if eIN || ~isfield(IN, 'sigICs') || isempty(IN.sigICs)
 
     if ~isfield(IN, 'subgroup') || isempty(IN.subgroup)
-        [Y,IN] = cv_icaHarmonize(Y(IN.subgroup, featind), 1, IN);
+        [Y,IN] = cv_icaHarmonize(Y, 1, IN);
     else
-        [Y,IN] = cv_icaHarmonize(Y(:,featind), 1, IN);
+        [Y,IN] = cv_icaHarmonize(Y, 1, IN);
     end
   
 else
 
-    Y = cv_icaHarmonize(Y(:,featind), 2, IN);
+    Y = cv_icaHarmonize(Y, 2, IN);
     
 end

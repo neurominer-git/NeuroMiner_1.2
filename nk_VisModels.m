@@ -42,7 +42,7 @@ nperms          = ones(1,nM);                       % number of permuations per 
 pmode           = ones(1,nM);                       % Permutation mode
 memorytested    = false;
 memoryprob      = false;
-CVRnorm         = 1;
+CVRnorm         = 2;
 if strcmp(MODEFL,'classification') && nclass > 1
     ngroups     = numel(unique(inp.labels(~isnan(inp.labels)))); % Number of classes in the label
 else

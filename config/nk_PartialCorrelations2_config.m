@@ -1,4 +1,4 @@
-function [CURACT, act ] = nk_PartialCorrelations_config(NM, CURACT, varind, parentstr, defaultsfl)
+function [CURACT, act ] = nk_PartialCorrelations2_config(NM, CURACT, varind, parentstr, defaultsfl)
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 % Defaults
@@ -11,7 +11,7 @@ COVDIR_DEF      = 1;
 INTERCEPT_DEF   = 2;
 BETAEXT_DEF     = [];
 SUBGROUP_DEF    = [];
-FEATIND_DEF     = [];
+
 
 if ~defaultsfl
     
@@ -25,18 +25,6 @@ if ~defaultsfl
     if isfield(CURACT,'MCOVARUSE'),   MCOVARUSE_DEF   = CURACT.MCOVARUSE; end
     if isfield(CURACT,'MCOVAR'),      MCOVAR_DEF      = CURACT.MCOVAR; end
     if isfield(CURACT,'MCOVARLABEL'), MCOVARLABEL_DEF = CURACT.MCOVARLABEL; end
-    if isfield(CURACT,'FEATIND')     
-        FEATINDFLAG_DEF = CURACT.SelectedFeatures.flag; 
-        if isfie
-        FEATIND_DEF = 
-    end
-    if isempty(FEATIND_DEF)
-        FEATIND_MNU = ''; 
-        FEATIND_STR = 'All features';
-    else
-        FEATIND_MNU = '|Select target features '
-        FEATIND_STR = sprintf('%g features',sum(FEATIND_DEF)); 
-    end
     COVAR_STR = strjoin(NM.covnames(COVAR_DEF),', ');
     SUBGROUP_MNU1 = []; SUBGROUP_MNU2 = [];
     menuact = [ 1 2 ];
@@ -46,7 +34,7 @@ if ~defaultsfl
         menuact = [ menuact 3 4 ];
         METHOD_STR = 'Partial Correlations';
         if INTERCEPT_DEF == 2,          INTERCEPT_STR = 'yes'; else     INTERCEPT_STR = 'no'; end
-        if COVDIR_DEF == 1,             COVDIR_STR = 'attenuate'; else  COVDIR_STR = 'increase'; end; 
+        if COVDIR_DEF == 1,             COVDIR_STR = 'attenuate'; else  COVDIR_STR = 'increase'; end
     elseif METHOD_DEF==2
         % ComBat
         menuact = [ menuact 5 ]; MCOVARLABEL_MNU = []; MCOVAR_MNU = [];
@@ -111,8 +99,6 @@ if ~defaultsfl
                '|Select covariates from NM covariate matrix [ ' COVAR_STR ' ]', ...
                '|Use intercept in partial correlation analysis [ ' INTERCEPT_STR ' ]', ...
                '|Attenuate or increase covariate effects [ ' COVDIR_STR ' ]' ...
-               '|Apply correction method to all features [ ' FEATINDALL_STR ' ]' ...
-               FEATIND_MNU ...
                '|Use externally-computed beta coeficients [ ' BETAEXT_STR ' ]' ...
                BETAEXT_MNU ...
                SUBGROUP_MNU1 ...
