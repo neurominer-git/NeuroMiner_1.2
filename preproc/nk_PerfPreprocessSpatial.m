@@ -118,7 +118,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
             sY{u} = Y{u}(idx);
             if ~isempty(Yocv), sYocv{u} = Yocv{u}(idx); end
             if ~isempty(Cocv), sCocv{u} = Cocv{u}(idx); end
-            if isfield(inp,'iYw'), sYw{u} = inp.iYw{u}(idx); end
+            if isfield(inp,'iYw') &&  ~isempty(sYw{u}), sYw{u} = inp.iYw{u}(idx); end
         end
     end
 else

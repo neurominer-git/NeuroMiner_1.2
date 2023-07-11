@@ -413,7 +413,7 @@ try
              if isfield(NM,'analysis')
                  inp = []; act = 1; 
                  while act > 0
-                     [act, inp] = cv_ExportModelsPrep(NM, act, inp, "EXPORT MODEL PARAMETERS");
+                     [act, NM, inp] = cv_ExportModelsPrep(NM, act, inp, "EXPORT MODEL PARAMETERS");
                  end
              end
     end

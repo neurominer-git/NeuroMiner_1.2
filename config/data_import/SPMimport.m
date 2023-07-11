@@ -70,8 +70,12 @@ try
     
             %% Generate NM design 
              % Check which columns in the design matrix are dummy variables
-            for i=1:size(IO.xX.X,2), uC(i) = numel(unique(IO.xX.X(:,i))); end
-            
+            for i=1:size(IO.xX.X,2)
+                uC(i) = numel(unique(IO.xX.X(:,i))); 
+            end
+            for i=1:numel(IO.xC)
+                uC(IO.xC(i).cols) = 0;
+            end
             switch IO.modeflag
                 case 'classification'
                     uC_dummy = uC==2; nuC_dummy = sum(uC_dummy);
@@ -136,16 +140,18 @@ try
             
             if isfield(IO,'sel_dummy')
                 % Extract columns, files and volumes structures from design matrix
-                IO.n_samples = numel(IO.sel_dummy);
+                
                 IO.design = SPM.xX.X(:,IO.sel_dummy);
                 IO.desc_groups = SPM.xX.name(IO.sel_dummy);
                 switch IO.modeflag
                     case 'classification'
+                        IO.n_samples = numel(IO.sel_dummy);
                         for i=1:IO.n_samples
                             IO.P{i} = IO.PP(IO.design(:,i)==1,:);
                             IO.V{i} = SPM.xY.VY(IO.design(:,i)==1);
                         end
                     case 'regression'
+                        IO.n_samples = 1;
                         IO.P{1} = char(IO.PP);
                         IO.V{1} = SPM.xY.VY;
                         IO.L = IO.design;

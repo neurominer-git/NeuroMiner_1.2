@@ -35,7 +35,7 @@ function [pY, IN] = PerfRedObj(Y, IN)
 global VERBOSE
 
 % Defaults
-if isempty(IN),eIN=true; else eIN=false; end
+if isempty(IN),eIN=true; else, eIN=false; end
 
 % Check for and eliminate zero variance attributes
 if eIN || ~isfield(IN,'DR') || isempty(IN.DR), error('Parameters for dimensionality reduction not specified'); end
@@ -168,7 +168,7 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
             pY = bsxfun(@minus, Y, IN.mpp.sampleMean) * IN.mpp.vec;
             
         case 'NNMF'
-            if isfield(IN.DR,'NMFmethod'), 
+            if isfield(IN.DR,'NMFmethod') 
                 optFE.feMethod = IN.DR.NMFmethod; 
             else
                 optFE.feMethod = 'nmf';
@@ -258,8 +258,6 @@ else
             pY = nk_PerfSPCA(Y, IN.mpp);
         case 'fastICA'
             pY = cv_PerfICA(Y, IN.mpp, 'test');
-%         case 'LMNN2.5'
-%             pY = (IN.mpp.L * Y')';
         otherwise
             try
                 pY = out_of_sample(Y, IN.mpp);
