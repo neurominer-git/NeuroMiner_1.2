@@ -12,9 +12,10 @@ function [sY, IN] = nk_PartialCorrelationsObj( Y, IN )
 % IN.subgroup       : Index vector of cases in Y to compute the beta(s) from
 % IN.beta           : The estimated beta coefficients
 % IN.revertflag     : Increase (=1) or attenuate (=0) IN.G effects
-% IN.METHOD         : Partial correlations (=1) or ComBat (=2)
+% IN.METHOD         : Partial correlations (=1), ComBat (=2), fastICA (=3)
+% IN.featind        : Feature subspace to apply the correction to           
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07 / 2022
+% (c) Nikolaos Koutsouleris, 06 / 2023
 
 method = @PartialCorrelationsObj; methodsel = 1;
 if exist('IN','var') && ~isempty(IN) && isfield(IN,'METHOD') && IN.METHOD == 2
@@ -91,9 +92,6 @@ else
             else
                 IN.G = IN.TrCovars;
             end
-
-
-
     end
 
     [ sY, IN ] = method( Y, IN );
@@ -136,10 +134,17 @@ if eIN || ~isfield(IN,'beta') || isempty(IN.beta)
         IN.beta = pinv(IN.G(idxSubgroup,:)) * Y(idxSubgroup,:);
     end
 end
-if eIN || ~isfield(IN,'revertflag') || isempty(IN.revertflag) || ~IN.revertflag
-    Y = Y - IN.G * IN.beta;
+
+if isfield(IN,'featind')
+    featind = IN.featind;
 else
-    Y = Y + IN.G * IN.beta;
+    featind = true(1,size(Y,2));
+end
+
+if eIN || ~isfield(IN,'revertflag') || isempty(IN.revertflag) || ~IN.revertflag
+    Y(:,featind) = Y(:,featind) - IN.G * IN.beta(:,featind);
+else
+    Y(:,featind) = Y(:,featind) + IN.G * IN.beta(:,featind);
     
 end
 
@@ -154,12 +159,25 @@ if eIN|| ~isfield(IN,'G') || isempty(IN.G), error('No covariates defined in para
 Y=Y'; G = IN.G'; if islogical(G), [~,G] = max(G); end
 M = []; if isfield(IN,'M'), M = IN.M; end
 
-if eIN || (~isfield(IN,'estimators') || isempty(IN.estimators) ) 
-    
-    [~,IN.estimators] = combat( Y, G, M );
+if isfield(IN,'featind')
+    featind = IN.featind;
+else
+    featind = true(1,size(Y,2));
 end
 
-Y = combat( Y, G, M, IN.estimators);
+if eIN || (~isfield(IN,'estimators') || isempty(IN.estimators) ) 
+
+    if ~isfield(IN,'subgroup') || isempty(IN.subgroup)
+        % Compute IN.beta from entire population
+        [~,IN.estimators] = combat( Y(:,featind), G, M );
+    else
+        % Compute IN.beta from a subgroup of observations
+        idxSubgroup = logical(IN.subgroup);
+        [~,IN.estimators] = combat( Y(idxSubgroup,featind), G(idxSubgroup,:), M );
+    end
+end
+
+Y = combat( Y(:,featind), G, M, IN.estimators);
 
 Y=Y';
 
@@ -170,17 +188,22 @@ if isempty(IN),eIN=true; else, eIN=false; end
 
 if eIN|| ~isfield(IN,'G') || isempty(IN.G), error('No covariates defined in parameter structure'), end
 
+if isfield(IN,'featind')
+    featind = IN.featind;
+else
+    featind = true(1,size(Y,2));
+end
 
 if eIN || ~isfield(IN, 'sigICs') || isempty(IN.sigICs)
 
     if ~isfield(IN, 'subgroup') || isempty(IN.subgroup)
-        [Y,IN] = cv_icaHarmonize(Y, 1, IN);
+        [Y,IN] = cv_icaHarmonize(Y(IN.subgroup, featind), 1, IN);
     else
-        [Y,IN] = cv_icaHarmonize(Y, 1, IN);
+        [Y,IN] = cv_icaHarmonize(Y(:,featind), 1, IN);
     end
   
 else
 
-    Y = cv_icaHarmonize(Y, 2, IN);
+    Y = cv_icaHarmonize(Y(:,featind), 2, IN);
     
 end

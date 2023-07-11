@@ -13,7 +13,7 @@ if ~defaultsfl
     if isfield(IMPUTE,'method'),    IMPUTEDEF_METH = IMPUTE.method;     end
     if isfield(IMPUTE,'blockind'),  IMPUTEDEF_BLOCK = IMPUTE.blockind; 	end
     if isfield(IMPUTE,'k'),         IMPUTEDEF_K = IMPUTE.k;             end
-    if isfield(IMPUTE,'hybrid'),    
+    if isfield(IMPUTE,'hybrid')    
         IMPUTEDEF_HYBMETH1 = IMPUTE.hybrid.method1;
         IMPUTEDEF_HYBMETH2 = IMPUTE.hybrid.method2;
         IMPUTEDEF_HYBTHRESH = IMPUTE.hybrid.cutoff;

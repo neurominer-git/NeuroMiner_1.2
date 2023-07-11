@@ -236,6 +236,10 @@ if isfield(TemplParam,'ACTPARAM')
                      InputParam.P{ac}.COVDIR=0;
                      InputParam.P{ac}.INTERCEPT=0;
                 end
+                if isfield(TemplParam.ACTPARAM{ac},'featind')
+                     if VERBOSE, fprintf('\n\t- Feature subspace for covariate correction identified.'); end
+                     InputParam.P{ac}.featind = TemplParam.ACTPARAM{ac}.featind;
+                end
                 
             case 'remmeandiff'
                 
