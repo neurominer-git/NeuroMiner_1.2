@@ -24,7 +24,10 @@ if mode == 1
     end
 
     % Identify the independent components significantly associated with the covariate
-    significantComponents = find(abs(pvals) < 0.05);
+    if ~isfield(IN, "pthres")
+        IN.pthres = 0.05;
+    end
+    significantComponents = find(abs(pvals) < IN.pthres);
 
 
     if isfield(IN,'subgroup') && ~isempty(IN.subgroup)

@@ -52,8 +52,32 @@ if eIN || ~isfield(IN,'dIND') || isempty(IN.dIND), IN.dIND = IN.sIND; end
 indGS = IN.sIND~=0; indGD = IN.dIND~=0;
 
 % Find unque group indices and determine number of groups
-MS = unique(IN.sIND(indGS)); nMS = numel(MS); if ~MS, nMS = 0; end
-MD = unique(IN.dIND(indGD)); nMD = numel(MD); if ~MD, nMD = 0; end
+if size(IN.sIND,2) > 1 % dummy coded, the case with MultiCentIntensNorm2
+    MS = size(IN.sIND,2);
+    nMS = MS; 
+    sIND = zeros(size(IN.sIND,1),1);
+    for i = 1:MS
+        sIND(IN.sIND(:,i)) = i; 
+    end
+    IN.sIND = sIND; 
+else
+    MS = unique(IN.sIND(indGS)); nMS = numel(MS); 
+end
+
+if ~MS, nMS = 0; end
+dIND = zeros(size(IN.dIND,1),1);
+if size(IN.dIND,2) > 1
+    MD = size(IN.dIND,2);
+    nMD = MD; 
+    for i = 1:MD
+        dIND(IN.dIND(:,i)) = i; 
+    end
+    IN.dIND = dIND; 
+else
+    MD = unique(IN.dIND(indGD)); nMD = numel(MD); 
+end
+
+if ~MD, nMD = 0; end
 
 if ~isfield(IN,'meanY') || isempty(IN.meanY)  
     % Compute overall mean of the data to be adjusted in non-zero indices
@@ -74,7 +98,7 @@ if ~isfield(IN,'meanG') || isempty(IN.meanG) && nMS > 0
 end
 
 % Loop through destination groups
-for i=1:nMD
+Ofor i=1:nMD
     
     % retrieve indices to cases of current destination group
     Di = IN.dIND == MD(i);

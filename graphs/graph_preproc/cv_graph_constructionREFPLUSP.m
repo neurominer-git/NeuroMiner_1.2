@@ -1,4 +1,4 @@
-function CM = cv_graph_constructionREFPLUSP(A, method, referenceGroup, similarityMeasure)
+function CM = cv_graph_constructionREFPLUSP(A, ~, referenceGroup, similarityMeasure)
 % Jackknife Bias Estimation for network construction (Das et al., 2018)
 %
 % INPUT: matrix format, dimensions: n people x m features 
@@ -30,7 +30,6 @@ function CM = cv_graph_constructionREFPLUSP(A, method, referenceGroup, similarit
 %
 % OUTPUT: matrix format, dimensions: n people x (m/2-m) edges 
 global NM
-sprintf('Dimensions of reference dataset: %d * %d', size(referenceGroup,1), size(referenceGroup,2))
 % % read in reference group data 
 if size(referenceGroup,1) >1
     RG = referenceGroup; 
