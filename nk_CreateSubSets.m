@@ -87,8 +87,8 @@ for curlabel=1:nl % Label loop
                             end
                             % Get Data
                             if ~BINMOD
-                                Tr = Y.Tr{i,j,v}(Y.TrInd{i,j}{curclass},:); 
-                                Cv = Y.CV{i,j,v}(Y.CVInd{i,j}{curclass},:);
+                                Tr = Y.Tr{i,j,v}{curclass}(Y.TrInd{i,j}{curclass},:); 
+                                Cv = Y.CV{i,j,v}{curclass}(Y.CVInd{i,j}{curclass},:);
                             else
                                 Tr = Y.Tr{i,j,v}{curclass}(Y.TrInd{i,j}{curclass},:); 
                                 Cv = Y.CV{i,j,v}{curclass}(Y.CVInd{i,j}{curclass},:); 
