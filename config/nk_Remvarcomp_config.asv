@@ -58,7 +58,7 @@ switch REMVARCOMP.dimmode
     case 1
         REMVARCOMP_dims_str = ['Fixed: ' nk_ConcatParamstr(REMVARCOMP.dims) ' components '];
     case 3
-        REMVARCOMP_dims_str = ['Percentage: ' nk_ConcatParamstr(REMVARCOMP.dims*100) '% of total variance '];
+        REMVARCOMP_dims_str = ['Percentage: ' nk_ConcatParamstr(REMVARCOMP.dims) ' of total variance '];
 end
 REMVARCOMP_subgroup_str = subgroupstr{REMVARCOMP.SUBGROUP.flag};
 
@@ -73,7 +73,7 @@ menustr = [ 'Define dimensionality redution method [ ' REMVARCOMP_redmethod_str 
 menuact = 1:8;
 
 if REMVARCOMP.redmethod ~= 2
-    menustr = [menustr, '|Define variance retention parameters in PCA projection [ ' REMVARCOMP_dims_str ']'];
+    menustr = [menustr, '|Define retained variance in PCA projection [ ' REMVARCOMP_dims_str ']'];
     menuact = [menuact 9];
 else
     menustr = [menustr, '|Define fixed number of independent components in ICA projection [ ' REMVARCOMP_dims_str ']'];

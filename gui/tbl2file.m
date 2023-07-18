@@ -9,12 +9,15 @@ try
             fil = sprintf('%s.%s',filename,typ);
         end
         s_rownames = size(tbl.rownames);
-        if s_rownames(1)==1,
+        if s_rownames(1)==1
             tbl.rownames = tbl.rownames';
         end
         T = [tbl.rownames array2table(tbl.array)];
         T.Properties.VariableNames = tbl.colnames;
-        writetable(T, fil, 'Sheet', sheetname);                 
+        if numel(sheetname)>31
+            sheetname = inputdlg(sprintf('Sheet name %s is too long. Provide alternative sheet name:',sheetname),'Sheetname problem',1,{sheetname},'on');
+        end
+        writetable(T, fil, 'Sheet', char(sheetname));                 
     else
         typ='csv';
         if isempty(ext)

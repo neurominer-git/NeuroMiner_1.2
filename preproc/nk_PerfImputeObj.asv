@@ -92,8 +92,7 @@ switch IN.method
 
     case 'SeqkNN' 
          tX = IN.X(:,IN.blockind);
-         ll = sum(isnan(stY(:)));
-         stY = SeqkNN(stY, IN.k, tX);
+         stY = SeqkNN(tX, stY, k        );
 
     case {'euclidean','cityblock','seuclidean','cosine','mahalanobis','jaccard','hamming','hybrid'}
         tX = IN.X(:,IN.blockind);
@@ -192,8 +191,6 @@ switch IN.method
 end
 if VERBOSE, fprintf('\t%g subject(s) with NaNs, total of %g NaN replaced.',sum(~snan),ll); end
 sY(:,IN.blockind) = stY;
-if sum(isnan(sY(:))) 
-    fprintf('\tNot all NaNs imputed!'); 
-end
+if sum(isnan(sY(:))), fprintf('\tNot all NaNs imputed!'); end
 % If you remove completely NaN cases temporarily add them back now to the imputed data.
 sY = nk_ManageNanCases(sY, [], IxNaN);
