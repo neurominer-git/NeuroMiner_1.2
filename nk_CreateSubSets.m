@@ -1,5 +1,5 @@
 function SubSets = nk_CreateSubSets(Y)
-global CV RFE MULTI MODEFL MULTILABEL VERBOSE PREPROC 
+global CV RFE MULTI MODEFL MULTILABEL VERBOSE PREPROC STACKING
 
 if VERBOSE && RFE.Filter.flag, fprintf('\n\nCreate feature subsets'); end
 
@@ -86,12 +86,12 @@ for curlabel=1:nl % Label loop
                                 end
                             end
                             % Get Data
-                            if ~BINMOD
-                                Tr = Y.Tr{i,j,v}{curclass}(Y.TrInd{i,j}{curclass},:); 
-                                Cv = Y.CV{i,j,v}{curclass}(Y.CVInd{i,j}{curclass},:);
-                            else
+                             if BINMOD || STACKING.flag == 1
                                 Tr = Y.Tr{i,j,v}{curclass}(Y.TrInd{i,j}{curclass},:); 
                                 Cv = Y.CV{i,j,v}{curclass}(Y.CVInd{i,j}{curclass},:); 
+                            else
+                                Tr = Y.Tr{i,j,v}(Y.TrInd{i,j}{curclass},:); 
+                                Cv = Y.CV{i,j,v}(Y.CVInd{i,j}{curclass},:);
                             end
                             % Get label
                             TrL = Y.TrL{i,j}{curclass}; CvL = Y.CVL{i,j}{curclass}(:,curlabel);
