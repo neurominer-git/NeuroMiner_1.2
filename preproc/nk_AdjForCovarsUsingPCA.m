@@ -53,7 +53,7 @@ dT = nk_PerfRedObj(T,IN);
 % Reconstruct target matrix without eigenvariates
 if VERBOSE, fprintf('\nReconstructing target matrix without identified variance components.'); end
 if strcmp(IN.DR.RedMode, 'fastICA')
-    tT = cv_PerfICA(dT(:,IN.ind0), IN.mpp, 'inverse_transform');
+    [tT, IN.mpp] = cv_PerfICA(dT(:,IN.ind0), IN.mpp, 'inverse_transform');
 else
     tT = bsxfun(@plus, IN.mpp.vec(:,IN.ind0)* dT(:,IN.ind0)' , IN.mpp.sampleMean')';
 end

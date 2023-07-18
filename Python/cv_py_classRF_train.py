@@ -96,5 +96,5 @@ rf = RandomForestClassifier(n_estimators = n_est,
 
 rf.fit(feat, lab)
 random_name = uuid.uuid4().hex;
-model_file = f'{rootdir}/RFC_model_{random_name}.sav';
+model_file = f"{rootdir}/RFC_model_{random_name}.sav"
 pickle.dump(rf, open(model_file, 'wb'))

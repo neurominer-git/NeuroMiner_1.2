@@ -324,7 +324,8 @@ if ~isempty(analysis)
                 inp.analysis_id = tNM.analysis{inp.analind(i)}.id;
                 
                 % check whether alternative label should be used (only
-                % necessary if analysis were set up with older NM structure
+                % necessary if analysis were set up with older NM
+                % structure)
                 if isfield(tNM.analysis{inp.analind(i)}.params,'label')
                     tNM.label = tNM.analysis{inp.analind(i)}.params.label.label; 
                     tNM.modeflag = tNM.analysis{inp.analind(i)}.params.label.modeflag;  
