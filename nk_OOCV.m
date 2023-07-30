@@ -115,7 +115,7 @@ end
 
 % Check whether you have to perform label imputation and set flags
 IMPUTE.flag = false;
-if iscell(inp.PREPROC), iPREPROC = inp.PREPROC{1}; else iPREPROC = inp.PREPROC; end    
+if iscell(inp.PREPROC), iPREPROC = inp.PREPROC{1}; else, iPREPROC = inp.PREPROC; end    
 if isfield(iPREPROC,'LABELMOD') && isfield(iPREPROC.LABELMOD,'LABELIMPUTE'); 
     IMPUTE = iPREPROC.LABELMOD.LABELIMPUTE; 
     IMPUTE.flag = true; 
@@ -238,7 +238,7 @@ for f=1:ix % Loop through CV2 permutations
                                     % Determine number of features in mask and
                                     % convert feature mask to logical index, if needed
                                     ul=size(Fkl,2); totLearn = totLearn + ul;
-                                    if ~islogical(Fkl), F = Fkl ~= 0; else F = Fkl; end
+                                    if ~islogical(Fkl), F = Fkl ~= 0; else, F = Fkl; end
 
                                     % Get data pointers for current dichotomization
                                     CVInd = mapY.CVInd{k,l}{h};
@@ -284,7 +284,7 @@ for f=1:ix % Loop through CV2 permutations
                                     uD = zeros(inp.nOOCVsubj,ul);
 
                                     % Loop through feature subspaces
-                                    if ~fndMD, 
+                                    if ~fndMD 
                                         MD{h}{m}{k,l} = cell(ul,1); 
                                         fprintf(['\nRetrain models in CV2 [%g,%g], ' ...
                                             'CV1 [%g,%g], %g %s, (total # learners: %g) => Data: %s, ML params [%s] ==> '], ...

@@ -71,7 +71,7 @@ switch act
                  if isfield(params.FEAST,'MethodParams'), params.FEAST = rmfield(params.FEAST,'MethodParams'); end
          end
     case 3
-         params.FEAST.NumFeat = nk_input('Number of features to select?',0,'e',NumFeat);
+         params.FEAST.NumFeat = nk_input('Number of features to select (enter Inf for all features to be returned) ?',0,'e',NumFeat);
     
 end
 

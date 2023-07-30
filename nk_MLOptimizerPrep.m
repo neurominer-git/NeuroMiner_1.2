@@ -322,7 +322,7 @@ if ~isempty(analysis)
                 inp = nk_GetAnalModalInfo_config(tNM, inp); 
                 if inp.HideGridAct, [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd); inp.GridAct = true(ix,jx); end
                 inp.analysis_id = tNM.analysis{inp.analind(i)}.id;
-                
+                inp.curranal = inp.analind(i);
                 % check whether alternative label should be used (only
                 % necessary if analysis were set up with older NM
                 % structure)
@@ -416,6 +416,12 @@ else
 end
 
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir);end
+
+% Write some info to command line
+clc
+fprintf('******************************\n')
+fprintf('**  PARAMETER OPTIMIZATION  **\n')
+fprintf('******************************\n')
 
 for i = 1:inp1.nF
 

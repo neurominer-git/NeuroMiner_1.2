@@ -58,7 +58,7 @@ function nm(varargin)
 % User can choose to use NM in expert mode by invoking nm with the 'expert'
 % option.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 05/2022
+% (c) Nikolaos Koutsouleris, 07/2023
 global EXPERT DEV OCTAVE NM 
 
 nosplash  = false; EXPERT = false; OCTAVE = false; DEV = false; 
@@ -302,15 +302,16 @@ try
         case 'loaddata'
             
             if s.analyses_locked
-                NM = nk_DefineOOCVData_config(NM, 1,'MAIN');
+                NM = nk_OOCVDataIO_config(NM, 1,'MAIN');
             else
                 act = Inf; 
-                while act>0, 
-                    [NM, act] = nk_DataIO3_config(NM, 'MAIN'); 
+                while act>0 
+                    [NM, act] = nk_DataIO_config(NM, 'MAIN'); 
                 end
             end
             
         case 'inspect'
+            
             nk_SelectVariateIndex(NM,1,[],0);
             nk_input('Press enter to return to the main menu',0,'sq');
             
@@ -325,7 +326,7 @@ try
              t_act = 'loop'; A = []; while ~strcmp(t_act,'BACK'), [t_act, NM, A] = nk_InitAnalysisPrep(NM, A, 'MAIN INTERFACE >> ANALYSIS MANAGER'); end
             
         case 'preproc'
-            BATCH = false; p = []; act = 1; analind = []; GridAct = []; while act>0, [act, analind, p, GridAct] = nk_PreprocessPrep(act, analind, GridAct, p, 'MAIN' ); end; 
+            BATCH = false; p = []; act = 1; analind = []; GridAct = []; while act>0, [act, analind, p, GridAct] = nk_PreprocessPrep(act, analind, GridAct, p, 'MAIN' ); end 
             
         case 'mlopt'    
             if isfield(NM,'analysis'), act = 1;  inp = []; while act>0, [act, inp] = nk_MLOptimizerPrep(act, inp, 'MAIN INTERFACE >> ML TRAINING MODULE'); end; end
@@ -357,7 +358,7 @@ try
         case 'oocv'
             if isfield(NM,'analysis')
                 inp = []; act = 1;
-                while act>0, 
+                while act>0
                     [act, NM, inp ] = nk_OOCVPrep(NM, act, inp, 'MAIN INTERFACE >> APPLY MODELS TO NEW DATA'); 
                 end
             end
@@ -391,16 +392,18 @@ try
         case 'update'
             complvec = []; for z=1:numel(NM.analysis), if NM.analysis{z}.status, complvec = [ complvec z ]; end; end
             t_act = 1; brief = 1; analind = 1; showmodalvec = []; 
-            while t_act>0, 
+            while t_act>0 
                 [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> UPDATE ANALYSES ROOT DIRECTORIES ', analind, [], 1, showmodalvec, brief); 
             end
-            if ~isempty(analind), 
+            if ~isempty(analind) 
                 analind = complvec(analind);
             else
                 analind = complvec;
             end
             newdir = nk_DirSelector('Update analyses'' root paths');
+
             NM = nk_UpdateRootPaths(NM, analind, newdir);
+        
         case 'simulateML'
             if s.analyses_locked
                 % use information from your sample TO DO
@@ -409,6 +412,7 @@ try
                 simulationRes = simSample_App2(NM);
                 %simulationRes = simulate_sampleSize();
             end
+
         case 'savemodels'
              if isfield(NM,'analysis')
                  inp = []; act = 1; 

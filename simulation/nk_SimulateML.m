@@ -153,7 +153,11 @@ Res.Params = P;
 function [Rmean, R95CI] = compute_perf(nf, mr, nc, er, auc_max, auc_min, nb, bp, ncm, nfm, algorithm, RAND, verbose)
 global SVM
 
-nmr 	= ceil(nf*mr);
+if mr>1
+    nmr = mr;
+else
+    nmr = ceil(nf*mr);
+end
 nc1     = ceil(nc*er);
 nc2     = nc-nc1;
 

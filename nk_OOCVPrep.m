@@ -242,6 +242,7 @@ switch act
         if inp.saveCV1 == 1, inp.saveCV1 = 2; elseif inp.saveCV1 == 2,  inp.saveCV1 = 1; end
 end
 
+% =========================================================================
 function tdir = create_defpath(analysis, oocvind)
  
 rootdir = analysis.GDdims{1}.RootPath;
@@ -255,7 +256,7 @@ else
     oocvdir = sprintf('OOCV_%g', oocvind);
     tdir = fullfile(rootdir, oocvdir);
 end
-%
+
 % =========================================================================
 function OOCVres = OOCVPrep(dat, inp1, analysis)
 global SAV MODEFL CV OOCV FUSION MULTILABEL

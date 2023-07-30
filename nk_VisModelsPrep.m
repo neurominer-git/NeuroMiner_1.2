@@ -32,8 +32,8 @@ end
 na_str = '?'; inp.datatype = 'VISdatamat'; 
 % Resolves bug when running in batch mode
 if ~isfield(inp,'extraL') , inp.extraL=[]; end
-OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; LoadStr = []; SaveStr = [];ExtraLStr = []; CV1OpStr = []; WriteCV2str = []; 
-OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = [];ExtraLAct = []; CV1OpAct = []; WriteCV2Act = []; 
+OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; LoadStr = []; SaveStr = []; ExtraLStr = []; CV1OpStr = []; WriteCV2str = []; 
+OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = []; ExtraLAct = []; CV1OpAct = []; WriteCV2Act = []; 
 
 %% Configure menu
 if numel(NM.analysis)>1
@@ -70,7 +70,7 @@ if ~isempty(analysis)
     else
         % precomputed
         nVisFiles = na_str;
-        if isfield(inp,'vismat') && ~isempty(inp.vismat), 
+        if isfield(inp,'vismat') && ~isempty(inp.vismat) 
             selGrid = ~cellfun(@isempty,inp.vismat); inp.GridAct = selGrid;
             nVisFiles = sprintf('%g selected', sum(selGrid(:))); 
         end     
@@ -342,7 +342,7 @@ for i = 1:nF
     % (30.12.2018)
     if isfield(VIS,'norm'), inp.norm = VIS.norm; else, inp.norm = 1; end
     for j = 1:nL
-        if MULTILABEL.flag && MULTILABEL.dim>1, 
+        if MULTILABEL.flag && MULTILABEL.dim>1 
             fprintf('\n\n====== Working on label #%g ====== ',j); inp.curlabel = j; 
         end
         vis = nk_VisModels(inp, dat.id, inp.GridAct);
