@@ -1073,6 +1073,9 @@ if isfield(handles, 'MLIdata') && ~isempty(handles.MLIdata)
 else 
     handles.thisMLIresult.Visible = 'off';
 end
+% if strcmp(handles.axes1.Legend.Interpreter,'latex')
+%     handles.axes1.Legend.Interpreter = 'none';
+% end
 handles.axes1.Legend.String{end} = selCaseX;
 guidata(handles.figure1,handles);
 
@@ -1403,8 +1406,8 @@ else
         handles = rmfield(handles,'SubIndex');
     end
 end
-guidata(handles.figure1,handles);
 display_main(handles);
+guidata(handles.figure1,handles);
 
 % --- Executes during object creation, after setting all properties.
 function selSubGroupOOCV_CreateFcn(hObject, eventdata, handles)

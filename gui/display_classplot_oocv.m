@@ -80,6 +80,7 @@ end
 
 legvecn = false(1,5);
 handlevecn = cell(1,5);
+
 % Print CV data: Group 1
 violin(P_h(id1),'x',1,'facecolor',handles.colptin(handles.BinClass{h}.groupind(1),:),'edgecolor','none', 'facealpha', 0.1, 'bw',0.3);% 'mc','','medc','');
 handlevecn{1} = dotdensity( 1 ,P_h(id1), ...
@@ -99,6 +100,7 @@ if numel(handles.BinClass{h}.groupind) == 2
 else
     CLP = 'o'; CLR = 'k';
 end
+
 violin(P_h(id2),'x',3,'facecolor',handles.colptin(handles.BinClass{h}.groupind(2),:),'edgecolor','none', 'facealpha', 0.1, 'bw',0.3);% 'mc','','medc','');
 handlevecn{2} = dotdensity(3,P_h(id2), ...
     'dotEdgeColor', CLR, ...

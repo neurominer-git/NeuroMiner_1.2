@@ -46,6 +46,7 @@ inp.na_str = '?';
 inp.covflag = false;
 inp.desc = Y.desc;
 inp.Ydims = cellfun('size', NM.Y , 2);
+inp.ncases = size(NM.cases,1);
 inp.datadescriptor = NM.datadescriptor;
 inp.brainmask = NM.brainmask;
 inp.badcoords = NM.badcoords;

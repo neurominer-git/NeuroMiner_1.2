@@ -59,33 +59,46 @@ if act < 10
     
     if isfield(datacontainer,'Y') && ~isempty(datacontainer.Y)
         if ~ischar(datacontainer.Y)
-            mnuact = [mnuact ['|Export ' containerstr 'data container to file and create link in NM structure|Replace ' containerstr 'data container with link to file']];
+            mnuact = [mnuact ['|Export ' containerstr 'modalities to files and create links in NM structure|Replace ' containerstr 'modalities with links to files']];
             mnusel = [mnusel  4 5];
         else
             mnuact = [mnuact ['|Update ' containerstr 'data link ']];
             mnusel = [mnusel  5];
             if exist(datacontainer.Y,'file')
-                mnuact = [mnuact ['|Re-import ' containerstr 'data from file into NM structure']];
+                mnuact = [mnuact ['|Re-import ' containerstr 'modalities from file into NM structure']];
                 mnusel = [mnusel  6];
             end
         end
     else
-        mnuact = [mnuact ['|Fill ' containerstr 'data container with link to file']];
+        mnuact = [mnuact ['|Fill ' containerstr 'modalities with links to files']];
         mnusel = [mnusel 5];
     end
     
-    if inp.covflag && isfield(datacontainer,'Y') && datacontainer.n_subjects_all>0
-        if isfield(datacontainer,'covars')
-            mnuact = [ mnuact '|Modify covariate data' ];    
-        else
-            mnuact = [ mnuact '|Add covariate data' ];   
-        end
-        mnusel = [mnusel 7];
-    end
+    if inp.oocvmode
     
-    if ~isempty(altlabels)
-        mnuact = [mnuact '|Add alternative label(s)'];
-        mnusel = [mnusel 8]; 
+        if inp.covflag && isfield(datacontainer,'Y') && datacontainer.n_subjects_all>0
+            if isfield(datacontainer,'covars')
+                mnuact = [ mnuact '|Modify covariates in OOCV data' ];    
+            else
+                mnuact = [ mnuact '|Add covariate data in OOCV data' ];   
+            end
+            mnusel = [mnusel 7];
+        end
+
+        if ~isempty(altlabels)
+            mnuact = [mnuact '|Add alternative label(s) to OOCV data'];
+            mnusel = [mnusel 8]; 
+        end
+
+        if isfield(datacontainer,'groups')
+            mnuact = [mnuact '|Modify subgroup information to OOCV data'];
+            mnuact = [mnuact '|Remove subgroup information from OOCV data'];
+            mnusel = [mnusel 9 10];
+        else
+            mnuact = [mnuact '|Add subgroup information to OOCV data'];
+            mnusel = [mnusel 9];
+        end
+
     end
     
     act = nk_input(sprintf('Select action for %scontainer %s', containerstr, inp.desc),0,'mq',mnuact,mnusel);
@@ -115,6 +128,36 @@ switch act
         % if alternative labels were used in any of the locked analyses,
         % new labels have to be input for the validation data too 
         datacontainer.label = nk_DataLabel_config(datacontainer.n_subjects_all, altlabels);
+    case {9, 19}
+        if isfield(datacontainer,'groups')
+            groups = datacontainer.groups;
+        else
+            groups = [];
+        end
+        datacontainer.groups = nk_input('Specify logical subgroup matrix (Each column indicates one subgroup)', 0, 'e', groups, [inp.ncases, inf]);
+        if isfield(datacontainer,'grpnames') && numel(datacontainer.grpnames) == size(datacontainer.groups,2)
+            grpnames = datacontainer.grpnames;
+        else
+            grpnames = [];
+        end
+        datacontainer.grpnames = nk_input('Provide subgroup names', 0, 'e', grpnames, size(datacontainer.groups,2));
+        if strcmp(inp.modeflag,'classification')
+            if isfield(datacontainer,'refgroup')
+                if ~datacontainer.refgroup, refgroup = 2; else, refgroup = 1; end
+            else
+                refgroup = 2;
+            end
+            refgroupflag = nk_input('Do you want to specify a reference group among the subgroups',0,'yes|no',[1 0], refgroup);
+            if refgroupflag
+                datacontainer.refgroup = nk_input('Select reference subgroup', 0, 'm', strjoin(datacontainer.grpnames,'|'), 1:numel(datacontainer.grpnames));  
+            end
+        end
+    case {10, 20}
+        datacontainer = rmfield(datacontainer,'groups');
+        datacontainer = rmfield(datacontainer,'grpnames');
+        if isfield(datacontainer,'refgroup')
+            datacontainer = rmfield(datacontainer,'refgroup');
+        end
 end
 
 % _________________________________________________________________________

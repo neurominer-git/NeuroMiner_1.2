@@ -116,8 +116,10 @@ switch act
         inp.datadescriptor = NM.datadescriptor;
         inp.brainmask = NM.brainmask;
         inp.badcoords = NM.badcoords;
+        inp.ncases = size(NM.cases,1);
         inp.oocvmode = false;
         inp.id = NM.id;
+        inp.modeflag = NM.modeflag;
         if isfield(NM,'covars'), inp.covflag = true; inp.covars = NM.covars; end
 
         actx = 1; 

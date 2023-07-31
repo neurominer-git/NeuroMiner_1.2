@@ -669,9 +669,7 @@ for curclass = 1: nclass
                     end
                 end
             end
-
         case 'regression'
-            
             Results.CV2PredictedValues      = binOOCVD{1};
             Results.MeanCV2PredictedValues  = nm_nanmedian(Results.CV2PredictedValues,2);
             Results.StdCV2PredictedValues   = nm_nanstd(Results.CV2PredictedValues,2);
@@ -682,7 +680,7 @@ for curclass = 1: nclass
             Results.CICV2PredictedValues(indnan)=nan;
 
             Results.ErrCV2PredictedValues = Results.MeanCV2PredictedValues - labelOOCV;
-            Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , labelOOCV, 1);
+            Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , labelOOCV);
 
             if inp.ngroups > 1 && isfield(inp,'groupind')
                 try
@@ -700,7 +698,6 @@ for curclass = 1: nclass
                         indg = find(inp.groupind == vec(g));
                     end
                     Results.Group{g}.ObservedValues = labelOOCV(indg);
-                    Results.Group{g}.Index = indg;
                     Results.Group{g}.MeanCV2PredictedValues = Results.MeanCV2PredictedValues(indg);
                     Results.Group{g}.StdCV2PredictedValues = Results.StdCV2PredictedValues(indg);
                     Results.Group{g}.CICV2PredictedValues   = cell2mat(arrayfun( @(i) percentile(Results.CV2PredictedValues(indg(i),:),[2.5 97.5]), 1:numel(indg),'UniformOutput',false)');
@@ -710,7 +707,7 @@ for curclass = 1: nclass
                         Results.Group{g}.PredictionPerformance = EVALFUNC(Results.Group{g}.ObservedValues, Results.Group{g}.MeanCV2PredictedValues);
                         Results.Group{g}.CorrPredictObserved = corrcoef(Results.Group{g}.ObservedValues,Results.Group{g}.MeanCV2PredictedValues);
                         Results.Group{g}.CorrPredictObserved = Results.Group{g}.CorrPredictObserved(2);
-                        Results.Group{g}.Regr = nk_ComputeEnsembleProbability(Results.Group{g}.MeanCV2PredictedValues, Results.Group{g}.ObservedValues, 1);
+                         Results.Group{g}.CorrPredictObservednk_ComputeEnsembleProbability(Results.Group{g}.MeanCV2PredictedValues, Results.Group{g}.ObservedValues);
                     else
                         fprintf('Need more than 2 subjects to compute meaningful performance metric.');
                     end

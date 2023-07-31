@@ -8,7 +8,7 @@ if ~exist("oocvflag","var") || isempty(oocvflag)
 end
 
 if ~exist("oocvprepflag","var") || isempty(oocvprepflag)
-    oocvprepflag = false;
+    oocvflag = false;
 end
 
 if ~exist("binarizeflag","var") || isempty(binarizeflag)
@@ -140,25 +140,6 @@ end
 
 handles.(['regrplot' regrplotstr]) = scatter(lxL(ind),pred(ind),'Marker','o','MarkerFaceColor',regrplotcl,'MarkerEdgeColor',rgb('LightBlue'),'MarkerFaceAlpha', alphax, 'MarkerEdgeAlpha',0.2,'SizeData',80);
 
-% Add regression line to plot
-xy = min(lxL(ind)):(max(lxL(ind))-min(lxL(ind)))/sum(ind):max(lxL(ind));
-try % Statistics toolbox available
-    [p,s] = polyfit(lxL(ind),pred(ind),1);
-    [yhat,dy] = polyconf(p,xy,s,'predopt','curve');
-    handles.(['hline' regrplotstr]) = plot(xy,yhat,regrplotcl,'LineWidth',2);
-    handles.(['hline_CI' regrplotstr]) = plotshaded(xy,[yhat+dy; yhat-dy],regrplotcl);
-    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
-    lgstr{end+1} = ['$\mathbf{\hat{y}_{95\%CI}}^{' lgsufstr '}$'];
-catch % or not
-    handles.(['hline' regrplotstr]) = lsline;
-    handles.(['hline_CI' regrplotstr]) = [];
-    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
-end
-
-handles.(['regrplot_lgstr' regrplotstr]) = lgstr;
-
-if oocvprepflag, return; end
-
 % Define textbox info data 
 findnan = find(indnan);
 pss = cell(1,numel(findnan)); psslen=0;
@@ -222,6 +203,23 @@ xLimitsVec = min(xrng):xstep:max(xrng);
 xlim([xLimitsVec(1)-rx xLimitsVec(end)+rx]);
 yLimitsVec = min(yrng):xstep:max(yrng);
 ylim([yLimitsVec(1)-ry yLimitsVec(end)+ry]);
+
+% Add regression line to plot
+xy = min(lxL(ind)):(max(lxL(ind))-min(lxL(ind)))/sum(ind):max(lxL(ind));
+try % Statistics toolbox available
+    [p,s] = polyfit(lxL(ind),pred(ind),1);
+    [yhat,dy] = polyconf(p,xy,s,'predopt','curve');
+    handles.(['hline' regrplotstr]) = plot(xy,yhat,regrplotcl,'LineWidth',2);
+    handles.(['hline_CI' regrplotstr]) = plotshaded(xy,[yhat+dy; yhat-dy],regrplotcl);
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{95\%CI}}^{' lgsufstr '}$'];
+catch % or not
+    handles.(['hline' regrplotstr]) = lsline;
+    handles.(['hline_CI' regrplotstr]) = [];
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
+end
+
+handles.(['regrplot_lgstr' regrplotstr]) = lgstr;
 
 % Prepare legend
 switch GraphType
