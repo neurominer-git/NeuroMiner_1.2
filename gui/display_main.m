@@ -6,6 +6,11 @@ h_list          = handles.selModelMeasures.String;
 h_val           = handles.selModelMeasures.Value;
 if h_val>numel(h_list), h_val=1; end
 handles.curclass = h_class; 
+
+if isfield(handles,'SubIndex') 
+    handles = rmfield(handles,'SubIndex');
+end
+
 switch h_list{h_val}
     
     case 'Classification plot'
@@ -49,12 +54,17 @@ switch h_list{h_val}
                         GroupNames{g} = Groups{g-1}.GroupName;
                     end
                     handles.selSubGroupOOCV.String = GroupNames;
+                    handles.selSubGroupOOCV.Value = 1;
                     handles.selSubGroupOOCV.Visible = 'on';
+                else
+                    handles.selSubGroupOOCV.Value = 1;
+                    handles.selSubGroupOOCV.Visible = 'off';
                 end
             else
                 handles.oocvview = false;
                 handles = display_classplot(h_class, handles);
                 load_selCase(handles,handles.BinClass{h_class}.cases)
+                handles.selSubGroupOOCV.Value = 1;
                 handles.selSubGroupOOCV.Visible = 'off';
             end
         end
@@ -70,8 +80,6 @@ switch h_list{h_val}
         handles.cmdExportAxes20.Visible = 'off';
 
         if strcmp(handles.selCVoocv.Enable,'on') && handles.selCVoocv.Value > 1
-            handles  = display_regrplot(handles, [], false, true, false, 0.2);
-            handles.oocvview = true;
             handles.oocvind = handles.selCVoocv.Value - 1;
             if isfield(handles.OOCV(handles.oocvind).data.RegrResults{1},'Group')
                 Groups = handles.OOCV(handles.oocvind).data.RegrResults{1}.Group;
@@ -81,13 +89,21 @@ switch h_list{h_val}
                     GroupNames{g} = Groups{g-1}.GroupName;
                 end
                 handles.selSubGroupOOCV.String = GroupNames;
+                handles.selSubGroupOOCV.Value = 1;
                 handles.selSubGroupOOCV.Visible = 'on';
+            else
+                handles.selSubGroupOOCV.Value = 1;
+                handles.selSubGroupOOCV.Visible = 'off';
             end
+            handles  = display_regrplot(handles, [], false, true, false, 0.2);
+            handles.oocvview = true;
+          
             handles  = display_regrplot(handles, [], handles.oocvview, false, true, 0.8);
             load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
         else
             handles.oocvview = false;
             handles = display_regrplot(handles, [], false, false, true, 0.8);
+            handles.selSubGroupOOCV.Value = 1;
             handles.selSubGroupOOCV.Visible = 'off';
             load_selCase(handles,handles.Regr.cases)
         end

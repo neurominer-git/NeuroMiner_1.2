@@ -225,7 +225,7 @@ end
 [~, ~, ~, ~, act] = nk_ReturnEvalOperator(SVM.GridParam);
 
 if ~batchflag && RFE.dispres
-   DISP.binwintitle = sprintf('NM Optimization Viewer => Analysis [#%g]: %s', inp.P.analind(inp.P.curranal), inp.P.analysis_id);
+   DISP.binwintitle = sprintf('NM Optimization Viewer => Analysis [#%g]: %s', inp.P.curranal, inp.P.analysis_id);
 end
 
 % Parameter flag structure for preprocessing

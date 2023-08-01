@@ -72,7 +72,6 @@ else
     end
     ind = true(1,height(pred));   
     regrplotcl = 'r';
-    handles.OOCVinfo.Analyses{handles.curranal}.cases{oocvind} = subjects;
 end
 
 % Update current Regr structure

@@ -1325,7 +1325,11 @@ function tglPercRank_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of tglPercRank
-handles = perf_display(handles);
+if handles.oocvview
+    handles = display_classplot_oocv(handles.curclass, handles);
+else
+    handles = display_classplot(handles.curclass, handles);
+end
 guidata(handles.figure1,handles);
 
 
@@ -1377,7 +1381,6 @@ function spiderPlotButton_Callback(hObject, eventdata, handles)
 
 appSpiderPlot(handles);
 
-
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
 % --- Otherwise, executes on mouse press in 5 pixel border or over spiderPlotButton.
 function spiderPlotButton_ButtonDownFcn(hObject, eventdata, handles)
@@ -1394,7 +1397,7 @@ function selSubGroupOOCV_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns selSubGroupOOCV contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from selSubGroupOOCV
-[~, oocvind] = get_oocvind(handles);
+[handles, oocvind] = get_oocvind(handles);
 if hObject.Value > 1
     gindex = hObject.Value-1;
     if ~islogical(handles.NM.OOCV{oocvind}.groups)
@@ -1411,7 +1414,16 @@ else
         handles = rmfield(handles,'SubIndex');
     end
 end
-display_main(handles);
+switch handles.modeflag
+    case 'classification'
+        handles = display_classplot_oocv(handles.curclass, handles);
+    case 'regression'
+        handles.oocvview = false;
+        handles  = display_regrplot(handles, [], false, true, false, 0.2);
+        handles.oocvview = true;
+        handles  = display_regrplot(handles, [], true, false, true, 0.8);
+        load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
+end
 guidata(handles.figure1,handles);
 
 % --- Executes during object creation, after setting all properties.

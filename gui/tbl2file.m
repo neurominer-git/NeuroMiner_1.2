@@ -1,7 +1,9 @@
 function [ERR, STATUS, fil, typ] = tbl2file(tbl, filename, sheetname )
 % Write table data to either a Excel or a text-based file
 ERR=[]; STATUS = 0;
-[~,~,ext] = fileparts(filename); fil = filename;
+[pth,filename,ext] = fileparts(filename); 
+filename = regexprep(filename,' ','_');
+fil = fullfile(pth, [filename ext]);
 try
     if ispc 
         typ='xls';  
@@ -21,7 +23,7 @@ try
     else
         typ='csv';
         if isempty(ext)
-            fil = sprintf('%s_%s.%s', filename, sheetname,typ);
+            fil = sprintf('%s_%s.%s', filename, sheetname, typ);
         end
         fid = fopen(fil,'w');
         %Print header row
@@ -45,6 +47,7 @@ try
         fclose(fid);
         STATUS = 1;
     end
+    fprintf('\n%s successfully written to disk.\n', fil );
 catch ERR
     errordlg(ERR.message);
 end
