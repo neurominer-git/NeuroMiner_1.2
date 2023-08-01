@@ -351,16 +351,15 @@ for f=1:ix % Loop through CV2 permutations
                 end 
         end
         
-        for h=1:nclass
+        for curclass=1:nclass
             if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel
                 fprintf('\nCompute mean of base learners'' outputs of current CV2 partition and add them to the ensemble matrix.')
-                binOOCVDh{h} = nm_nanmedian(binOOCVDh{h},2);
+                binOOCVDh{curclass} = nm_nanmedian(binOOCVDh{curclass},2);
             else
                 fprintf('\nAdd all base learners'' outputs to the ensemble matrix without averaging.')
             end
+            binOOCVD{curclass} = [binOOCVD{curclass} binOOCVDh{curclass}];
         end
-
-        binOOCVD{h} = [binOOCVD{h} binOOCVDh{h}];
         
         %% Step 4: Compute OOCV multi-group prediction from current binary classifier arrays
         if MULTI.flag && multiflag
@@ -408,9 +407,11 @@ for f=1:ix % Loop through CV2 permutations
             end
 
         end
-        
-        indnan = isnan(labelOOCV) | sum(isnan(binOOCVD{1}),2)==size(binOOCVD{1},2);
-        
+        try
+            indnan = isnan(labelOOCV) | sum(isnan(binOOCVD{1}),2)==size(binOOCVD{1},2);
+        catch
+            fprintf('Ä')
+        end
         if LabelMode
         
             %% Step 5: Assess binary classifier performance, if OOCV Label has been specified
@@ -560,8 +561,8 @@ for f=1:ix % Loop through CV2 permutations
                                 hd(curgroup,curclass) = plot(ha(curgroup+inp.ngroups),yvalTC,CLtarg_m,'Color', CL(curclass,:));
                                 hd(curgroup,curclass) = plot(ha(curgroup+inp.ngroups),yvalDC, CLdec_m,'Color', CL(curclass,:));
                             
-                                lg{curgroup,curclass} = lgH;
-                                lh{curgroup,curclass} = lgC;
+                                lg{curgroup} = [lg{curgroup}; lgH];
+                                lh{curgroup} = [lh{curgroup}; lgC];
                                 
                             case 'regression'
                                 if inp.ngroups>1
@@ -587,8 +588,8 @@ for f=1:ix % Loop through CV2 permutations
                     if curgroup == 1 
                         ylabel(ha(curgroup),ylb); ylabel(ha(curgroup+inp.ngroups),ylb); 
                         xlabel(ha(curgroup+inp.ngroups),sprintf('%g/%g [ %3.1f%% ] of CV_2 partitions processed',ll,nCV2,ll*100/nCV2)); 
-                        legend(ha(curgroup), lg{curgroup,:},'Location','Best'); 
-                        legend(ha(curgroup+inp.ngroups), lh{curgroup,:},'Location','Best'); 
+                        legend(ha(curgroup), lg{curgroup},'Location','Best'); 
+                        legend(ha(curgroup+inp.ngroups), lh{curgroup},'Location','Best'); 
                     end
                     box(ha(curgroup),'on'); ha(curgroup).YGrid='on';
                     box(ha(curgroup+inp.ngroups),'on'); ha(curgroup+inp.ngroups).YGrid='on';
