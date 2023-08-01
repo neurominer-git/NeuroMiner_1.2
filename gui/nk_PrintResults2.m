@@ -1357,8 +1357,13 @@ function tglClrSwp_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of tglClrSwp
-handles = perf_display(handles);
+if handles.oocvview
+    handles = display_classplot_oocv(handles.curclass, handles);
+else
+    handles = display_classplot(handles.curclass, handles);
+end
 guidata(handles.figure1,handles);
+
 %if isfield(handles, 'MLIapp') && ~isnumeric(handles.MLIapp)
 %    updateFcn(handles.MLIapp,handles);
 %end

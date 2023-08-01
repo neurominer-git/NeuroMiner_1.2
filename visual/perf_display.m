@@ -45,7 +45,6 @@ if isfield(handles,'multilabel') && handles.multilabel
     end
 end
 
-
 [handles, visdata] = switch_analysis(handles);
 
 if isfield(handles,'MLIapp') && ~isfield(handles.NM.analysis{analind},'MLI') && ~isempty(handles.MLIapp) && handles.MLIapp~=0

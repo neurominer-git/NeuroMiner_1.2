@@ -19,6 +19,13 @@ GraphType = get(handles.selYaxis,'Value');
 % Check whether the labels are known
 labels_known = handles.OOCVinfo.Analyses{handles.curranal}.labels_known(oocvind);
 
+clrswp = handles.tglClrSwp.Value;
+if clrswp
+    g1 = 2; g2 = 1;
+else
+    g1 = 1; g2 = 2;
+end
+
 % Current label
 l=1;
 
@@ -82,10 +89,10 @@ legvecn = false(1,5);
 handlevecn = cell(1,5);
 
 % Print CV data: Group 1
-violin(P_h(id1),'x',1,'facecolor',handles.colptin(handles.BinClass{h}.groupind(1),:),'edgecolor','none', 'facealpha', 0.1, 'bw',0.3);% 'mc','','medc','');
+violin(P_h(id1),'x',1,'facecolor',handles.colptin(handles.BinClass{h}.groupind(g1),:),'edgecolor','none', 'facealpha', 0.1, 'bw',0.3);% 'mc','','medc','');
 handlevecn{1} = dotdensity( 1 ,P_h(id1), ...
-    'dotEdgeColor', handles.colptin(handles.BinClass{h}.groupind(1),:), ...
-    'dotFaceColor',handles.colptin(handles.BinClass{h}.groupind(1),:), ...
+    'dotEdgeColor', handles.colptin(handles.BinClass{h}.groupind(g1),:), ...
+    'dotFaceColor',handles.colptin(handles.BinClass{h}.groupind(g1),:), ...
     'dotSize',MS, ...
     'dotMarker','o', ...
     'dotAlpha', 0.5, ...
@@ -96,12 +103,12 @@ legvecn(1)=1;
 
 % Print CV data: Group 2
 if numel(handles.BinClass{h}.groupind) == 2
-    CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(2),:);
+    CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(g2),:);
 else
     CLP = 'o'; CLR = 'k';
 end
 
-violin(P_h(id2),'x',3,'facecolor',handles.colptin(handles.BinClass{h}.groupind(2),:),'edgecolor','none', 'facealpha', 0.1, 'bw',0.3);% 'mc','','medc','');
+violin(P_h(id2),'x',3,'facecolor',handles.colptin(handles.BinClass{h}.groupind(g2),:),'edgecolor','none', 'facealpha', 0.1, 'bw',0.3);% 'mc','','medc','');
 handlevecn{2} = dotdensity(3,P_h(id2), ...
     'dotEdgeColor', CLR, ...
     'dotFaceColor', CLR, ...
@@ -127,10 +134,10 @@ if labels_known
     end
      % Print independent sample prediction using dot density plots: Group 1
      if sum(id1_oocv)
-        violin(tP_oocv_h(id1_oocv),'x',kpos1 ,'facecolor',handles.colptin(handles.BinClass{h}.groupind(1),:),'edgecolor','none', 'facealpha', 0.3, 'bw',0.3);% 'mc','','medc','');
+        violin(tP_oocv_h(id1_oocv),'x',kpos1 ,'facecolor',handles.colptin(handles.BinClass{h}.groupind(g1),:),'edgecolor','none', 'facealpha', 0.3, 'bw',0.3);% 'mc','','medc','');
         [handlevecn{3},~,N{1},X{1},Y{1}] = dotdensity( kpos1 ,tP_oocv_h(id1_oocv), ...
-            'dotEdgeColor', handles.colptin(handles.BinClass{h}.groupind(1),:), ...
-            'dotFaceColor', handles.colptin(handles.BinClass{h}.groupind(1),:), ...
+            'dotEdgeColor', handles.colptin(handles.BinClass{h}.groupind(g1),:), ...
+            'dotFaceColor', handles.colptin(handles.BinClass{h}.groupind(g1),:), ...
             'dotSize',MSoocv, ...
             'dotMarker','o', ...
             'meanLine', 'off', ...
@@ -142,7 +149,7 @@ if labels_known
      % Print independent sample prediction using dot density plots: Group 2
     if sum(id2_oocv)
         if numel(handles.BinClass{h}.groupind) == 2
-            CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(2),:);
+            CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(g2),:);
         else
             CLP = 'o'; CLR = 'k';
         end
@@ -345,6 +352,5 @@ end
 handles.pnRocCmds.Visible = flg2;
 handles.pnPieCmds.Visible = flg2;
 handles.pnContigCmds.Visible = flg;
-handles.cmdExportCobWeb.Visible = flg;
 handles.cmdMetricExport.Visible = flg;
 handles.cmdExportAxes20.Visible = flg;

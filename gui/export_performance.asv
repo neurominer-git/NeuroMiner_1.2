@@ -16,16 +16,14 @@ for i=1:handles.nclass
     sheetname = sprintf('%s%g',sheetstr,i);
     switch handles.modeflag
         case 'classification'
-            TBL = handles.BinClass{i}.tbl_cont;
             if handles.oocvview
-                TBL.array=[]; TBL.rownames = [];
                 [handles, oocvind] = get_oocvind(handles);
                 if isfield(handles.OOCV(oocvind).data,'BinResults')
                     if handles.selSubGroupOOCV.Value>1
-                        if iscell(handles.OOCV(oocvind).data.BinResults{1}.Group{handles.selSubGroupOOCV.Value-1}.PredictionPerformance)
-                            contigmat = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{handles.selSubGroupOOCV.Value-1}.PredictionPerformance{i};
+                        if iscell(handles.OOCV(oocvind).data.BinResults{1}.Group{handles.selSubGroupOOCV.Value-1}.contingency{i})
+                            contigmat = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{handles.SubGroupOOCV.Value-1}.contingency{i};
                         else
-                            contigmat = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{handles.selSubGroupOOCV.Value-1}.PredictionPerformance;
+                            contigmat = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{handles.SubGroupOOCV.Value-1}.contingency;
                         end
                     else
                         if iscell(handles.OOCV(oocvind).data.BinResults{1}.contingency)
@@ -37,13 +35,16 @@ for i=1:handles.nclass
                 else
                     contigmat = handles.OOCV(oocvind).data.MultiResults{handles.curlabel}.contingency{i};
                 end
+            else
+                TBL = handles.BinClass{i}.tbl_cont;
             end
         case 'regression'
-            TBL = handles.Regr.tbl_cont;
+            [handles, oocvind] = get_oocvind(handles);
             if handles.oocvview
-                [handles, oocvind] = get_oocvind(handles);
                 TBL = handles.curRegr.tbl_cont;
                 contigmat = handles.curRegr.contigmat;
+            else
+                TBL = handles.Regr.tbl_cont;
             end
     end
     if handles.oocvview
