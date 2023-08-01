@@ -1,7 +1,7 @@
 function [h, n_mat, ca, o] = nk_PlotCobWeb(mat, groupnames, ha)
 
 cla(ha);
-ha.Position(1:2)= [.15 .6];
+ha.Position= [.12 .5 .7 .425];
 [M,N] = size(mat);
 idx = eye(M,N);
 n_mat =  (mat ./ sum(mat,2))*100;

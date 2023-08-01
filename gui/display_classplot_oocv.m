@@ -103,7 +103,11 @@ legvecn(1)=1;
 
 % Print CV data: Group 2
 if numel(handles.BinClass{h}.groupind) == 2
-    CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(g2),:);
+    if ~handles.BinClass{h}.one_vs_all
+        CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(g2),:);
+    else
+         CLP = 'o'; CLR = rgb('DarkGrey');
+    end
 else
     CLP = 'o'; CLR = 'k';
 end
@@ -149,7 +153,11 @@ if labels_known
      % Print independent sample prediction using dot density plots: Group 2
     if sum(id2_oocv)
         if numel(handles.BinClass{h}.groupind) == 2
-            CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(g2),:);
+            if ~handles.BinClass{h}.one_vs_all
+                CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(g2),:);
+            else
+                 CLP = 'o'; CLR = rgb('DarkGrey');
+            end
         else
             CLP = 'o'; CLR = 'k';
         end

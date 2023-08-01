@@ -46,7 +46,7 @@ switch h_list{h_val}
                 handles = display_classplot_oocv(h_class, handles);
                 handles.oocvind = handles.selCVoocv.Value - 1;
                 load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
-                if isfield(handles.OOCV(handles.oocvind).data.BinResults{h_class},'Group')
+                if isfield(handles.OOCV(handles.oocvind).data,'BinResults') && isfield(handles.OOCV(handles.oocvind).data.BinResults{h_class},'Group')
                     Groups = handles.OOCV(handles.oocvind).data.BinResults{h_class}.Group;
                     GroupNames = cell(numel(Groups)+1,1);
                     GroupNames{1} = 'Show entire OOCV sample';

@@ -306,19 +306,19 @@ if isfield(inp1.OO,'groups') && size(inp1.OO.groups,1)==numel(inp1.OO.cases)
         inp1.groupind = inp1.OO.groups;
     end
     inp1.groupvec = unique(inp1.groupind);
-    inp1.ngroups = numel(unique(inp1.groupind));
-    if isfield(inp1.OO,'grpnames') && numel(inp1.OO.grpnames) == inp1.ngroups
+    inp1.nsubgroups  = numel(unique(inp1.groupind));
+    if isfield(inp1.OO,'grpnames') && numel(inp1.OO.grpnames) == inp1.nsubgroups
         inp1.groupnames = inp1.OO.grpnames;
     else
-        inp1.groupnames = cellstr([repmat('Group #',inp1.ngroups,1) num2str((1:inp1.ngroups)')]);
+        inp1.groupnames = cellstr([repmat('Group #',inp1.nsubgroups,1) num2str((1:inp1.nsubgroups)')]);
     end
     if isfield(inp1.OO,'refgroup') && any(inp1.groupind == inp1.OO.refgroup)
         inp1.refgroup= inp1.OO.refgroup;
-        inp1.ngroups = inp1.ngroups-1;
+        inp1.nsubgroups = inp1.nsubgroups-1;
         inp1.groupvec(inp1.OO.refgroup) = [];
     end
 else
-    inp1.ngroups=1;
+    inp1.nsubgroups=1;
 end
 if isfield(inp1,'targdir') 
     inp1.rootdir = fullfile(inp1.targdir, inp1.oocvname);
@@ -364,7 +364,7 @@ for i = 1:inp1.nF
 				        [ijOOCV.MultiResults, ijOOCV.FileNames, ijOOCV.RootPath] = nk_OOCV(inp);
 			        case 3
 				        inp.multiflag = 0;
-				        [ijOOCV.BinResults, ijOOCV.FileNames, ijOOCV.RootPath] = nk_OOCV(inp);
+				        [ijOOCV.BinResults, ijOOCV.FileNames, ijOOCV.RootPath] = nk_OOCV(inp);inp.nsubgroups
 				        inp.multiflag = 1;
 				        [ijOOCV.MultiResults, ijOOCV.FileNames, ijOOCV.RootPath] = nk_OOCV(inp);
 		        end

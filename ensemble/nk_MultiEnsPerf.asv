@@ -1,10 +1,5 @@
 function [hEPerf, hE, hSim] = nk_MultiEnsPerf(E, sE, L, C, G)
-% E :   Prediction scores
-% sE :  Sign(E)
-% L :   Labels
-% C :   Classifiers
 global MULTI RAND
-
 hSim = []; ProbComp=[]; 
 if isfield(MULTI,'ProbComp'), ProbComp=MULTI.ProbComp; end
 switch MULTI.method
@@ -21,3 +16,9 @@ switch MULTI.method
         [hE, hEPerf, hSim] = nk_MultiDecideDAG(E, L, C, G);
         
 end
+
+% E :   Prediction scores
+% sE :  Sign(E)
+% L :   Labels
+% C :   Classifiers
+% G ?

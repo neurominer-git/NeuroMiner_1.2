@@ -17,12 +17,12 @@ switch inp.analmode
         oocvmat  = inp.oocvmat;                     % OOCVdatamat
 end
 multiflag       = false; if strcmp(MODEFL,'classification'), multiflag = inp.multiflag; end
-meanflag        = OOCV.meanflag;
 TrainWithCV2Ts  = OOCV.trainwithCV2Ts;
 saveparam       = inp.saveparam;
 loadparam       = inp.loadparam;
 nclass          = inp.nclass;
 ngroups         = inp.ngroups;
+nsubgroups      = inp.nsubgroups;
 analysis        = inp.analysis;
 GridAct         = inp.GridAct;
 batchflag       = inp.batchflag;
@@ -39,11 +39,8 @@ totLearn        = 0;
 if ~exist('GridAct','var') || isempty(GridAct), GridAct = nk_CVGridSelector(ix,jx); end
 if ~exist('batchflag','var') || isempty(batchflag), batchflag = false; end
 
-%'b*','r*','g*','y*','m*','c*','k*'
-CLreg_m = '*';
 CLtarg_m = '*-';
 CLdec_m = 'o-';
-
 CL = getNMcolors;
 
 % Train models with CV2 test data
@@ -407,11 +404,9 @@ for f=1:ix % Loop through CV2 permutations
             end
 
         end
-        try
-            indnan = isnan(labelOOCV) | sum(isnan(binOOCVD{1}),2)==size(binOOCVD{1},2);
-        catch
-            fprintf('Ä')
-        end
+
+        indnan = isnan(labelOOCV) | sum(isnan(binOOCVD{1}),2)==size(binOOCVD{1},2);
+
         if LabelMode
         
             %% Step 5: Assess binary classifier performance, if OOCV Label has been specified
@@ -465,7 +460,7 @@ for f=1:ix % Loop through CV2 permutations
                     % are computed for each group against reference group
                     % (e.g. HCs subjects)
                     if isfield(inp,'groupind')
-                        for g = 1:inp.ngroups
+                        for g = 1:nsubgroups
                             indr = []; 
                             if iscell(inp.groupvec)
                                 indg = find(strcmp(inp.groupind,inp.groupvec{g}));
@@ -498,7 +493,7 @@ for f=1:ix % Loop through CV2 permutations
                 Results.CV2Performance_PredictedValues(ll) = EVALFUNC(Results.RegrLabels, hdx_ll);
                 Results.CV2Performance_PredictedValues_History(ll) = EVALFUNC(Results.RegrLabels, hdx);
                 if isfield(inp,'groupind')
-                     for g = 1:inp.ngroups
+                     for g = 1:nsubgroups
                         if iscell(inp.groupvec)
                             indg = find(strcmp(inp.groupind,inp.groupvec{g}));
                         else
@@ -527,17 +522,17 @@ for f=1:ix % Loop through CV2 permutations
                 end
                 hu.Name = sprintf('NM Application Viewer: %s => %s [OOCV #%g]',inp.analysis_id, inp.desc_oocv, inp.oocvind);
                 set(0,'CurrentFigure',hu); if ll==1, clf ; end
-                if ll==1; ha = tight_subplot(2,inp.ngroups,0.03,[.1 .05],[.1 .05]); end
-                lg = cell(inp.ngroups,nclass); hc = zeros(inp.ngroups, nclass); lh = lg; hd = hc;
-                for curgroup=1:inp.ngroups
-                    hold(ha(curgroup),'on');hold (ha(curgroup+inp.ngroups),'on');
-                    if ll==1 && inp.ngroups>1
+                if ll==1; ha = tight_subplot(2,nsubgroups,0.03,[.1 .05],[.1 .05]); end
+                lg = cell(nsubgroups,nclass); hc = zeros(nsubgroups, nclass); lh = lg; hd = hc;
+                for curgroup=1:nsubgroups
+                    hold(ha(curgroup),'on');hold (ha(curgroup+nsubgroups),'on');
+                    if ll==1 && nsubgroups>1
                         title(ha(curgroup), Results.Group{curgroup}.GroupName, 'FontWeight', 'bold', 'Interpreter', 'none');
                     end
                     for curclass=1:nclass
                         switch MODEFL
                             case 'classification'
-                                if inp.ngroups>1
+                                if nsubgroups>1
                                     yvalTH = Results.Group{curgroup}.BinCV2Performance_Targets_History(curclass,:);
                                     yvalDH = Results.Group{curgroup}.BinCV2Performance_DecisionValues_History(curclass,:);
                                     yvalTC = Results.Group{curgroup}.BinCV2Performance_Targets(curclass,:);
@@ -558,42 +553,42 @@ for f=1:ix % Loop through CV2 permutations
                                 end
                                 hc(curgroup,curclass) = plot(ha(curgroup),yvalTH,CLtarg_m,'Color', CL(curclass,:));
                                 hc(curgroup,curclass) = plot(ha(curgroup),yvalDH, CLdec_m,'Color', CL(curclass,:));
-                                hd(curgroup,curclass) = plot(ha(curgroup+inp.ngroups),yvalTC,CLtarg_m,'Color', CL(curclass,:));
-                                hd(curgroup,curclass) = plot(ha(curgroup+inp.ngroups),yvalDC, CLdec_m,'Color', CL(curclass,:));
+                                hd(curgroup,curclass) = plot(ha(curgroup+nsubgroups),yvalTC,CLtarg_m,'Color', CL(curclass,:));
+                                hd(curgroup,curclass) = plot(ha(curgroup+nsubgroups),yvalDC, CLdec_m,'Color', CL(curclass,:));
                             
                                 lg{curgroup} = [lg{curgroup}; lgH];
                                 lh{curgroup} = [lh{curgroup}; lgC];
                                 
                             case 'regression'
-                                if inp.ngroups>1
+                                if nsubgroups>1
                                     hd(curgroup,1) = plot(ha(curgroup),Results.Group{curgroup}.CV2Performance_PredictedValues_History, CLtarg_m, 'Color', CL(curclass,:));
                                     lg{curgroup,1} = sprintf('Predictor performance of current ensemble [overall]'); 
-                                    hd(curgroup,1) = plot(ha(curgroup+inp.ngroups),Results.Group{curgroup}.CV2Performance_PredictedValues, CLtarg_m, 'Color', CL(curclass,:));
+                                    hd(curgroup,1) = plot(ha(curgroup+nsubgroups),Results.Group{curgroup}.CV2Performance_PredictedValues, CLtarg_m, 'Color', CL(curclass,:));
                                     lh{curgroup,1} = sprintf('Predictor performance of current ensemble [current]'); 
                                 else
                                     hd(curgroup,1) = plot(ha(curgroup),Results.CV2Performance_PredictedValues_History, CLtarg_m, 'Color', CL(curclass,:));
                                     lg{curgroup,1} = sprintf('Predictor performance of current ensemble [overall]'); 
-                                    hd(curgroup,1) = plot(ha(curgroup+inp.ngroups),Results.CV2Performance_PredictedValues, CLtarg_m, 'Color', CL(curclass,:));
+                                    hd(curgroup,1) = plot(ha(curgroup+nsubgroups),Results.CV2Performance_PredictedValues, CLtarg_m, 'Color', CL(curclass,:));
                                     lh{curgroup,1} = sprintf('Predictor performance of current ensemble [current]'); 
                                 end
                         end
                     end
                     if MULTI.flag && multiflag,plot(Results.MultiCV2Performance_History,'k+'); end
                     ylim(ha(curgroup),ylm); ha(curgroup).YTickLabelMode='auto';
-                    ylim(ha(curgroup+inp.ngroups),ylm); ha(curgroup+inp.ngroups).YTickLabelMode='auto';
+                    ylim(ha(curgroup+nsubgroups),ylm); ha(curgroup+nsubgroups).YTickLabelMode='auto';
                     if ll_start+nCV2-1 > ll_start
                         xlim(ha(curgroup),[ll_start ll_start+nCV2-1]); ha(curgroup).XTickLabelMode='auto';
-                        xlim(ha(curgroup+inp.ngroups),[ll_start ll_start+nCV2-1]); ha(curgroup+inp.ngroups).XTickLabelMode='auto';
+                        xlim(ha(curgroup+nsubgroups),[ll_start ll_start+nCV2-1]); ha(curgroup+nsubgroups).XTickLabelMode='auto';
                     end
                     if curgroup == 1 
-                        ylabel(ha(curgroup),ylb); ylabel(ha(curgroup+inp.ngroups),ylb); 
-                        xlabel(ha(curgroup+inp.ngroups),sprintf('%g/%g [ %3.1f%% ] of CV_2 partitions processed',ll,nCV2,ll*100/nCV2)); 
+                        ylabel(ha(curgroup),ylb); ylabel(ha(curgroup+nsubgroups),ylb); 
+                        xlabel(ha(curgroup+nsubgroups),sprintf('%g/%g [ %3.1f%% ] of CV_2 partitions processed',ll,nCV2,ll*100/nCV2)); 
                         legend(ha(curgroup), lg{curgroup},'Location','Best'); 
-                        legend(ha(curgroup+inp.ngroups), lh{curgroup},'Location','Best'); 
+                        legend(ha(curgroup+nsubgroups), lh{curgroup},'Location','Best'); 
                     end
                     box(ha(curgroup),'on'); ha(curgroup).YGrid='on';
-                    box(ha(curgroup+inp.ngroups),'on'); ha(curgroup+inp.ngroups).YGrid='on';
-                    hold(ha(curgroup),'off');hold (ha(curgroup+inp.ngroups),'off');
+                    box(ha(curgroup+nsubgroups),'on'); ha(curgroup+nsubgroups).YGrid='on';
+                    hold(ha(curgroup),'off');hold (ha(curgroup+nsubgroups),'off');
                 end
                 drawnow
             end
@@ -642,7 +637,7 @@ for curclass = 1: nclass
             Results.BinMajVoteProbabilities{curclass}(indnan)=nan;
 
             if isfield(inp,'groupind')
-                for g = 1:inp.ngroups
+                for g = 1:nsubgroups
                     indr = []; 
                     if iscell(inp.groupvec)
                         indg = find(strcmp(inp.groupind,inp.groupvec{g}));
@@ -685,7 +680,7 @@ for curclass = 1: nclass
             Results.ErrCV2PredictedValues = Results.MeanCV2PredictedValues - labelOOCV;
             Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , labelOOCV, 1);
 
-            if inp.ngroups > 1 && isfield(inp,'groupind')
+            if nsubgroups > 1 && isfield(inp,'groupind')
                 try
                     [Results.GroupComp.P, Results.GroupComp.AnovaTab, Results.GroupComp.Stats] = ...
                         anova1(Results.ErrCV2PedictedValues,inp.groupind);

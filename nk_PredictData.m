@@ -219,7 +219,7 @@ for k=1:iy % Loop through CV1 permutations
             
             % Weight decision values
             if ~isempty(W) && ~isempty(W{k,l,curclass}) 
-                if nW == 1 , Wkl = W{k,l}';  else Wkl = W{k,l,curclass}'; end
+                if nW == 1 , Wkl = W{k,l}';  else, Wkl = W{k,l,curclass}'; end
                 wx = repmat(Wkl,n_subj,1); tsD = bsxfun(@times,tsD,wx); tsT = bsxfun(@times,tsT,wx); 
             end
             
