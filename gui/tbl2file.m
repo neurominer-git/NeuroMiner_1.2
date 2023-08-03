@@ -19,7 +19,8 @@ try
         if numel(sheetname)>31
             sheetname = inputdlg(sprintf('Sheet name %s is too long. Provide alternative sheet name:',sheetname),'Sheetname problem',1,{sheetname},'on');
         end
-        writetable(T, fil, 'Sheet', char(sheetname));                 
+        writetable(T, fil, 'Sheet', char(sheetname));                
+        STATUS = 1;
     else
         typ='csv';
         if isempty(ext)

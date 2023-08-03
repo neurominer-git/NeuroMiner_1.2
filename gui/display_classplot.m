@@ -22,10 +22,14 @@ CLR1 = handles.colptin(handles.BinClass{h}.groupind(g1),:);
 if ~handles.BinClass{h}.one_vs_all
     CLP = handles.colpt;
     CLR2 = handles.colptin(handles.BinClass{h}.groupind(g2),:);
+    handles.tglClrSwp.Enable = "on";
 else
     CLP = 'o';
     CLR2 = rgb('DarkGrey');
+    handles.tglClrSwp.Enable = "off";
 end
+
+handles.tglSort.Enable = "on";
 
 %% Display classification plot
 % Define X axis data

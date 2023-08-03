@@ -1332,7 +1332,6 @@ else
 end
 guidata(handles.figure1,handles);
 
-
 % --- Executes on button press in thisMLIresult.
 function thisMLIresult_Callback(hObject, eventdata, handles)
 % hObject    handle to thisMLIresult (see GCBO)
@@ -1371,7 +1370,6 @@ guidata(handles.figure1,handles);
 %if isfield(handles, 'MLIapp') && ~isnumeric(handles.MLIapp)
 %    updateFcn(handles.MLIapp,handles);
 %end
-
 
 % --- Executes on button press in spiderPlotButton.
 function spiderPlotButton_Callback(hObject, eventdata, handles)

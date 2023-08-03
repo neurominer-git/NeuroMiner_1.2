@@ -240,8 +240,7 @@ for i=1:numel(handles.NM.analysis)
                             sfld = handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}.RegrResults{1}.Regr;
                     end
                 else
-                    fprintf('\No valid OOCV results structure found in analysis #%g', i);
-                    continue
+                    conti
                 end
             else 
                 sfld = handles.NM.analysis{i}.GDdims{j}.(mfld); 
@@ -302,7 +301,6 @@ for i=1:numel(handles.NM.analysis)
                         ~isempty(handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}) 
                         mcfld = handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}.MultiResults{1}.MultiClass; 
                     else
-                        fprintf('\No valid OOCV results structure found in analysis #%g', i);
                         continue
                     end
                 else

@@ -262,6 +262,7 @@ if isfield(GDdims,'BinClass') || isfield(GDdims,'MultiClass')
         handles.MultiClass.tbl_cont.array = cell2mat(handles.MultiClass.tbl_cont.array);
         handles.MultiClass.tbl_cont.rownames(remind) = [];
     end
+    
 elseif isfield(GDdims,'Regr') % Regression Model 
     handles.labels                                  = Label(I,handles.curlabel);
     handles.modeflag                                = 'regression';

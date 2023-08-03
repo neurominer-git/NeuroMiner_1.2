@@ -8,6 +8,7 @@ warning off
 axes(handles.axes1); cla(handles.axes1); hold on
 handles.axes1.Position = handles.axes1pos_orig;
 handles.axes38.Visible = 'off';  cla(handles.axes38);
+handles.tglSort.Enable =  "off";
 MS = 15;
 MSoocv = 40;
 
@@ -105,8 +106,10 @@ legvecn(1)=1;
 if numel(handles.BinClass{h}.groupind) == 2
     if ~handles.BinClass{h}.one_vs_all
         CLP = 'o'; CLR = handles.colptin(handles.BinClass{h}.groupind(g2),:);
+        handles.tglClrSwp.Enable = "on";
     else
-         CLP = 'o'; CLR = rgb('DarkGrey');
+        CLP = 'o'; CLR = rgb('DarkGrey');
+        handles.tglClrSwp.Enable = "off";
     end
 else
     CLP = 'o'; CLR = 'k';
