@@ -323,29 +323,25 @@ if ~isempty(analysis)
                 if inp.HideGridAct, [ ix, jx ] = size(NM.analysis{inp.analind(i)}.params.cv.TrainInd); inp.GridAct = true(ix,jx); end
                 inp.analysis_id = tNM.analysis{inp.analind(i)}.id;
                 inp.curranal = inp.analind(i);
-                % check whether alternative label should be used (only
-                % necessary if analysis were set up with older NM
-                % structure)
+                % check whether alternative label should be used
+                altlabel = false;
                 if isfield(tNM.analysis{inp.analind(i)}.params,'label')
                     tNM.label = tNM.analysis{inp.analind(i)}.params.label.label; 
                     tNM.modeflag = tNM.analysis{inp.analind(i)}.params.label.modeflag;  
+                    altlabel = true;
                 end
-
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
-                nk_SetupGlobalVariables(tNM.analysis{inp.analind(i)}.params, 'clear', 0);
+                nk_SetupGlobalVariables(tNM.analysis{inp.analind(i)}.params, 'clear', 0)
+                % Bring back standard label
+                if altlabel
+                    tNM.label = NM.label; 
+                    tNM.modeflag = NM.modeflag; 
+                end
             end
             % Copy back results to NM/xNM
             if ~isfield(inp,'simFlag') || ~inp.simFlag
-                if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
-                    tNM.label = NM.label; 
-                    tNM.modeflag = NM.modeflag; 
-                end
                 NM = tNM;
             else
-                if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
-                    tNM.label = NM.label; 
-                    tNM.modeflag = NM.modeflag; 
-                end
                 xNM = tNM;
             end
             clear tNM

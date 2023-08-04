@@ -188,7 +188,7 @@ if ~defaultsfl
                         RANK.SVM.kernel.kerndef = 1;
                         switch RANK.algostr
                             case 'libsvm'
-                                RANK.SVM = nk_LIBSVM_config(RANK.SVM, RANK.SVM, [],[], navistr);
+                                act =1; while act, [act,RANK.SVM] = nk_LIBSVM_config(RANK.SVM, RANK.SVM, [],[], navistr); end
                                 RANK.SVM.kernel.kernstr = ' -t 0';
                             case 'liblin'
                                 RANK.SVM = nk_LIBLIN_config(RANK.SVM, RANK.SVM, [], navistr);

@@ -6,7 +6,7 @@ amode = 1;
 ovrwrt = 3;
 na_str = '?'; mn_str = []; mn_act = [];
 Amodes = {'generate new','manage existing'};
-Aovrwrt = {'delete', 'delete & wipe', 'complete reset', 'parameter reset', 'update paths and descriptors', 'overwrite NM parameter template', 'manage on disk'};
+Aovrwrt = {'delete', 'delete & wipe', 'complete reset', 'manage on disk', 'parameter reset', 'update paths and descriptors', 'overwrite NM parameter template'};
 
 if ~exist('A','var') || isempty(A)
     A.mode = amode;
@@ -133,7 +133,7 @@ switch act
         
         switch A.ovrwrt
     
-            case {1,2} % Delete or delete & wipe
+            case {1,2}
                 if A.ovrwrt == 2
                     askfl = questdlg('Are you sure you want to wipe this analysis from your computer?',mestr,'Yes','No','No');
                     if strcmp(askfl,'Yes')
@@ -144,7 +144,7 @@ switch act
                 end
                 NM.analysis(A.analdim) = [];
                 if isempty(NM.analysis), NM = rmfield(NM,'analysis'); end
-            case {3,4} % Reset analysis
+            case {3,4}
                 if A.ovrwrt == 3
                     NM.analysis{A.analdim} = []; 
                     NM.analysis{A.analdim}.id                 = A.id;                   
@@ -192,7 +192,7 @@ switch act
                 NM.analysis{A.analdim}.meta.NM.ver            = NM.defs.NM_ver;
                 NM.analysis{A.analdim}.status = 0;
                 [ ~, NM.analysis{A.analdim} ]        = nk_NMLogFileManager('init', NM, NM.analysis{A.analdim});
-            case 5 % Reset analysis paths to new directory
+            case 5
                 old_rootdir = sprintf('NM_ID%s_A%g_%s',NM.analysis{A.analdim}.params.id,A.analdim,NM.analysis{A.analdim}.id); 
                 old_rootdirpath = NM.analysis{A.analdim}.rootdir;
                 new_rootdirpath = fullfile(A.parentdir,old_rootdir);
@@ -211,11 +211,10 @@ switch act
                     mess.text = sprintf('%s\nParent directory: %s\nRoot directory: %s', mess.text, A.parentdir, new_rootdirpath);
                     nk_NMLogFileManager('add_entry', NM, NM.analysis{A.analdim}, 'InitAnalysis:UpdatePaths', mess);
                 end
-            case 6 % overwrite NM parameter workspace
+            case 6
                 NM.TrainParam = NM.analysis{A.analdim}.params.TrainParam;
-                NM.cv = NM.analysis{A.analdim}.params.cv;
-            case 7 % mang
 
+                NM.cv = NM.analysis{A.analdim}.params.cv;
         end
         act='BACK';
 end

@@ -272,6 +272,4 @@ if binarizeflag
     display_contigmat(handles);
     %handles.axes20.Visible = "on";
     %handles.axes20.Position(4) = 0.28;
-else
-    %handles.axes20.Visible = "off";
 end

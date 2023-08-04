@@ -62,9 +62,7 @@ switch act
         end
 
         try
-
             MODEFL  = dat.label.modeflag;
-
         catch
             paramstr = sprintf('%s\n%s',paramstr,'Type of predictor: Classification / Regression model');
         end
@@ -458,7 +456,7 @@ switch decomposeflag
         class.groupdesc = 'Multi-group classification';
         class.label = lb;
         class.ind = (1:size(lb,1))';
-        if nanflag,
+        if nanflag
             indnan = find( ~isfinite(lb) );
             labelnan = nan(numel(indnan),1);
             class.ind = [class.ind; indnan];
