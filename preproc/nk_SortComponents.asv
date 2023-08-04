@@ -44,9 +44,8 @@ for colIndexMatrix2 = 1:numColumnsMatrix2
     % If the chosen column in matrix2 is already assigned, find the next best unassigned column
     correlations(indexInMatrix1, :) = nan; % Set correlation to Nan to exclude it from consideration
 end
-idxnan = isnan(mapping);
-mapping(idxnan) = [];
-flipping(idxnan) =[];
+mapping(isnan(mapping)) = [];
+
 % Step 3: Reorder the columns of matrix2 based on the mapping
 IN.templmatrixsize = size(matrix1);
 IN.correlations = correlations;

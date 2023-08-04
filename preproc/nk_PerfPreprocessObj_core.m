@@ -89,7 +89,7 @@ end
 
 if nact>1, fprintf('\t...Execute preprocessing sequence: '); end
 
-if isequaln(InputParam.Tr, InputParam.Ts{1})
+if isfield(InputParam,'Ts') && isequaln(InputParam.Tr, InputParam.Ts{1})
     copy_ts = true;
 else
     copy_ts = false;
@@ -187,10 +187,10 @@ for i=1:nact
                     end
                 end
                 if ~isempty(TEMPL)
-                    if isstruct(TEMPL.Param{InputParam.curclass}{i})
-                        ActParam.Templ = TEMPL.Param{InputParam.curclass}{i};
+                    if isstruct(TEMPL.Param(InputParam.curclass).TrainedParam{i})
+                        ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainParam{i};
                     else
-                        ActParam.Templ = TEMPL.Param{InputParam.curclass}{i}{j}; 
+                        ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainedParam{i}{j}; 
                     end
                 end
                 if nTs>1
@@ -298,7 +298,7 @@ for i=1:nact
                 % PREPARE PARAMS
                 ActParam.opt = O(l,:); % Retrieve current processing params
                 % Is there any template parameter structure?
-                if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param{InputParam.curclass}{i}; end
+                if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainedParam{i}; end
                 % Are there any precomputed parameters?
                 if paramfl, llTrParam = TrParami{kl,nl}; else, llTrParam = []; end
                 % -----------------------------------------------------------------------------------------------------------------
@@ -342,7 +342,7 @@ for i=1:nact
         if adasynfl && i==1
             InputParam.Tr = [InputParam.Tr; InputParam.TrSyn];
         end
-        if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param{InputParam.curclass}{i}; end
+        if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainedParam{i}; end
         [ SrcParam, InputParam, TrParami, ActParam ] = feval( funcstr, SrcParam, InputParam, TrParam, TrParami, ActParam );
     end
     

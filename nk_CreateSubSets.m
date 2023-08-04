@@ -86,12 +86,17 @@ for curlabel=1:nl % Label loop
                                 end
                             end
                             % Get Data
-                             if BINMOD || STACKING.flag == 1
+                            if BINMOD || STACKING.flag == 1
                                 Tr = Y.Tr{i,j,v}{curclass}(Y.TrInd{i,j}{curclass},:); 
                                 Cv = Y.CV{i,j,v}{curclass}(Y.CVInd{i,j}{curclass},:); 
                             else
-                                Tr = Y.Tr{i,j,v}(Y.TrInd{i,j}{curclass},:); 
-                                Cv = Y.CV{i,j,v}(Y.CVInd{i,j}{curclass},:);
+                                if iscell(Y.Tr{i,j,v})
+                                    Tr = Y.Tr{i,j,v}{1}(Y.TrInd{i,j}{curclass},:); 
+                                    Cv = Y.CV{i,j,v}{1}(Y.CVInd{i,j}{curclass},:);
+                                else
+                                    Tr = Y.Tr{i,j,v}(Y.TrInd{i,j}{curclass},:); 
+                                    Cv = Y.CV{i,j,v}(Y.CVInd{i,j}{curclass},:);
+                                end
                             end
                             % Get label
                             TrL = Y.TrL{i,j}{curclass}; CvL = Y.CVL{i,j}{curclass}(:,curlabel);

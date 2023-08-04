@@ -324,6 +324,9 @@ for f=1:ix % Loop through CV2 permutations
                         I1.mDS_perm = cell(nclass,1);
                         I1.mTS_perm = cell(nclass,1);
                     end
+                    if ~isempty(TEMPL)
+                        I1.VCV1WFMPERM = cell(nclass,1);
+                    end
                 end
                 
                 for h=1:nclass % Loop through binary comparisons
@@ -517,6 +520,9 @@ for f=1:ix % Loop through CV2 permutations
                                     otherwise
                                         [~,~,~,~, ParamX ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, [], Param{1}(k,l,hix), pnt); 
                                 end
+                                if ~isempty(TEMPL)
+                                    [~,~,~,~, TEMPL.TemplParams ] = nk_ReturnAtOptPos([], [], [], [], TEMPL.Param(hix), pnt);
+                                end
 
                                 % Get label info
                                 modelTrL = mapY.TrL{k,l}{h};
@@ -651,13 +657,15 @@ for f=1:ix % Loop through CV2 permutations
                                         end
                                         
                                         % Compute original weight map in input space
-                                        [ Tx, Psel, Rx, SRx, Cx, ~, PAx ] = nk_VisXWeight(inp, MD{h}{m}{k,l}{u}, Ymodel, modelTrL, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
+                                        [Tx, Psel, Rx, SRx, Cx, ~, PAx, WFx ] = nk_VisXWeight(inp, MD{h}{m}{k,l}{u}, Ymodel, modelTrL, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
 
                                         % Compute permuted weight maps
                                         fprintf(' | Permuting:\t');
                                         Tx_perm = cell(1,nM); Px_perm = zeros(1,nperms(1)); 
+                                        if ~isempty(TEMPL), WFx_perm = cell(1,nM); end
                                         for n=1:nM
                                             Tx_perm{n} = zeros(size(Tx{n},1),nperms(n)); 
+                                            if ~isempty(TEMPL), WFx_perm{n} = zeros(nperms(n), size(WFx{n},2)); end 
                                         end
                                         for perms = 1:nperms(1)
                                             if ~sigfl 
@@ -686,14 +694,24 @@ for f=1:ix % Loop through CV2 permutations
                                                 Px_perm(perms) = Px_perm(perms) + 1;
                                             end
                                             % Compute permuted weight map in input space
-                                            TXperms= nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
+                                            [TXperms, ~, ~, ~, ~, ~, ~, WFxperms] = nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
                                             for n=1:nM 
                                                 Tx_perm{n}(:,perms) = TXperms{n}; 
+                                                if ~isempty(TEMPL), WFx_perm{n}(perms,:) = WFxperms{n}; end 
                                             end
                                         end
                                         
                                         % Model significance
                                         I1.VCV1MPERM{h}(il(h)) = (sum(Px_perm) / nperms(1));
+                                        
+                                        if ~isempty(TEMPL)
+                                            indnanWF = isnan(WFx{n});
+                                            if isempty(I1.VCV1WFMPERM{h})
+                                                I1.VCV1WFMPERM{h} = zeros()
+                                            end
+                                            I1.VCV1WFMPERM{h}(il(h),:) = sum(abs(WFx_perm{n}) >= abs(WFx{n}) ) / nperms(1);
+                                            I1.VCV1WFMPERM{h}(il(h),indnanWF) = NaN;
+                                        end
 
                                         % Print significance to screen
                                         fprintf(' P=%1.3f ', I1.VCV1MPERM{h}(il(h)));

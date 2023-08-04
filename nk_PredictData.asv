@@ -15,7 +15,7 @@
 % --------
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 08/2023
+% (c) Nikolaos Koutsouleris, 07/2017
 
 function Predict = nk_PredictData(F, W, TR, TRInd, dTRLabel, ...
                                         CVD, CVDInd, dCVDLabel, ...
@@ -88,7 +88,7 @@ for k=1:iy % Loop through CV1 permutations
         
         for curclass = 1:nclass % Loop through dichotomizers
             
-            %%%%%%%%%%%%%%%% DATA EXTRACTION %%%%%%%%%%%%%%%%
+            %% Data extraction
             % Extract CV2 test data
             % Binary decomposition mode during preprocessing
             if iscell(TS{k,l}) && numel(TS{k,l}) == nclass 
@@ -157,7 +157,7 @@ for k=1:iy % Loop through CV1 permutations
                     XTrain = TR{k,l};
                 end
             end
-            % Extract CV1 training labels
+            % Extract training label
             YTrain = dTRLabel{k,l}{curclass}(:,MULTILABEL.curdim);
             
             %Extract CV1 test data
@@ -192,7 +192,7 @@ for k=1:iy % Loop through CV1 permutations
                     XCV = CVD{k,l};
                 end
             end
-            % Extract CV1 test labels
+            % Extract CV
             YCV = dCVDLabel{k,l}{curclass}(:,MULTILABEL.curdim);
             Ydum = zeros(size(XTest,1),1);
             if RFE.ClassRetrain

@@ -1,7 +1,7 @@
 function [ inp, contfl, analysis, mapY, GD, MD, Param, P, mapYocv ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param)
 % =========================================================================
 % [ contfl, analysis, mapY, GD, MD, Param, P, mapYocv ] = ...
-%                           nk_ApplyTrainedPreproc2(analysis, inp, paramfl)
+%                           nk_ApplyTrainedPreproc(analysis, inp, paramfl)
 % =========================================================================
 % Main function to compute /load and return preprocessing parameters and
 % preprocessed data for trained analysis chains. The functions is used by
@@ -13,12 +13,24 @@ function [ inp, contfl, analysis, mapY, GD, MD, Param, P, mapYocv ] = nk_ApplyTr
 % 
 % Input:
 % -------
+% analysis
+% inp
+% paramfl: struct => use_exist,         Use existing data
+%                    loadparam,         Load parameter files
+%                    found,             Flag for found data files
+%                    write,             Write parameters to disk 
+%                    CV1op,             Operate at CV1 level
+%                    multiflag          Multi-class mode
+%                    template_flag      Run preprocessing on all data to
+%                                       generate template for reordering
+%                                       operations
+% Param :   Pretrained parameter structure
 %
 % Output:
 % -------
-%
+% inp, contfl, analysis, mapY, GD, MD, Param, P, mapYocv
 % =========================================================================
-% (c) Nikolaos Koutsouleris, 12/2021
+% (c) Nikolaos Koutsouleris, 08/2023
 
 global VERBOSE PREPROC SAV OCTAVE
 
@@ -130,7 +142,6 @@ else
         else
             [mapY{n}, Param{n}, P{n}, mapYocv{n}] = nk_PerfPreprocess(Y, inp, inp.label, tparamfl, Yocv);
         end
-
     end
         
     % Save parameters to disk

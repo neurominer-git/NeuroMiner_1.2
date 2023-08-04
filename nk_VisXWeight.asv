@@ -1,6 +1,6 @@
-function [ mW, mP, mR, mSR, mC, W, mPA ] = nk_VisXWeight(inp, MD, Y, L, varind, P, F, VI, decompfl, memprob, procfl, Fadd)
+function [ mW, mP, mR, mSR, mC, W, mPA, mWF ] = nk_VisXWeight(inp, MD, Y, L, varind, P, F, VI, decompfl, memprob, procfl, Fadd)
 % =========================================================================
-% [mW, mP, mR, mSR, mC, W, mPA ] = nk_VisXWeight(inp, MD, Y, L, varind, ...
+% [mW, mP, mR, mSR, mC, W, mPA, mWF] = nk_VisXWeight(inp, MD, Y, L, varind, ...
 %                                          P, F, VI, decompfl, procfl, Fadd)
 % =========================================================================
 % Core visualization module that retrieves a weight vector and maps it back
@@ -65,9 +65,12 @@ end
 
 mW = cell(1,mM);
 if ~isempty(PA), mPA = cell(1,mM); end
-mP = []; mR = []; mSR = []; mC=[]; 
+mP = []; mR = []; mSR = []; mC=[]; mWF=[]; templfl = false;
 if procfl
     mP = cell(1,mM); mR = cell(1,mM); mSR = cell(1,mM); mC = cell(1,nM);
+    if any(decompfl) && ~isempty(TEMPL)
+        mWF = cell(1,mM); templfl = true;
+    end
 end
 
 % Loop through modalities
@@ -141,14 +144,19 @@ for n=1:nM
                     else
                         if isfield(naPX.mpp,'vec')
                            redvec = naPX.mpp.vec;
+                           if templfl, templvec = TEMPL.TemplParams{a}.mpp.vec; end
                         elseif isfield(naPX.mpp,'factors')
                            redvec = naPX.mpp.factors{1};
+                           if templfl, templvec = TEMPL.TemplParams{a}.mpp.factors{1}; end
                         elseif isfield(naPX.mpp,'u')
                            redvec = naPX.mpp.u;
+                           if templfl, templvec = TEMPL.TemplParams{a}.mpp.u; end
                         elseif isfield(naPX.mpp,'M')
                            redvec = naPX.mpp.M;
+                           if templfl, templvec = TEMPL.TemplParams{a}.mpp.M; end
                         elseif isfield(naPX.mpp,'W')
                             redvec = naPX.mpp.W;
+                            if templfl, templvec = TEMPL.TemplParams{a}.mpp.W; end
                         elseif isfield(naPX.mpp,'network')
                            error('Autoencoder reconstructions not supported!')
                         end
@@ -161,6 +169,17 @@ for n=1:nM
                         end
 
                         mpp.vec = redvec(:,ind0);
+
+                        if templfl
+                            [~, IN] = nk_SortComponents(templvec,mpp.vec,[]);
+                            if ~isfield(TEMPL,'templmatrixsize'), TEMPL.templmatrixsize = IN.templmatrixsize; end
+                            nmWF = nan( 1, IN.templmatrixsize(2) );
+                            try
+                                nmWF = nmW(IN.mapping).*;
+                            catch
+                                fprintf('problem')
+                            end
+                        end
 
                         switch DR.RedMode                                        
                             case {'PCA','RobPCA','SparsePCA'}
@@ -198,6 +217,10 @@ for n=1:nM
                             if ~isempty(PA) 
                                 tmPA = tmW; tmPA(naPX.indNonRem) = nmPA; nmPA = tmPA; 
                             end
+%                             if templfl
+%                                 tnmWF = zeros(size(naPX.indNonRem')); 
+%                                 tnmWF(naPX.indNonRem) = nmWF; nmWF = tnmWF;
+%                             end
                             clear tmW tmP tmPA 
                         end
                         reducedimfl = true;
@@ -224,6 +247,10 @@ for n=1:nM
                     if ~isempty(PA)
                          tmPA = tmW; tmPA(naPX.(IND)) = nmPA; nmPA = tmPA; 
                     end
+%                     if templfl && reducedimfl
+%                          tnmWF = zeros(length(pIND)); 
+%                          tnmWF(pIND) = nmWF; nmWF = tnmWF;
+%                     end
                     % Don't forget to adjust the feature masks and the
                     % indices to modalities in case of fused feature spaces
                     if ~reducedimfl
@@ -236,6 +263,7 @@ for n=1:nM
     
         if size(nmW,2) > 1, nmW = nmW'; nmP = nmP'; 
             if ~isempty(PA), nmPA = nmPA'; end
+            %if templfl, nmWF=nmWF'; end
         end
         
         % Run univariate correlation analysis if no factorization method
@@ -274,6 +302,7 @@ for n=1:nM
                         mC{m} = nmC(indX, indX);
                     end
                     if ~isempty(PA), mPA{m} = nmPA(indX); end
+                    %if templfl, mWF{m} = nmWF(indX); end
                 else
                     mW{m} = nmW;
                     mP{m} = nmP;
@@ -308,6 +337,7 @@ for n=1:nM
                 mSR{n} = nmSR; 
                 mC{n} = nmC;
             end
+            if templfl, mWF{n} = nmWF; end
         end
     else
         nmW = zeros(numel(fVI),1); nmW(nmP) = W(lFuVI);
