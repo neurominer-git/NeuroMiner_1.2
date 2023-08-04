@@ -1,5 +1,5 @@
 function mapYi = nk_MLOptimizer_ExtractDimMat(mapY, dim_index, cPs)
-global PREPROC STACKING MULTILABEL
+global PREPROC STACKING MULTILABEL RAND
 
 [m,n,o]  = size(mapY.Tr);
 mapYi    = mapY;
@@ -9,6 +9,9 @@ mapYi.Ts = cell(m,n,o);
 IMPUTE.flag = 0;
 if iscell(PREPROC), iPREPROC = PREPROC{1}; else, iPREPROC = PREPROC; end
 BINMOD = iPREPROC.BINMOD;
+if isfield(RAND,'Decompose') && RAND.Decompose == 2
+    BINMOD = 0;
+end
 if isfield(iPREPROC,'LABELMOD') && isfield(iPREPROC.LABELMOD,'LABELIMPUTE') && ~strcmp(iPREPROC.LABELMOD.LABELIMPUTE.method,'none') 
     IMPUTE = iPREPROC.LABELMOD.LABELIMPUTE; IMPUTE.flag = true; 
 end

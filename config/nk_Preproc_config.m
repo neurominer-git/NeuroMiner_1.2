@@ -110,10 +110,15 @@ d = nk_GetParamDescription2(NM, PREPROC, 'PreProc');
 nk_PrintLogo
 
 % Check group processing mode possibilities
-if max(NM.label(:,1)) > 2 && strcmp(modeflag,'classification')
-    fprintf('\n%s\n',d.PREPROC.groupmode);
-    cmdstr = 'Define group processing mode in multi-class setting'; cmdmnu = 1;
-    [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu); 
+if numel(unique(NM.label(:,1))) > 2 && strcmp(modeflag,'classification') 
+    if NM.TrainParam.RAND.Decompose == 2
+        fprintf('\nOne-vs-All mode => multigroup processing activated');
+        PREPROC.BINMOD = 0;
+    else
+        fprintf('\n%s\n',d.PREPROC.groupmode);
+        cmdstr = 'Define group processing mode in multi-class setting'; cmdmnu = 1;
+        [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu); 
+    end
 elseif isempty(PREPROC) || ~isfield(PREPROC,'BINMOD')
     PREPROC = config_binmod(NM, PREPROC);
 end
@@ -122,7 +127,7 @@ end
 if strcmp(modeflag,'regression')
     if isfield(PREPROC,'LABELMOD') && isfield(PREPROC.LABELMOD,'TARGETSCALE') && ( PREPROC.LABELMOD.TARGETSCALE || isfield(PREPROC.LABELMOD,'POLYNOM') )
         cmdstr = 'Modify / Disable';
-        if ~strcmp(d.PREPROC.targetscaling,'NA'), 
+        if ~strcmp(d.PREPROC.targetscaling,'NA') 
             prestr = sprintf('\n* %s', d.PREPROC.targetscaling); 
         end
     else

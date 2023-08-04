@@ -67,9 +67,9 @@ else
     BINMOD = PREPROC.BINMOD;
 end
 if BINMOD || strcmp(MODEFL,'regression')
-    ukbin = kbin;   if VERBOSE; fprintf('\nProcessing Mode: binary / regression preprocessing'); end
+    if BINMOD
+    if VERBOSE; fprintf('\nProcessing Mode: binary / regression preprocessing'); end
 else
-    ukbin = 1;      
     if VERBOSE; fprintf('\nProcessing Mode: multi-group preprocessing'); end
 end
 
@@ -459,7 +459,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                   Pnt(k,l,u).nP, ...
                   Pnt(k,l,u).nA] = nk_ParamReplicator(paramfl.P{u}, paramfl.PXopt{u}, paramfl.PREPROC, numel(oTrainedParam));
             end
-            
+
             if oocvonly
                 if multoocv
                     ocv = [];

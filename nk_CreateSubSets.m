@@ -1,6 +1,6 @@
 function SubSets = nk_CreateSubSets(Y)
-global CV RFE MULTI MODEFL MULTILABEL VERBOSE PREPROC STACKING
-
+global CV RAND RFE MULTI MODEFL MULTILABEL VERBOSE PREPROC STACKING
+ 
 if VERBOSE && RFE.Filter.flag, fprintf('\n\nCreate feature subsets'); end
 
 [nperms, nfolds, nvar] = size(Y.Tr);
@@ -33,6 +33,10 @@ if iscell(PREPROC)
     BINMOD = PREPROC{1}.BINMOD;
 else
     BINMOD = PREPROC.BINMOD;
+end
+
+if isfield(RAND,'Decompose') && RAND.Decompose == 2
+    BINMOD = 0;
 end
 
 for curlabel=1:nl % Label loop

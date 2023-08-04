@@ -24,7 +24,6 @@ decoding      = 1;
 BinBind       = 0;
 decisiontype  = 1;
 act           = 0;
-yesno         = {'yes','no'};
 if ~defaultfl
     nk_PrintLogo
     % Take over previous values if available
@@ -91,9 +90,8 @@ if ~defaultfl
         if ~MultiTrain
             menustr = [ sprintf('Train multi-class predictor [ %s ]|', multiflagstr) ...
                 sprintf('Optimize NM training process for multi-group classification performance [ %s ]|', multitrainstr) ...
-                sprintf('Bind multi-class optimum to binary classifiers'' optimal hyperparams [ %s ]|', yesno{binbinddef}) ...];
+                sprintf('Specify multi-class decision mechanism [ %s ]', binbinddef) ...];
                 sprintf('Specify multi-class decision mechanism [ %s ]', multimethodstr) ];
-            menuact = 1:4;
         else
             menustr = [ sprintf('Train multi-class predictor [ %s ]|', multiflagstr) ...
                 sprintf('Optimize NM training process for multi-group classification performance [ %s ]|', multitrainstr) ...
@@ -109,10 +107,9 @@ if ~defaultfl
         case 1
             multiflag = nk_input('Train multi-class predictor',0,'yes|no',[1,0],multiflagdef);
         case 2
-            MultiTrain= ~MultiTrain;
-            if MultiTrain, BinBind=0; end
+            MultiTrain= nk_input('Optimize NM training process for multi-group classification performance',0,'yes|no',[1,0],multitraindef);
         case 3
-            BinBind = ~BinBind;  
+            BinBind = nk_input('Bind multi-class predictor to binary classifiers'' optima',0,'yes|no',[1,0], binbinddef);  
         case 4
              if isfield(NM.TrainParam,'RAND') && ...
                 isfield(NM.TrainParam.RAND,'Decompose') && ...

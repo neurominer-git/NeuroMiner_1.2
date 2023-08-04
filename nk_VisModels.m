@@ -9,7 +9,7 @@ function visdata = nk_VisModels(inp, id, GridAct, batchflag)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 03/2020
 
-global SVM SAV RFE MODEFL CV VERBOSE FUSION MULTILABEL EVALFUNC CVPOS OCTAVE TEMPL
+global SVM SAV RFE MODEFL CV VERBOSE FUSION MULTILABEL EVALFUNC CVPOS OCTAVE 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 visdata         = [];                               % Initialize with empty output
@@ -60,9 +60,11 @@ if isfield(iPREPROC,'LABELMOD') && isfield(iPREPROC.LABELMOD,'LABELIMPUTE')
 end
 linsvmfl = determine_linsvm_flag(SVM);
 
-% Always set to binary preprocessing (unless true multi-group learners have
-% been intergrated in NM)
 BINMOD = iPREPROC.BINMOD; 
+if isfield(RAND,'Decompose') && RAND.Decompose == 2
+    BINMOD = 0;
+end
+
 clc
 fprintf('***************************\n')
 fprintf('**  MODEL VISUALIZATION  **\n')
@@ -72,7 +74,8 @@ fprintf('\n');
 
 inp.id = id;
 CVPOS.fFull = FullPartFlag;
-%savemodel=true;
+templateflag = false(1,nM);
+
 for i = 1 : nM
     
     % Dimensionality of current modality
@@ -159,6 +162,8 @@ for i = 1 : nM
     if isfield(iVis,'use_template') && iVis.use_template
         fprintf('\nPerform template processing!')
         templateflag(i) = true;
+    else
+        templateflag(i) = false;
     end        
 end
 
