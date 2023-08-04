@@ -618,7 +618,7 @@ switch act
             if isempty(LABEL.newmode)
                 LABEL.newmode           = origmodefl;
             end
-            % Create default NM parameters space
+            % Create default NM parameters space for alternative label
             try
                 NM.modeflag                 = LABEL.newmode;
                 nk_CVpartition_config(true);
