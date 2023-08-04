@@ -77,7 +77,12 @@ else
             if exist(inp.optpreprocmat{inp.f,inp.d},'file')
                 fprintf('\nLoading optimized pre-processing parameters for CV2 [%g,%g]:\n%s', ...
                         inp.f, inp.d, inp.optpreprocmat{inp.f,inp.d}); 
-                load(inp.optpreprocmat{inp.f,inp.d}); paramfl.found = true;
+                load(inp.optpreprocmat{inp.f,inp.d}); 
+                if iscell(paramfl)
+                    paramfl{1}.found= true;
+                else
+                    paramfl.found = true;
+                end
             else
                 if VERBOSE, fprintf('ERROR: Loading of pre-computed parameters not possible because path to file does not anymore exist. Update your paths!'); end
             end

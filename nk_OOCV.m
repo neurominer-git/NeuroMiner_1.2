@@ -7,7 +7,7 @@ function [Results, FileNames, RootPath] = nk_OOCV(inp)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, last modified 08/2020
 
-global SVM RFE MULTI MODEFL CV EVALFUNC OOCV SCALE SAV CVPOS 
+global SVM RFE MULTI MODEFL CV EVALFUNC OOCV SCALE SAV CVPOS RAND
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FullPartFlag    = RFE.ClassRetrain;
 switch inp.analmode
@@ -119,6 +119,9 @@ if isfield(iPREPROC,'LABELMOD') && isfield(iPREPROC.LABELMOD,'LABELIMPUTE');
 end
 
 BINMOD = iPREPROC.BINMOD;
+if isfield(RAND,'Decompose') && RAND.Decompose == 2
+    BINMOD = 0;
+end
 
 CVPOS.fFull = FullPartFlag;
 FileNames = cell(ix,jx); fnd=false;

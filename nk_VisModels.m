@@ -9,7 +9,7 @@ function visdata = nk_VisModels(inp, id, GridAct, batchflag)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 03/2020
 
-global SVM SAV RFE MODEFL CV VERBOSE FUSION MULTILABEL EVALFUNC CVPOS OCTAVE 
+global SVM RAND SAV RFE MODEFL CV VERBOSE FUSION MULTILABEL EVALFUNC CVPOS OCTAVE 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 visdata         = [];                               % Initialize with empty output

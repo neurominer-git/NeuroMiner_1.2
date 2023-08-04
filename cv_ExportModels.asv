@@ -1,14 +1,13 @@
 function cv_ExportModels(inp)
 % =========================================================================
-% FORMAT Results = cv_ExportModels(inp)
+% FORMAT Results = nk_OOCV(inp)
 % =========================================================================
-% The export module saves optimally trained model and preprocessing structures 
-% for each CV2 partition in a opt subdirectory of the given analysis
+% Independent test data prediction module
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris & Clara Vetter, last modified 08/2023
-global SVM RFE MODEFL CV SCALE SAV CVPOS RAND
+% (c) Nikolaos Koutsouleris, last modified 08/2020
 
+global SVM RFE MODEFL CV SCALE SAV CVPOS RAND
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 FullPartFlag    = RFE.ClassRetrain;
 
@@ -28,6 +27,7 @@ ll              = 1;
 totLearn        = 0;
 
 if ~exist('GridAct','var') || isempty(GridAct), GridAct = nk_CVGridSelector(ix,jx); end
+if ~exist('batchflag','var') || isempty(batchflag), batchflag = false; end
 
 % Train models with CV2 test data
 if FullPartFlag
@@ -69,7 +69,9 @@ inp = nk_PerfInitSpatial(analysis, inp, paramfl);
 
 % =========================================================================
 for f=1:ix % Loop through CV2 permutations
+
     for d=1:jx % Loop through CV2 folds
+
         fprintf('\n--------------------------------------------------------------------------')
         if ~GridAct(f,d)
             ll=ll+1;
@@ -81,8 +83,6 @@ for f=1:ix % Loop through CV2 permutations
         operm = f; ofold = d;
         inp.f = f; inp.d = d; inp.ll = ll;
         OptModelPath = nk_GenerateNMFilePath( inp.saveoptdir, SAV.matname, 'OptModel', [], inp.varstr, inp.id, operm, ofold);
-        % Preprocess data at optimal hyperparameter combination(s) and save
-        % trained hyperparameter structure
         [ inp, contfl, analysis, mapY, GD, MD, Param, paramfl, mapYocv ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
         if contfl, continue; end
         fndMD = false;
@@ -171,7 +171,7 @@ for f=1:ix % Loop through CV2 permutations
                                 f, d, k, l, ul, algostr, totLearn, TrainWithCV2TsStr, P_str)
 
                             % Impute labels if needed
-                            [modelTrL, TR, TrInd] = nk_LabelImputer( modelTrL, TR, TrInd, sPs, IMPUTE);
+                            [modelTrL, TR, TrInd] =     nk_LabelImputer( modelTrL, TR, TrInd, sPs, IMPUTE);
                             TR = TR(TrInd,:);
                         else
                             fprintf(['\nUse precomputed models in CV2 [%g,%g], ' ...
@@ -192,7 +192,6 @@ for f=1:ix % Loop through CV2 permutations
                     end
                 end
             end
-            % Now save trained model structure for current partition CV2 to disk
             if saveparam, fprintf('\nSaving %s', OptModelPath); save(OptModelPath, 'MD', 'ofold','operm'); end
         end
         ll=ll+1;
