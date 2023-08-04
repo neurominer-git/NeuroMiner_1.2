@@ -35,7 +35,7 @@ function [sY, IN] = nk_PerfImputeObj(Y, IN)
 %                     criterion minnumcols (currently fixed at 0.5) is 
 %                     fulfilled.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 09/2022
+% (c) Nikolaos Koutsouleris, 06/2023
 
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) 
