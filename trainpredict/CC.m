@@ -3,7 +3,7 @@
 % =========================================================================
 % Compute Correlation Coefficient
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 09/2011
+% (c) Nikolaos Koutsouleris, 08/2023
 
 function param = CC(expected, predicted)
 if isempty(expected), param = []; return; end

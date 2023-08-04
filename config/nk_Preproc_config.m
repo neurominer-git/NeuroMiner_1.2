@@ -39,16 +39,13 @@ if isempty(PREPROC)
     end
 end
 
-if isfield(NM.TrainParam,'LABEL')
-    if NM.TrainParam.LABEL.flag == 1
-        modeflag = NM.TrainParam.LABEL.newmode;
-        labelname = sprintf('Alternative label: %s [ %s ]', NM.TrainParam.LABEL.newlabelname, modeflag);
-        label = NM.TrainParam.LABEL.newlabel;
-    end
-else
-    modeflag = NM.modeflag;
-    label = NM.label;
-    labelname = 'NM standard label';
+modeflag = NM.modeflag;
+label = NM.label;
+labelname = 'NM standard label';
+if isfield(NM.TrainParam,'LABEL') && NM.TrainParam.LABEL.flag == 1
+    modeflag = NM.TrainParam.LABEL.newmode;
+    labelname = sprintf('Alternative label: %s [ %s ]', NM.TrainParam.LABEL.newlabelname, modeflag);
+    label = NM.TrainParam.LABEL.newlabel;
 end
 
 if ~exist('enind','var'), enind = []; end 

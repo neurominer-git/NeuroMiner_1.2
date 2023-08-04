@@ -426,7 +426,7 @@ switch act
         % FEATURE SELECTION ==============================================================================================x=================================================
     case 8
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-            if ~isfield(NM.TrainParam.STRAT{varind},'RFE'),
+            if ~isfield(NM.TrainParam.STRAT{varind},'RFE')
                 [~, NM.TrainParam.STRAT{varind}.RFE ] = ...
                     nk_RFE_config([], NM.TrainParam.STRAT{varind}, ...
                     NM.TrainParam.STRAT{varind}.SVM, ...
@@ -524,14 +524,14 @@ switch act
                             if exist(matname,'file'),load(matname); end
                         case 3
                             matname = nk_FileSelector(1,'matrix','Select NM structure file','.*\mat');
-                            if exist(matname,'file'),
+                            if exist(matname,'file')
                                 [~, matfile] = fileparts(matname);
                                 fprintf('\nLoading %s as temporary structure',matfile)
                                 load(matname,'NM','TrainParam');
                                 load(matname,'NM','cv');
                             end
                     end
-                    if exist('TrainParam','var'),
+                    if exist('TrainParam','var')
                         if isfield(NM,'TrainParam') && isfield(NM.TrainParam,'RAND')
                             RAND = NM.TrainParam.RAND;
                         end
@@ -639,7 +639,8 @@ switch act
                 NM.modeflag                 = origmodefl;
             catch ERR
                 errordlg(sprintf('Error when setting defaults for alternative label:\n%s',ERR.message),'NM Error');
-                NM.modeflag                 = origmodefl;
+                NM.TrainParam = LABEL.OrigTrainParam;
+                NM.modeflag   = origmodefl;
             end
         elseif LABEL.flag % but same learning framework
             NM.TrainParam.LABEL         = LABEL;
@@ -647,21 +648,6 @@ switch act
             NM.TrainParam = rmfield(NM.TrainParam, 'LABEL'); 
         elseif ~LABEL.flag % if either nothing has been changed in submenu or switch from alternative label to no alt. label and learning mode switch 
             NM.TrainParam = LABEL.OrigTrainParam;
-
-%             nk_CVpartition_config(true);
-%             NM.TrainParam.STACKING.flag = 2;
-%             NM.TrainParam.FUSION.flag   = 0;
-%             NM.TrainParam.FUSION.M      = 1;
-%             NM.TrainParam.SVM           = nk_LIBSVM_config(NM,[],1);
-%             NM.TrainParam.SVM.prog      = 'LIBSVM';
-%             NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
-%             NM.TrainParam.SVM.GridParam = 1;
-%             if strcmp(NM.modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
-%             NM.TrainParam.MULTI.flag    = 0;
-%             NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
-%             [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
-%             NM.TrainParam.verbosity     = 1;
-%             NM.TrainParam.LABEL         = LABEL;
         end
 
  %% read in calibration data
