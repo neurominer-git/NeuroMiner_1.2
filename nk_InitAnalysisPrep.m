@@ -170,7 +170,7 @@ switch act
                     if strcmp(NM.TrainParam.LABEL.newmode, 'classification')
                         NM.analysis{A.analdim}.params.label.altgroupnames = NM.TrainParam.LABEL.newgroupnames; 
                     end
-                    NM.analysis{A.analdim}.params.TrainParam = rmfield(NM.analysis{A.analdim}.params.TrainParam, 'LABEL'); % remove LABEL field from analysis' TrainParam to save memory
+                    %NM.analysis{A.analdim}.params.TrainParam = rmfield(NM.analysis{A.analdim}.params.TrainParam, 'LABEL'); % remove LABEL field from analysis' TrainParam to save memory
                 else 
                     NM.analysis{A.analdim}.params.label.label       = NM.label;
                     NM.analysis{A.analdim}.params.label.modeflag    = NM.modeflag; 
@@ -213,6 +213,7 @@ switch act
                 end
             case 6
                 NM.TrainParam = NM.analysis{A.analdim}.params.TrainParam;
+
                 NM.cv = NM.analysis{A.analdim}.params.cv;
         end
         act='BACK';

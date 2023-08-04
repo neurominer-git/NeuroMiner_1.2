@@ -7,7 +7,7 @@
 
 function param = CC(expected, predicted)
 if isempty(expected), param = []; return; end
-idxnan = ~isnan(predicted);
+idxnan = ~isnan(predicted) & ~isnan(expected);
 param = corrcoef(expected(idxnan),predicted(idxnan));
 param = param(2);
 if isnan(param) 

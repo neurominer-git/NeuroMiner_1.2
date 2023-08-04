@@ -17,13 +17,12 @@ switch progtype
     
     case 'LIBSVM'
         
+        modeflag = [];
         if isfield(res.TrainParam,'LABEL') && res.TrainParam.LABEL.flag == 1
             modeflag = res.TrainParam.LABEL.newmode;
-        else
-            modeflag = [];
         end
-        param = nk_LIBSVM_config(res, param, [],[], parentstr, modeflag);
-
+        act = 1; while act, [act, param] = nk_LIBSVM_config(res, param, [], [], parentstr, modeflag); end
+        
     case 'SVMPRF'
         
         param = nk_SVMPRF_config(param);

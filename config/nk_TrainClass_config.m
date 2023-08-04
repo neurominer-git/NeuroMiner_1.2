@@ -497,7 +497,7 @@ switch act
             TrainParam = NM.TrainParam;
             save(matname,'TrainParam');
         end
-        if isfield(NM,'cv'),
+        if isfield(NM,'cv')
             cv = NM.cv;
             save(matname,'cv','-append');
         end

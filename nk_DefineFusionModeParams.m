@@ -70,6 +70,12 @@ end
 % Get back data and data descriptors according to data fusion mode
 [OUT.X, OUT.labels] = nk_CompatY2(dat, tF, oocvind, FUSION);
 
+% Overwrite standard label with alternative label, if needed
+if isfield(analysis.params,'label') && analysis.params.label.altlabelflag==1
+    fprintf('\nUsing alternative label: %s [ %s ]', analysis.params.label.labelname, analysis.params.label.modeflag)
+    OUT.labels = analysis.params.label.label;
+end
+
 % Initialize globals based on data fusion mode
 switch FUSION.flag
     case {0,1,3}

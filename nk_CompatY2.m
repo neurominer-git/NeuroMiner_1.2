@@ -58,6 +58,7 @@ if ~exist('FUSION','var') || isempty(FUSION)
     end
     FUSION.M = varind;
 end
+
 L = NM.label;
 
 % Load linked files if needed
