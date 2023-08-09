@@ -304,7 +304,13 @@ for f=1:ix % Loop through CV2 permutations
                                     for u=1:ul
 
                                         % Extract features according to mask
-                                        Ymodel = nk_ExtractFeatures(TR, F, [], u);
+                                        %Ymodel = nk_ExtractFeatures(TR, F, [], u);
+
+                                        try
+                                            Ymodel = nk_ExtractFeatures(modelTr, F, [], u);
+                                        catch
+                                            error('Dimensionality mismatch between training data matrix and feature selection mask. Check your settings')
+                                        end
                                         
                                         if ~fndMD
                                             fprintf('Computing OptModel');

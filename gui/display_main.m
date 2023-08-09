@@ -66,7 +66,7 @@ switch h_list{h_val}
         handles.pnBinary.Visible            = 'on';
         handles.cmdExportCobWeb.Visible     = 'off';
         handles.cmdMetricExport.Visible     = 'on';
-
+       
         if strcmp(handles.selCVoocv.Enable,'on') && handles.selCVoocv.Value>1
             handles  = display_regrplot(handles, [], false, false, 0.2);
             handles.oocvview = true;
