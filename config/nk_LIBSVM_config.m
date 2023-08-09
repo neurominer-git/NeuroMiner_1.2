@@ -1,4 +1,4 @@
-function param = nk_LIBSVM_config(res, param, defaultsfl, cvfl, parentstr, modeflag)
+function [act, param] = nk_LIBSVM_config(res, param, defaultsfl, cvfl, parentstr, modeflag)
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 if ~exist('cvfl','var') || isempty(cvfl), cvfl = 0; end
@@ -282,6 +282,4 @@ param.LIBSVM.Optimization.nu = nu;
 param.LIBSVM.Optimization.p = p;
 param.LIBSVM.Weighting = weighting;
 param.LIBSVM.quiet = quiet;
-
-if act, param = nk_LIBSVM_config(res, param, [], [], parentstr); end
 

@@ -66,16 +66,18 @@ if iscell(PREPROC)
 else
     BINMOD = PREPROC.BINMOD;
 end
-if BINMOD || strcmp(MODEFL,'regression')
-    ukbin = kbin;   if VERBOSE; fprintf('\nProcessing Mode: binary / regression preprocessing'); end
+if isfield(RAND,'Decompose') && RAND.Decompose == 2
+    BINMOD = 0;
+end
+if BINMOD || strcmp(MODEFL,'regression')    
+    if VERBOSE; fprintf('\nProcessing Mode: binary / regression preprocessing'); end
 else
-    ukbin = 1;      
     if VERBOSE; fprintf('\nProcessing Mode: multi-group preprocessing'); end
 end
 
 if VERBOSE
     if iscell(Y)
-        fprintf('\nMultiple shelfs of input data detected')
+        fprintf('\nMultiple shelves of input data detected')
         for ii=1:size(Y,1)
             fprintf('\nShelf [ %2g ]: Original dimensionality: %g', ii, size(Y{ii},2)); 
         end
@@ -111,12 +113,16 @@ if ~BINMOD && isfield(paramfl,'PXopt') && numel(paramfl.PXopt)>1
     if VERBOSE; fprintf('\nProcessing Mode: multi-group preprocessing, but no multi-group classifier requested'); end
 else
     uBINMOD = BINMOD;
-    ukbin = kbin;
+    if ~uBINMOD
+        ukbin = 1;
+    else
+        ukbin = kbin;
+    end
 end
 
 % Generate template parameters (e.g. for feature re-ordering)
 if isfield(paramfl,'templateflag') && paramfl.templateflag 
-    TEMPL = nk_GenTemplParam(PREPROC, tCV, MODEFL, RAND, sY, inp, kbin);
+    TEMPL = nk_GenTemplParam(PREPROC, tCV, MODEFL, RAND, sY, inp, kbin, paramfl);
 else
     clear TEMPL
 end
@@ -179,6 +185,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
         
         tElapsed = tic;
         fprintf('\nWorking on CV1 [%2g, %2g ]: Prepare data', k, l);
+
         for u=1:ukbin % Binary comparison loop depending on PREPROC.BINMOD & FBINMOD
             
             if ischar(Pnt(k,l,u).TrainedParam) && exist(Pnt(k,l,u).TrainedParam,'file')
@@ -454,6 +461,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                   Pnt(k,l,u).nP, ...
                   Pnt(k,l,u).nA] = nk_ParamReplicator(paramfl.P{u}, paramfl.PXopt{u}, paramfl.PREPROC, numel(oTrainedParam));
             end
+
             if oocvonly
                 if multoocv
                     ocv = [];

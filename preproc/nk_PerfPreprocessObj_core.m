@@ -11,7 +11,7 @@
 % hyperparameter combination are stored. This results in a tree structure 
 % of preprocessed data and respective parameters.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 05/2022
+% (c) Nikolaos Koutsouleris, 07/2023
 
 function [SrcParam, InputParam, TrParam] = ...
               nk_PerfPreprocessObj_core(SrcParam, InputParam, TrParam, act)
@@ -89,6 +89,12 @@ end
 
 if nact>1, fprintf('\t...Execute preprocessing sequence: '); end
 
+if isfield(InputParam,'Ts') && isequaln(InputParam.Tr, InputParam.Ts{1})
+    copy_ts = true;
+else
+    copy_ts = false;
+end
+
 ActParam = struct('trfl', trfl, ...
                   'paramfl', paramfl, ...
                   'tsfl', tsfl, ...
@@ -98,7 +104,8 @@ ActParam = struct('trfl', trfl, ...
                   'i',0, ...
                   'adasynfl', adasynfl, ...
                   'curlabel', 1, ...
-                  'label_interaction', nL>1);
+                  'label_interaction', nL>1, ...
+                  'copy_ts', copy_ts);
 
 for i=1:nact
     
@@ -180,10 +187,10 @@ for i=1:nact
                     end
                 end
                 if ~isempty(TEMPL)
-                    if isstruct(TEMPL.Param{InputParam.curclass}{i})
-                        ActParam.Templ = TEMPL.Param{InputParam.curclass}{i};
+                    if isstruct(TEMPL.Param(InputParam.curclass).TrainedParam{i})
+                        ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainParam{i};
                     else
-                        ActParam.Templ = TEMPL.Param{InputParam.curclass}{i}{j}; 
+                        ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainedParam{i}{j}; 
                     end
                 end
                 if nTs>1
@@ -291,7 +298,7 @@ for i=1:nact
                 % PREPARE PARAMS
                 ActParam.opt = O(l,:); % Retrieve current processing params
                 % Is there any template parameter structure?
-                if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param{InputParam.curclass}{i}; end
+                if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainedParam{i}; end
                 % Are there any precomputed parameters?
                 if paramfl, llTrParam = TrParami{kl,nl}; else, llTrParam = []; end
                 % -----------------------------------------------------------------------------------------------------------------
@@ -335,7 +342,7 @@ for i=1:nact
         if adasynfl && i==1
             InputParam.Tr = [InputParam.Tr; InputParam.TrSyn];
         end
-        if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param{InputParam.curclass}{i}; end
+        if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainedParam{i}; end
         [ SrcParam, InputParam, TrParami, ActParam ] = feval( funcstr, SrcParam, InputParam, TrParam, TrParami, ActParam );
     end
     
@@ -353,15 +360,26 @@ function [SrcParam, InputParam, TrParami, actparam] = act_impute(SrcParam, Input
 %global VERBOSE
 trfl     = actparam.trfl;
 tsfl     = actparam.tsfl;
+copy_ts  = actparam.copy_ts;
 %paramfl  = actparam.paramfl;
 i        = actparam.i;
 tsproc   = false;
 InputParam.P{i}.IMPUTE.X = InputParam.Tr;
+
 if trfl 
     [InputParam.Tr, TrParami] = nk_PerfImputeObj(InputParam.Tr, InputParam.P{i}.IMPUTE); 
+    TrParami.X = InputParam.Tr;
     if tsfl, tsproc = true; end  
 end
-if tsproc, InputParam.Ts = nk_PerfImputeObj(InputParam.Ts, TrParami); end
+if tsproc 
+    if copy_ts
+        Ts = nk_PerfImputeObj(InputParam.Ts(2:end), TrParami); 
+        InputParam.Ts{1} = InputParam.Tr;
+        InputParam.Ts(2:end) = Ts;
+    else
+        InputParam.Ts = nk_PerfImputeObj(InputParam.Ts, TrParami); 
+    end
+end
 
 end
 
@@ -423,7 +441,7 @@ if VERBOSE; fprintf('\tNormalizing to group mean(s) ...'); end
             
 if paramfl && tsfl && isfield(TrParami,'meanY') && isfield(InputParam.P{i},'TsInd')
     tsproc = true;
-elseif trfl, 
+elseif trfl
     if actparam.adasynfl && isfield(InputParam.P{i},'TrInd') && ~isempty(InputParam.P{i}.TrInd)
         if iscell(SrcParam.covarsSyn)
             InputParam.P{i}.TrInd = [InputParam.P{i}.TrInd; SrcParam.covarsSyn{actparam.j}(:,InputParam.P{i}.IND)]; 
@@ -505,7 +523,7 @@ if isfield(InputParam,'C') && CALIB.calibflag % && CALIB.preprocstep > i
 end
 end
 
-% =========================================================================
+% =================================================================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_discretize(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
 
@@ -523,7 +541,7 @@ if VERBOSE;
 end
 if paramfl && tsfl && isfield(TrParami,'mY') && isfield(TrParami,'sY') 
     tsproc = true;
-elseif trfl,
+elseif trfl
     [InputParam.Tr, TrParami] = nk_PerfDiscretizeObj(InputParam.Tr, InputParam.P{i});
     if tsfl, tsproc = true; end
 else
@@ -533,7 +551,7 @@ if tsproc, InputParam.Ts = nk_PerfDiscretizeObj(InputParam.Ts, TrParami); end
 
 end
 
-% =========================================================================
+% =================================================================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_symbolize(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
 trfl    = actparam.trfl;
@@ -547,9 +565,9 @@ if VERBOSE; fprintf('\tSymbolizing ...'); end
 
 if paramfl && tsfl && isfield(TrParami,'sBin')
     tsproc=true;
-elseif trfl, 
+elseif trfl
     [ InputParam.Tr, TrParami ] = nk_PerfDiscretizeObj(InputParam.Tr, InputParam.P{i}); 
-    if tsfl, tsproc = true; end;
+    if tsfl, tsproc = true; end
 else
     if VERBOSE;fprintf(' not performed.'); end
 end
@@ -557,7 +575,7 @@ if tsproc, InputParam.Ts = nk_PerfDiscretizeObj(InputParam.Ts, TrParami); end
 
 end   
 
-% =========================================================================
+% =================================================================================================================
 function [SrcParam,InputParam, TrParami, actparam ] = act_standardize(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
 trfl    = actparam.trfl;
@@ -574,7 +592,7 @@ if VERBOSE; fprintf('\tStandardizing data ...'); end
 if paramfl && tsfl && isfield(TrParami,'meanY') && isfield(TrParami,'stdY')
     tsproc = true;
 else
-    if trfl, 
+    if trfl
         % Check for ADASYN
         if actparam.adasynfl && isfield(InputParam.P{i},'sTrInd') && ~isempty(InputParam.P{i}.sTrInd)
             if iscell(SrcParam.covarsSyn)
@@ -591,7 +609,7 @@ if tsproc, InputParam.Ts = nk_PerfStandardizeObj(InputParam.Ts, TrParami); end
 
 end
 
-% =========================================================================
+% =================================================================================================================
 function [SrcParam,InputParam, TrParami, actparam ] = act_reducedim(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
 
@@ -599,6 +617,7 @@ trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
 i       = actparam.i;
+copy_ts  = actparam.copy_ts;
 tsproc  = false;
 
 if isfield(actparam,'DIMOPT') && ~isempty(actparam.DIMOPT)
@@ -655,10 +674,20 @@ elseif trfl
     if tsfl,tsproc = true; end   
 end 
 TrParami.mappedX = InputParam.Tr;
-if tsproc, InputParam.Ts = nk_PerfRedObj(InputParam.Ts, TrParami); end
+
+if tsproc
+    if copy_ts
+        InputParam.Ts{1} = InputParam.Tr;
+        Ts = nk_PerfRedObj(InputParam.Ts(2:end), TrParami); 
+        InputParam.Ts(2:end) = Ts;
+    else
+        InputParam.Ts = nk_PerfRedObj(InputParam.Ts, TrParami); 
+    end
+end
 
 end
 
+% =================================================================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_extdim(SrcParam, InputParam, TrParam, TrParami, actparam)
 global VERBOSE
 
@@ -666,6 +695,7 @@ trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
 i       = actparam.i;
+copy_ts  = actparam.copy_ts;
 tsproc  = false;
 
 if isfield(actparam,'opt') && ~isempty(actparam.opt)
@@ -686,7 +716,7 @@ else
 end
 
 if VERBOSE    
-    if trfl, 
+    if trfl
         featnum = size(InputParam.Tr,2); 
     elseif tsfl
         if iscell(InputParam.Ts)
@@ -700,15 +730,23 @@ end
 
 if paramfl && tsfl && isfield(TrParami,'indNonRem')
     tsproc = true;
-elseif trfl, 
+elseif trfl 
     [InputParam.Tr, TrParami] = nk_PerfExtDimObj(InputParam.Tr, InputParam.P{i}); 
     if tsfl,tsproc = true; end   
 end 
 
-if tsproc, InputParam.Ts = nk_PerfExtDimObj(InputParam.Ts, TrParami); end
-
+if tsproc 
+    if copy_ts
+        InputParam.Ts{1} = InputParam.Tr;
+        Ts = nk_PerfExtDimObj(InputParam.Ts(2:end), TrParami); 
+        InputParam.Ts(2:end)=Ts;
+    else
+        InputParam.Ts = nk_PerfExtDimObj(InputParam.Ts, TrParami); 
+    end
 end
-% =========================================================================
+end
+
+% =================================================================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_correctnuis(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE CALIB 
 
@@ -716,6 +754,7 @@ trfl    = actparam.trfl;
 tsfl    = actparam.tsfl;
 paramfl = actparam.paramfl;
 i       = actparam.i;
+copy_ts = actparam.copy_ts;
 tsproc  = false;            
 
 IN = InputParam.P{i}; 
@@ -755,7 +794,17 @@ else
     if VERBOSE;fprintf('not performed'); end
 end
 
-if tsproc, InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); end 
+if tsproc
+    if copy_ts
+        InputParam.Ts{1} = InputParam.Tr;
+        TrParami.copy_ts = true;
+        Ts = nk_PartialCorrelationsObj(InputParam.Ts(2:end), TrParami); 
+        InputParam.Ts(2:end) = Ts;
+    else
+        InputParam.Ts = nk_PartialCorrelationsObj(InputParam.Ts, TrParami); 
+    end
+end 
+
 if isfield(CALIB,'calibflag') && CALIB.calibflag && isfield(InputParam, 'C')
     INcalib = IN;
     INcalib.TrCovars = CALIB.covars;
@@ -764,8 +813,10 @@ if isfield(CALIB,'calibflag') && CALIB.calibflag && isfield(InputParam, 'C')
     InputParam.C = nk_PartialCorrelationsObj(InputParam.C, INcalib);
     %end
 end
+
 end
-% =========================================================================
+
+% =================================================================================================================
 function [SrcParam, InputParam, TrParami, actparam ] = act_elimzero(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
 trfl    = actparam.trfl;
@@ -793,7 +844,7 @@ end
 if tsproc, InputParam.Ts = nk_PerfElimZeroObj(InputParam.Ts, TrParami); end
 end
 
-% =========================================================================
+% =================================================================================================================
 function [SrcParam,InputParam, TrParami, actparam ] = act_rankfeat(SrcParam, InputParam, ~, TrParami, actparam)
 global VERBOSE
 
@@ -810,7 +861,7 @@ end
 RANK = InputParam.P{i}.RANK;
 
 if ~isfield(TrParami,'W') || isempty(TrParami.W)
-    % Modification alllows to compute weights in a user-defined subgroup
+    % Modification allows to compute weights in a user-defined subgroup
     % (RANK.curglabel)
     if isfield(InputParam.P{i}.RANK,'curglabel')
         RANK.curlabel = InputParam.P{i}.RANK.curlabel(InputParam.P{i}.RANK.curglabel,actparam.curlabel);
@@ -835,7 +886,8 @@ if ~isfield(TrParami,'W') || isempty(TrParami.W)
 end
 
 end
-% =========================================================================
+
+% =================================================================================================================
 function [SrcParam,InputParam, TrParami, actparam ] = act_extfeat(SrcParam, InputParam, TrParam, TrParami, actparam)
 global VERBOSE
 trfl    = actparam.trfl;

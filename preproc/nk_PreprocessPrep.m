@@ -171,6 +171,7 @@ switch act
             %% Define program parameters
             if strcmp(MODEFL,'classification') && RAND.Decompose ~= 9, kbin = length(CV.class{1,1}); end
             datid       = NM.id;
+        
             switch act
                 case 6
                 for j = 1:nM
@@ -327,10 +328,11 @@ switch act
                 end
     
             case 7
-                
+
+                nk_SetupGlobalVariables(analysis.params, 'setup_strat', 1);                 
                 % LABEL SCALING (regression only)
-                nk_SetupGlobalVariables(analysis.params, 'setup_strat', 1); 
-                labels = nk_LabelTransform(PREPROC, MODEFL, NM.label);
+
+                
                 %% Get Training / CV data (Y) & Build modality suffix
                 inp = nk_DefineFusionModeParams(NM, analysis, F, nM, 1);
                 inp.nM = nM;

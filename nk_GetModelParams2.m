@@ -17,7 +17,7 @@ end
 
 function [P, Ppos, nP] = getP(analysis, MULTI, multiflag, CV2ind, curclass, curlabel)
 
-if ~isempty(MULTI) && MULTI.flag && multiflag && ~MULTI.BinBind
+if ~isempty(MULTI) && MULTI.flag && multiflag
     % Get optimum multi-group classification parameters
     if iscell(analysis.multi_bestPpos)
         Ppos = analysis.multi_bestPpos{CV2ind,curlabel};

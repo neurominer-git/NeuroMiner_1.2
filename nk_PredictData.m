@@ -15,7 +15,7 @@
 % --------
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2017
+% (c) Nikolaos Koutsouleris, 08/2023
 
 function Predict = nk_PredictData(F, W, TR, TRInd, dTRLabel, ...
                                         CVD, CVDInd, dCVDLabel, ...
@@ -88,8 +88,10 @@ for k=1:iy % Loop through CV1 permutations
         
         for curclass = 1:nclass % Loop through dichotomizers
             
-            % Extract Test Data
-            if iscell(TS{k,l}) 
+            %%%%%%%%%%%%%%%% DATA EXTRACTION %%%%%%%%%%%%%%%%
+            % Extract CV2 test data
+            % Binary decomposition mode during preprocessing
+            if iscell(TS{k,l}) && numel(TS{k,l}) == nclass 
                 if ~isempty(mTSInd)
                     if iscell(mTSInd{k,l})
                         XTest = TS{k,l}{curclass}(mTSInd{k,l}{curclass},:); 
@@ -97,8 +99,20 @@ for k=1:iy % Loop through CV1 permutations
                         XTest = TS{k,l}{curclass}(mTSInd{k,l},:); 
                     end
                 else
-                    XTest = TS{k,l}{curclass}; 
+                    XTest = TS{k,l}{1}; 
                 end
+            % Multigroup mode during preprocessing
+            elseif iscell(TS{k,l}) 
+                if ~isempty(mTSInd)
+                    if iscell(mTSInd{k,l})
+                        XTest = TS{k,l}{1}(mTSInd{k,l}{curclass},:); 
+                    else
+                        XTest = TS{k,l}{1}(mTSInd{k,l},:); 
+                    end
+                else
+                    XTest = TS{k,l}{1}; 
+                end
+            % Regression mode
             else
                 if ~isempty(mTSInd)
                     if iscell(mTSInd{k,l})
@@ -111,8 +125,8 @@ for k=1:iy % Loop through CV1 permutations
                 end
             end
             
-            % Extract Training Data
-            if iscell(TR{k,l}) 
+            % Extract CV1 training data
+            if iscell(TR{k,l}) && numel(TR{k,l}) == nclass
                 if ~isempty(TRInd) 
                     if iscell(TRInd{k,l})
                         XTrain = TR{k,l}{curclass}(TRInd{k,l}{curclass},:); 
@@ -121,6 +135,16 @@ for k=1:iy % Loop through CV1 permutations
                     end
                 else
                     XTrain = TR{k,l}{curclass}; 
+                end
+            elseif iscell(TR{k,l}) 
+                if ~isempty(TRInd) 
+                    if iscell(TRInd{k,l})
+                        XTrain = TR{k,l}{1}(TRInd{k,l}{curclass},:); 
+                    else
+                        XTrain = TR{k,l}{1}(TRInd{k,l},:); 
+                    end
+                else
+                    XTrain = TR{k,l}{1}; 
                 end
             else
                 if ~isempty(TRInd)
@@ -133,10 +157,11 @@ for k=1:iy % Loop through CV1 permutations
                     XTrain = TR{k,l};
                 end
             end
+            % Extract CV1 training labels
             YTrain = dTRLabel{k,l}{curclass}(:,MULTILABEL.curdim);
             
-            %Extract CV1 Test Data
-            if iscell(CVD{k,l}) 
+            %Extract CV1 test data
+            if iscell(CVD{k,l}) && numel(CVD{k,l}) == nclass
                 if ~isempty(CVDInd) 
                     if iscell(CVDInd{k,l})
                         XCV = CVD{k,l}{curclass}(CVDInd{k,l}{curclass},:); 
@@ -145,6 +170,16 @@ for k=1:iy % Loop through CV1 permutations
                     end
                 else
                     XCV = CVD{k,l}{curclass}; 
+                end
+            elseif iscell(CVD{k,l})
+                if ~isempty(CVDInd) 
+                    if iscell(CVDInd{k,l})
+                        XCV = CVD{k,l}{1}(CVDInd{k,l}{curclass},:); 
+                    else
+                        XCV = CVD{k,l}{1}(CVDInd{k,l},:); 
+                    end
+                else
+                    XCV = CVD{k,l}{1}; 
                 end
             else
                 if ~isempty(CVDInd)
@@ -157,6 +192,7 @@ for k=1:iy % Loop through CV1 permutations
                     XCV = CVD{k,l};
                 end
             end
+            % Extract CV1 test labels
             YCV = dCVDLabel{k,l}{curclass}(:,MULTILABEL.curdim);
             Ydum = zeros(size(XTest,1),1);
             if RFE.ClassRetrain
@@ -219,7 +255,7 @@ for k=1:iy % Loop through CV1 permutations
             
             % Weight decision values
             if ~isempty(W) && ~isempty(W{k,l,curclass}) 
-                if nW == 1 , Wkl = W{k,l}';  else Wkl = W{k,l,curclass}'; end
+                if nW == 1 , Wkl = W{k,l}';  else, Wkl = W{k,l,curclass}'; end
                 wx = repmat(Wkl,n_subj,1); tsD = bsxfun(@times,tsD,wx); tsT = bsxfun(@times,tsT,wx); 
             end
             

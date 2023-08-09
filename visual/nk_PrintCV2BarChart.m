@@ -3,7 +3,7 @@ global OCTAVE
 
 WinTag = 'PrintCVBarsBin';
 
-if isfield(D,'h'), hx = ishandle(D.h); else hx = 0; end
+if isfield(D,'h'), hx = ishandle(D.h); else, hx = 0; end
 if ~hx  
     h = findobj('Tag',WinTag);
     if isempty(h)
@@ -34,7 +34,7 @@ end
 hold on
 set(h,'CurrentAxes',D.hl); cla; barh(D.hl,1,D.pltperc, 'FaceColor', 'b'); hold on
 
-if ~isempty(D.Pdesc{1}),
+if ~isempty(D.Pdesc{1})
     tx = sprintf('%s\nParams: ',D.s); 
     txi = []; i=1;
     for j = 1:numel(D.Pdesc{i})
@@ -88,7 +88,7 @@ for p=1:numel(D.ax)
         set(D.ax{p}.h,'XTick',1:1:numel(D.ax{p}.label));
         set(D.ax{p}.h,'XTickLabel',D.ax{p}.label);
         title(D.ax{p}.h, D.ax{p}.title)
-        if ~isempty(D.ax{p}.lg), 
+        if ~isempty(D.ax{p}.lg) 
             h_legend = legend(D.ax{p}.h, D.ax{p}.lg); 
             legend(D.ax{p}.h, 'boxoff');
             set(h_legend,'FontSize',8);
@@ -98,7 +98,7 @@ for p=1:numel(D.ax)
         set(h,'CurrentAxes',D.ax{p}.h);
         for i = 1:D.nclass
             if sum(any(isnan(D.ax{p}.val_y(:,i)))),continue; end
-            if D.nclass==1, 
+            if D.nclass==1 
                 std_y = D.ax{p}.std_y;
                 val_y = D.ax{p}.val_y;
             else

@@ -31,7 +31,7 @@ if ~isempty(act) || ~defaultsfl
     
     % -------------------------------------------------------------------------
     % Retrieve current values from param
-    if isfield(param,'Filter'), 
+    if isfield(param,'Filter')
         Filter = param.Filter; 
     end
          

@@ -11,8 +11,6 @@ COVDIR_DEF      = 1;
 INTERCEPT_DEF   = 2;
 BETAEXT_DEF     = [];
 SUBGROUP_DEF    = [];
-FEATIND_DEF     = [];
-
 if ~defaultsfl
     
     % Get information from CURACT if available
@@ -25,18 +23,6 @@ if ~defaultsfl
     if isfield(CURACT,'MCOVARUSE'),   MCOVARUSE_DEF   = CURACT.MCOVARUSE; end
     if isfield(CURACT,'MCOVAR'),      MCOVAR_DEF      = CURACT.MCOVAR; end
     if isfield(CURACT,'MCOVARLABEL'), MCOVARLABEL_DEF = CURACT.MCOVARLABEL; end
-    if isfield(CURACT,'FEATIND')     
-        FEATINDFLAG_DEF = CURACT.SelectedFeatures.flag; 
-        if isfie
-        FEATIND_DEF = 
-    end
-    if isempty(FEATIND_DEF)
-        FEATIND_MNU = ''; 
-        FEATIND_STR = 'All features';
-    else
-        FEATIND_MNU = '|Select target features '
-        FEATIND_STR = sprintf('%g features',sum(FEATIND_DEF)); 
-    end
     COVAR_STR = strjoin(NM.covnames(COVAR_DEF),', ');
     SUBGROUP_MNU1 = []; SUBGROUP_MNU2 = [];
     menuact = [ 1 2 ];
@@ -111,8 +97,6 @@ if ~defaultsfl
                '|Select covariates from NM covariate matrix [ ' COVAR_STR ' ]', ...
                '|Use intercept in partial correlation analysis [ ' INTERCEPT_STR ' ]', ...
                '|Attenuate or increase covariate effects [ ' COVDIR_STR ' ]' ...
-               '|Apply correction method to all features [ ' FEATINDALL_STR ' ]' ...
-               FEATIND_MNU ...
                '|Use externally-computed beta coeficients [ ' BETAEXT_STR ' ]' ...
                BETAEXT_MNU ...
                SUBGROUP_MNU1 ...
@@ -169,9 +153,9 @@ if ~defaultsfl
            if MCOVARLABEL_DEF == 1, MCOVARLABEL_DEF = 2; else, MCOVARLABEL_DEF = 1; end
             
         case 8
-            if ~isfield(CURACT,'BETAEXT'), 
+            if ~isfield(CURACT,'BETAEXT')
                 CURACT.BETAEXT = NaN; 
-            elseif isfield(CURACT,'BETAEXT'), 
+            elseif isfield(CURACT,'BETAEXT')
                 CURACT = rmfield(CURACT,'BETAEXT'); 
             end
             
@@ -184,9 +168,9 @@ if ~defaultsfl
             CURACT.BETAEXT = nk_input('Define precompute beta matrix',0,'e',[],[defc, size(NM.Y{varind},2)]);
 
         case 10
-              if ~isfield(CURACT,'SUBGROUP'), 
+              if ~isfield(CURACT,'SUBGROUP')
                 CURACT.SUBGROUP = NaN; 
-            elseif isfield(CURACT,'SUBGROUP'), 
+            elseif isfield(CURACT,'SUBGROUP')
                 CURACT = rmfield(CURACT,'SUBGROUP'); 
               end
               

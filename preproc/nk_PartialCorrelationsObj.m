@@ -23,11 +23,15 @@ if exist('IN','var') && ~isempty(IN) && isfield(IN,'METHOD') && IN.METHOD == 2
 elseif exist('IN','var') && ~isempty(IN) && isfield(IN,'METHOD') && IN.METHOD == 3
     method = @FastICAObj; methodsel = 3;
 end
-
+if isfield(IN,'copy_ts') && IN.copy_ts
+    str = 2; off = 1;
+else
+    str = 1; off = 0;
+end
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) && exist('IN','var') && ~isempty(IN)
     sY = cell(1,numel(Y));
-    for i=1:numel(Y)
+    for i = str:numel(Y) + off
         switch methodsel 
             case 1
                 if isfield(IN,'beta') && ~isempty(IN.beta)
@@ -54,7 +58,7 @@ if iscell(Y) && exist('IN','var') && ~isempty(IN)
                     end
                 end
         end
-        [sY{i}, IN] = method (Y{i}, IN); 
+        [sY{i-off}, IN] = method (Y{i-off}, IN); 
     end
 else
     switch methodsel 

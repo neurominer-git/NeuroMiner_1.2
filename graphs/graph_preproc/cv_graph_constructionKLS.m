@@ -49,8 +49,8 @@ for i = 1:size(A,1)
         roi = rois(j); 
         voxel_values = pp_values(maskVec == roi);
         roiname = sprintf('roi_%d',j);
-        voxelValues_struct.(roiname) = voxel_values
-        [bw, density, grid, cdf_values] = kde(voxel_values, n = sp);
+        voxelValues_struct.(roiname) = voxel_values;
+        [bw, density, grid, cdf_values] = kde(voxel_values, sp);
         pdf_struct.(ppname).(roiname) = cdf_values;
     end
 end

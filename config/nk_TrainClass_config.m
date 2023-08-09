@@ -35,7 +35,7 @@ if ~isfield(NM,'TrainParam')
     NM.TrainParam.STACKING.flag = 2;
     NM.TrainParam.FUSION.flag   = 0;
     NM.TrainParam.FUSION.M      = 1;
-    NM.TrainParam.SVM           = nk_LIBSVM_config(NM,[],1);
+    [~,NM.TrainParam.SVM]       = nk_LIBSVM_config(NM,[],1);
     NM.TrainParam.SVM.prog      = 'LIBSVM';
     NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
     NM.TrainParam.SVM.GridParam = 1;
@@ -142,7 +142,7 @@ end
 
 %% Check data entry status
 if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'CALIB','LABEL'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'CALIB', 'LABEL'});
     STATUS = nk_CheckFieldStatus(NM.TrainParam.STRAT{varind},{'PREPROC','SVM','GRD','RFE','MULTI','VIS','MLI'}, [], [], STATUS);
 else
     STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI', 'CALIB', 'LABEL'});
@@ -224,10 +224,14 @@ if ~exist('act','var') || isempty(act)
         modeflag = NM.TrainParam.LABEL.newmode;
     else
         modeflag = NM.modeflag;
+<<<<<<< HEAD
         %if isfield(NM.TrainParam, 'LABEL')
         %    NM.TrainParam = rmfield(NM.TrainParam, 'LABEL');
         %end
         NM.TrainParam.LABEL.flag = 0; 
+=======
+        NM.TrainParam.LABEL.flag = false;
+>>>>>>> refs/remotes/origin/main
     end
     if strcmp(modeflag,'classification')
 
@@ -431,7 +435,7 @@ switch act
         % FEATURE SELECTION ==============================================================================================x=================================================
     case 8
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-            if ~isfield(NM.TrainParam.STRAT{varind},'RFE'),
+            if ~isfield(NM.TrainParam.STRAT{varind},'RFE')
                 [~, NM.TrainParam.STRAT{varind}.RFE ] = ...
                     nk_RFE_config([], NM.TrainParam.STRAT{varind}, ...
                     NM.TrainParam.STRAT{varind}.SVM, ...
@@ -500,7 +504,7 @@ switch act
             TrainParam = NM.TrainParam;
             save(matname,'TrainParam');
         end
-        if isfield(NM,'cv'),
+        if isfield(NM,'cv')
             cv = NM.cv;
             save(matname,'cv','-append');
         end
@@ -529,14 +533,14 @@ switch act
                             if exist(matname,'file'),load(matname); end
                         case 3
                             matname = nk_FileSelector(1,'matrix','Select NM structure file','.*\mat');
-                            if exist(matname,'file'),
+                            if exist(matname,'file')
                                 [~, matfile] = fileparts(matname);
                                 fprintf('\nLoading %s as temporary structure',matfile)
                                 load(matname,'NM','TrainParam');
                                 load(matname,'NM','cv');
                             end
                     end
-                    if exist('TrainParam','var'),
+                    if exist('TrainParam','var')
                         if isfield(NM,'TrainParam') && isfield(NM.TrainParam,'RAND')
                             RAND = NM.TrainParam.RAND;
                         end
@@ -623,12 +627,13 @@ switch act
         while act>0  
             [LABEL, act] = cv_Label_config(LABEL);
         end
-        if LABEL.flag && ~strcmp(LABEL.newmode, modeflag)
+        if LABEL.flag && ~isempty(LABEL.newmode) && ~strcmp(LABEL.newmode, modeflag)
             origmodefl                  = NM.modeflag;
             % check whether a new mode was entered
             if isempty(LABEL.newmode)
                 LABEL.newmode           = origmodefl;
             end
+<<<<<<< HEAD
             NM.modeflag                 = LABEL.newmode;
             
             % Create default NM parameters space
@@ -650,34 +655,45 @@ switch act
 
             NM.TrainParam.LABEL         = LABEL;
             NM.modeflag                 = origmodefl;
+=======
+            % Create default NM parameters space for alternative label
+            try
+                NM.modeflag                 = LABEL.newmode;
+                nk_CVpartition_config(true);
+                NM.TrainParam.STACKING.flag = 2;
+                NM.TrainParam.FUSION.flag   = 0;
+                NM.TrainParam.FUSION.M      = 1;
+                [~,NM.TrainParam.SVM]       = nk_LIBSVM_config(NM,[],1);
+                NM.TrainParam.SVM.prog      = 'LIBSVM';
+                NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
+                NM.TrainParam.SVM.GridParam = 1;
+                if strcmp(NM.modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
+                NM.TrainParam.MULTI.flag    = 0;
+                NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
+                [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
+                NM.TrainParam.verbosity     = 1;
+                NM.TrainParam               = rmfield(NM.TrainParam,'PREPROC');
+                NM.TrainParam.LABEL         = LABEL;
+                NM.modeflag                 = origmodefl;
+            catch ERR
+                errordlg(sprintf('Error when setting defaults for alternative label:\n%s',ERR.message),'NM Error');
+                NM.TrainParam = LABEL.OrigTrainParam;
+                NM.modeflag   = origmodefl;
+            end
+>>>>>>> refs/remotes/origin/main
         elseif LABEL.flag % but same learning framework
             NM.TrainParam.LABEL         = LABEL;
         elseif ~LABEL.flag && strcmp(LABEL.newmode, modeflag) % if switched from alternative label to no alt. label but no learning mode switch
             NM.TrainParam = rmfield(NM.TrainParam, 'LABEL'); 
         elseif ~LABEL.flag % if either nothing has been changed in submenu or switch from alternative label to no alt. label and learning mode switch 
             NM.TrainParam = LABEL.OrigTrainParam;
-
-%             nk_CVpartition_config(true);
-%             NM.TrainParam.STACKING.flag = 2;
-%             NM.TrainParam.FUSION.flag   = 0;
-%             NM.TrainParam.FUSION.M      = 1;
-%             NM.TrainParam.SVM           = nk_LIBSVM_config(NM,[],1);
-%             NM.TrainParam.SVM.prog      = 'LIBSVM';
-%             NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
-%             NM.TrainParam.SVM.GridParam = 1;
-%             if strcmp(NM.modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
-%             NM.TrainParam.MULTI.flag    = 0;
-%             NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
-%             [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
-%             NM.TrainParam.verbosity     = 1;
-%             NM.TrainParam.LABEL         = LABEL;
         end
 
  %% read in calibration data
     case 1000
 
         NM = nk_DefineOOCVData_config(NM, 2, 'calib');
-        [NM, C, oocvind, fldnam, dattype] = nk_SelectOOCVdata(NM, 2, 0);
+        NM = nk_SelectOOCVdata(NM, 2, 0);
         CALIBAVAIL = 1;
         CY = NM.C{1,1}.Y;
         Cfile_path = sprintf('%s/CY.mat', pwd);

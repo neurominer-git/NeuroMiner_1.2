@@ -1,16 +1,18 @@
 function [sY, sX, sYX, IN] = nk_PLS(Y, X, IN)
 % Computes PLS model from experimental predictors X and predictands Y
 % _________________________________________________________________________
-% (c) Nikolaos Koutsouleris, 08/2020
+% (c) Nikolaos Koutsouleris, 08/2023
 if ~isfield(IN,'trained'),IN.trained=0;end
 if ~isfield(IN,'algostr'),IN.algostr='pls';end
-if exist('X','var') && ~isempty(X), 
+% Get behavioural data
+if exist('X','var') && ~isempty(X)
     Xd = X;
 else
     Xd = IN.DR.PLS.V;
 end
 
 if ~IN.trained
+
     % Mean centering of Y and Xd
     switch IN.algostr
         case 'pls'
@@ -23,6 +25,13 @@ if ~IN.trained
     [mY, IN.mpp.mY] = nk_PerfStandardizeObj(Y,IN.mpp.mY);
     [mXd, IN.mpp.mX] = nk_PerfStandardizeObj(Xd,IN.mpp.mX);
     
+    % If mXd contains NaNs, we have to implement an imputation step here:
+    % Imputation
+    if sum(isnan(mXd(:)))
+        mXd = SeqkNN(mXd, 5);
+        IN.tX = mXd;
+    end
+
     switch IN.algostr
         case 'pls'
             % Build covariance matrix S
@@ -52,6 +61,11 @@ else
     sY = mY*IN.mpp.u; sX = []; sYX = [];
     if ~isempty(Xd)
         mXd = nk_PerfStandardizeObj(Xd,IN.mpp.mX);
+        % If mXd contains NaNs, we have to implement an imputation step here:
+        % Imputation
+        if sum(isnan(mXd(:)))
+            mXd = SeqkNN(mXd, 5, IN.tX);
+        end
         sX = mXd*IN.mpp.v;
         sYX = mXd * (IN.mpp.u * IN.mpp.v')' + IN.mpp.mY.meanY;
     end

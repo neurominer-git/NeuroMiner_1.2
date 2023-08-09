@@ -6,7 +6,7 @@ amode = 1;
 ovrwrt = 3;
 na_str = '?'; mn_str = []; mn_act = [];
 Amodes = {'generate new','manage existing'};
-Aovrwrt = {'delete', 'delete & wipe', 'complete reset', 'parameter reset', 'update paths and descriptors', 'overwrite NM parameter template'};
+Aovrwrt = {'delete', 'delete & wipe', 'complete reset', 'parameter reset', 'update paths and descriptors', 'overwrite NM parameter template', 'manage on disk'};
 
 if ~exist('A','var') || isempty(A)
     A.mode = amode;
@@ -64,7 +64,7 @@ if A.ovrwrt > 1 && A.ovrwrt<6
     
 end
 
-if any(strcmp(A.parentdir,na_str)) || any(strcmp(A.desc,na_str)) || any(strcmp(A.id,na_str)), 
+if any(strcmp(A.parentdir,na_str)) || any(strcmp(A.desc,na_str)) || any(strcmp(A.id,na_str)) 
     disallow=true; 
 end
 
@@ -133,10 +133,10 @@ switch act
         
         switch A.ovrwrt
     
-            case {1,2}
+            case {1,2} % Delete or delete & wipe
                 if A.ovrwrt == 2
                     askfl = questdlg('Are you sure you want to wipe this analysis from your computer?',mestr,'Yes','No','No');
-                    if strcmp(askfl,'Yes'), 
+                    if strcmp(askfl,'Yes')
                         for i=1:numel(A.analdim)
                             rmdir( NM.analysis{A.analdim(i)}.rootdir,'s' ); 
                         end
@@ -144,7 +144,7 @@ switch act
                 end
                 NM.analysis(A.analdim) = [];
                 if isempty(NM.analysis), NM = rmfield(NM,'analysis'); end
-            case {3,4}
+            case {3,4} % Reset analysis
                 if A.ovrwrt == 3
                     NM.analysis{A.analdim} = []; 
                     NM.analysis{A.analdim}.id                 = A.id;                   
@@ -170,7 +170,7 @@ switch act
                     if strcmp(NM.TrainParam.LABEL.newmode, 'classification')
                         NM.analysis{A.analdim}.params.label.altgroupnames = NM.TrainParam.LABEL.newgroupnames; 
                     end
-                    NM.analysis{A.analdim}.params.TrainParam = rmfield(NM.analysis{A.analdim}.params.TrainParam, 'LABEL'); % remove LABEL field from analysis' TrainParam to save memory
+                    %NM.analysis{A.analdim}.params.TrainParam = rmfield(NM.analysis{A.analdim}.params.TrainParam, 'LABEL'); % remove LABEL field from analysis' TrainParam to save memory
                 else 
                     NM.analysis{A.analdim}.params.label.label       = NM.label;
                     NM.analysis{A.analdim}.params.label.modeflag    = NM.modeflag; 
@@ -192,8 +192,8 @@ switch act
                 NM.analysis{A.analdim}.meta.MATLAB.ver        = ver;
                 NM.analysis{A.analdim}.meta.NM.ver            = NM.defs.NM_ver;
                 NM.analysis{A.analdim}.status = 0;
-                [ log_status, NM.analysis{A.analdim} ]        = nk_NMLogFileManager('init', NM, NM.analysis{A.analdim});
-            case 5
+                [ ~, NM.analysis{A.analdim} ]        = nk_NMLogFileManager('init', NM, NM.analysis{A.analdim});
+            case 5 % Reset analysis paths to new directory
                 old_rootdir = sprintf('NM_ID%s_A%g_%s',NM.analysis{A.analdim}.params.id,A.analdim,NM.analysis{A.analdim}.id); 
                 old_rootdirpath = NM.analysis{A.analdim}.rootdir;
                 new_rootdirpath = fullfile(A.parentdir,old_rootdir);
@@ -210,11 +210,13 @@ switch act
                         mess.text = sprintf('%s\n\t\t\t\t\t%s', mess.text, A.desc{i});
                     end
                     mess.text = sprintf('%s\nParent directory: %s\nRoot directory: %s', mess.text, A.parentdir, new_rootdirpath);
-                    log_status = nk_NMLogFileManager('add_entry', NM, NM.analysis{A.analdim}, 'InitAnalysis:UpdatePaths', mess);
+                    nk_NMLogFileManager('add_entry', NM, NM.analysis{A.analdim}, 'InitAnalysis:UpdatePaths', mess);
                 end
-            case 6
+            case 6 % overwrite NM parameter workspace
                 NM.TrainParam = NM.analysis{A.analdim}.params.TrainParam;
                 NM.cv = NM.analysis{A.analdim}.params.cv;
+            case 7 % mang
+
         end
         act='BACK';
 end

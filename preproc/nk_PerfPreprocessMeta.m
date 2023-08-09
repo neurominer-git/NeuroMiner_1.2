@@ -18,7 +18,7 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocessMeta(inp, labels, paramfl)
 % paramfl   : parameter structure describing the stacking process to be
 %               done
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2022
+% (c) Nikolaos Koutsouleris, 08/2023
 
 global MODEFL MULTI CV RAND VERBOSE PREPROC STACKING SVM
 
@@ -28,13 +28,12 @@ if ~exist('paramfl','var'), paramfl.use_exist = false; end
 cv2flag = false; 
 if isfield(PREPROC,'CV2flag') && (PREPROC.CV2flag - 1) == 1; cv2flag = true; end
 
-% Binary/regression or multi-group processing mode
-% if iscell(PREPROC)
-%     BINMOD = PREPROC{1}.BINMOD;
-% else
-%     BINMOD = PREPROC.BINMOD;
-% end
 BINMOD = 1;
+% if iscell(PREPROC), iPREPROC = PREPROC{1}; else, iPREPROC = PREPROC; end
+% BINMOD = iPREPROC.BINMOD;
+% if isfield(RAND,'Decompose') && RAND.Decompose == 2
+%     BINMOD = 0;
+% end
 
 % Pointers
 [iy,jy]     = size(CV.cvin{i,j}.TrainInd);  
@@ -240,7 +239,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
                     [~,Pspos, nP] = nk_GetModelParams2(inp.analyses{am}.GDdims{jm}, inp.multiflag, inp.ll, u, inp.curlabel);
                     CVfilename = inp.analyses{am}.GDdims{jm}.GDfilenames{inp.f,inp.d}; 
                     tY.nM_cnt(am) = nP;
-                    if VERBOSE, 
+                    if VERBOSE
                         fprintf('\nCV [ %g, %g ]: Concatenating predictions from modality #%g in analysis #%g (%s): %s',k, l,jm, am, inp.analyses{am}.id, CVfilename); 
                         if oocvflag
                             OOCVfilename = inp.analyses{am}.OOCV{oocvind}.FileNames{jm}{inp.f,inp.d};
@@ -380,7 +379,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
             [InputParam, oTrainedParam, SrcParam] = nk_GenPreprocSequence(InputParam, PREPROC, SrcParam, Pnt(k, l, u).TrainedParam);
             
              % Check whether we have imputed labels
-            if isfield(SrcParam,'TrL_imputed'), 
+            if isfield(SrcParam,'TrL_imputed')
                 TrL = SrcParam.TrL_imputed; 
                 [~,TrL] = nk_ManageNanCases(InputParam.Ts{1}, TrL, SrcParam.iTr); 
                 tTrL = labels(TrI,:);
@@ -407,13 +406,13 @@ for k=sta_iy:stp_iy % Inner permutation loop
             tsd = InputParam.Ts(:,3);
             if oocvflag, ocv = InputParam.Ts(:,4); end
             
-            if  any(cellfun(@isempty,trd)) ||  any(cellfun(@isempty,cvd)) ||  any(cellfun(@isempty,tsd)),
+            if  any(cellfun(@isempty,trd)) ||  any(cellfun(@isempty,cvd)) ||  any(cellfun(@isempty,tsd))
                 error('Empty training/test/validation data matrices return by preprocessing pipeline. Check your settings')
             end
             
             switch BINMOD
 
-                case 0 % Multi-group mode both in FBINMOD and PREPROC.BINMOD
+                case 0 
                     if ukbin > 1
                         [tY.Tr{k,l}{u},TrL] = nk_ManageNanCases(trd, TrL, SrcParam.iTr);
                         [tY.CV{k,l}{u},CVL] = nk_ManageNanCases(cvd, CVL, SrcParam.iCV);

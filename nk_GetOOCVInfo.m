@@ -80,7 +80,5 @@ if AS.analcompleteflag >0 && AS.oocvappflag
                      OOCVinfo.Analyses{i}.OOCVdone = false;
                  end
              end
-
     end
-    
 end

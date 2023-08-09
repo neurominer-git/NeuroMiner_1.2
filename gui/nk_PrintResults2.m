@@ -1016,6 +1016,7 @@ function axes1_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
+
 % --- Executes on selection change in selCVoocv.
 function selCVoocv_Callback(hObject, eventdata, handles)
 % hObject    handle to selCVoocv (see GCBO)
@@ -1072,6 +1073,9 @@ if isfield(handles, 'MLIdata') && ~isempty(handles.MLIdata)
 else 
     handles.thisMLIresult.Visible = 'off';
 end
+% if strcmp(handles.axes1.Legend.Interpreter,'latex')
+%     handles.axes1.Legend.Interpreter = 'none';
+% end
 handles.axes1.Legend.String{end} = selCaseX;
 guidata(handles.figure1,handles);
 
@@ -1321,9 +1325,12 @@ function tglPercRank_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of tglPercRank
-handles = perf_display(handles);
+if handles.oocvview
+    handles = display_classplot_oocv(handles.curclass, handles);
+else
+    handles = display_classplot(handles.curclass, handles);
+end
 guidata(handles.figure1,handles);
-
 
 % --- Executes on button press in thisMLIresult.
 function thisMLIresult_Callback(hObject, eventdata, handles)
@@ -1353,12 +1360,16 @@ function tglClrSwp_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of tglClrSwp
-handles = perf_display(handles);
+if handles.oocvview
+    handles = display_classplot_oocv(handles.curclass, handles);
+else
+    handles = display_classplot(handles.curclass, handles);
+end
 guidata(handles.figure1,handles);
+
 %if isfield(handles, 'MLIapp') && ~isnumeric(handles.MLIapp)
 %    updateFcn(handles.MLIapp,handles);
 %end
-
 
 % --- Executes on button press in spiderPlotButton.
 function spiderPlotButton_Callback(hObject, eventdata, handles)
@@ -1367,7 +1378,6 @@ function spiderPlotButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 appSpiderPlot(handles);
-
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
 % --- Otherwise, executes on mouse press in 5 pixel border or over spiderPlotButton.
@@ -1385,7 +1395,7 @@ function selSubGroupOOCV_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns selSubGroupOOCV contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from selSubGroupOOCV
-[~, oocvind] = get_oocvind(handles);
+[handles, oocvind] = get_oocvind(handles);
 if hObject.Value > 1
     gindex = hObject.Value-1;
     if ~islogical(handles.NM.OOCV{oocvind}.groups)
@@ -1402,8 +1412,17 @@ else
         handles = rmfield(handles,'SubIndex');
     end
 end
+switch handles.modeflag
+    case 'classification'
+        handles = display_classplot_oocv(handles.curclass, handles);
+    case 'regression'
+        handles.oocvview = false;
+        handles  = display_regrplot(handles, [], false, true, false, 0.2);
+        handles.oocvview = true;
+        handles  = display_regrplot(handles, [], true, false, true, 0.8);
+        load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
+end
 guidata(handles.figure1,handles);
-display_main(handles);
 
 % --- Executes during object creation, after setting all properties.
 function selSubGroupOOCV_CreateFcn(hObject, eventdata, handles)

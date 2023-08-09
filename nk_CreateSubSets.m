@@ -1,6 +1,6 @@
 function SubSets = nk_CreateSubSets(Y)
-global CV RFE MULTI MODEFL MULTILABEL VERBOSE PREPROC STACKING
-
+global CV RAND RFE MULTI MODEFL MULTILABEL VERBOSE PREPROC STACKING
+ 
 if VERBOSE && RFE.Filter.flag, fprintf('\n\nCreate feature subsets'); end
 
 [nperms, nfolds, nvar] = size(Y.Tr);
@@ -33,6 +33,10 @@ if iscell(PREPROC)
     BINMOD = PREPROC{1}.BINMOD;
 else
     BINMOD = PREPROC.BINMOD;
+end
+
+if isfield(RAND,'Decompose') && RAND.Decompose == 2
+    BINMOD = 0;
 end
 
 for curlabel=1:nl % Label loop
@@ -86,12 +90,17 @@ for curlabel=1:nl % Label loop
                                 end
                             end
                             % Get Data
-                             if BINMOD || STACKING.flag == 1
+                            if BINMOD || STACKING.flag == 1
                                 Tr = Y.Tr{i,j,v}{curclass}(Y.TrInd{i,j}{curclass},:); 
                                 Cv = Y.CV{i,j,v}{curclass}(Y.CVInd{i,j}{curclass},:); 
                             else
-                                Tr = Y.Tr{i,j,v}(Y.TrInd{i,j}{curclass},:); 
-                                Cv = Y.CV{i,j,v}(Y.CVInd{i,j}{curclass},:);
+                                if iscell(Y.Tr{i,j,v})
+                                    Tr = Y.Tr{i,j,v}{1}(Y.TrInd{i,j}{curclass},:); 
+                                    Cv = Y.CV{i,j,v}{1}(Y.CVInd{i,j}{curclass},:);
+                                else
+                                    Tr = Y.Tr{i,j,v}(Y.TrInd{i,j}{curclass},:); 
+                                    Cv = Y.CV{i,j,v}(Y.CVInd{i,j}{curclass},:);
+                                end
                             end
                             % Get label
                             TrL = Y.TrL{i,j}{curclass}; CvL = Y.CVL{i,j}{curclass}(:,curlabel);
@@ -102,7 +111,7 @@ for curlabel=1:nl % Label loop
             end
             % Computer optimum parameters across all CV1 data partitions
             % (similar to Feature generation step) for IMRelief algorithm
-            if RFE.Filter.type == 6 && ~isempty(Mx)
+            if RFE.Filter.flag && RFE.Filter.type == 6 && ~isempty(Mx)
 
                 if numel(RFE.Filter.imrelief) > 1
                     sigma = RFE.Filter.imrelief{curclass}.sigma;

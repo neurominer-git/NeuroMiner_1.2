@@ -9,7 +9,7 @@ function visdata = nk_VisModels(inp, id, GridAct, batchflag)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 03/2020
 
-global SVM SAV RFE MODEFL CV VERBOSE FUSION MULTILABEL EVALFUNC CVPOS OCTAVE
+global SVM RAND SAV RFE MODEFL CV VERBOSE FUSION MULTILABEL EVALFUNC CVPOS OCTAVE 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 visdata         = [];                               % Initialize with empty output
@@ -60,9 +60,11 @@ if isfield(iPREPROC,'LABELMOD') && isfield(iPREPROC.LABELMOD,'LABELIMPUTE')
 end
 linsvmfl = determine_linsvm_flag(SVM);
 
-% Always set to binary preprocessing (unless true multi-group learners have
-% been intergrated in NM)
 BINMOD = iPREPROC.BINMOD; 
+if isfield(RAND,'Decompose') && RAND.Decompose == 2
+    BINMOD = 0;
+end
+
 clc
 fprintf('***************************\n')
 fprintf('**  MODEL VISUALIZATION  **\n')
@@ -72,7 +74,8 @@ fprintf('\n');
 
 inp.id = id;
 CVPOS.fFull = FullPartFlag;
-%savemodel=true;
+templateflag = false(1,nM);
+
 for i = 1 : nM
     
     % Dimensionality of current modality
@@ -159,6 +162,8 @@ for i = 1 : nM
     if isfield(iVis,'use_template') && iVis.use_template
         fprintf('\nPerform template processing!')
         templateflag(i) = true;
+    else
+        templateflag(i) = false;
     end        
 end
 
@@ -265,7 +270,7 @@ for f=1:ix % Loop through CV2 permutations
                 % Apply prerpocessing on the entire data and use these
                 % parameters to adjust for arbitrary PCA rotations through 
                 % the Procrustes transform 
-                if exist('templateflag','var') && any(templateflag), paramfl.templateflag = true; end
+                if any(templateflag), templateflag = true; else, templateflag = false; end
                                
                 % Compute params
                 inp.loadGD = true;
@@ -275,7 +280,8 @@ for f=1:ix % Loop through CV2 permutations
                                  'found',       false, ... 
                                  'write',       true, ... % has to be set to true otherwise no params will be returned from the preproc module
                                  'CV1op',       CV1op, ...
-                                 'multiflag',   multiflag);
+                                 'multiflag',   multiflag, ...
+                                 'templateflag',templateflag);
                                 
                 % find range of feature in current CV1 partition 
                 [ inp, contfl, analysis, mapY, GD, MD, Param, paramfl ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl);
@@ -515,7 +521,7 @@ for f=1:ix % Loop through CV2 permutations
                                         end
                                     otherwise
                                         [~,~,~,~, ParamX ] = nk_ReturnAtOptPos(mapY.Tr{k,l}{hix},  mapY.CV{k,l}{hix}, mapY.Ts{k,l}{hix}, [], Param{1}(k,l,hix), pnt); 
-                                end      
+                                end
 
                                 % Get label info
                                 modelTrL = mapY.TrL{k,l}{h};
@@ -586,11 +592,6 @@ for f=1:ix % Loop through CV2 permutations
                                     else
                                         if ~fndMD, [~, MD{h}{m}{k,l}{u}] = nk_GetParam2(Ymodel, modelTrL, sPs, 1); end
                                     end
-                                    
-%                                   if savemodel
-%                                       xMD = MD{h}{m}{k,l}{u};
-%                                       save(sprintf('VisModels_%s_CV2%g-%g_CV%g-%g.mat', multlabelstr, CVPOS.CV2p, CVPOS.CV2f, CVPOS.CV1p, CVPOS.CV1f ),"xMD");
-%                                   end
 
                                     if inp.stacking
                                         vec_mj = [];
@@ -655,12 +656,14 @@ for f=1:ix % Loop through CV2 permutations
                                         end
                                         
                                         % Compute original weight map in input space
-                                        [Tx, Psel, Rx, SRx, Cx, ~, PAx ] = nk_VisXWeight(inp, MD{h}{m}{k,l}{u}, Ymodel, modelTrL, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
+                                        [ Tx, Psel, Rx, SRx, Cx, ~, PAx ] = nk_VisXWeight(inp, MD{h}{m}{k,l}{u}, Ymodel, modelTrL, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
 
                                         % Compute permuted weight maps
                                         fprintf(' | Permuting:\t');
-                                        Tx_perm = cell(1,nM); Px_perm = zeros(1,nperms(1));
-                                        for n=1:nM, Tx_perm{n} = zeros(size(Tx{n},1),nperms(n)); end
+                                        Tx_perm = cell(1,nM); Px_perm = zeros(1,nperms(1)); 
+                                        for n=1:nM
+                                            Tx_perm{n} = zeros(size(Tx{n},1),nperms(n)); 
+                                        end
                                         for perms = 1:nperms(1)
                                             if ~sigfl 
                                                 % Train permuted model
@@ -688,13 +691,15 @@ for f=1:ix % Loop through CV2 permutations
                                                 Px_perm(perms) = Px_perm(perms) + 1;
                                             end
                                             % Compute permuted weight map in input space
-                                            TXperms = nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
-                                            for n=1:nM, Tx_perm{n}(:,perms) = TXperms{n}; end
+                                            TXperms= nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
+                                            for n=1:nM 
+                                                Tx_perm{n}(:,perms) = TXperms{n}; 
+                                            end
                                         end
                                         
                                         % Model significance
                                         I1.VCV1MPERM{h}(il(h)) = (sum(Px_perm) / nperms(1));
-                                        
+
                                         % Print significance to screen
                                         fprintf(' P=%1.3f ', I1.VCV1MPERM{h}(il(h)));
                                         

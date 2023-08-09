@@ -1,5 +1,5 @@
 function [sY, IN] = nk_PerfImputeObj(Y, IN)
-% =========================================================================
+% =========================================================================npu
 % FORMAT function [sY, IN] = nk_PerfImputeObj(Y, IN)
 % =========================================================================
 % Performes imputation using either single-subject median replacement, 
@@ -35,7 +35,7 @@ function [sY, IN] = nk_PerfImputeObj(Y, IN)
 %                     criterion minnumcols (currently fixed at 0.5) is 
 %                     fulfilled.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 09/2022
+% (c) Nikolaos Koutsouleris, 06/2023
 
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) 
@@ -89,6 +89,12 @@ switch IN.method
             stY(i,indnan(i,:)) = mn(indnan(i,:));
             ll=ll+1;
         end
+
+    case 'SeqkNN' 
+         tX = IN.X(:,IN.blockind);
+         ll = sum(isnan(stY(:)));
+         stY = SeqkNN(stY, IN.k, tX);
+
     case {'euclidean','cityblock','seuclidean','cosine','mahalanobis','jaccard','hamming','hybrid'}
         tX = IN.X(:,IN.blockind);
         IN.C = nan(m,1);
@@ -184,8 +190,10 @@ switch IN.method
             end
         end
 end
-if VERBOSE, fprintf('\n\t\t\t%g subject(s) with NaNs, total of %g NaN replaced.',sum(~snan),ll); end
+if VERBOSE, fprintf('\t%g subject(s) with NaNs, total of %g NaN replaced.',sum(~snan),ll); end
 sY(:,IN.blockind) = stY;
-if sum(isnan(sY(:))), fprintf('\nNot all NaNs imputed!'); end
+if sum(isnan(sY(:))) 
+    fprintf('\tNot all NaNs imputed!'); 
+end
 % If you remove completely NaN cases temporarily add them back now to the imputed data.
 sY = nk_ManageNanCases(sY, [], IxNaN);

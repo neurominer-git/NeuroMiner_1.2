@@ -1,11 +1,11 @@
-function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P, F, VI, decompfl, memprob, procfl, Fadd)
+function [ mW, mP, mR, mSR, mC, W, mPA ] = nk_VisXWeight(inp, MD, Y, L, varind, P, F, VI, decompfl, memprob, procfl, Fadd)
 % =========================================================================
-% [mW, mP, mR, mSR, mC, W, mPA] = nk_VisXWeight(inp, MD, Y, L, varind, ...
+% [mW, mP, mR, mSR, mC, W, mPA ] = nk_VisXWeight(inp, MD, Y, L, varind, ...
 %                                          P, F, VI, decompfl, procfl, Fadd)
 % =========================================================================
 % Core visualization module that retrieves a weight vector and maps it back
 % to the input space of features by reversing processing steps as much as
-% possible and meaningful
+% possible and meaningful.
 %
 % Inputs:
 % ------
@@ -31,9 +31,9 @@ function [ mW, mP, mR, mSR, mC, W, mPA ]= nk_VisXWeight(inp, MD, Y, L, varind, P
 % W :           weight vector in processed feature space
 % mPA :
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 05/2022
+% (c) Nikolaos Koutsouleris, 08/2023
 
-global SVM %TEMPL
+global SVM TEMPL
 if ~exist('memprob','var') || isempty(memprob), memprob = false; end % to fix bug report
 if ~exist('procfl','var') || isempty(procfl), procfl = true; end
 if ~exist('Fadd','var') || isempty(Fadd), Fadd = true(size(F)); end
@@ -65,11 +65,9 @@ end
 
 mW = cell(1,mM);
 if ~isempty(PA), mPA = cell(1,mM); end
-
+mP = []; mR = []; mSR = []; mC=[]; 
 if procfl
     mP = cell(1,mM); mR = cell(1,mM); mSR = cell(1,mM); mC = cell(1,nM);
-else
-    mP = []; mR = []; mSR = []; mC=[];
 end
 
 % Loop through modalities
@@ -154,7 +152,6 @@ for n=1:nM
                         elseif isfield(naPX.mpp,'network')
                            error('Autoencoder reconstructions not supported!')
                         end
-
                         if isfield(naPX,'ind0')
                             ind0 = naPX.ind0;
                             DR = naPX.DR;
@@ -196,13 +193,12 @@ for n=1:nM
                         % reduction take care that you recover the original space
                         if isfield(naPX,'indNonRem') && ~isempty(naPX.indNonRem) && sum(~naPX.indNonRem) > 0
                             tmW = zeros(size(naPX.indNonRem')); tmP = tmW; 
-                            tmW(naPX.indNonRem) = nmW; nmW = tmW; tmP(naPX.indNonRem) = nmP; nmP = tmP;  
-                            if ~isempty(PA), tmPA = tmW; tmPA(naPX.indNonRem) = nmPA; nmPA = tmPA; end
-                            % Don't forget to adjust the feature masks and the
-                            % indices to modalities in case of fused feature spaces
-                            %tlFuVI = false(length(naPX.indNonRem),1); tlFuVI(naPX.indNonRem) = lFuVI; lFuVI = tlFuVI;
-                            %tlVI = true(length(naPX.indNonRem),1); tlVI(naPX.indNonRem) = fVI; fVI = tlVI;
-                            clear tmW tmP %tlFuVI tlVI;
+                            tmW(naPX.indNonRem) = nmW; nmW = tmW; 
+                            tmP(naPX.indNonRem) = nmP; nmP = tmP;  
+                            if ~isempty(PA) 
+                                tmPA = tmW; tmPA(naPX.indNonRem) = nmPA; nmPA = tmPA; 
+                            end
+                            clear tmW tmP tmPA 
                         end
                         reducedimfl = true;
                     end
@@ -227,22 +223,15 @@ for n=1:nM
                     tmP = false(length(pIND),1); tmP(pIND) = nmP; nmP = tmP;
                     if ~isempty(PA)
                          tmPA = tmW; tmPA(naPX.(IND)) = nmPA; nmPA = tmPA; 
-                    end 
+                    end
                     % Don't forget to adjust the feature masks and the
                     % indices to modalities in case of fused feature spaces
                     if ~reducedimfl
                         tlFuVI = false(length(pIND),1); tlFuVI(lFuVI) = true; lFuVI = tlFuVI;
                         tlVI = false(length(pIND),1); tlVI(fVI) = true; fVI = tlVI;
                     end
-               % case 'juspace'
-               % features zurückgeben; in atlas-Raum zurück projezieren?
-               % columns nicht images
-               % braucht man das? 
-               % ist das Problem, dass NM von image Daten ausgeht?
-               % nk_VisModels!
-
+                    clear tmW tmpP tmPA tnmWF
             end
-
         end
     
         if size(nmW,2) > 1, nmW = nmW'; nmP = nmP'; 
@@ -272,7 +261,7 @@ for n=1:nM
             nmR  =  nan(size(nmW)); nmSR = nmR; nmC = nmR;
         end
         
-        if nM == 1 && mM>1
+        if nM == 1 && mM > 1
             for m=1:numel(varind)
                 if procfl
                     % Extract indices to modality
@@ -295,6 +284,7 @@ for n=1:nM
                     end
                     if ~isempty(PA), mPA{m} = nmPA; end
                 end
+                if templfl, mWF{m} = nmWF; end
             end
         else
             mW{n} = nmW;

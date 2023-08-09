@@ -3,11 +3,11 @@
 % =========================================================================
 % Compute Correlation Coefficient
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 09/2011
+% (c) Nikolaos Koutsouleris, 08/2023
 
 function param = CC(expected, predicted)
 if isempty(expected), param = []; return; end
-idxnan = ~isnan(predicted);
+idxnan = ~isnan(predicted) & ~isnan(expected);
 param = corrcoef(expected(idxnan),predicted(idxnan));
 param = param(2);
 if isnan(param) 

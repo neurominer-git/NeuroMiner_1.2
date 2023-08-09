@@ -361,7 +361,7 @@ Lg(nanO)=NaN;
 if any(nanO), recomp = true; else, recomp = false; end   
 
 nA = sum(AnalysisSelection);
-if mPadd>0,
+if mPadd>0
     PNames = cellstr([repmat('ExtPred_',mPadd,1) num2str((1:mPadd)')])';
 else
     PNames = [];
@@ -371,6 +371,7 @@ switch handles.PerfTab.multiflag.Value
 
     case 1 % MULTI-CLASS ANALYSIS
         G    = zeros(ix*jx, mPadd+nA, handles.ngroups);
+        G_Multi = zeros(ix*jx, mPadd+nA);
         %Create one-vs-rest labels
         Lgfd = zeros(size(Lg,1),handles.ngroups);
         for curclass=1:handles.ngroups
@@ -381,6 +382,7 @@ switch handles.PerfTab.multiflag.Value
         Lgfd(nanO,:)=NaN;
         Gnames = cell(ix*jx,handles.ngroups);
         Gnames_Multi = cell(ix*jx,1);
+        AnalNames = cell(handles.ngroups,1);
         for curclass=1:handles.ngroups
             
              if mPadd>0
@@ -398,9 +400,8 @@ switch handles.PerfTab.multiflag.Value
              end
              
              lx = size(handles.NM.label,1); ig = mPadd+1;
-             % now either get CV2 grids straightaway or recompute grid
-             AnalNames = []; 
-        
+             % now either get CV2 grids straightaway or recompute grid 
+             [ylm, Crit] = nk_GetScaleYAxisLabel(handles.NM.analysis{a(1)}.params.TrainParam.SVM);
              for i=1:nA
                  
                 AggrFlag = handles.NM.analysis{a(i)}.params.TrainParam.RFE.CV2Class.EnsembleStrategy.AggregationLevel;
@@ -428,7 +429,7 @@ switch handles.PerfTab.multiflag.Value
                         AnalName = tAnalName;
                     end
                     
-                    AnalNames = [AnalNames {AnalName}];
+                    AnalNames{curclass} = [AnalNames{curclass} {AnalName}];
 
                     if recomp
                         
@@ -457,49 +458,109 @@ switch handles.PerfTab.multiflag.Value
                                 indP = Pred > 50;
                                 Pred(indP)=1; Pred(~indP)=-1;
                                 G(ll,ig,curclass) = PARAMFUN(Lgfd(TsInd,curclass), Pred);
-                                if i==1 && g==1, 
+                                if i==1 && g==1
                                     Gnames{ll,curclass} = sprintf('CV2: R%g_F%g_C%g', f,d,curclass); 
-                                    if curclass==1
-                                        Gnames_Multi{ll} = sprintf('CV2: R%g_F%g', f,d); 
-                                    end
                                 end
                                 ll=ll+1;
                             end
                             NodesCnt(:,1) = NodesCnt(:,2)+1;
                         end
                     else
-                        G(:,ig,curclass) = AnalG.bestTS{curclass}(:);
+                        ll=1;
+                        for f=1:ix
+                            for d=1:jx
+                                G(ll,ig,curclass) = AnalG.bestTS{curclass}(f,d);
+                                if i==1 && g==1
+                                    Gnames{ll,curclass} = sprintf('CV2: R%g_F%g_C%g', f,d,curclass);                                    
+                                end
+                                ll=ll+1;
+                            end
+                        end
                     end
                     ig=ig+1;
                 end
              end
         end
-        
-        AnalNames = [PNames AnalNames];
+        % Now work in multi-class mode
+        AnalNamesMulti = []; ig = mPadd+1;
+        for i=1:nA
+            M = handles.NM.analysis{a(i)}.params.TrainParam.FUSION.M;
+            nGDdims = numel(handles.NM.analysis{a(i)}.GDdims);
+          
+            for g=1:nGDdims
+                AnalG = handles.NM.analysis{a(i)}.GDdims{g};
+                if nGDdims > 1
+                    AnalName = sprintf('%s_MultiClass_M%g', AnalysisAliasStringsSel{i}, M(g));
+                elseif handles.nclass > 1
+                    AnalName = sprintf('%s_MultiClass', AnalysisAliasStringsSel{i});
+                else
+                    AnalName = handles.NM.analysis{a(i)}.id;
+                end
+                AnalName = regexprep(AnalName,'-','_');
+                if length(AnalName) > namelengthmax
+                    warning('Variable name to long! Removing any underscores');
+                    tAnalName = regexprep(AnalName,'_','');
+                    if length(tAnalName) > namelengthmax
+                        tAnalName = inputdlg(['The variable name is too long (max ' num2str(namelengthmax) ' characters. Please make manual adjustments'],'Error',[], AnalName);
+                    end
+                    AnalName = tAnalName;
+                end
+                
+                AnalNamesMulti = [AnalNamesMulti {AnalName}];
+                
+                ll=1;
+                for f=1:ix
+                    for d=1:jx
+                         G_Multi(ll,ig) = AnalG.multi_bestTS(f,d);
+                         Gnames_Multi{ll} = sprintf('CV2: R%g_F%g', f,d);      
+                         ll=ll+1;
+                    end
+                end
+                ig=ig+1;
+            end
+        end
+        AnalNamesMulti = [PNames AnalNamesMulti];
         [ pth ,nam , ext ] = fileparts(handles.PerfTab.fileseltext.Value);
         
         % Perform stats for each one-vs-rest classifier
         for curclass=1:handles.ngroups
+            AnalNames{curclass} = [PNames AnalNames{curclass}];
             Filename = fullfile(pth, [nam sprintf('_G%g-vs-REST', curclass) ext]);
-            handles.comparator_stats{curclass}.PredictorNames = AnalNames;
+            handles.comparator_stats{curclass}.PredictorNames = AnalNames{curclass};
             handles.comparator_stats{curclass}.PredictorPerformances = G(:,:,curclass);
-            if numel(AnalNames)>2
-                handles.comparator_stats{curclass} = quadetest(G(:,:,curclass), Gnames(:,curclass), AnalNames, Filename);
+            if numel(AnalNames{curclass})>2
+                if ~any(RefSelectionSel)
+                    handles.comparator_stats{curclass} = ...
+                        quadetest(G(:,:,curclass), Gnames(:,curclass), AnalNames{curclass}, Filename);
+                        display_comparator_prepmatplot(G(:,:,curclass), ylm, handles.PerfTab.perfplot_radio, handles.comparator_stats{curclass}, AnalNames{curclass})
+                else
+                    [handles.comparator_stats{curclass}, handles.comparator_diffs{curclass}] = ... 
+                                                  wilcoxon(G(:,RefSelectionSel, curclass)', G(:,~RefSelectionSel, curclass)', ...
+                                                  0.05, Gnames(:,curclass), AnalNames{curclass}, Filename);
+                    display_comparatot_preprefplot(handles.comparator_diffs{curclass}, Crit, RefSelectionSel, AnalNames{curclass});
+                end
             else
                 handles.comparator_stats{curclass} = wilcoxon(G(:,1,curclass), G(:,2,curclass), 0.05);
             end
         end
         % Now perform multigroup test
-        Gm = nm_nanmean(G,3);
-        Filename = fullfile(pth, [nam '_Multi_Group' ext]);
-        handles.comparator_stats_multi.PredictorNames = AnalNames;
-        handles.comparator_stats_multi.PredictorPerformances = Gm;
-        if numel(AnalNames)>2
-            handles.comparator_stats{curclass} = quadetest(Gm, Gnames_Multi, AnalNames, Filename);
+        Filename = fullfile(pth, [nam '_MultiClass' ext]);
+        handles.comparator_stats_multi.PredictorNames = AnalNamesMulti;
+        handles.comparator_stats_multi.PredictorPerformances = G_Multi;
+        if numel(AnalNamesMulti)>2
+            if ~any(RefSelectionSel)
+                handles.comparator_stats_multi = ...
+                                                  quadetest(G_Multi, Gnames_Multi, AnalNamesMulti, Filename);
+                display_comparator_prepmatplot(G_Multi, ylm, handles.PerfTab.perfplot_radio, handles.comparator_stats_multi, AnalNamesMulti)
+            else
+                [handles.comparator_stats_multi, handles.comparator_diffs_multi] = ... 
+                                                  wilcoxon(G_Multi(:,RefSelectionSel)', G_Multi(:,~RefSelectionSel)', 0.05, Gnames_Multi, AnalNamesMulti, Filename);
+                display_comparatot_preprefplot(handles.comparator_diffs_multi, Crit, RefSelectionSel, AnalNamesMulti);
+            end
         else
-            handles.comparator_stats_multi = wilcoxon(Gm(:,1), Gm(:,2), 0.05);
+            handles.comparator_stats_multi = wilcoxon(G_Multi(:,1), G_Multi(:,2), 0.05);
         end
-
+       
     case 0 % BINARY / REGRESSION ANALYSIS
         % for repeated LSO it may make sense to remove a CV2 fold that
         % contains only subjects from one class ( in these cases NM
@@ -511,7 +572,6 @@ switch handles.PerfTab.multiflag.Value
         % leave-group-out index, instead of performing the test on CV2
         % performances
         LGOflag = false;
-        [ylm, Crit] = nk_GetScaleYAxisLabel(handles.NM.analysis{a(i)}.params.TrainParam.SVM);
         % Map external predictor to cross-validation structure 
         % (implement mapping to binary dichotomizers in multi-class case)
         for curclass=1:handles.nclass
@@ -541,7 +601,7 @@ switch handles.PerfTab.multiflag.Value
             else
                 Gnames = cell(ix*(jx-numel(col_skip)),1);
             end
-            
+            [ylm, Crit] = nk_GetScaleYAxisLabel(handles.NM.analysis{a(1)}.params.TrainParam.SVM);
             % Loop through analyses
             for i=1:nA
 
@@ -654,57 +714,17 @@ switch handles.PerfTab.multiflag.Value
             handles.comparator_stats{curclass}.PredictorPerformances = G;
             
             if numel(AnalNames)>2
-
                 if ~any(RefSelectionSel)
                     % Run quade test if no reference population has been
                     % defined, thus each model is compared to all other
                     % models
                     handles.comparator_stats{curclass} = quadetest(G, Gnames, AnalNames, Filename);
-                    mw=[]; sw=[];
-                    rI = DetermineSelectedRadioButton(handles.PerfTab.perfplot_radio);
-                    switch rI
-                        case {1,4}
-                            switch rI
-                                case 1
-                                    D = G;
-                                case 4
-                                    D = [];  mw = nm_nanmedian(G); sw = abs(mw-percentile(G,25)); sw = [sw;abs(mw-percentile(G,75))];
-                            end
-                            str = 'Performance';
-                            hlinepos = mean(ylm);
-                        case 2
-                            D = nk_ComputeMnMdPairWiseDiff(G,'md','meandiff');
-                            str = 'Mean one-vs.-all \Delta(Performance)';
-                            hlinepos = 0;
-                        case 3
-                            D = nk_ComputeMnMdPairWiseDiff(G,'md','alldiff');
-                            str = 'One-vs.-one \Delta(Performance)';
-                            hlinepos = 0;
-                    end
-                    if ~isfield(handles.comparator_stats{curclass},'tbl_p_fdr_posthoc')
-                        warndlg(sprintf('Quade test was not significant (W=%1.2f; P=%0.3f). Skipping visual post-hoc analysis.',handles.comparator_stats{curclass}.W, handles.comparator_stats{curclass}.p));
-                    else
-                        display_classcomparison_matrix(handles.comparator_stats{curclass}.tbl_p_fdr_posthoc, AnalNames, mw, sw, [], D, hlinepos, str);
-                    end
+                    display_comparator_prepmatplot(G, ylm, handles.PerfTab.perfplot_radio, handles.comparator_stats{curclass}, AnalNames)
                 else
                     % Compare each model against a reference model
                     AnalNames = [AnalNames(RefSelectionSel) AnalNames(~RefSelectionSel)];
                     [handles.comparator_stats{curclass}, handles.comparator_diffs{curclass}] = wilcoxon(G(:,RefSelectionSel)', G(:,~RefSelectionSel)', 0.05, Gnames, AnalNames, Filename);
-                    figure; ax = axes; hold on;
-                    d = handles.comparator_diffs{curclass}';
-                    mw = nm_nanmedian(d); %sw = abs(mw-percentile(d,5)); sw = [sw;abs(mw-percentile(d,95))];
-                    sw = nm_95confint(d);
-                    bar(ax, mw, 'FaceColor', rgb('LightSteelBlue'));
-                    errorbar(ax, 1:numel(mw), mw, sw(1,:), sw(2,:), 'LineStyle', 'none', 'Color', 'k'); 
-                    ax.XTick = 1:numel(mw);
-                    ax.XTickLabel = AnalNames(~RefSelectionSel);
-                    ax.XTickLabelRotation = 45;
-                    ax.XLim = [0.25 numel(mw)+0.75];
-                    ax.Box='on';
-                    ax.TickLabelInterpreter='none';
-                    ax.FontWeight = 'bold';
-                    ax.FontSize = 14;
-                    ax.YAxis.Label.String = sprintf('Difference: %s',Crit);
+                    display_comparatot_preprefplot(handles.comparator_diffs{curclass}, Crit, RefSelectionSel, AnalNames);
                 end
             else
                 handles.comparator_stats{curclass} = wilcoxon(G(:,1)', G(:,2)', 0.05, Gnames, AnalNames, Filename);
@@ -890,3 +910,51 @@ NodesCnt(TsInd,2) = NodesCnt(TsInd,2) + nPred;
 llNodesCnt = NodesCnt(TsInd,:); N = numel(TsInd);
 PredX = AnalG.predictions(TsInd, curclass, curlabel);
 Pred = arrayfun( @(j) nm_nanmedian(PredX{j}(llNodesCnt(j,1):llNodesCnt(j,2))), 1:N )';
+
+% _________________________________________________________________________
+function display_comparator_prepmatplot(G, ylm, perfplot_radio, comparator_stats, AnalNames)
+
+mw=[]; sw=[];
+rI = DetermineSelectedRadioButton(perfplot_radio);
+switch rI
+    case {1,4}
+        switch rI
+            case 1
+                D = G;
+            case 4
+                D = [];  mw = nm_nanmedian(G); sw = abs(mw-percentile(G,25)); sw = [sw;abs(mw-percentile(G,75))];
+        end
+        str = 'Performance';
+        hlinepos = mean(ylm);
+    case 2
+        D = nk_ComputeMnMdPairWiseDiff(G,'md','meandiff');
+        str = 'Mean one-vs.-all \Delta(Performance)';
+        hlinepos = 0;
+    case 3
+        D = nk_ComputeMnMdPairWiseDiff(G,'md','alldiff');
+        str = 'One-vs.-one \Delta(Performance)';
+        hlinepos = 0;
+end
+if ~isfield(comparator_stats,'tbl_p_fdr_posthoc')
+    warndlg(sprintf('Quade test was not significant (W=%1.2f; P=%0.3f). Skipping visual post-hoc analysis.', comparator_stats.W, comparator_stats.p));
+else
+    display_classcomparison_matrix(comparator_stats.tbl_p_fdr_posthoc, AnalNames, mw, sw, [], D, hlinepos, str);
+end
+
+function display_comparatot_preprefplot(comparator_diffs, Crit, RefSelectionSel, AnalNames)
+
+figure; ax = axes; hold on;
+d = comparator_diffs';
+mw = nm_nanmedian(d); %sw = abs(mw-percentile(d,5)); sw = [sw;abs(mw-percentile(d,95))];
+sw = nm_95confint(d);
+bar(ax, mw, 'FaceColor', rgb('LightSteelBlue'));
+errorbar(ax, 1:numel(mw), mw, sw(1,:), sw(2,:), 'LineStyle', 'none', 'Color', 'k'); 
+ax.XTick = 1:numel(mw);
+ax.XTickLabel = AnalNames(~RefSelectionSel);
+ax.XTickLabelRotation = 45;
+ax.XLim = [0.25 numel(mw)+0.75];
+ax.Box='on';
+ax.TickLabelInterpreter='none';
+ax.FontWeight = 'bold';
+ax.FontSize = 14;
+ax.YAxis.Label.String = sprintf('Difference: %s',Crit);

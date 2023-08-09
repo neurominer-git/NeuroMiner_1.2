@@ -9,7 +9,7 @@ if ~isempty(Pnt.data_ind)
 else
     Ix = 1;
 end
-if iscell(oTr)
+if ~isempty(oTr) && iscell(oTr)
     Tr = oTr{Ix}; 
     if ~oocvonly
         CV = oCV{Ix}; Ts = oTs{Ix};   
@@ -21,12 +21,17 @@ if iscell(oTr)
             Ocv = oOcv{Ix}; 
         end
     end
-else
+elseif ~isempty(oTr)
     Tr = oTr; 
     if ~oocvonly
         CV = oCV; Ts = oTs;   
     end
     if ~isempty(oOcv), Ocv = oOcv; end
+else
+    Tr = [];
+    CV = [];
+    Ts = [];
+    Ocv= [];
 end
 
 if nargout == 5

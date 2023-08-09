@@ -61,7 +61,7 @@ for i=1:numel(fnan)
     % Sort training cases according to their proximity to the
     % test case whose value will be imputed.
     [Ds, ind] = sort(D,'ascend');
-    if size(Ds,1) < IN.k, kx = size(Ds,1); else kx = IN.k; end
+    if size(Ds,1) < IN.k, kx = size(Ds,1); else, kx = IN.k; end
     % Here we take the unweighted median of the kx imputation
     % training cases
     mn = feval(frepl, SL(ind(1:kx)));

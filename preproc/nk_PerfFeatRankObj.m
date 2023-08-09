@@ -103,7 +103,7 @@ switch IN.algostr
         
     case 'auc'
         % Area-under-the-Curve ooperator
-        IN.W = nk_AUCFeatRank(Y, L, 0.5); 
+        IN.W = nk_AUCFeatRank(Y, L); 
 
     case {'pearson','spearman'}
         % simple univariate correlation using Pearson's or Spearman's

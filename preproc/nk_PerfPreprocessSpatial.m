@@ -73,7 +73,7 @@ if isfield(paramfl,'PREPROC') && isfield(paramfl.PREPROC,'SPATIAL') && paramfl.P
                 inp.smoothing_kernels = uPREPROC.SPATIAL.PX.opt;
                 sY{u} = nk_PerfSpatFilt( Y, uPREPROC, paramfl.PV ); 
 
-                if isfield(inp,'iYw') && ~isempty(inp.iYw) 
+                if isfield(inp,'iYw') && ~isempty(inp.iYw{1}) 
                     fprintf('\nSmoothing weighting map')
                     sYw{u} = nk_PerfSpatFilt( inp.iYw, uPREPROC, paramfl.PV ); 
                 else

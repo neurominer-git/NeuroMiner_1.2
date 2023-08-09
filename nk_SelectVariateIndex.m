@@ -5,7 +5,7 @@ function [varind, varstr] = nk_SelectVariateIndex(dat, unifl, varind, askfl, sho
 % Select modality to work on depending on dat.Y
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 09 / 2017
+% (c) Nikolaos Koutsouleris, 09 / 2023
 
 nvar = length(dat.Y); 
 if ~exist('unifl','var') ||  isempty(unifl),    unifl = 1;  end
@@ -13,7 +13,7 @@ if ~exist('varind','var') || isempty(varind),   varind = 1; end
 if ~exist('askfl','var') || isempty(askfl),     askfl = 1;  end
 if ~exist('showvar','var') || isempty(showvar), showvar = 1:nvar;  end
 
-if iscell(dat.Y),
+if iscell(dat.Y)
            
     if isfield(dat,'datadescriptor')
         
@@ -34,16 +34,16 @@ if iscell(dat.Y),
         fprintf('\n')
         menuact = []; ll = 1;
         for i=1:nvar
-            if isempty(find(showvar == i)), continue; end
+            if isempty(find(showvar == i, 1)), continue; end
             menuact = [menuact i]; badcases = []; badfeats = [];
             [~, ~, ~, NanStats] = nk_ManageNanCases(dat.Y{i}, [], [], 'inform');
-            if sum(NanStats.Cases)>0,
+            if sum(NanStats.Cases)>0
                 badcases = sprintf('%1.1f%% cases with NaNs', sum(NanStats.Cases>0)*100/numel(NanStats.Cases));
                 if any(NanStats.Cases100), badcases = sprintf('%s | %g (%1.1f%%) = 100%% NaNs', badcases, sum(NanStats.Cases100),NanStats.Cases100Perc); end
                 if any(NanStats.Cases50), badcases = sprintf('%s | %g (%1.1f%%) = [50%%-99%%] NaNs', badcases, sum(NanStats.Cases50),NanStats.Cases50Perc); end
                 if any(NanStats.Cases25), badcases = sprintf('%s | %g (%1.1f%%) = [25%%-50%%] NaNs', badcases, sum(NanStats.Cases25),NanStats.Cases25Perc); end
             end
-            if sum(NanStats.Feats)>0,
+            if sum(NanStats.Feats)>0
                 badfeats = sprintf('%g%% features with NaNs', sum(NanStats.Feats>0)*100/numel(NanStats.Feats));
                 if any(NanStats.Feats100), badfeats = sprintf('%s | %g (%1.1f%%) = 100%% NaNs', badfeats, sum(NanStats.Feats100),NanStats.Feats100Perc); end
                 if any(NanStats.Feats50), badfeats = sprintf('%s | %g (%1.1f%%) = [50%%-99%%] NaNs', badfeats, sum(NanStats.Feats50),NanStats.Feats50Perc); end
@@ -74,7 +74,7 @@ if iscell(dat.Y),
                             case 'spm'
                                 fprintf('\t\t* Source: SPM design matrix\n')
                         end
-                        if ~isempty(dat.brainmask{i}),
+                        if ~isempty(dat.brainmask{i})
                             fprintf('\t\t* Space-defining image: %s\n', dat.brainmask{i});
                         end
                         if isfield(dat.datadescriptor{i},'globnorm') 

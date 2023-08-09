@@ -1,7 +1,9 @@
 function [ERR, STATUS, fil, typ] = tbl2file(tbl, filename, sheetname )
 % Write table data to either a Excel or a text-based file
 ERR=[]; STATUS = 0;
-[~,~,ext] = fileparts(filename); fil = filename;
+[pth,filename,ext] = fileparts(filename); 
+filename = regexprep(filename,' ','_');
+fil = fullfile(pth, [filename ext]);
 try
     if ispc 
         typ='xls';  
@@ -9,16 +11,20 @@ try
             fil = sprintf('%s.%s',filename,typ);
         end
         s_rownames = size(tbl.rownames);
-        if s_rownames(1)==1,
+        if s_rownames(1)==1
             tbl.rownames = tbl.rownames';
         end
         T = [tbl.rownames array2table(tbl.array)];
         T.Properties.VariableNames = tbl.colnames;
-        writetable(T, fil, 'Sheet', sheetname);                 
+        if numel(sheetname)>31
+            sheetname = inputdlg(sprintf('Sheet name %s is too long. Provide alternative sheet name:',sheetname),'Sheetname problem',1,{sheetname},'on');
+        end
+        writetable(T, fil, 'Sheet', char(sheetname));                
+        STATUS = 1;
     else
         typ='csv';
         if isempty(ext)
-            fil = sprintf('%s_%s.%s', filename, sheetname,typ);
+            fil = sprintf('%s_%s.%s', filename, sheetname, typ);
         end
         fid = fopen(fil,'w');
         %Print header row
@@ -42,6 +48,7 @@ try
         fclose(fid);
         STATUS = 1;
     end
+    fprintf('\n%s successfully written to disk.\n', fil );
 catch ERR
     errordlg(ERR.message);
 end

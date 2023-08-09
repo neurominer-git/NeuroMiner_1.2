@@ -1,7 +1,7 @@
 function [ inp, contfl, analysis, mapY, GD, MD, Param, P, mapYocv ] = nk_ApplyTrainedPreproc(analysis, inp, paramfl, Param)
 % =========================================================================
 % [ contfl, analysis, mapY, GD, MD, Param, P, mapYocv ] = ...
-%                           nk_ApplyTrainedPreproc2(analysis, inp, paramfl)
+%                           nk_ApplyTrainedPreproc(analysis, inp, paramfl)
 % =========================================================================
 % Main function to compute /load and return preprocessing parameters and
 % preprocessed data for trained analysis chains. The functions is used by
@@ -13,12 +13,24 @@ function [ inp, contfl, analysis, mapY, GD, MD, Param, P, mapYocv ] = nk_ApplyTr
 % 
 % Input:
 % -------
+% analysis
+% inp
+% paramfl: struct => use_exist,         Use existing data
+%                    loadparam,         Load parameter files
+%                    found,             Flag for found data files
+%                    write,             Write parameters to disk 
+%                    CV1op,             Operate at CV1 level
+%                    multiflag          Multi-class mode
+%                    template_flag      Run preprocessing on all data to
+%                                       generate template for reordering
+%                                       operations
+% Param :   Pretrained parameter structure
 %
 % Output:
 % -------
-%
+% inp, contfl, analysis, mapY, GD, MD, Param, P, mapYocv
 % =========================================================================
-% (c) Nikolaos Koutsouleris, 12/2021
+% (c) Nikolaos Koutsouleris, 08/2023
 
 global VERBOSE PREPROC SAV OCTAVE
 
@@ -65,7 +77,12 @@ else
             if exist(inp.optpreprocmat{inp.f,inp.d},'file')
                 fprintf('\nLoading optimized pre-processing parameters for CV2 [%g,%g]:\n%s', ...
                         inp.f, inp.d, inp.optpreprocmat{inp.f,inp.d}); 
-                load(inp.optpreprocmat{inp.f,inp.d}); paramfl.found = true;
+                load(inp.optpreprocmat{inp.f,inp.d}); 
+                if iscell(paramfl)
+                    paramfl{1}.found= true;
+                else
+                    paramfl.found = true;
+                end
             else
                 if VERBOSE, fprintf('ERROR: Loading of pre-computed parameters not possible because path to file does not anymore exist. Update your paths!'); end
             end
@@ -130,7 +147,6 @@ else
         else
             [mapY{n}, Param{n}, P{n}, mapYocv{n}] = nk_PerfPreprocess(Y, inp, inp.label, tparamfl, Yocv);
         end
-
     end
         
     % Save parameters to disk

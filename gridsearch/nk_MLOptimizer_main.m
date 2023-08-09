@@ -2,12 +2,6 @@ function analysis = nk_MLOptimizer_main(inp, datid, PreML)
 
 global SVM GRD MODEFL W2AVAIL VERBOSE BATCH
 
-% Write some info to command line
-clc
-fprintf('******************************\n')
-fprintf('**  PARAMETER OPTIMIZATION  **\n')
-fprintf('******************************\n')
-
 if ~isfield(inp,'batchflag') || isempty(inp.batchflag), inp.batchflag = false; end
 if ~isfield(inp,'probflag') || isempty(inp.probflag), inp.probflag = false; end
 if ~isfield(inp,'simFlag') || isempty(inp.simFlag), inp.simFlag = false; end

@@ -1,10 +1,14 @@
 % =========================================================================
 % =                             REGRESSION PLOT                           =
 % =========================================================================
-function handles = display_regrplot(handles, markflag, oocvflag, binarizeflag, alphax)
+function handles = display_regrplot(handles, markflag, oocvflag, oocvprepflag, binarizeflag, alphax)
 
 if ~exist("oocvflag","var") || isempty(oocvflag)
     oocvflag = false;
+end
+
+if ~exist("oocvprepflag","var") || isempty(oocvprepflag)
+    oocvprepflag = false;
 end
 
 if ~exist("binarizeflag","var") || isempty(binarizeflag)
@@ -18,7 +22,7 @@ if ~exist('markflag','var') || isempty(markflag), markflag=false; end
 
 axes(handles.axes1);
 uistack(handles.axes1,'top')
-
+label = [];
 if ~oocvflag
     regrplotstr = '';
     lgsufstr = 'OOT'; 
@@ -28,32 +32,66 @@ if ~oocvflag
     errbarCI2 = handles.Regr.CI2_predictions;
     ind     = handles.Regr.index_predictions;
     regr    = handles.Regr;
-    label   = handles.Regr.labels;
+    label   = handles.labels;
     subjects = handles.subjects;
     regrplotcl = 'b';
     cla
     hold on
 else
     [handles, oocvind] = get_oocvind(handles);
+    % Check whether the labels are known
+    labels_known = handles.OOCVinfo.Analyses{handles.curranal}.labels_known(oocvind);
     hold on
     regrplotstr = '_oocv';
     lgsufstr = 'OOCV';
-    subjects = handles.OOCV(oocvind).data.tbl.rownames;
-    pred    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.MeanCV2PredictedValues;
-    errbar  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.StdCV2PredictedValues;
-    errbarCI1  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,1);
-    errbarCI2  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,2);
-    ind = true(1,height(pred));
-    regr    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Regr;
-    % Check whether the labels are known
-    labels_known = handles.OOCVinfo.Analyses{handles.curranal}.labels_known(oocvind);
-    if labels_known
-        label = handles.OOCVinfo.Analyses{handles.curranal}.label{oocvind};
-    else
-        label = [];
+    if oocvflag && isfield(handles.OOCV.data.RegrResults{1},'Group') && handles.selSubGroupOOCV.Value>1
+        groupidx = handles.selSubGroupOOCV.Value-1;
+        subjects = handles.OOCV(oocvind).data.tbl.rownames( handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{groupidx}.Index);
+        pred    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{groupidx}.MeanCV2PredictedValues;
+        errbar  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{groupidx}.StdCV2PredictedValues;
+        errbarCI1  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{groupidx}.CICV2PredictedValues(:,1);
+        errbarCI2  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{groupidx}.CICV2PredictedValues(:,2);
+        if isfield(handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{groupidx},'Regr')
+            regr   = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{groupidx}.Regr;
+        else
+            regr   = [];
+        end
+        if labels_known
+            label = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{groupidx}.ObservedValues;
+        end
+   else
+        subjects = handles.OOCV(oocvind).data.tbl.rownames;
+        pred    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.MeanCV2PredictedValues;
+        errbar  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.StdCV2PredictedValues;
+        errbarCI1  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,1);
+        errbarCI2  = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.CICV2PredictedValues(:,2);
+        regr    = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Regr;
+        if labels_known
+            label = handles.OOCVinfo.Analyses{handles.curranal}.label{oocvind};
+        end
     end
+    ind = true(1,height(pred));   
     regrplotcl = 'r';
 end
+
+% Update current Regr structure
+handles.curRegr = regr;
+handles.curRegr.labels = label;
+handles.curRegr.tbl_cont.R2                        = handles.curRegr.R2(handles.curlabel);
+handles.curRegr.tbl_cont.r                         = handles.curRegr.r(handles.curlabel);
+handles.curRegr.tbl_cont.r_95CI_low                = handles.curRegr.r_95CI_low(handles.curlabel);
+handles.curRegr.tbl_cont.r_95CI_up                 = handles.curRegr.r_95CI_up(handles.curlabel);
+handles.curRegr.tbl_cont.t                         = handles.curRegr.t(handles.curlabel);
+handles.curRegr.tbl_cont.p                         = handles.curRegr.p(handles.curlabel);
+handles.curRegr.tbl_cont.MAE                       = handles.curRegr.MAE(handles.curlabel);
+handles.curRegr.tbl_cont.NRSMD                     = handles.curRegr.NRSMD(handles.curlabel);
+if ~isfield(handles.curRegr.tbl_cont,'array')
+    arr                                            = cell2mat(struct2cell( handles.curRegr.tbl_cont));
+else
+    arr = handles.curRegr.tbl_cont.array;
+end
+handles.curRegr.tbl_cont.rownames                  = fieldnames(handles.curRegr.tbl_cont);
+handles.curRegr.tbl_cont.array                     = arr;
 
 if ~isfield(handles.Regr,'Xaxis') || isempty(handles.Regr.Xaxis)
     indnan    = ~isnan(label);
@@ -82,37 +120,6 @@ else
     ngroups = 1; grouping = ones(lx,1); markgroups = false;
 end
 
-% Define textbox info data 
-findnan = find(indnan);
-pss = cell(1,numel(findnan)); psslen=0;
-for i=1:numel(findnan)
-      pss{i} = sprintf(['Subject ID [%g]: %s' ...
-            '\nObserved Target: %g' ...
-            '\nPredicted Target: %g\n'], i, subjects{findnan(i)}, label(i), pred(i));
-     if size(pss{i},2)> psslen, psslen=size(pss{i},2); pssi = i; end
-end
-try
-hText = uicontrol('Style','text','String', pss{pssi},'FontSize',11, 'Units','normalized', 'Parent', gcf,'Visible','off'); 
-catch
-    disp(pssi)
-end
-figdata.x = lxL;
-figdata.y = pred;
-figdata.patterntext = pss;
-figdata.parentui = handles.pnBinary;
-figdata.hPanel      = uipanel('Units','norm', 'Position',hText.Extent, 'BorderType','etchedout', 'BackgroundColor', [.6 .7 .6], 'Visible','off');
-figdata.textHdl     = annotation(figdata.hPanel, 'textbox', 'String','', ...
-                            'Interpreter','none', ... %'VerticalAlign', 'Top', ...
-                            'Color', 'black', ...
-                            'BackgroundColor',[.6 .7 .6], ...
-                            'Position', [0 0 0.99 0.99], ...
-                            'EdgeColor', [.6 .7 .6], ...
-                            'LineWidth', 0.1, ...
-                            'Margin', 5, ...
-                            'FitBoxToText','on', ...
-                            'Visible','off');
-set(handles.axes1,'UserData',figdata);
-
 switch GraphType
     
     case 1
@@ -131,6 +138,61 @@ switch GraphType
 end
 
 handles.(['regrplot' regrplotstr]) = scatter(lxL(ind),pred(ind),'Marker','o','MarkerFaceColor',regrplotcl,'MarkerEdgeColor',rgb('LightBlue'),'MarkerFaceAlpha', alphax, 'MarkerEdgeAlpha',0.2,'SizeData',80);
+
+% Add regression line to plot
+xy = min(lxL(ind)):(max(lxL(ind))-min(lxL(ind)))/sum(ind):max(lxL(ind));
+try % Statistics toolbox available
+    [p,s] = polyfit(lxL(ind),pred(ind),1);
+    [yhat,dy] = polyconf(p,xy,s,'predopt','curve');
+    handles.(['hline' regrplotstr]) = plot(xy,yhat,regrplotcl,'LineWidth',2);
+    handles.(['hline_CI' regrplotstr]) = plotshaded(xy,[yhat+dy; yhat-dy],regrplotcl);
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{95\%CI}}^{' lgsufstr '}$'];
+catch % or not
+    handles.(['hline' regrplotstr]) = lsline;
+    handles.(['hline_CI' regrplotstr]) = [];
+    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
+end
+
+handles.(['regrplot_lgstr' regrplotstr]) = lgstr;
+
+if oocvprepflag, return; end
+
+% Define textbox info data 
+findnan = find(indnan);
+pss = cell(1,numel(findnan)); psslen=0;
+for i=1:numel(findnan)
+      pss{i} = sprintf(['Subject ID [%g]: %s' ...
+            '\nObserved Target: %g' ...
+            '\nPredicted Target: %g\n'], i, subjects{findnan(i)}, label(i), pred(i));
+     if size(pss{i},2)> psslen, psslen=size(pss{i},2); pssi = i; end
+end
+try
+hText = uicontrol('Style','text','String', pss{pssi},'FontSize',11, 'Units','normalized', 'Parent', gcf,'Visible','off'); 
+catch
+    disp(pssi)
+end
+if oocvflag
+    figdata.cases = handles.OOCVinfo.Analyses{handles.curranal}.cases{oocvind};
+else
+    figdata.cases = handles.NM.cases;
+end
+figdata.x = lxL;
+figdata.y = pred;
+figdata.patterntext = pss;
+figdata.parentui = handles.pnBinary;
+figdata.hPanel      = uipanel('Units','norm', 'Position',hText.Extent, 'BorderType','etchedout', 'BackgroundColor', [.6 .7 .6], 'Visible','off');
+figdata.textHdl     = annotation(figdata.hPanel, 'textbox', 'String','', ...
+                            'Interpreter','none', ... %'VerticalAlign', 'Top', ...
+                            'Color', 'black', ...
+                            'BackgroundColor',[.6 .7 .6], ...
+                            'Position', [0 0 0.99 0.99], ...
+                            'EdgeColor', [.6 .7 .6], ...
+                            'LineWidth', 0.1, ...
+                            'Margin', 5, ...
+                            'FitBoxToText','on', ...
+                            'Visible','off');
+set(handles.axes1,'UserData',figdata);
 
 % Mark points according to "grouping"
 handles.hg = [];
@@ -159,23 +221,6 @@ xLimitsVec = min(xrng):xstep:max(xrng);
 xlim([xLimitsVec(1)-rx xLimitsVec(end)+rx]);
 yLimitsVec = min(yrng):xstep:max(yrng);
 ylim([yLimitsVec(1)-ry yLimitsVec(end)+ry]);
-
-% Add regression line to plot
-xy = min(lxL(ind)):(max(lxL(ind))-min(lxL(ind)))/sum(ind):max(lxL(ind));
-try % Statistics toolbox available
-    [p,s] = polyfit(lxL(ind),pred(ind),1);
-    [yhat,dy] = polyconf(p,xy,s,'predopt','curve');
-    handles.(['hline' regrplotstr]) = plot(xy,yhat,regrplotcl,'LineWidth',2);
-    handles.(['hline_CI' regrplotstr]) = plotshaded(xy,[yhat+dy; yhat-dy],regrplotcl);
-    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
-    lgstr{end+1} = ['$\mathbf{\hat{y}_{95\%CI}}^{' lgsufstr '}$'];
-catch % or not
-    handles.(['hline' regrplotstr]) = lsline;
-    handles.(['hline_CI' regrplotstr]) = [];
-    lgstr{end+1} = ['$\mathbf{\hat{y}_{linear}}^{' lgsufstr '}$'];
-end
-
-handles.(['regrplot_lgstr' regrplotstr]) = lgstr;
 
 % Prepare legend
 switch GraphType
@@ -208,14 +253,23 @@ ylabel('Predicted targets')
 
 axes(handles.axes5)
 if isfield(handles,'txtPerf'); delete(handles.txtPerf); end
-
-handles.curRegr = regr;    
+  
 if binarizeflag
     % Binarize at median
     m = nm_nanmean(label); set(handles.txtBinarize,'String',m);
+    handles.curRegr.b_label = label; 
+    handles.curRegr.b_label(label>=m) = 1; 
+    handles.curRegr.b_label(label<m) = -1;
+    handles.curRegr.b_pred = pred; 
+    handles.curRegr.b_pred = handles.curRegr.b_pred - m;
+    [handles.curRegr.X, ...
+     handles.curRegr.Y, ...
+     handles.curRegr.T, ...
+     handles.curRegr.AUC] = perfcurve2(handles.curRegr.b_label, handles.curRegr.b_pred, 1);
+    handles.curRegr.contigmat = ALLPARAM(handles.curRegr.b_label, handles.curRegr.b_pred);
+    handles.curRegr.contigmat.BINARIZATION_THRESHOLD = m;
     binarize_regr(handles);
-    handles.axes20.Visible = "on";
-    handles.axes20.Position(4) = 0.28;
-else
-    handles.axes20.Visible = "off";
+    display_contigmat(handles);
+    %handles.axes20.Visible = "on";
+    %handles.axes20.Position(4) = 0.28;
 end

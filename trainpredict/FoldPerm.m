@@ -135,11 +135,16 @@ for ii=1:PermNum % Loop through CV1 permutations
                     tTr{v} = IN.Y.Tr{i,j,v};
                     if fFull, modelTr{v} = [modelTr{v}; IN.Y.CV{i,j,v}(CVInd,:) ]; end
                     tCV{v} = IN.Y.CV{i,j,v};
-                else
+                elseif numel(IN.Y.Tr{i,j,v}) == nc
                     modelTr{v} = IN.Y.Tr{i,j,v}{curclass}(TrInd,:);
                     tTr{v} = IN.Y.Tr{i,j,v}{curclass};
                     if fFull, modelTr{v} = [modelTr{v}; IN.Y.CV{i,j,v}{curclass}(CVInd,:) ]; end
                     tCV{v} = IN.Y.CV{i,j,v}{curclass};
+                else
+                    modelTr{v} = IN.Y.Tr{i,j,v}{1}(TrInd,:);
+                    tTr{v} = IN.Y.Tr{i,j,v}{1};
+                    if fFull, modelTr{v} = [modelTr{v}; IN.Y.CV{i,j,v}{1}(CVInd,:) ]; end
+                    tCV{v} = IN.Y.CV{i,j,v}{1};
                 end
               
             end

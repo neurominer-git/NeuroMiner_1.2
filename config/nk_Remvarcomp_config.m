@@ -58,7 +58,7 @@ switch REMVARCOMP.dimmode
     case 1
         REMVARCOMP_dims_str = ['Fixed: ' nk_ConcatParamstr(REMVARCOMP.dims) ' components '];
     case 3
-        REMVARCOMP_dims_str = ['Percentage: ' nk_ConcatParamstr(REMVARCOMP.dims) ' of total variance '];
+        REMVARCOMP_dims_str = ['Percentage: ' nk_ConcatParamstr(REMVARCOMP.dims*100) '% of total variance '];
 end
 REMVARCOMP_subgroup_str = subgroupstr{REMVARCOMP.SUBGROUP.flag};
 
@@ -70,14 +70,14 @@ menustr = [ 'Define dimensionality redution method [ ' REMVARCOMP_redmethod_str 
             'Define variance extraction operator [ ' REMVARCOMP.varop  ' ]|', ...
             'Back-project adjusted matrices to input space [ ' REMVARCOMP_recon_str ' ]|'...
             'Define training data for dimensionality reduction model generation [ ' REMVARCOMP_subgroup_str ' ]'];
-menuact = [9,1,2,3,4,5,6,8];
+menuact = 1:8;
 
-if REMVARCOMP.redmethod == 2
-    menustr = [menustr, '|Define fixed number of independen components in ICA projection [ ' REMVARCOMP_dims_str ']'];
-    menuact = [9,1,2,3,4,5,6,8,10];
+if REMVARCOMP.redmethod ~= 2
+    menustr = [menustr, '|Define variance retention parameters in PCA projection [ ' REMVARCOMP_dims_str ']'];
+    menuact = [menuact 9];
 else
-    menustr = [menustr, '|Define % retained variance in PCA projection [ ' REMVARCOMP_dims_str ']'];
-    menuact = [9,1,2,3,4,5,6,7,8];
+    menustr = [menustr, '|Define fixed number of independent components in ICA projection [ ' REMVARCOMP_dims_str ']'];
+    menuact = [menuact 10];
 end
 
 %% Print menu
@@ -88,19 +88,23 @@ act = nk_input(mestr,0,'mq', menustr , menuact);
 % Get user data
 switch act
     case 1
-        REMVARCOMP.G = nk_input('Define target vector (matrix) for identification of variance components',0,'e',[],[m Inf]);
+        REMVARCOMP.redmethod = nk_input('Choose dimensionality reduction method', 0, 'm', 'PCA|fastICA',[1,2], REMVARCOMP.redmethod);
     case 2
-        REMVARCOMP.corrmeth = nk_input('Define method for identifying variance components',0,'m','Pearson|Spearman|ANOVA', [1,2,3], REMVARCOMP.corrmeth);
+        REMVARCOMP.G = nk_input('Define target vector (matrix) for identification of variance components',0,'e',[],[m Inf]);
     case 3
+        REMVARCOMP.corrmeth = nk_input('Define method for identifying variance components',0,'m','Pearson|Spearman|ANOVA', [1,2,3], REMVARCOMP.corrmeth);
+    case 4
         corrcritdef = find(strcmp(corrcrits, REMVARCOMP.corrcrit));
         REMVARCOMP.corrcrit = char(nk_input('Define metric for identifying variance components',0,'m','correlation coefficient|P value',corrcrits,corrcritdef));
-    case 4
-        REMVARCOMP.corrthresh = nk_input('Define single absolute correlation cutoff or multiple cutoffs for variance extraction',0,'e',REMVARCOMP.corrthresh);
     case 5
-        varopnum = nk_input('Define variance extraction operator',0,'>|>=|<|<=',{'gt','ge','lt','le'}, varopdef); REMVARCOMP.varop = char(varopnum);
+        REMVARCOMP.corrthresh = nk_input('Define single absolute correlation cutoff or multiple cutoffs for variance extraction',0,'e',REMVARCOMP.corrthresh);
     case 6
-        if REMVARCOMP.recon == 1, REMVARCOMP.recon = 2; elseif REMVARCOMP.recon == 2, REMVARCOMP.recon = 1; end
+        varopnum = nk_input('Define variance extraction operator',0,'>|>=|<|<=',{'gt','ge','lt','le'}, varopdef); REMVARCOMP.varop = char(varopnum);
     case 7
+        if REMVARCOMP.recon == 1, REMVARCOMP.recon = 2; elseif REMVARCOMP.recon == 2, REMVARCOMP.recon = 1; end
+    case 8
+        REMVARCOMP.SUBGROUP = nk_SubgroupOperation_config( NM, REMVARCOMP.SUBGROUP );
+    case 9
         switch REMVARCOMP.dimmode
             case 1
                 dimmodedef = 1;
@@ -114,10 +118,6 @@ switch act
             case 3
                 REMVARCOMP.dims = nk_input('Percentage of variance components to be returned by PCA (0-1)',0,'e',REMVARCOMP.dims); 
         end
-    case 8
-        REMVARCOMP.SUBGROUP = nk_SubgroupOperation_config( NM, REMVARCOMP.SUBGROUP );
-    case 9
-        REMVARCOMP.redmethod = nk_input('Choose dimensionality reduction method', 0, 'm', 'PCA|fastICA',[1,2], REMVARCOMP.redmethod);
     case 10
         REMVARCOMP.dimmode = 1;
         REMVARCOMP.dims = nk_input('Fixed number of independent components to be returned by fastICA (1-num(dims))',0,'e',REMVARCOMP.dims); 

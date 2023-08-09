@@ -31,28 +31,47 @@ end
 
 switch handles.modeflag
     case 'classification'
-        mfld = 'BinClass';
+        fld = fieldnames(handles.NM.analysis{1}.GDdims{1}.BinClass{1}.contigency);
+
     case 'regression'
-        mfld = 'Regr';
+        fld = {'R2','r','r_95CI_low','r_95CI_up','t','p','MAE', 'MSE', 'NRMSD'};
 end
 
-fld = fieldnames(handles.NM.analysis{1}.GDdims{1}.(mfld){1}.contigency);
 fcnt = 0;
 for i=1:numel(fld)
-    if strcmp(fld{i},'X'), 
+    if strcmp(fld{i},'X')
         continue, 
     end
     fcnt=fcnt+1;
     fldcnt{fcnt} = num2str(fcnt);
     flddata{fcnt,1} = fld{i}; flddata{fcnt,2} = false; 
 end
-handles.PerfTab.analysisselect = uitable('units', 'normalized', 'position', [0.05, 0.2, 0.9, 0.425], ...
+handles.PerfTab.oocvflag = false;
+if isfield(handles,'OOCVinfo') && ~isempty(handles.OOCVinfo)
+    handles.PerfTab.oocvflag = true;
+end
+
+if handles.PerfTab.oocvflag
+    handles.PerfTab.oocvselect     = uicontrol('Style','popupmenu', 'Units','normalized', ...
+                                        'Position', [0.05, 0.2, 0.9, 0.067], ...
+                                        'String', handles.selCVoocv.String', ...
+                                        'Value', 1);
+    handles.PerfTab.analysisselect = uitable('units', 'normalized', 'position', [0.05, 0.3, 0.9, 0.33], ...
                                         'ColumnName', {'Analyses','Alias','Select'}, ... 
                                         'ColumnFormat',{'char','char','logical'},...
                                         'ColumnEditable', [false, true, true],...
                                         'ColumnWidth',{300, 100, 'auto'}, ...
                                         'RowName', analyses,...
                                         'data', data);
+else
+    handles.PerfTab.analysisselect = uitable('units', 'normalized', 'position', [0.05, 0.2, 0.9, 0.425], ...
+                                        'ColumnName', {'Analyses','Alias','Select'}, ... 
+                                        'ColumnFormat',{'char','char','logical'},...
+                                        'ColumnEditable', [false, true, true],...
+                                        'ColumnWidth',{300, 100, 'auto'}, ...
+                                        'RowName', analyses,...
+                                        'data', data);
+end
 handles.PerfTab.perfselect = uitable('units', 'normalized', 'position', [0.05, 0.65, 0.9, 0.30], ...
                                         'ColumnName', {'Metric','Select'}, ... 
                                         'ColumnFormat',{'char','logical'},...
@@ -138,7 +157,7 @@ SubgroupSelection=[]; strmode = false;
 if ~any(AnalysisSelection)
     errordlg('You have to select at least one analysis from the list')
     return
-elseif isempty(MetricSelection), 
+elseif isempty(MetricSelection) 
     errordlg('You have to select at least one performance metric from the list')
     return; 
 elseif ~isempty(SubgroupSelectionVarName) && evalin('base',['exist(''' SubgroupSelectionVarName ''',''var'')'])
@@ -153,7 +172,7 @@ elseif ~isempty(SubgroupSelectionVarName) && evalin('base',['exist(''' SubgroupS
         end
         nuSG = numel(uSG);
         if ~isempty(SubgroupSelection)
-            if size(SubgroupSelection,1) ~= size(handles.NM.label,1),
+            if size(SubgroupSelection,1) ~= size(handles.NM.label,1)
                 errordlg(sprintf('%s has not the same number of values [%g] as cases in the NM structure!',  SubgroupSelectionVarName, size(handles.NM.label,1)));
                 return
             elseif ~isnumeric(SubgroupSelection) && ~iscellstr(SubgroupSelection)
@@ -201,13 +220,35 @@ for i=1:numel(handles.NM.analysis)
         data_table{cnt,1} = AnalysisAliasStringsSel{acnt};
         nGD = numel(handles.NM.analysis{i}.GDdims);
         for j = 1:nGD
-            if nGD>1, 
+            if nGD>1
                 cnt=cnt+1; data_table{cnt,1}=sprintf('Modality #%g', handles.NM.analysis{i}.params.TrainParam.FUSION.M(j)); 
             end
-            sfld = handles.NM.analysis{i}.GDdims{j}.(mfld); 
+            % We may also want to export OOCV data
+            if handles.PerfTab.oocvselect.Value>1 
+                if isfield(handles.NM.analysis{i},'OOCV') && ...
+                    handles.PerfTab.oocvselect.Value-1 <= numel(handles.NM.analysis{i}.OOCV) && ...
+                    ~isempty(handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}) 
+                    switch handles.modeflag
+                        case 'classification'
+                            if handles.multiflag
+                                sfld = handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}.MultiResults{1}.contingency;
+                            else
+                                sfld = handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}.BinResults{1}.contingency;
+                                
+                            end
+                        case 'regression'
+                            sfld = handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}.RegrResults{1}.Regr;
+                    end
+                else
+                    fprintf('\No valid OOCV results structure found in analysis #%g', i);
+                    continue
+                end
+            else 
+                sfld = handles.NM.analysis{i}.GDdims{j}.(mfld); 
+            end
             if multiflag, cnt=cnt+1; data_table{cnt,1} = 'Binary classification results'; end
             for k=1:numel(sfld)
-                if multiflag, 
+                if multiflag
                     cnt=cnt+1; data_table{cnt,1} = sprintf('%s', handles.NM.analysis{i}.params.cv.class{1,1}{k}.groupdesc); 
                 end
                 if ~isempty(SubgroupSelection)
@@ -233,7 +274,7 @@ for i=1:numel(handles.NM.analysis)
                             indp = strcmp(S,uSG{p});
                         end
                         ALL = ALLPARAM(Lx(indp), P(indp));
-                        for l=1:numel(MetricSelection), 
+                        for l=1:numel(MetricSelection) 
                             try
                                 data_table{cnt,l+1} = ALL.(MetricSelection{l});
                             catch
@@ -244,13 +285,29 @@ for i=1:numel(handles.NM.analysis)
                     end
                     cnt=cnt-1;
                 else
-                     for l=1:numel(MetricSelection), 
-                        data_table{cnt,l+1} = sfld{k}.contigency.(MetricSelection{l});
+                     for l=1:numel(MetricSelection)
+                        switch handles.modeflag
+                            case 'classification'
+                                data_table{cnt,l+1} = sfld{k}.contigency.(MetricSelection{l});
+                            case 'regression'
+                                data_table{cnt,l+1} = sfld.(MetricSelection{l});
+                        end
                      end
                 end
             end
             if multiflag
-                mcfld = handles.NM.analysis{i}.GDdims{j}.MultiClass; 
+                if handles.PerfTab.oocvselect.Value>1 
+                    if isfield(handles.NM.analysis{i},'OOCV') && ...
+                        handles.PerfTab.oocvselect.Value-1 <= numel(handles.NM.analysis{i}.OOCV) && ...
+                        ~isempty(handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}) 
+                        mcfld = handles.NM.analysis{i}.OOCV{handles.PerfTab.oocvselect.Value-1}.MultiResults{1}.MultiClass; 
+                    else
+                        fprintf('\No valid OOCV results structure found in analysis #%g', i);
+                        continue
+                    end
+                else
+                    mcfld = handles.NM.analysis{i}.GDdims{j}.MultiClass; 
+                end
                 cnt=cnt+1; data_table{cnt,1} = 'Multi-group classification results';
                 for k=1:numel(sfld)
                     cnt=cnt+1; data_table{cnt,1} = sprintf('Multi-group: %s vs. REST', handles.NM.groupnames{k});
@@ -263,7 +320,7 @@ end
 tbl.colnames = data_table(1,1:end);
 tbl.rownames = data_table(2:end,1);
 tbl.array    = data_table(2:end,2:end);
-[ERR, STATUS, fil, typ] = tbl2file(tbl, handles.PerfTab.fileseltext.String, 'Performance Table');
+[ERR, STATUS, fil] = tbl2file(tbl, handles.PerfTab.fileseltext.String, 'Performance Table');
 
 if STATUS
     msgbox(['Data successfully exported to file ' fil]);

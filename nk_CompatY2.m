@@ -58,16 +58,13 @@ if ~exist('FUSION','var') || isempty(FUSION)
     end
     FUSION.M = varind;
 end
+
 L = NM.label;
 
-%Load linked OOCV files if needed
-if ~isempty(oocvind) && ischar(NM.OOCV{oocvind}.Y) 
-   if ~exist(NM.OOCV{oocvind}.Y,'file')
-       error('Linked OOCV container not found in expected path: %s',NM.OOCV{oocvind}.Y);
-   end
-   fprintf('\nLoading linked OOCV container: %s',NM.OOCV{oocvind}.Y);
-   load(NM.OOCV{oocvind}.Y);
-   NM.OOCV{oocvind} = OOCV;
+% Load linked files if needed
+NM = nk_LoadLinkedData(NM, varind);
+if ~isempty(oocvind) 
+   NM.OOCV{oocvind} = nk_LoadLinkedData(NM.OOCV{oocvind}, varind);
 end
 
 switch FUSION.flag

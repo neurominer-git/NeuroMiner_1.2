@@ -22,10 +22,14 @@ CLR1 = handles.colptin(handles.BinClass{h}.groupind(g1),:);
 if ~handles.BinClass{h}.one_vs_all
     CLP = handles.colpt;
     CLR2 = handles.colptin(handles.BinClass{h}.groupind(g2),:);
+    handles.tglClrSwp.Enable = "on";
 else
     CLP = 'o';
     CLR2 = rgb('DarkGrey');
+    handles.tglClrSwp.Enable = "off";
 end
+
+handles.tglSort.Enable = "on";
 
 %% Display classification plot
 % Define X axis data
@@ -270,7 +274,7 @@ idx1 = id1 & ~err; idx2 = id2 & ~err; b(1) = 0; b(2)= 0;
 if sum(idx1)
     if ~AltAx && ~handles.tglSort.Value
         fIdx1 = find(id1);
-        v = [ [0 offy]; [0 YLIMS(2)]; [lxL(fIdx1(end))+r YLIMS(2)]; [lxL(fIdx1(end))+r offy] ];             
+        v = [ [ lxL(fIdx1(1)) offy ]; [ lxL(fIdx1(1)) YLIMS(2) ]; [ lxL(fIdx1(end))+r YLIMS(2) ]; [ lxL(fIdx1(end))+r offy ] ];             
         patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR1, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
     end
     b(1) = plot(lxL(idx1),predh(idx1), handles.colpt,...
@@ -287,8 +291,15 @@ end
 if sum(idx2)
     if ~AltAx && ~handles.tglSort.Value
         fIdx2 = find(id2);
-        v = [ [lxL(fIdx2(1)) offy]; [lxL(fIdx2(1)) YLIMS(1)]; [XLIMS(2) YLIMS(1)]; [XLIMS(2) offy] ];             
-        patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR2, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
+        if fIdx1(1)>1 && fIdx1(end)<XLIMS(2)
+            v1 = [ [lxL(fIdx2(1)) offy]; [lxL(fIdx2(1)) YLIMS(1)]; [ lxL(fIdx1(1)) YLIMS(1)]; [ lxL(fIdx1(1)) offy] ];
+            v2 = [ [lxL(fIdx1(end)) offy]; [lxL(fIdx1(end)) YLIMS(1)]; [ XLIMS(2) YLIMS(1)]; [ XLIMS(2) offy] ];
+            patch('Faces',[1 2 3 4], 'Vertices', v1, 'FaceColor', CLR2, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
+            patch('Faces',[1 2 3 4], 'Vertices', v2, 'FaceColor', CLR2, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
+        else
+            v = [ [lxL(fIdx2(1)) offy]; [lxL(fIdx2(1)) YLIMS(1)]; [XLIMS(2) YLIMS(1)]; [XLIMS(2) offy] ];             
+            patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR2, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
+        end
     end
     b(2) = plot(lxL(idx2),predh(idx2),CLP,...
         'MarkerSize',MS,...

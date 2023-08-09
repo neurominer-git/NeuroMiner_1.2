@@ -33,7 +33,7 @@ if ~defaultsfl
     menuact = [ menuact 2 ];
     
     switch IMPUTEDEF_METH2
-         case {2,3,4,5,6,7,8} 
+         case {2,3,4,5,6,7,8,9} 
             IMPUTESTR_K = sprintf('%g nearest neighbors',IMPUTEDEF_K); 
             menustr = [menustr '|Define # of nearest neighbors [ ' IMPUTESTR_K ' ]'];
             menuact = [menuact 3];
@@ -111,6 +111,8 @@ switch IMPUTEDEF_METH
         IMPUTESTR_METH = sprintf('kNN imputation (JACCARD: nominal positive only)'); IMPUTEDEF_METH2 = 7;
     case 'hybrid'
         IMPUTESTR_METH = sprintf('kNN imputation (HYBRID: Adaptive to nominal vs. ordinal/continuous features'); IMPUTEDEF_METH2 = 8;
+    case 'SeqkNN'
+        IMPUTESTR_METH = sprintf('Sequential kNN imputation (EUCLIDEAN; significantly faster than other kNN methods)'); IMPUTEDEF_METH2 = 9;
 end
 
 function IMPUTEDEF_METH = return_methdef(TYPE, IMPUTEDEF_METH2)
@@ -125,9 +127,10 @@ switch TYPE
     
     case 1 % Coninuous data
         IMPUTEDEF_METHMENU = ['MANHATTAN distance-based nearest-neighbor search (Scale / Standardize first!)|', ...
-                 'EUCLIDEAN distance-based nearest-neighbor search (Scale / Standardize first!)'];
+                 'EUCLIDEAN distance-based nearest-neighbor search (Scale / Standardize first!)', ...
+                 '|Sequential kNN-based imputation method (EUCLIDEAN)'];
         if ~isempty(which('pdist2'))
-            IMPUTEDEF_METHMENUSEL = {'cityblock', 'euclidean'};
+            IMPUTEDEF_METHMENUSEL = {'cityblock', 'euclidean','SeqkNN'};
             IMPUTEDEF_METHMENU = [IMPUTEDEF_METHMENU ...
                                   '|SEUCLIDEAN distance-based nearest-neighbor search', ...
                                   '|COSINE similarity-based nearest-neighbor search'];
@@ -139,8 +142,9 @@ switch TYPE
         IMPUTEDEF_METHMENU = ['Median of non-NaN values in given case|', ...
                  'Mean of non-NaN values in given feature|', ...
                  'MANHATTAN distance-based nearest-neighbor search (Scale / Standardize first!)|', ...
-                 'EUCLIDEAN distance-based nearest-neighbor search (Scale / Standardize first!)'];
-        IMPUTEDEF_METHMENUSEL = {'singlemean', 'mean', 'cityblock', 'euclidean'};
+                 'EUCLIDEAN distance-based nearest-neighbor search (Scale / Standardize first!)', ...
+                 '|Sequential kNN-based imputation method (EUCLIDEAN)'];
+        IMPUTEDEF_METHMENUSEL = {'singlemean', 'mean', 'cityblock', 'euclidean','SeqkNN'};
         if  ~isempty(which('pdist2'))
             IMPUTEDEF_METHMENU = [IMPUTEDEF_METHMENU ...
                                   '|SEUCLIDEAN distance-based nearest-neighbor search', ...

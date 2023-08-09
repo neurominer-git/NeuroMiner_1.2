@@ -17,9 +17,10 @@ if clafl, cla; hold on; end
 
 cl = 'k';
 if exist('targets', 'var') && ~isempty(targets)
-    for i = 1:size(targets,2)
+    nroc = size(targets,2);
+    for i = 1:nroc
         [X, Y] = perfcurve2(targets(:,i), predictions(:,1), 1);  
-        cl = handles.colptin(i,:);
+        if nroc >1, cl = handles.colptin(i,:); end
         hroc(i) = plot(handles.(axeshdl),X, Y, 'Color', cl, 'LineWidth', linewidth); 
     end
 else

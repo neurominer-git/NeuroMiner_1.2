@@ -8,9 +8,9 @@ end
 
 switch handles.modeflag
     case 'classification'
-        sheetstr = 'Class'; 
+        sheetstr = 'Cl_'; 
     case 'regression'
-        sheetstr = 'Regr';  
+        sheetstr = 'R_';  
 end
 
 % Do we print the results of the bagged classifier?

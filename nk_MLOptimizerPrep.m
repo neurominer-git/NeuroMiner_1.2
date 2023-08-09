@@ -327,25 +327,29 @@ if ~isempty(analysis)
                 % necessary if analysis were set up with older NM
                 % structure)
                 if isfield(tNM.analysis{inp.analind(i)}.params,'label') && tNM.analysis{inp.analind(i)}.params.label.altlabelflag
+
                     tNM.label = tNM.analysis{inp.analind(i)}.params.label.label; 
                     tNM.modeflag = tNM.analysis{inp.analind(i)}.params.label.modeflag;  
+                    altlabel = true;
                 end
-
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
-                nk_SetupGlobalVariables(tNM.analysis{inp.analind(i)}.params, 'clear', 0);
+                nk_SetupGlobalVariables(tNM.analysis{inp.analind(i)}.params, 'clear', 0)
+                % Bring back standard label
+                if altlabel
+                    tNM.label = NM.label; 
+                    tNM.modeflag = NM.modeflag; 
+                end
             end
             % Copy back results to NM/xNM
             if ~isfield(inp,'simFlag') || ~inp.simFlag
+
                 if isfield(tNM.analysis{inp.analind(i)}.params, 'label') && tNM.analysis{inp.analind(i)}.params.label.altlabelflag
                     tNM.label = NM.label; 
                     tNM.modeflag = NM.modeflag; 
                 end
                 NM = tNM;
             else
-                if isfield(tNM.analysis{inp.analind(i)}.params, 'label') && tNM.analysis{inp.analind(i)}.params.label.altlabelflag
-                    tNM.label = NM.label; 
-                    tNM.modeflag = NM.modeflag; 
-                end
+
                 xNM = tNM;
             end
             clear tNM
@@ -416,6 +420,12 @@ else
 end
 
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir);end
+
+% Write some info to command line
+clc
+fprintf('******************************\n')
+fprintf('**  PARAMETER OPTIMIZATION  **\n')
+fprintf('******************************\n')
 
 for i = 1:inp1.nF
 

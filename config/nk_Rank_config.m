@@ -107,7 +107,12 @@ if ~defaultsfl
     
             switch RANK.ranktype
                 case 1
-                    switch NM.modeflag
+                    if  NM.TrainParam.LABEL.flag==1
+                        modeflag = NM.TrainParam.LABEL.newmode;
+                    else
+                        modeflag = NM.modeflag;
+                    end
+                    switch modeflag
                         case 'classification'
                             menuact = rstr_cl; menusel = rsel_cl;
                         case 'regression'
@@ -183,7 +188,7 @@ if ~defaultsfl
                         RANK.SVM.kernel.kerndef = 1;
                         switch RANK.algostr
                             case 'libsvm'
-                                RANK.SVM = nk_LIBSVM_config(RANK.SVM, RANK.SVM, [],[], navistr);
+                                act =1; while act, [act,RANK.SVM] = nk_LIBSVM_config(RANK.SVM, RANK.SVM, [],[], navistr); end
                                 RANK.SVM.kernel.kernstr = ' -t 0';
                             case 'liblin'
                                 RANK.SVM = nk_LIBLIN_config(RANK.SVM, RANK.SVM, [], navistr);
@@ -314,8 +319,15 @@ if ~defaultsfl
                             end
                             RANK.labeldesc = nk_input(['Give a short description of the ' lbstr ],0,'s');
                         else
-                            RANK.label = NM.label;
-                            RANK.labeldesc = 'NM target label';
+                            switch NM.TrainParam.LABEL.flag
+                                case 1
+                                    RANK.label = NM.TrainParam.LABEL.newlabel;
+                                    RANK.labeldesc = sprintf('NM alternative label: %s', NM.TrainParam.LABEL.newlabelname);
+                                otherwise
+                                    RANK.label = NM.label;
+                                    RANK.labeldesc = 'NM target label';
+                            end
+                            
                         end
                     end
                     
@@ -339,8 +351,14 @@ if ~defaultsfl
 else
     RANK.ranktype       = ranktype;
     RANK.weightmethod   = weightmethod;
-    RANK.label          = NM.label;
-    RANK.labeldesc      = 'NM target label';
+    switch NM.TrainParam.LABEL.flag
+        case 1
+            RANK.label = NM.TrainParam.LABEL.newlabel;
+            RANK.labeldesc = sprintf('NM alternative label: %s', NM.TrainParam.LABEL.newlabelname);
+        otherwise
+            RANK.label          = NM.label;
+            RANK.labeldesc      = 'NM target label';
+    end
     RANK.rankmethod     = 8;
     RANK.algostr        = 'pearson';
 end

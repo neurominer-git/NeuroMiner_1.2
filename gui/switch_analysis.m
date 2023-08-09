@@ -10,8 +10,10 @@ else
     GDdims = handles.NM.analysis{analind}.GDdims{handles.curmodal}; handles.METAstr = 'none';
 end
 
-% Set current subgroup
-if isfield(handles,'SubIndex') && ~handles.oocvview, I = handles.SubIndex; else, I = true(size(handles.NM.label,1),1); end
+% Remove subgroup indices
+if isfield(handles,'SubIndex') 
+    handles = rmfield(handles,'SubIndex');
+end
 
 % Set current label
 if size(handles.NM.label,2)>1, handles.multilabel = true; else, handles.multilabel=false; end
@@ -36,23 +38,24 @@ elseif isfield(handles,'visdata')
     handles = rmfield(handles,'visdata');
 end
 
-if isfield(handles,'SubIndex') 
-    handles = rmfield(handles,'SubIndex');
-end
-
 % Check whether selected analysis has OOCV data
 if isfield(handles.NM.analysis{analind},'OOCV') && handles.NM.defs.analyses_locked
     idx = ~cellfun(@isempty,handles.NM.analysis{analind}.OOCV);
     oocvdata = handles.NM.analysis{analind}.OOCV(idx); 
+    handles.oocvview = true;
+    [handles, oocvind] = get_oocvind(handles);
 elseif isfield(handles,'OOCV')
     handles = rmfield(handles,'OOCV');
+    oocvdata = [];
+    handles.oocvview = false;
+    handles.selCVoocv.Value=1;
 end
 
 % Check whether selected analysis has MLI data
 mlifl='off';
-if isfield(handles,'oocvview') && handles.oocvview
-    if isfield(handles.NM.analysis{analind}.OOCV{handles.oocvind},'MLI')
-        mlidata = handles.NM.analysis{analind}.OOCV{handles.oocvind}.MLI;
+if isfield(handles,'oocvview') && handles.oocvview && oocvind
+    if isfield(handles.NM.analysis{analind}.OOCV{oocvind},'MLI')
+        mlidata = handles.NM.analysis{analind}.OOCV{oocvind}.MLI;
         mlifl = 'on';
     elseif isfield(handles,'MLI')
         handles = rmfield(handles,'MLI');
@@ -70,7 +73,7 @@ handles.thisMLIresult.Visible = mlifl;
 handles = load_analysis(handles, ...
                     'Subjects', handles.NM.cases, ...
                     'Params', handles.NM.analysis{analind}.params, ...
-                    'Analysis', handles.NM.cv, handles.label(I,:), GDdims, ...
+                    'Analysis', handles.NM.analysis{analind}.params.cv, handles.label, GDdims, ...
                     'Visdata', visdata, ...
                     'OOCVdata', oocvdata, ...
                     'MLIdata', mlidata);

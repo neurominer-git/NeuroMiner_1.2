@@ -39,6 +39,7 @@ if isempty(PREPROC)
     end
 end
 
+
 if isfield(NM.TrainParam,'LABEL') && NM.TrainParam.LABEL.flag == 1
     modeflag = NM.TrainParam.LABEL.newmode;
 %     else
@@ -109,10 +110,15 @@ d = nk_GetParamDescription2(NM, PREPROC, 'PreProc');
 nk_PrintLogo
 
 % Check group processing mode possibilities
-if max(NM.label(:,1)) > 2 && strcmp(modeflag,'classification')
-    fprintf('\n%s\n',d.PREPROC.groupmode);
-    cmdstr = 'Define group processing mode in multi-class setting'; cmdmnu = 1;
-    [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu); 
+if numel(unique(label(:,1))) > 2 && strcmp(modeflag,'classification') 
+    if NM.TrainParam.RAND.Decompose == 2
+        fprintf('\nOne-vs-All mode => multigroup processing activated');
+        PREPROC.BINMOD = 0;
+    else
+        fprintf('\n%s\n',d.PREPROC.groupmode);
+        cmdstr = 'Define group processing mode in multi-class setting'; cmdmnu = 1;
+        [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu); 
+    end
 elseif isempty(PREPROC) || ~isfield(PREPROC,'BINMOD')
     PREPROC = config_binmod(NM, PREPROC);
 end
@@ -121,7 +127,7 @@ end
 if strcmp(modeflag,'regression')
     if isfield(PREPROC,'LABELMOD') && isfield(PREPROC.LABELMOD,'TARGETSCALE') && ( PREPROC.LABELMOD.TARGETSCALE || isfield(PREPROC.LABELMOD,'POLYNOM') )
         cmdstr = 'Modify / Disable';
-        if ~strcmp(d.PREPROC.targetscaling,'NA'), 
+        if ~strcmp(d.PREPROC.targetscaling,'NA') 
             prestr = sprintf('\n* %s', d.PREPROC.targetscaling); 
         end
     else
@@ -129,7 +135,6 @@ if strcmp(modeflag,'regression')
     end
     cmdstr = [cmdstr ' label transformation']; cmdmnu = 99;
     [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu);
-
 end
 
 % Check for availability of image filtering options
@@ -155,15 +160,15 @@ if ~isempty(prestr)
     fprintf('%s ',prestr)
 end
 
-slnan = sum(isnan(NM.label));
+slnan = sum(isnan(label));
 if slnan
     fprintf('\n');
     cmdstr = 'Define parameters for label propagation to unlabeled training data'; cmdmnu = 100;
     [actstr, actmnu] = ConcatMenu(actstr, actmnu, cmdstr, cmdmnu);
     if ~strcmp(d.PREPROC.labelimpute,'NA')
-        fprintf('Missing label settings:\n* %s', d.PREPROC.labelimpute); 
+        fprintf('Missing label (%s) settings:\n* %s', labelname, d.PREPROC.labelimpute); 
     else
-        fprintf('Missing labels found! Please specifiy label imputation parameters')
+        fprintf('Missing labels (%s) found! Please specifiy label imputation parameters', labelname)
     end
 end
 

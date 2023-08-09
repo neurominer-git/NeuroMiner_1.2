@@ -1,4 +1,4 @@
-function [classes, perf, dist, sim, minimum] = nk_MultiDecideErrorCorrOutCodes(X, L, ClX, Groups, Coding, Decoding, WeightFlag, ProbComp)
+function [classes, perf, dist, sim, minimum] = nk_MultiDecideErrorCorrOutCodes(X, L, ClX, Groups, Coding, Decoding, ~, ProbComp)
 % [classes, ECOC] = nk_ErrorCorrOutCodes(X, L, ClX, Coding, Decoding, Weightflag)
 % ===================================================================================
 % 
@@ -48,11 +48,6 @@ if ~exist('ProbComp','var') || isempty(ProbComp)
     ProbComp = 'invnormquad';
 end
 
-nr_classes = numel(unique(ClX));
-
-% Only binary decoding needed
-if nr_classes==1, nr_classes = 2; end;
-
 % Compute code words if not available
 switch Coding
     case 1 % One-vs-One
@@ -62,16 +57,6 @@ switch Coding
     case 2 % One-vs-All
         oECOC = nk_OneVsAll(ClX, Groups);
 end
-
-% if WeightFlag
-%     Weights = zeros(1,nr_classes);
-%     for curclass=1:nr_classes
-%         Weights(curclass) = sum(ClX==curclass);
-%     end
-%     [~,mXI] = max(Weights);
-%     Weights = Weights./Weights(mXI);
-%     
-% end
 
 % Decode (with or without weighting according to number of dichotomizers in each class)
 [classes, dist, minimum] = decoding_main(X, oECOC, Decoding);
