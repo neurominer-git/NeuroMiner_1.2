@@ -44,6 +44,8 @@ if ~isfield(NM,'TrainParam')
     NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
     [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
     NM.TrainParam.verbosity     = 1;
+    NM.TrainParam.LABEL.flag    = 0;
+    NM.TrainParam.LABEL.origlabel = NM.label;
 elseif ~isfield(NM.TrainParam,'verbosity')
     NM.TrainParam.verbosity     = 1;
     if size(NM.label,2)>1
@@ -222,9 +224,10 @@ if ~exist('act','var') || isempty(act)
         modeflag = NM.TrainParam.LABEL.newmode;
     else
         modeflag = NM.modeflag;
-        if isfield(NM.TrainParam, 'LABEL')
-            NM.TrainParam = rmfield(NM.TrainParam, 'LABEL');
-        end
+        %if isfield(NM.TrainParam, 'LABEL')
+        %    NM.TrainParam = rmfield(NM.TrainParam, 'LABEL');
+        %end
+        NM.TrainParam.LABEL.flag = 0; 
     end
     if strcmp(modeflag,'classification')
 
@@ -609,8 +612,14 @@ switch act
             LABEL = NM.TrainParam.LABEL;
         else
             LABEL = [];
+        end
+        if ~isfield(LABEL, 'OrigTrainParam')
             LABEL.OrigTrainParam = NM.TrainParam; 
         end
+        if ~isfield(LABEL, 'origlablabel')
+            LABEL.origlabel = NM.label;
+        end
+        
         while act>0  
             [LABEL, act] = cv_Label_config(LABEL);
         end
@@ -637,11 +646,6 @@ switch act
             [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
             NM.TrainParam.verbosity     = 1;
 
-%             for i=1:nY
-%                 nan_in_pred = false;        if sum(isnan(NM.Y{i}(:)))>0, nan_in_pred=true; end
-%                 NM.TrainParam.PREPROC{i}    = DefPREPROC(modeflag,nan_in_pred,nan_in_label);
-%                 NM.TrainParam.VIS{i}        = nk_Vis_config([], NM.TrainParam.PREPROC, i, 1);
-%             end
             NM.TrainParam               = rmfield(NM.TrainParam,'PREPROC');
 
             NM.TrainParam.LABEL         = LABEL;

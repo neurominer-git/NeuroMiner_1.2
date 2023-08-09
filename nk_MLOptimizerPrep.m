@@ -326,7 +326,7 @@ if ~isempty(analysis)
                 % check whether alternative label should be used (only
                 % necessary if analysis were set up with older NM
                 % structure)
-                if isfield(tNM.analysis{inp.analind(i)}.params,'label')
+                if isfield(tNM.analysis{inp.analind(i)}.params,'label') && tNM.analysis{inp.analind(i)}.params.label.altlabelflag
                     tNM.label = tNM.analysis{inp.analind(i)}.params.label.label; 
                     tNM.modeflag = tNM.analysis{inp.analind(i)}.params.label.modeflag;  
                 end
@@ -336,13 +336,13 @@ if ~isempty(analysis)
             end
             % Copy back results to NM/xNM
             if ~isfield(inp,'simFlag') || ~inp.simFlag
-                if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
+                if isfield(tNM.analysis{inp.analind(i)}.params, 'label') && tNM.analysis{inp.analind(i)}.params.label.altlabelflag
                     tNM.label = NM.label; 
                     tNM.modeflag = NM.modeflag; 
                 end
                 NM = tNM;
             else
-                if isfield(tNM.analysis{inp.analind(i)}.params.TrainParam, 'LABEL') && tNM.analysis{inp.analind(i)}.params.TrainParam.LABEL.flag
+                if isfield(tNM.analysis{inp.analind(i)}.params, 'label') && tNM.analysis{inp.analind(i)}.params.label.altlabelflag
                     tNM.label = NM.label; 
                     tNM.modeflag = NM.modeflag; 
                 end

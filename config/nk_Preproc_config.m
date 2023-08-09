@@ -39,16 +39,15 @@ if isempty(PREPROC)
     end
 end
 
-if isfield(NM.TrainParam,'LABEL')
-    if NM.TrainParam.LABEL.flag == 1
-        modeflag = NM.TrainParam.LABEL.newmode;
+if isfield(NM.TrainParam,'LABEL') && NM.TrainParam.LABEL.flag == 1
+    modeflag = NM.TrainParam.LABEL.newmode;
 %     else
 %         if strcmp(NM.TrainParam.LABEL.newmode,'classification') 
 %             if isfield(NM.TrainParam.PREPROC{varind},'LABELMOD') && NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE == 1
 %                 NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE = 0;
 %             end
 %         end
-    end
+
 else
     modeflag = NM.modeflag;
 end

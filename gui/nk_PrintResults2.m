@@ -1016,7 +1016,6 @@ function axes1_CreateFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
-
 % --- Executes on selection change in selCVoocv.
 function selCVoocv_Callback(hObject, eventdata, handles)
 % hObject    handle to selCVoocv (see GCBO)
