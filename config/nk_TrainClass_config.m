@@ -6,7 +6,6 @@
 % has been added to the NM workspace
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % (c) Nikolaos Koutsouleris, 07/2022
-
 function [act, varind] = nk_TrainClass_config(act, varind, parentstr)
 global NM CALIBAVAIL
 
@@ -224,14 +223,12 @@ if ~exist('act','var') || isempty(act)
         modeflag = NM.TrainParam.LABEL.newmode;
     else
         modeflag = NM.modeflag;
-<<<<<<< HEAD
+
         %if isfield(NM.TrainParam, 'LABEL')
         %    NM.TrainParam = rmfield(NM.TrainParam, 'LABEL');
         %end
         NM.TrainParam.LABEL.flag = 0; 
-=======
-        NM.TrainParam.LABEL.flag = false;
->>>>>>> refs/remotes/origin/main
+
     end
     if strcmp(modeflag,'classification')
 
@@ -633,7 +630,6 @@ switch act
             if isempty(LABEL.newmode)
                 LABEL.newmode           = origmodefl;
             end
-<<<<<<< HEAD
             NM.modeflag                 = LABEL.newmode;
             
             % Create default NM parameters space
@@ -655,32 +651,7 @@ switch act
 
             NM.TrainParam.LABEL         = LABEL;
             NM.modeflag                 = origmodefl;
-=======
-            % Create default NM parameters space for alternative label
-            try
-                NM.modeflag                 = LABEL.newmode;
-                nk_CVpartition_config(true);
-                NM.TrainParam.STACKING.flag = 2;
-                NM.TrainParam.FUSION.flag   = 0;
-                NM.TrainParam.FUSION.M      = 1;
-                [~,NM.TrainParam.SVM]       = nk_LIBSVM_config(NM,[],1);
-                NM.TrainParam.SVM.prog      = 'LIBSVM';
-                NM.TrainParam.SVM           = nk_Kernel_config(NM.TrainParam.SVM,1);
-                NM.TrainParam.SVM.GridParam = 1;
-                if strcmp(NM.modeflag, 'regression'), NM.TrainParam.SVM.GridParam = 18; end
-                NM.TrainParam.MULTI.flag    = 0;
-                NM.TrainParam               = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, true);
-                [~,NM.TrainParam.RFE]       = nk_RFE_config([], NM.TrainParam, NM.TrainParam.SVM, modeflag, NM.TrainParam.MULTI, NM.TrainParam.GRD, 1);
-                NM.TrainParam.verbosity     = 1;
-                NM.TrainParam               = rmfield(NM.TrainParam,'PREPROC');
-                NM.TrainParam.LABEL         = LABEL;
-                NM.modeflag                 = origmodefl;
-            catch ERR
-                errordlg(sprintf('Error when setting defaults for alternative label:\n%s',ERR.message),'NM Error');
-                NM.TrainParam = LABEL.OrigTrainParam;
-                NM.modeflag   = origmodefl;
-            end
->>>>>>> refs/remotes/origin/main
+
         elseif LABEL.flag % but same learning framework
             NM.TrainParam.LABEL         = LABEL;
         elseif ~LABEL.flag && strcmp(LABEL.newmode, modeflag) % if switched from alternative label to no alt. label but no learning mode switch
