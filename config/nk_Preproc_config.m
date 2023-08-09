@@ -110,7 +110,7 @@ d = nk_GetParamDescription2(NM, PREPROC, 'PreProc');
 nk_PrintLogo
 
 % Check group processing mode possibilities
-if numel(unique(label(:,1))) > 2 && strcmp(modeflag,'classification') 
+if numel(unique(NM.label(:,1))) > 2 && strcmp(modeflag,'classification') 
     if NM.TrainParam.RAND.Decompose == 2
         fprintf('\nOne-vs-All mode => multigroup processing activated');
         PREPROC.BINMOD = 0;
@@ -160,7 +160,7 @@ if ~isempty(prestr)
     fprintf('%s ',prestr)
 end
 
-slnan = sum(isnan(label));
+slnan = sum(isnan(NM.label));
 if slnan
     fprintf('\n');
     cmdstr = 'Define parameters for label propagation to unlabeled training data'; cmdmnu = 100;

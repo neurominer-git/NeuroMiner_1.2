@@ -1,4 +1,4 @@
-function [act, param] = nk_LIBSVM_config(res, param, defaultsfl, cvfl, parentstr, modeflag)
+function [param,act] = nk_LIBSVM_config(res, param, defaultsfl, cvfl, parentstr, modeflag)
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl), defaultsfl=0; end
 if ~exist('cvfl','var') || isempty(cvfl), cvfl = 0; end

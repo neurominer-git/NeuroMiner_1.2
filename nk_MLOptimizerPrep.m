@@ -334,11 +334,7 @@ if ~isempty(analysis)
                 end
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
                 nk_SetupGlobalVariables(tNM.analysis{inp.analind(i)}.params, 'clear', 0)
-                % Bring back standard label
-                if altlabel
-                    tNM.label = NM.label; 
-                    tNM.modeflag = NM.modeflag; 
-                end
+              
             end
             % Copy back results to NM/xNM
             if ~isfield(inp,'simFlag') || ~inp.simFlag
