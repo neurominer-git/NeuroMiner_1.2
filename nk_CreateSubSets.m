@@ -126,7 +126,7 @@ for curlabel=1:nl % Label loop
                 Mx = Mx./(nperms*nfolds);
 
                 if VERBOSE, fprintf('\nComputed CV grid of sigma & lambda across CV1 partitions:'); end
-                for i=1:nsigma,
+                for i=1:nsigma
                     fprintf('\n')
                     fprintf('\t%1.1f',Mx(i,:)); 
                 end

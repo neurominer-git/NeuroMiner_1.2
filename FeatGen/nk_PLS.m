@@ -29,6 +29,14 @@ if ~IN.trained
     % Imputation
     if sum(isnan(mXd(:)))
         mXd = SeqkNN(mXd, 5);
+        % if there are still missings use median replacement
+        if sum(isnan(mXd(:)))
+             IN.mn = median(mXd,'omitnan');
+             for i = 1:size(mXd,2)
+                 idxnan = isnan(mXd(:,i));
+                 mXd(idxnan,i) = IN.mn(i);
+             end
+        end
         IN.tX = mXd;
     end
 
@@ -65,6 +73,18 @@ else
         % Imputation
         if sum(isnan(mXd(:)))
             mXd = SeqkNN(mXd, 5, IN.tX);
+            % if there are still missings use median replacement
+            if sum(isnan(mXd(:)))
+                 if ~isfield(IN,'mn')
+                     mn = median(IN.tX,'omitnan');
+                 else
+                     mn=IN.mn;
+                 end
+                 for i = 1:size(mXd,2)
+                     idxnan = isnan(mXd(:,i));
+                     mXd(idxnan,i) = mn(i);
+                 end
+            end
         end
         sX = mXd*IN.mpp.v;
         sYX = mXd * (IN.mpp.u * IN.mpp.v')' + IN.mpp.mY.meanY;
