@@ -176,9 +176,10 @@ switch act
                     NM.analysis{A.analdim}.params.label.modeflag    = NM.modeflag; 
                     NM.analysis{A.analdim}.params.label.labelname   = NM.datadescriptor{1,1}.input_settings.label_edit;
                     NM.analysis{A.analdim}.params.label.altlabelflag = 0;
-                    if isfield(NM.TrainParam, 'LABEL') && isfield(NM.TrainParam.LABEL,'newmode') && strcmp(NM.TrainParam.LABEL.newmode, 'classification')
+                    if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag && isfield(NM.TrainParam.LABEL,'newmode') && strcmp(NM.TrainParam.LABEL.newmode, 'classification')
                         NM.analysis{A.analdim}.params.label.altgroupnames = NM.groupnames; 
                     end
+                    
                 end
                 try
                   NM.analysis{A.analdim}.meta.USER              = java.lang.System.getProperty('user.name');

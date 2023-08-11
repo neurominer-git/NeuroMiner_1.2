@@ -39,13 +39,18 @@ if isempty(PREPROC)
     end
 end
 
-modeflag = NM.modeflag;
-label = NM.label;
-labelname = 'NM standard label';
+
 if isfield(NM.TrainParam,'LABEL') && NM.TrainParam.LABEL.flag == 1
     modeflag = NM.TrainParam.LABEL.newmode;
-    labelname = sprintf('Alternative label: %s [ %s ]', NM.TrainParam.LABEL.newlabelname, modeflag);
-    label = NM.TrainParam.LABEL.newlabel;
+%     else
+%         if strcmp(NM.TrainParam.LABEL.newmode,'classification') 
+%             if isfield(NM.TrainParam.PREPROC{varind},'LABELMOD') && NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE == 1
+%                 NM.TrainParam.PREPROC{varind}.LABELMOD.TARGETSCALE = 0;
+%             end
+%         end
+
+else
+    modeflag = NM.modeflag;
 end
 
 if ~exist('enind','var'), enind = []; end 
@@ -105,7 +110,7 @@ d = nk_GetParamDescription2(NM, PREPROC, 'PreProc');
 nk_PrintLogo
 
 % Check group processing mode possibilities
-if numel(unique(label(:,1))) > 2 && strcmp(modeflag,'classification') 
+if numel(unique(NM.label(:,1))) > 2 && strcmp(modeflag,'classification') 
     if NM.TrainParam.RAND.Decompose == 2
         fprintf('\nOne-vs-All mode => multigroup processing activated');
         PREPROC.BINMOD = 0;
@@ -155,7 +160,7 @@ if ~isempty(prestr)
     fprintf('%s ',prestr)
 end
 
-slnan = sum(isnan(label));
+slnan = sum(isnan(NM.label));
 if slnan
     fprintf('\n');
     cmdstr = 'Define parameters for label propagation to unlabeled training data'; cmdmnu = 100;
