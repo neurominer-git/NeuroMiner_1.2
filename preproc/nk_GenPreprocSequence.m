@@ -408,7 +408,13 @@ if isfield(TemplParam,'ACTPARAM')
                     end
                     if strcmp(TemplParam.ACTPARAM{ac}.DR.RedMode,'PLS')
                         InputParam.P{ac}.DR.PLS.V = TemplParam.ACTPARAM{ac}.DR.PLS.V(SrcParam.TrX,:);
-                        if sum(SrcParam.iTr), InputParam.P{ac}.DR.PLS.V(SrcParam.iTr,:)=[]; end
+                        %InputParam.P{ac}.DR.PLS.VT{1} = TemplParam.ACTPARAM{ac}.DR.PLS.V(SrcParam.TrI,:);
+                        InputParam.P{ac}.DR.PLS.VT{1} = TemplParam.ACTPARAM{ac}.DR.PLS.V(SrcParam.CVI,:);
+                        InputParam.P{ac}.DR.PLS.VT{2} = TemplParam.ACTPARAM{ac}.DR.PLS.V(SrcParam.TsI,:);
+                        if sum(SrcParam.iTrX), InputParam.P{ac}.DR.PLS.V(SrcParam.iTrX,:)=[]; end
+                        %if sum(SrcParam.iTr), InputParam.P{ac}.DR.PLS.VT{1}(SrcParam.iTr,:)=[]; end
+                        if sum(SrcParam.iCV), InputParam.P{ac}.DR.PLS.VT{1}(SrcParam.iCV,:)=[]; end
+                        if sum(SrcParam.iTs), InputParam.P{ac}.DR.PLS.VT{2}(SrcParam.iTs,:)=[]; end
                     end
                     if strcmp(TemplParam.ACTPARAM{ac}.DR.RedMode,{'PLS','LDA','KLDA', 'KFDA', 'KernelLDA', 'KernelFDA', 'GDA', 'NCA', 'LMNN'})
                         InputParam.P{ac}.LabelInteraction = true;

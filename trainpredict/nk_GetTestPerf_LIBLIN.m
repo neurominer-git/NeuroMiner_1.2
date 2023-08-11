@@ -8,5 +8,9 @@ if isfield(md,'BBQ') && ~SVM.LIBLIN.b
     rs = sign(predict_test_calib-.5); ds = predict_test_calib;
 else
     [err_test, ~, predict_test] = predict_liblin244(Ytest, sparse(tXtest), md, sprintf(' -b %g -q',SVM.LIBLIN.b )); 
-    rs = err_test; ds = predict_test(:,1);
+    try
+        rs = err_test; ds = predict_test(:,1);
+    catch
+        fprintf('problem')
+    end
 end

@@ -24,7 +24,10 @@ function [sY, IN] = nk_PerfRedObj(Y, IN)
 % =========================== WRAPPER FUNCTION ============================ 
 if iscell(Y) && exist('IN','var') && ~isempty(IN)
     sY = cell(1,numel(Y)); 
-    for i=1:numel(Y), [sY{i}, IN] = PerfRedObj(Y{i}, IN); end
+    for i=1:numel(Y)
+        IN.i = i;
+        [sY{i}, IN] = PerfRedObj(Y{i}, IN); 
+    end
 else
     [ sY, IN ] = PerfRedObj(Y, IN );
 end
@@ -68,7 +71,7 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
     % Dimensionality check
     if ~isempty(IN.DR.dims)
         if VERBOSE, fprintf(' %g', IN.DR.dims); end
-        if sum(IN.indNonRem) < IN.DR.dims || size(Y,2) < IN.DR.dims,
+        if sum(IN.indNonRem) < IN.DR.dims || size(Y,2) < IN.DR.dims
            fprintf('Number of nonzero features (=%g) in original space less than number of features (=%g) in projected space!', ...
                sum(IN.indNonRem),IN.DR.dims);
            IN.DR.dims = sum(IN.indNonRem)-1;
@@ -87,7 +90,8 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
             end
             if isfield(IN.DR.PLS,'algostr'), IN.algostr = IN.DR.PLS.algostr; end
             [pY,pX,~,IN] = nk_PLS(Y, L, IN);
-            %pY=[pY pX];
+            % Merge matrices
+            pY=[pY pX];
             
         case 'ProbPCA'
             iter = nk_ReturnParam([IN.DR.RedMode '-Iter'],Params_desc, opt);
@@ -240,7 +244,8 @@ if eIN || ~isfield(IN,'mpp') || isempty(IN.mpp)
 else
     switch IN.DR.RedMode
         case 'PLS'
-            [pY, pX] = nk_PLS(Y, [], IN);
+            [pY, pX] = nk_PLS(Y, IN.DR.PLS.VT{IN.i}, IN);
+            pY = [ pY pX ];
         case {'PCA','SparsePCA'}
             switch IN.DR.DRsoft
                 case 0
