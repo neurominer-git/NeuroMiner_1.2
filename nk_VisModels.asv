@@ -127,14 +127,14 @@ for i = 1 : nM
                     if nclass>1
                         if h==1, indpermA = cell(1,nclass); end
                         if numel(CV.class{1,1}{1}.groups)==1
-                            lb = [find(inp.labels == CV.class{1,1}{h}.groups(1)); find(inp.labels ~= CV.class{1,1}{h}.groups(1))];  
+                            lb = [find(inp.labels = CV.class{1,1}{h}.groups(1)); find(inp.labels ~= CV.class{1,1}{h}.groups(1))]; 
                         else
-                            lb = [find(inp.labels == CV.class{1,1}{h}.groups(1)); find(inp.labels == CV.class{1,1}{h}.groups(2))]; 
+                            I = inp.labels ~= CV.class{1,1}{1}.groups(1) && inp.labels ~= CV.class{1,1}{1}.groups(2);
                         end
-                        indpermA{h} = zeros(size(inp.labels,1), nperms(1));
-                        indpermAh = nk_VisXPermHelper('genpermlabel', size(lb,1), nperms(1));
+                        indpermAh = nk_VisXPermHelper('genpermlabel', size(inp.labels,1), nperms(1));
                         for ii=1:nperms(1)
-                            indpermA{h}(lb,ii) = lb(indpermAh(:,ii));
+                            Iperm = I(indpermA{h}(:,ii));
+                            indpermA{h}(Iperm,ii) = 0;
                         end
                     else
                         indpermA = nk_VisXPermHelper('genpermlabel', size(inp.labels,1), nperms(1));
@@ -145,18 +145,15 @@ for i = 1 : nM
                 fprintf('\nLoading parent permutation matrix from file: \n%s', permfile);
                 load(permfile,'indpermA');
                 if iscell(indpermA)
-                    [~, nsA] = size(indpermA{1});
-                    if nsA ~= nperms(1)
-                        error('Number of permutations in matrix (%g) does not match number of expected permutations (%g)', size(indpermA,2), nperms(1))
-                    end
+                    [msA, nsA] = size(indpermA{1});
                 else
                     [msA, nsA] = size(indpermA);
-                    if nsA ~= nperms(1)
-                        error('Number of permutations in matrix (%g) does not match number of expected permutations (%g)', size(indpermA,2), nperms(1))
-                    end
-                    if msA ~= size(inp.labels,1) 
-                        error('Number of cases in permutation matrix (%g) does not match number of cases in NM file (%g)', size(indpermA,1), size(inp.labels,1))
-                    end
+                end
+                if nsA ~= nperms(1)
+                    error('Number of permutations in matrix (%g) does not match number of expected permutations (%g)', size(indpermA,2), nperms(1))
+                end
+                if msA ~= size(inp.labels,1) 
+                    error('Number of cases in permutation matrix (%g) does not match number of cases in NM file (%g)', size(indpermA,1), size(inp.labels,1))
                 end
             end
         end
@@ -706,11 +703,7 @@ for f=1:ix % Loop through CV2 permutations
                                                 Px_perm(perms) = Px_perm(perms) + 1;
                                             end
                                             % Compute permuted weight map in input space
-                                            try
-                                                TXperms= nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
-                                            catch
-                                                fprintf('problem');
-                                            end
+                                            TXperms= nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
                                             for n=1:nM 
                                                 Tx_perm{n}(:,perms) = TXperms{n}; 
                                             end

@@ -9,13 +9,16 @@ switch permmode
         Yperm = Y;
         indN = isnan(L);
         if strcmp(MODEFL,'classification')
-            tL = Lperm;
-            if numel(CV.class{1,1}{1}.groups)==1
-                tL(Lperm == CV.class{1,1}{1}.groups(1)) = 1;
-                tL(Lperm ~= CV.class{1,1}{1}.groups(1)) = -1;
-            else
-                tL(Lperm == CV.class{1,1}{1}.groups(1)) = 1;
-                tL(Lperm == CV.class{1,1}{1}.groups(2)) = -1;
+            nuL = numel(CV.class{1,1});
+            tL = Lperm; uL = 1:nuL;
+            for i=1:nuL
+                if numel(CV.class{1,1}{1}.groups)==1
+                    if i==h, lb=1; else, lb=-1; end
+                    tL( Lperm == uL(i) ) = lb;
+                else
+                    tL (Lperm == CV.class{1,1}{1}.groups(1)) = 1;
+                    tL (Lperm == CV.class{1,1}{1}.groups(1)) = 1;
+                end
             end
             Lperm = tL;
         end
@@ -41,12 +44,9 @@ switch permmode
 
         if strcmp(MODEFL,'classification')
             tL = Lperm;
-            if numel(CV.class{1,1}{1}.groups)==1
-                tL(Lperm == CV.class{1,1}{1}.groups(1)) = 1;
-                tL(Lperm ~= CV.class{1,1}{1}.groups(1)) = -1;
-            else
-                tL(Lperm == CV.class{1,1}{1}.groups(1)) = 1;
-                tL(Lperm == CV.class{1,1}{1}.groups(2)) = -1;
+            for i=1:nuL
+                if i==h, lb=1; else, lb=-1; end
+                tL( Lperm == uL(i) ) = lb;
             end
             Lperm = tL;
         end
