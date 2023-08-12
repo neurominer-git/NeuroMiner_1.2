@@ -34,6 +34,8 @@ else
     MrkSizeL = 6;
 end
 offy=0;
+lg_groups = [];
+lg_handles = [];
 
 for h=1:n
     
@@ -63,7 +65,10 @@ for h=1:n
                                         'Color',hcolptin, ...
                                         'LineWidth',1, ...
                                         'LineStyle','none');
+        lg_groups = [lg_groups {sprintf('%s: probabilities',handles.NM.groupnames{h})} ];
+        lg_handles = [lg_handles handles.MultiClass.bx(h)];
         indhx =  indh & ~errors; indh0 = indh & errors;
+
         if sum(indhx)>0
             handles.MultiClass.b(h)    = plot(subjvec(indhx),probabilities(indhx,h), ...
                                         handles.colpt, ...
@@ -72,6 +77,8 @@ for h=1:n
                                         'LineWidth',handles.DataMarkerWidth,...
                                         'Color',hcolptin, ...
                                         'LineStyle','none');
+            lg_groups = [lg_groups {sprintf('%s: correct classifications',handles.NM.groupnames{h})} ];
+            lg_handles = [lg_handles handles.MultiClass.b(h)];
         else
             handles.MultiClass.b(h) = plot(0,0);
         end
@@ -83,10 +90,11 @@ for h=1:n
                                         'Color',hcolptin, ...
                                         'LineWidth',handles.DataMissMarkerWidth,...
                                         'LineStyle','none');
+            lg_groups = [lg_groups {sprintf('%s: misclassifications',handles.NM.groupnames{h})} ];
+            lg_handles = [lg_handles handles.MultiClass.be(h)];
         else
             handles.MultiClass.be(h) = plot(0,0);
         end
-        groupnames_err{h}            = 'misclassified';
     else
         handles.MultiClass.b(h)     = plot (0,0);
         handles.MultiClass.bx(h)    = plot (0,0);
@@ -95,7 +103,6 @@ end
 
 xlim([min(subjvec) max(subjvec)]);
 ylim([0 1]);
-
 
 % Define textbox info data 
 pss = cell(1,m); subjects = handles.MultiClass.cases;
@@ -138,4 +145,9 @@ xLimitsVec = linspace(1,numel(handles.MultiClass.labels), numel(handles.axes1.XA
 zeroline = ones(1,numel(xLimitsVec))*0.5;
 
 plot(xLimitsVec,zeroline,'LineWidth',handles.ZeroLineWidth,'Color',rgb('Grey'))
-legend(handles.MultiClass.bx, handles.NM.groupnames(:)', 'Location','Best', 'FontSize',handles.LegendFontSize)
+
+if h_onevsall_val == 1 
+    legend(lg_handles, lg_groups, 'Location','Best', 'FontSize',handles.LegendFontSize);
+else
+    legend('off')
+end
