@@ -118,9 +118,9 @@ if inp.PERM.flag==1
     binOOCVD_perm = cell(nclass,1);
     for h=1:nclass
         if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel
-            binOOCVD_perm{h} = zeros(inp.nOOCVsubj, sum(inp.analysis.NumModels(h,:, inp.curlabel)>0), inp.PERM.nperms);
+            binOOCVD_perm{h} = nan(inp.nOOCVsubj, sum(inp.analysis.NumModels(h,:, inp.curlabel)>0), inp.PERM.nperms);
         else
-            binOOCVD_perm{h} = zeros(inp.nOOCVsubj, sum(inp.analysis.NumModels(h, :, inp.curlabel)), inp.PERM.nperms);
+            binOOCVD_perm{h} = nan(inp.nOOCVsubj, sum(inp.analysis.NumModels(h, :, inp.curlabel)), inp.PERM.nperms);
         end
     end
 end
@@ -499,24 +499,21 @@ for f=1:ix % Loop through CV2 permutations
                     binOOCVDhx = binOOCVD{curclass}(indDicho{curclass},:);
 
                     if size(binOOCVDhx,2)>1
-                        if size(binOOCVDhx_ll,2)>1
-                            hrx_ll = sign(nm_nansum(sign(binOOCVDhx_ll),2)); 
-                            hdx_ll = nm_nanmedian(binOOCVDhx_ll,2); 
-                        else
-                            hrx_ll = sign(binOOCVDhx_ll);
-                            hdx_ll = binOOCVDhx_ll;
-                        end
-                        hdx_ll(indnan) = nan;
                         hrx = sign(nm_nansum(sign(binOOCVDhx),2)); 
                         hdx = nm_nanmedian(binOOCVDhx,2); hdx(indnan) = nan;
                     else
-                        hrx_ll = sign(binOOCVDhx_ll);
-                        hdx_ll = binOOCVDhx_ll;
                         hrx = sign(binOOCVDhx);
                         hdx = binOOCVDhx;
-                        hdx_ll(indnan) = nan;
-                        hdx(indnan) = nan;
                     end
+                    if size(binOOCVDhx_ll,2)>1
+                        hrx_ll = sign(nm_nansum(sign(binOOCVDhx_ll),2)); 
+                        hdx_ll = nm_nanmedian(binOOCVDhx_ll,2); 
+                    else
+                        hrx_ll = sign(binOOCVDhx_ll);
+                        hdx_ll = binOOCVDhx_ll;
+                    end
+                    hdx(indnan) = nan;
+                    hdx_ll(indnan) = nan;
                     if ll==1 
                         Results.BinLabels{curclass} = labelDicho{curclass}; 
                         if inp.multiflag, Results.Labels = labelOOCV; end
@@ -755,7 +752,16 @@ for curclass = 1: nclass
                         Results.Group{g}.PredictionPerformance = ALLPARAM(Results.Group{g}.ObservedValues{curclass}, Results.Group{g}.MeanCV2PredictedValues{curclass}); 
                     end
                     if inp.PERM.flag==1
-
+                        hdx = Results.Group{g}.MeanCV2PredictedValues{curclass}; 
+                        PermPredPerf = zeros(1,inp.PERM.nperms);
+                        for curperm = 1:inp.PERM.nperms
+                            PermPred = nm_nanmedian(binOOCVD_perm{curclass}(idx,:,curperm),2);
+                            PermPredPerf(curperm) = EVALFUNC(Results.Group{g}.ObservedValues{curclass}, PermPred);
+                        end
+                        Results.Group{g}.PermAnal.ModelObsPerf(curclass) = EVALFUNC(Results.Group{g}.ObservedValues{curclass}, hdx);
+                        Results.Group{g}.PermAnal.ModelPermPerf{curclass} = PermPredPerf;
+                        Results.Group{g}.PermAnal.ModelPermPerfCrit{curclass} = PermPredPerf >= Results.Group{g}.PermAnal.ModelObsPerf(curclass);
+                        Results.Group{g}.PermAnal.ModelPermSignificance(curclass) = sum(Results.Group{g}.PermAnal.ModelPermPerfCrit{curclass})/inp.PERM.nperms;  
                     end
                 end
             end
@@ -773,6 +779,20 @@ for curclass = 1: nclass
 
             Results.ErrCV2PredictedValues = Results.MeanCV2PredictedValues - labelOOCV;
             Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , labelOOCV, 1);
+
+            if inp.PERM.flag==1
+                binOOCVDhx = binOOCVD{1};
+                hdx = nm_nanmedian(binOOCVDhx,2); hdx(indnan) = nan;
+                PermPredPerf = zeros(1,inp.PERM.nperms);
+                for curperm = 1:inp.PERM.nperms
+                    PermPred = nm_nanmedian(binOOCVD_perm{curclass}(indDicho{curclass},:,curperm),2);
+                    PermPredPerf(curperm) = EVALFUNC(labelDicho{curclass}(indDicho{curclass}), PermPred);
+                end
+                Results.PermAnal.ModelObsPerf(curclass) = EVALFUNC(labelDicho{curclass}(indDicho{curclass}), hdx);
+                Results.PermAnal.ModelPermPerf{curclass} = PermPredPerf;
+                Results.PermAnal.ModelPermPerfCrit{curclass} = PermPredPerf >= Results.PermAnal.ModelObsPerf(curclass);
+                Results.PermAnal.ModelPermSignificance(curclass) = sum(Results.PermAnal.ModelPermPerfCrit{curclass})/inp.PERM.nperms;    
+            end
 
             if nsubgroups > 1 && isfield(inp,'groupind')
                 try

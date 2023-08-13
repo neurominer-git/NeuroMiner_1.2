@@ -780,6 +780,20 @@ for curclass = 1: nclass
             Results.ErrCV2PredictedValues = Results.MeanCV2PredictedValues - labelOOCV;
             Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , labelOOCV, 1);
 
+            if inp.PERM.flag==1
+                binOOCVDhx = binOOCVD{1};
+                hdx = nm_nanmedian(binOOCVDhx,2); hdx(indnan) = nan;
+                PermPredPerf = zeros(1,inp.PERM.nperms);
+                for curperm = 1:inp.PERM.nperms
+                    PermPred = nm_nanmedian(binOOCVD_perm{1}(:,:,curperm),2);
+                    PermPredPerf(curperm) = EVALFUNC(labelOOCV, PermPred);
+                end
+                Results.PermAnal.ModelObsPerf = EVALFUNC(labelOOCV, hdx);
+                Results.PermAnal.ModelPermPerf = PermPredPerf;
+                Results.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.PermAnal.ModelObsPerf;
+                Results.PermAnal.ModelPermSignificance = sum(Results.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;    
+            end
+
             if nsubgroups > 1 && isfield(inp,'groupind')
                 try
                     [Results.GroupComp.P, Results.GroupComp.AnovaTab, Results.GroupComp.Stats] = ...
@@ -807,6 +821,18 @@ for curclass = 1: nclass
                         Results.Group{g}.CorrPredictObserved = corrcoef(Results.Group{g}.ObservedValues,Results.Group{g}.MeanCV2PredictedValues);
                         Results.Group{g}.CorrPredictObserved = Results.Group{g}.CorrPredictObserved(2);
                         Results.Group{g}.Regr = nk_ComputeEnsembleProbability(Results.Group{g}.MeanCV2PredictedValues, Results.Group{g}.ObservedValues, 1);
+                        if inp.PERM.flag==1
+                            hdx = Results.Group{g}.MeanCV2PredictedValues; 
+                            PermPredPerf = zeros(1,inp.PERM.nperms);
+                            for curperm = 1:inp.PERM.nperms
+                                PermPred = nm_nanmedian(binOOCVD_perm{1}(indg,:,curperm),2);
+                                PermPredPerf(curperm) = EVALFUNC(Results.Group{g}.ObservedValues, PermPred);
+                            end
+                            Results.Group{g}.PermAnal.ModelObsPerf = EVALFUNC(Results.Group{g}.ObservedValues, hdx);
+                            Results.Group{g}.PermAnal.ModelPermPerf = PermPredPerf;
+                            Results.Group{g}.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.Group{g}.PermAnal.ModelObsPerf;
+                            Results.Group{g}.PermAnal.ModelPermSignificance = sum(Results.Group{g}.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;  
+                        end
                     else
                         fprintf('Need more than 2 subjects to compute meaningful performance metric.');
                     end
