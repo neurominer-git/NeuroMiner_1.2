@@ -43,11 +43,8 @@ if act < 10
                 if ischar(datacontainer.Y) 
                     containerpth = datacontainer.Y;
                     availstr = 'linked';
-                elseif isnumeric(datacontainer.Y)
-                    availstr = 'loaded';
                 else
-                    availstr = 'not loaded';
-                end
+                    
             end
         end
         str = sprintf('Modality %g [ %s ]: ', i, inp.datadescriptor{i}.desc);
@@ -76,20 +73,21 @@ if act < 10
         mnusel = 2:3;
     end
     
-    switch availstr
-        case 'loaded'
+    if isfield(datacontainer,'Y') && ~isempty(datacontainer.Y)
+        if ~ischar(datacontainer.Y)
             mnuact = [mnuact ['|Export ' containerstr 'modalities to files and create links in NM structure|Replace ' containerstr 'modalities with links to files']];
             mnusel = [mnusel  4 5];
-        case 'linked'
+        else
             mnuact = [mnuact ['|Update ' containerstr 'data link ']];
             mnusel = [mnusel  5];
             if exist(datacontainer.Y,'file')
                 mnuact = [mnuact ['|Re-import ' containerstr 'modalities from file into NM structure']];
                 mnusel = [mnusel  6];
             end
-        case 'not loaded'
-            mnuact = [mnuact ['|Fill ' containerstr 'modalities with links to files']];
-            mnusel = [mnusel 5];
+        end
+    else
+        mnuact = [mnuact ['|Fill ' containerstr 'modalities with links to files']];
+        mnusel = [mnusel 5];
     end
     
     if inp.oocvmode
@@ -244,7 +242,6 @@ switch act
                 datacontainer.Y{i} = pth;
             end
         else
-            pth = fullfile(pathname, filename);
             load(pth)
             if exist("OOCV","var")
                 datacontainer = OOCV;

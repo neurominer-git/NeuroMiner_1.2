@@ -5,7 +5,7 @@
 % Runtime model of independent test data prediction
 %
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, last modified 08/2023
+% (c) Nikolaos Koutsouleris, last modified 07/2021
 
 global CV 
 
@@ -129,8 +129,8 @@ if ~isempty(analysis)
     % if the currently selected OOCV container has labels allow user to test model significance in OOCV data 
     if isfield(inp,'OO') && isfield(inp.OO,'labels_known') && inp.OO.labels_known
         PERM_opts       = {'yes', 'no'};   
-        PermFlagStr = sprintf('Perform permutation analysis [ %s ]|', PERM_opts{inp.PERM.flag});                             PermFlagAct = 13;
-        if inp.PERM.flag == 1
+        PermFlagStr = sprintf('Perform permutation analysis [ %s ]', PERM_opts{inp.PERM.flag});                             PermFlagAct = 13;
+        if inp.PERM.flag
             PermNPermsStr = sprintf('Define no. of permutations [ %g ]', inp.PERM.nperms);                                  PermNPermsAct = 14;
         end
     end
@@ -149,7 +149,7 @@ menustr = [ AnalSelectStr ...
             LoadParamsStr ... 
             LoadModelsStr ...
             PermFlagStr ...
-            PermNPermsStr ];
+            PermNPermStr ];
 
 menuact = [ AnalSelectAct ...
             OOCVSelectAct ...
@@ -257,9 +257,9 @@ switch act
     case 12
         if inp.saveCV1 == 1, inp.saveCV1 = 2; elseif inp.saveCV1 == 2,  inp.saveCV1 = 1; end
     case 13
-        if inp.PERM.flag == 1, inp.PERM.flag = 2; elseif inp.PERM.flag == 2,  inp.PERM.flag = 1; end
+        if inp.PERM.flag == 1, inp.PERM.flag = 2; elseif inp.PERM.flag == 2,  inp.saveCV1 = 1; end
+
     case 14
-        inp.PERM.nperms = nk_input('Define no. of permutation for testing model significance in OOCV data',0,'e', inp.PERM.nperms);
 end
 
 % =========================================================================

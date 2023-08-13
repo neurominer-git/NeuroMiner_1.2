@@ -67,6 +67,9 @@ else
     sta = 0.49;
     stp = 0.45;
 end
+if isfield(handles,'PermAnal')
+    contig{end+1} = ['\bf Model permutation P value: \rm' num2str(handles.PermAnal,'%0.3f')];
+end
 
 switch handles.modeflag
     case 'classification'

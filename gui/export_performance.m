@@ -22,13 +22,13 @@ for i=1:handles.nclass
                 [handles, oocvind] = get_oocvind(handles);
                 if isfield(handles.OOCV(oocvind).data,'BinResults')
                     if handles.selSubGroupOOCV.Value>1
-                        if iscell(handles.OOCV(oocvind).data.BinResults{1}.Group{handles.selSubGroupOOCV.Value-1}.PredictionPerformance)
+                        if iscell(handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{handles.selSubGroupOOCV.Value-1}.PredictionPerformance)
                             contigmat = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{handles.selSubGroupOOCV.Value-1}.PredictionPerformance{i};
                         else
                             contigmat = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{handles.selSubGroupOOCV.Value-1}.PredictionPerformance;
                         end
                     else
-                        if iscell(handles.OOCV(oocvind).data.BinResults{1}.contingency)
+                        if iscell(handles.OOCV(oocvind).data.BinResults{handles.curlabel}.contingency)
                             contigmat = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.contingency{i};
                         else
                             contigmat = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.contingency;
@@ -37,6 +37,7 @@ for i=1:handles.nclass
                 else
                     contigmat = handles.OOCV(oocvind).data.MultiResults{handles.curlabel}.contingency{i};
                 end
+                if isfield(handles,'PermAnal'), contigmat.Pvalue = handles.PermAnal; end
             end
         case 'regression'
             TBL = handles.Regr.tbl_cont;
@@ -44,6 +45,7 @@ for i=1:handles.nclass
                 [handles, oocvind] = get_oocvind(handles);
                 TBL = handles.curRegr.tbl_cont;
                 contigmat = handles.curRegr.contigmat;
+                if isfield(handles,'PermAnal'), contigmat.Pvalue = handles.PermAnal; end
             end
     end
     if handles.oocvview
