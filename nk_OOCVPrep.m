@@ -27,14 +27,20 @@ if ~exist('inp','var') || isempty(inp)
                     ...                         % 2 = operate at CV2 level
                     'loadparam', 2, ...         % 1 = load existing optpreproc and/or optmodel parameters from disk
                     ...                         % 2 = recompute parameters
-                    'PERM', struct( 'flag', 2, 'nperms', 100 ), ... % Permutation analysis performed on OOCV data
+                    'PERM', struct( 'flag', 2, 'fileflag', 2, 'nperms', 100, 'permdeffile', '' ), ... % Permutation analysis performed on OOCV data
                     'HideGridAct', false, ...
                     'batchflag', 0);            % 1 = Run in batchmode (without graphics outputs)
                                                 % 0 = run in interactive mode
 end
 na_str = '?'; inp.datatype = 'OOCVdatamat'; 
-OverWriteStr = []; GridSelectStr = []; LoadModelsStr = []; LoadParamsStr = []; LoadStr = []; SaveStr = []; SaveCV1Str = []; PermFlagStr = []; PermNPermsStr = [];
-OverWriteAct = []; GridSelectAct = []; LoadModelsAct = []; LoadParamsAct = []; LoadAct = []; SaveAct = []; SaveCV1Act = []; PermFlagAct = []; PermNPermsAct = [];
+OverWriteStr = []; GridSelectStr = []; 
+LoadModelsStr = []; LoadParamsStr = []; 
+LoadStr = []; SaveStr = []; SaveCV1Str = []; 
+PermFlagStr = []; PermFileOrNewStr = []; PermNPermsStr = []; PermFileStr = [];
+OverWriteAct = []; GridSelectAct = []; 
+LoadModelsAct = []; LoadParamsAct = []; 
+LoadAct = []; SaveAct = []; SaveCV1Act = []; 
+PermFlagAct = []; PermFileOrNewAct = []; PermNPermsAct = []; PermFileAct = [];
 DATASCRAM = false; if isfield(NM.defs,'data_scrambled') && ~isempty(NM.defs.data_scrambled), DATASCRAM = NM.defs.data_scrambled;end
     
 %% Configure menu
@@ -129,9 +135,16 @@ if ~isempty(analysis)
     % if the currently selected OOCV container has labels allow user to test model significance in OOCV data 
     if isfield(inp,'OO') && isfield(inp.OO,'labels_known') && inp.OO.labels_known
         PERM_opts       = {'yes', 'no'};   
-        PermFlagStr = sprintf('Perform permutation analysis [ %s ]|', PERM_opts{inp.PERM.flag});                             PermFlagAct = 13;
+        PERM_file_opts  = {'create new', 'use existing'};
+        PermFlagStr = sprintf('Perform permutation analysis [ %s ]|', PERM_opts{inp.PERM.flag});                            PermFlagAct = 13;
         if inp.PERM.flag == 1
-            PermNPermsStr = sprintf('Define no. of permutations [ %g ]', inp.PERM.nperms);                                  PermNPermsAct = 14;
+            PermFileOrNewStr = sprintf('Create new or use existing permutation definition file [ %s ]|', ...
+                                        PERM_file_opts{inp.PERM.fileflag});                                                 PermFileOrNewAct = 14;
+            if inp.PERM.fileflag == 1
+                PermNPermsStr = sprintf('Define no. of permutations [ %g ]', inp.PERM.nperms);                              PermNPermsAct = 15;
+            else
+                PermFileStr = sprintf('Select permutation definition file [ %s ]', inp.PERM.permdeffile);                   PermFileAct = 16;
+            end
         end
     end
 
@@ -149,7 +162,9 @@ menustr = [ AnalSelectStr ...
             LoadParamsStr ... 
             LoadModelsStr ...
             PermFlagStr ...
-            PermNPermsStr ];
+            PermFileOrNewStr ...
+            PermNPermsStr ...
+            PermFileStr ];
 
 menuact = [ AnalSelectAct ...
             OOCVSelectAct ...
@@ -162,7 +177,9 @@ menuact = [ AnalSelectAct ...
             LoadParamsAct ...
             LoadModelsAct ...
             PermFlagAct ...
-            PermNPermsAct];       
+            PermFileOrNewAct ...
+            PermNPermsAct ...
+            PermFileAct];       
 
 disallow = false;
 
@@ -179,7 +196,7 @@ if ~disallow, menustr = [menustr '|PROCEED >>>']; menuact = [menuact 10]; end
 %% Display menu and act on user selections
 nk_PrintLogo
 mestr = 'Independent test module run-time configuration'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
-if ~inp.batchflag && act<15, act = nk_input(mestr, 0, 'mq', menustr, menuact); end
+if ~inp.batchflag && act<17, act = nk_input(mestr, 0, 'mq', menustr, menuact); end
 
 switch act
     
@@ -259,7 +276,11 @@ switch act
     case 13
         if inp.PERM.flag == 1, inp.PERM.flag = 2; elseif inp.PERM.flag == 2,  inp.PERM.flag = 1; end
     case 14
+        if inp.PERM.fileflag == 1, inp.PERM.fileflag = 2; elseif inp.PERM.fileflag  == 2,  inp.PERM.fileflag = 1; end
+    case 15
         inp.PERM.nperms = nk_input('Define no. of permutation for testing model significance in OOCV data',0,'e', inp.PERM.nperms);
+    case 16
+        inp.PERM.permdeffile = nk_FileSelector(1, 'none', 'Select permutation definition file', '.mat');
 end
 
 % =========================================================================

@@ -113,8 +113,16 @@ end
 % Check whether you have to perform permutation analysis on OOCV data and
 % create permutation index file
 if inp.PERM.flag==1
-    inp.PERM.suffix = '_OOCVpermmat_ID';
-    indpermA = nk_GenPermMatrix(CV, SAV, inp); 
+    if isfield(inp.PERM,'permdeffile') && ~isempty(inp.PERM.permdeffile) && exist(inp.PERM.permdeffile,'file')
+        fprintf('\nLoading permutation definition: %s', inp.PERM.permdeffile);
+        load(inp.PERM.permdeffile)
+        if ~exist("indpermA","var")
+            error('\n%s does not contain permutation definitions!', inp.PERM.permdeffile)
+        end
+    else
+        inp.PERM.suffix = '_OOCVpermmat_ID';
+        indpermA = nk_GenPermMatrix(CV, SAV, inp); 
+    end
     binOOCVD_perm = cell(nclass,1);
     for h=1:nclass
         if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel
@@ -843,6 +851,29 @@ end
 
 if MULTI.flag && multiflag 
     labels = []; if LabelMode, labels = labelOOCV; end
+    % Compute multiclass prediction results for current OOCV data
     Results = nk_MultiPerfComp(Results, Results.MultiCV2PredictionsLL, labels, ngroups, 'pred');
+    % Permutation enabled?
+    if inp.PERM.flag == 1
+        PermPredPerf = zeros(1,inp.PERM.nperms);
+        for curperm = 1:inp.PERM.nperms
+            nDicho = 0; nDichoH = zeros(nclass+1,1); nDichoH(1) = 1;
+            for curclass = 1 : nclass
+                nDicho = nDicho + size(binOOCVD{curclass}(:,:,curperm),2);
+                nDichoH(curclass+1) = 1 + nDicho;
+            end
+            multiOOCV_perm  = zeros(inp.nOOCVsubj, nDicho);
+            multiClass_perm = zeros(1, nDicho);
+            for curclass = 1 : nclass
+                multiOOCV_perm( : , nDichoH(curclass) : nDichoH(curclass+1) - 1) = binOOCVD{curclass}(:,:,curperm);
+                multiClass_perm(1, nDichoH(curclass) : nDichoH(curclass+1) - 1) = ones(1,size(binOOCVD{curclass}(:,:,curperm),2)) * curclass;
+            end
+            PermPredPerf(curperm) = nk_MultiEnsPerf(multiOOCV_perm, sign(multiOOCV_perm), labels, multiClass_perm, ngroups);
+        end
+        Results.MultiClass.PermAnal.ModelObsPerf = Results.MultiClass.performance.BAC_Mean;
+        Results.MultiClass.PermAnal.ModelPermPerf = PermPredPerf;
+        Results.MultiClass.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.MultiClass.PermAnal.ModelObsPerf;
+        Results.MultiClass.PermAnal.ModelPermSignificance = sum(Results.MultiClass.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;  
+    end
 end
 

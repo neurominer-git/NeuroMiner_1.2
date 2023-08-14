@@ -113,6 +113,7 @@ end
 % Check whether you have to perform permutation analysis on OOCV data and
 % create permutation index file
 if inp.PERM.flag==1
+    i
     inp.PERM.suffix = '_OOCVpermmat_ID';
     indpermA = nk_GenPermMatrix(CV, SAV, inp); 
     binOOCVD_perm = cell(nclass,1);
@@ -785,13 +786,13 @@ for curclass = 1: nclass
                 hdx = nm_nanmedian(binOOCVDhx,2); hdx(indnan) = nan;
                 PermPredPerf = zeros(1,inp.PERM.nperms);
                 for curperm = 1:inp.PERM.nperms
-                    PermPred = nm_nanmedian(binOOCVD_perm{curclass}(indDicho{curclass},:,curperm),2);
-                    PermPredPerf(curperm) = EVALFUNC(labelDicho{curclass}(indDicho{curclass}), PermPred);
+                    PermPred = nm_nanmedian(binOOCVD_perm{1}(:,:,curperm),2);
+                    PermPredPerf(curperm) = EVALFUNC(labelOOCV, PermPred);
                 end
-                Results.PermAnal.ModelObsPerf(curclass) = EVALFUNC(labelDicho{curclass}(indDicho{curclass}), hdx);
-                Results.PermAnal.ModelPermPerf{curclass} = PermPredPerf;
-                Results.PermAnal.ModelPermPerfCrit{curclass} = PermPredPerf >= Results.PermAnal.ModelObsPerf(curclass);
-                Results.PermAnal.ModelPermSignificance(curclass) = sum(Results.PermAnal.ModelPermPerfCrit{curclass})/inp.PERM.nperms;    
+                Results.PermAnal.ModelObsPerf = EVALFUNC(labelOOCV, hdx);
+                Results.PermAnal.ModelPermPerf = PermPredPerf;
+                Results.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.PermAnal.ModelObsPerf;
+                Results.PermAnal.ModelPermSignificance = sum(Results.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;    
             end
 
             if nsubgroups > 1 && isfield(inp,'groupind')
@@ -821,6 +822,18 @@ for curclass = 1: nclass
                         Results.Group{g}.CorrPredictObserved = corrcoef(Results.Group{g}.ObservedValues,Results.Group{g}.MeanCV2PredictedValues);
                         Results.Group{g}.CorrPredictObserved = Results.Group{g}.CorrPredictObserved(2);
                         Results.Group{g}.Regr = nk_ComputeEnsembleProbability(Results.Group{g}.MeanCV2PredictedValues, Results.Group{g}.ObservedValues, 1);
+                        if inp.PERM.flag==1
+                            hdx = Results.Group{g}.MeanCV2PredictedValues; 
+                            PermPredPerf = zeros(1,inp.PERM.nperms);
+                            for curperm = 1:inp.PERM.nperms
+                                PermPred = nm_nanmedian(binOOCVD_perm{1}(indg,:,curperm),2);
+                                PermPredPerf(curperm) = EVALFUNC(Results.Group{g}.ObservedValues, PermPred);
+                            end
+                            Results.Group{g}.PermAnal.ModelObsPerf = EVALFUNC(Results.Group{g}.ObservedValues, hdx);
+                            Results.Group{g}.PermAnal.ModelPermPerf = PermPredPerf;
+                            Results.Group{g}.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.Group{g}.PermAnal.ModelObsPerf;
+                            Results.Group{g}.PermAnal.ModelPermSignificance = sum(Results.Group{g}.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;  
+                        end
                     else
                         fprintf('Need more than 2 subjects to compute meaningful performance metric.');
                     end
@@ -831,6 +844,29 @@ end
 
 if MULTI.flag && multiflag 
     labels = []; if LabelMode, labels = labelOOCV; end
+    % Compute multiclass prediction results for current OOCV data
     Results = nk_MultiPerfComp(Results, Results.MultiCV2PredictionsLL, labels, ngroups, 'pred');
+    % Permutation enabled?
+    if inp.PERM.flag == 1
+        PermPredPerf = zeros(1,inp.PERM.nperms);
+        for curperm = 1:inp.PERM.nperms
+            nDicho = 0; nDichoH = zeros(nclass+1,1); nDichoH(1) = 1;
+            for curclass = 1 : nclass
+                nDicho = nDicho + size(binOOCVD{curclass}(:,:,curperm),2);
+                nDichoH(curclass+1) = 1 + nDicho;
+            end
+            multiOOCV_perm  = zeros(inp.nOOCVsubj, nDicho);
+            multiClass_perm = zeros(1, nDicho);
+            for curclass = 1 : nclass
+                multiOOCV_perm( : , nDichoH(curclass) : nDichoH(curclass+1) - 1) = binOOCVD{curclass}(:,:,curperm);
+                multiClass_perm(1, nDichoH(curclass) : nDichoH(curclass+1) - 1) = ones(1,size(binOOCVD{curclass}(:,:,curperm),2)) * curclass;
+            end
+            PermPredPerf(curperm) = nk_MultiEnsPerf(multiOOCV_perm, sign(multiOOCV_perm), labels, multiClass_perm, ngroups);
+        end
+        Results.MultiClass.PermAnal.ModelObsPerf = Results.MultiClass.performance.BAC_Mean;
+        Results.MultiClass.PermAnal.ModelPermPerf = PermPredPerf;
+        Results.MultiClass.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.MultiClass.PermAnal.ModelObsPerf;
+        Results.MultiClass.PermAnal.ModelPermSignificance = sum(Results.MultiClass.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;  
+    end
 end
 

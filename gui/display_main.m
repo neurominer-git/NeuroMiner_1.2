@@ -55,10 +55,15 @@ switch h_list{h_val}
                     end
                     handles.selSubGroupOOCV.String = GroupNames;
                     handles.selSubGroupOOCV.Value = 1;
-                    handles.selSubGroupOOCV.Visible = 'on';
+                    handles.selSubGroupOOCV.Visible = 'on';                    
                 else
                     handles.selSubGroupOOCV.Value = 1;
                     handles.selSubGroupOOCV.Visible = 'off';
+                end
+                if isfield(handles.OOCV(handles.oocvind ).data.BinResults{handles.curlabel},'PermAnal')
+                    handles.PermAnal = handles.OOCV(handles.oocvind ).data.BinResults{handles.curlabel}.PermAnal.ModelPermSignificance(h_class);
+                else
+                    if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
                 end
             else
                 handles.oocvview = false;
@@ -102,6 +107,11 @@ switch h_list{h_val}
           
             handles  = display_regrplot(handles, [], handles.oocvview, false, true, 0.8);
             load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{handles.oocvind});
+            if isfield(handles.OOCV(handles.oocvind ).data.RegrResults{handles.curlabel},'PermAnal')
+                handles.PermAnal = handles.OOCV(handles.oocvind ).data.RegrResults{handles.curlabel}.PermAnal.ModelPermSignificance;
+            else
+                if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
+            end
         else
             handles.oocvview = false;
             handles = display_regrplot(handles, [], false, false, true, 0.8);
