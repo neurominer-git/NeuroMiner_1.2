@@ -113,9 +113,18 @@ end
 % Check whether you have to perform permutation analysis on OOCV data and
 % create permutation index file
 if inp.PERM.flag==1
-    i
-    inp.PERM.suffix = '_OOCVpermmat_ID';
-    indpermA = nk_GenPermMatrix(CV, SAV, inp); 
+    if isfield(inp.PERM,'permdeffile') && ~isempty(inp.PERM.permdeffile) && exist(inp.PERM.permdeffile,'file')
+        fprintf('\nLoading permutation definition: %s', inp.PERM.permdeffile);
+        load(inp.PERM.permdeffile)
+        if ~exist("indpermA","var")
+            error('\n%s does not contain permutation definitions!', inp.PERM.permdeffile)
+        end
+        inp.PERM.nperms = size(indpermA,2);
+        fprintf('\nn=%g permutations found in ')
+    else
+        inp.PERM.suffix = '_OOCVpermmat_ID';
+        indpermA = nk_GenPermMatrix(CV, SAV, inp); 
+    end
     binOOCVD_perm = cell(nclass,1);
     for h=1:nclass
         if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel

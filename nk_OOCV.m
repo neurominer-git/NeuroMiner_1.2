@@ -119,6 +119,8 @@ if inp.PERM.flag==1
         if ~exist("indpermA","var")
             error('\n%s does not contain permutation definitions!', inp.PERM.permdeffile)
         end
+        inp.PERM.nperms = size(indpermA,2);
+        fprintf('\nn=%g permutations found in permutation matrix.',inp.PERM.nperms);
     else
         inp.PERM.suffix = '_OOCVpermmat_ID';
         indpermA = nk_GenPermMatrix(CV, SAV, inp); 
