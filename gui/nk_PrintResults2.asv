@@ -1409,35 +1409,12 @@ if hObject.Value > 1
     handles.SubIndex = any(groups(:,gindex),2);
     switch handles.modeflag
         case 'classification'
-            if isfield(handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{gindex(1)},'PermAnal')
-                handles.PermAnal = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{gindex(1)}.PermAnal.ModelPermSignificance(handles.curclass);
-            else
-                if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
+            if isfield(handles.OOCV(oocvind).data.BinResults{1}.Group{gindex},'PermAnal')
+                handles.BinClass{1}.PermAnal = handles.OOCV(oocvind).data.BinResults{1}.Group{gindex}.PermAnal.ModelPermSignificance(handles)
             end
-        case 'regression'
-            if isfield(handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{gindex(1)},'PermAnal')
-                handles.PermAnal = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{gindex(1)}.PermAnal.ModelPermSignificance;
-            else
-                if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
-            end
-    end
 else
     if isfield(handles,'SubIndex') 
         handles = rmfield(handles,'SubIndex');
-    end
-    switch handles.modeflag
-        case 'classification'
-            if isfield(handles.OOCV(oocvind).data.BinResults{1},'PermAnal')
-                handles.PermAnal = handles.OOCV(oocvind).data.BinResults{1}.PermAnal.ModelPermSignificance(handles.curclass);
-            else
-                if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
-            end
-        case 'regression'
-            if isfield(handles.OOCV(oocvind).data.RegrResults{1},'PermAnal')
-                handles.PermAnal = handles.OOCV(oocvind).data.RegrResults{1}.PermAnal.ModelPermSignificance;
-            else
-                if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
-            end
     end
 end
 switch handles.modeflag

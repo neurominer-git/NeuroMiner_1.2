@@ -142,7 +142,7 @@ GDanalysis.grid.mean_Complexity             = nan(nPs(1),nclass,ix*jx,nl);
 GDanalysis.grid.mean_CVDiversity            = nan(nPs(1),nclass,ix*jx,nl);
 GDanalysis.grid.mean_TsDiversity            = nan(nPs(1),nclass,ix*jx,nl);
 GDanalysis.grid.SelNodeFreq                 = nan(nPs(1),nclass,ix*jx,nl);
-
+GDanalysis.NumModels                        = zeros(nclass,ix*jx,nl);
 % Some algorithms require specific variables
 switch SVM.prog
     case 'SEQOPT'
@@ -743,6 +743,7 @@ for f=1:ix % Loop through CV2 permutations
                             GDanalysis.CV2grid.predictions(TsI, f, curclass, curlabel) = nm_nanmedian(EnsDat(binInd,:),2);
                         end
                     end
+                    GDanalysis.NumModels(curclass,ll,curlabel) = GDanalysis.NumModels(curclass,ll,curlabel) + size(EnsDat,2); 
                     
                     % Choose Metric (hard or soft predictions):
                     % Metric = 1 => use hard labels for aggregation

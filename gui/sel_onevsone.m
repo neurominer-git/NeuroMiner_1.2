@@ -9,8 +9,6 @@ switch rowind
         [handles.hroc, handles.hroc_random] = display_roc(handles);
         %% Display Cobweb
         [handles.hspider, handles.MultiClass.misclass_confusion, handles.MultiClass.spideraxes] = nk_PlotCobWeb(handles.MultiClass.confusion_matrix, handles.NM.groupnames, handles.axes5);
-        %handles.axes4.Visible='off'; handles.axes3.Visible='off';
-        %handles.axes4.Title.Visible = 'off'; handles.axes4.Title.Visible = 'off';
         cla(handles.axes4);title(handles.axes4,{''});
         cla(handles.axes3);title(handles.axes3,{''});
         handles.selOneVsAll_Info.Visible = 'on';
@@ -27,9 +25,7 @@ switch rowind
         handles.cmdExportCobWeb.Visible = 'off';
         
         %% Display ROC
-        %handles.txtPerf.Visible='on';
-        legend off %set(handles.txtPerf,'visible','on');
-        
+        legend off 
         [handles.hroc, handles.hroc_random] = display_roc(handles);
         
         %% Display contingency info

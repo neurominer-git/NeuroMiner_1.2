@@ -27,7 +27,7 @@ if ~exist('inp','var') || isempty(inp)
                     ...                         % 2 = operate at CV2 level
                     'loadparam', 2, ...         % 1 = load existing optpreproc and/or optmodel parameters from disk
                     ...                         % 2 = recompute parameters
-                    'PERM', struct( 'flag', 2, 'fileflag', 2, 'nperms', 100, 'permdeffile', '' ), ... % Permutation analysis performed on OOCV data
+                    'PERM', struct( 'flag', 2, 'fileflag', 2, 'nperms', 100,  ), ... % Permutation analysis performed on OOCV data
                     'HideGridAct', false, ...
                     'batchflag', 0);            % 1 = Run in batchmode (without graphics outputs)
                                                 % 0 = run in interactive mode
@@ -196,7 +196,7 @@ if ~disallow, menustr = [menustr '|PROCEED >>>']; menuact = [menuact 10]; end
 %% Display menu and act on user selections
 nk_PrintLogo
 mestr = 'Independent test module run-time configuration'; navistr = [parentstr ' >>> ' mestr]; fprintf('\nYou are here: %s >>>',parentstr);
-if ~inp.batchflag && act<17, act = nk_input(mestr, 0, 'mq', menustr, menuact); end
+if ~inp.batchflag && act<15, act = nk_input(mestr, 0, 'mq', menustr, menuact); end
 
 switch act
     
@@ -280,7 +280,7 @@ switch act
     case 15
         inp.PERM.nperms = nk_input('Define no. of permutation for testing model significance in OOCV data',0,'e', inp.PERM.nperms);
     case 16
-        inp.PERM.permdeffile = nk_FileSelector(1, 'none', 'Select permutation definition file', '.mat');
+        inp.PERM.permdeffile
 end
 
 % =========================================================================

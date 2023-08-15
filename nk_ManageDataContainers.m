@@ -26,10 +26,29 @@ if act < 10
     fprintf('\n')
     for i=1:inp.nummodal
         availstr = 'available';
-        if ~isfield(datacontainer,'Y')  || i > numel(datacontainer.Y) || isempty(datacontainer.Y{i})
+
+        if ~isfield(datacontainer,'Y')  || i > numel(datacontainer.Y) || (iscell(datacontainer.Y) && isempty(datacontainer.Y{i}))
             availstr = 'not loaded';
-        elseif isfield(datacontainer,'Y') && ischar(datacontainer.Y{i})
-            availstr = 'linked';
+        elseif isfield(datacontainer,'Y') 
+            if iscell(datacontainer.Y) 
+                if ischar(datacontainer.Y{i})
+                    containerpth = datacontainer.Y{i};
+                    availstr = 'linked';
+                elseif isnumeric(datacontainer.Y{i})
+                    availstr = 'loaded';
+                else
+                    availstr = 'not loaded';
+                end
+            else 
+                if ischar(datacontainer.Y) 
+                    containerpth = datacontainer.Y;
+                    availstr = 'linked';
+                elseif isnumeric(datacontainer.Y)
+                    availstr = 'loaded';
+                else
+                    availstr = 'not loaded';
+                end
+            end
         end
         str = sprintf('Modality %g [ %s ]: ', i, inp.datadescriptor{i}.desc);
         fprintf('\n'); 
@@ -39,7 +58,7 @@ if act < 10
             fprintf('\t%s', str); 
         end
         if strcmp(availstr,'linked')
-            fprintf('%s [ %s ] ', availstr, datacontainer.Y{i});
+            fprintf('%s [ %s ] ', availstr, containerpth);
         else
             fprintf( '%s ', availstr);
         end   
@@ -57,21 +76,20 @@ if act < 10
         mnusel = 2:3;
     end
     
-    if isfield(datacontainer,'Y') && ~isempty(datacontainer.Y)
-        if ~ischar(datacontainer.Y)
+    switch availstr
+        case 'loaded'
             mnuact = [mnuact ['|Export ' containerstr 'modalities to files and create links in NM structure|Replace ' containerstr 'modalities with links to files']];
             mnusel = [mnusel  4 5];
-        else
+        case 'linked'
             mnuact = [mnuact ['|Update ' containerstr 'data link ']];
             mnusel = [mnusel  5];
             if exist(datacontainer.Y,'file')
                 mnuact = [mnuact ['|Re-import ' containerstr 'modalities from file into NM structure']];
                 mnusel = [mnusel  6];
             end
-        end
-    else
-        mnuact = [mnuact ['|Fill ' containerstr 'modalities with links to files']];
-        mnusel = [mnusel 5];
+        case 'not loaded'
+            mnuact = [mnuact ['|Fill ' containerstr 'modalities with links to files']];
+            mnusel = [mnusel 5];
     end
     
     if inp.oocvmode
@@ -226,6 +244,7 @@ switch act
                 datacontainer.Y{i} = pth;
             end
         else
+            pth = fullfile(pathname, filename);
             load(pth)
             if exist("OOCV","var")
                 datacontainer = OOCV;
