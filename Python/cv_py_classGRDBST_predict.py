@@ -19,7 +19,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 import pickle
 from scipy.io import savemat
 import uuid
-#import os
+import os
 
 gb = pickle.load(open(model_name, 'rb'))
 #os.remove(model_name)

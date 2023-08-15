@@ -1,7 +1,7 @@
 from sklearn.ensemble import RandomForestClassifier
 import pickle
 from scipy.io import savemat
-#import os
+import os
 
 rf = pickle.load(open(model_name, 'rb'))
 #os.remove(model_name)

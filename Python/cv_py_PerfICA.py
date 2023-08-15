@@ -2,6 +2,7 @@ from sklearn.decomposition import FastICA
 import numpy as np
 import pickle
 import uuid
+import os
 
 # train 
 if mode == "train":
@@ -13,7 +14,7 @@ if mode == "train":
     S = ica_model.transform(data)
     ICs = ica_model.components_
     random_name = uuid.uuid4().hex
-    
+
     model_file = f"{rootdir}/ica_model_{random_name}.sav"
     if not os.path.isdir(f'{rootdir}/Py_modelfiles')
         os.makedirs(f'{rootdir}/Py_filesmodel')

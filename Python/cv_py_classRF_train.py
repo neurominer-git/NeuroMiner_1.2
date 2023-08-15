@@ -24,6 +24,7 @@ Output:
 from sklearn.ensemble import RandomForestClassifier
 import pickle
 import uuid
+import os
 
 # a few categorical arguments need to be 'translated' to fit function
 # criterion
