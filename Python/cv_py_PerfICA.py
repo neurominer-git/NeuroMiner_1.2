@@ -15,9 +15,9 @@ if mode == "train":
     ICs = ica_model.components_
     random_name = uuid.uuid4().hex
 
-    py_modeldir = os.path.join(rootdir,"Py_modelfiles")
-    if not os.path.isdir(py_modeldir)
-        os.makedirs(f"{rootdir}/Py_filesmodel")
+    py_modeldir = os.path.join(rootdir,'Py_modelfiles')
+    if not os.path.isdir(py_modeldir):
+        os.makedirs(f"{rootdir}/Py_modelfiles")
         print(f"created folder: {py_modeldir}") 
     model_file = os.path.join(py_modeldir,f"ica_model_{random_name}.sav")
    

@@ -88,10 +88,11 @@ rf = RandomForestRegressor(n_estimators = n_est,
 rf.fit(feat, lab)
 random_name = uuid.uuid4().hex;
 
-py_modeldir = os.path.join(rootdir,"Py_modelfiles")
-if not os.path.isdir(py_modeldir)
+py_modeldir = os.path.join(rootdir,'Py_modelfiles')
+if not os.path.isdir(py_modeldir):
     os.makedirs(py_modeldir)
     print(f"created folder: {py_modeldir}") 
+model_file = os.path.join(py_modeldir,f"ica_model_{random_name}.sav")
 
 model_file = os.path.join(py_modeldir,f"RFR_model_{random_name}.sav")
 
