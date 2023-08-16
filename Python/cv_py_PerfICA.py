@@ -18,8 +18,8 @@ if mode == "train":
     py_modeldir = os.path.join(rootdir,"Py_modelfiles")
     if not os.path.isdir(py_modeldir)
         os.makedirs(f"{rootdir}/Py_filesmodel")
-        print(f"created folder: {rootdir}/Py_modelfiles") 
-    model_file = os.path.join(rootdir,"Py_modelfiles","ica_model_{random_name}.sav")
+        print(f"created folder: {py_modeldir}") 
+    model_file = os.path.join(py_modeldir,f"ica_model_{random_name}.sav")
    
     pickle.dump(ica, open(model_file, "wb"))
 # test

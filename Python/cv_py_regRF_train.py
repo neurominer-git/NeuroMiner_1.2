@@ -88,9 +88,11 @@ rf = RandomForestRegressor(n_estimators = n_est,
 rf.fit(feat, lab)
 random_name = uuid.uuid4().hex;
 
-if not os.path.isdir(f'{rootdir}/Py_modelfiles')
-    os.makedirs(f'{rootdir}/Py_filesmodel')
-    print(f'created folder: {rootdir}/Py_modelfiles') 
-    
-model_file = f'{rootdir}Py_modelfiles//RFR_model_{random_name}.sav';
+py_modeldir = os.path.join(rootdir,"Py_modelfiles")
+if not os.path.isdir(py_modeldir)
+    os.makedirs(py_modeldir)
+    print(f"created folder: {py_modeldir}") 
+
+model_file = os.path.join(py_modeldir,f"RFR_model_{random_name}.sav")
+
 pickle.dump(rf, open(model_file, 'wb'))

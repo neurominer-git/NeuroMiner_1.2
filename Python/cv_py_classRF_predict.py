@@ -10,10 +10,11 @@ probabilities = rf.predict_proba(test_feat)
 
 res_dict = {'predictions': predictions, 'probabilities': probabilities}
 
-if not os.path.isdir(f'{rootdir}/Py_modelfiles')
-    os.makedirs(f'{rootdir}/Py_filesmodel')
-    print(f'created folder: {rootdir}/Py_modelfiles') 
+py_modeldir = os.path.join(rootdir,"Py_modelfiles")
+if not os.path.isdir(py_modeldir)
+    os.makedirs(py_modeldir)
+    print(f"created folder: {py_modeldir}") 
 
-results_file = f'{rootdir}/Py_modelfiles/RFpredict_output.mat'
+results_file = os.path.join(py_modeldir,"RFpredict_output.mat")
 
 savemat(results_file, res_dict)
