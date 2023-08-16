@@ -21,7 +21,7 @@ switch progtype
         if isfield(res.TrainParam,'LABEL') && res.TrainParam.LABEL.flag == 1
             modeflag = res.TrainParam.LABEL.newmode;
         end
-        act = 1; while act, [act, param] = nk_LIBSVM_config(res, param, [], [], parentstr, modeflag); end
+        act = 1; while act, [param,act] = nk_LIBSVM_config(res, param, [], [], parentstr, modeflag); end
         
     case 'SVMPRF'
         

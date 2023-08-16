@@ -18,7 +18,7 @@ Output:
 from sklearn.ensemble import RandomForestRegressor
 import pickle
 from scipy.io import savemat
-#import os
+import os
 
 rf = pickle.load(open(model_name, 'rb'))
 #os.remove(model_name)
@@ -27,6 +27,11 @@ predictions = rf.predict(test_feat)
 
 #res_dict = {'predictions': predictions, 'probabilities': probabilities}
 res_dict = {'predictions': predictions}
-results_file = f'{rootdir}/RFpredict_output.mat'
+
+if not os.path.isdir(f'{rootdir}/Py_modelfiles')
+    os.makedirs(f'{rootdir}/Py_filesmodel')
+    print(f'created folder: {rootdir}/Py_modelfiles') 
+
+results_file = f'{rootdir}/Py_modelfiles/RFpredict_output.mat'
 
 savemat(results_file, res_dict)

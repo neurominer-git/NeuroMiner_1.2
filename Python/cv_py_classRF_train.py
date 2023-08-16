@@ -24,6 +24,7 @@ Output:
 from sklearn.ensemble import RandomForestClassifier
 import pickle
 import uuid
+import os
 
 # a few categorical arguments need to be 'translated' to fit function
 # criterion
@@ -96,5 +97,8 @@ rf = RandomForestClassifier(n_estimators = n_est,
 
 rf.fit(feat, lab)
 random_name = uuid.uuid4().hex;
-model_file = f"{rootdir}/RFC_model_{random_name}.sav"
+if not os.path.isdir(f'{rootdir}/Py_modelfiles')
+    os.makedirs(f'{rootdir}/Py_filesmodel')
+    print(f'created folder: {rootdir}/Py_modelfiles') 
+model_file = f'{rootdir}/Py_modelfiles/RFC_model_{random_name}.sav';
 pickle.dump(rf, open(model_file, 'wb'))
