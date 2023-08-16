@@ -1396,27 +1396,28 @@ function selSubGroupOOCV_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns selSubGroupOOCV contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from selSubGroupOOCV
 [handles, oocvind] = get_oocvind(handles);
+g_oocvind = handles.OOCVinfo.Analyses{handles.curranal}.OOCVvec(oocvind);
 if hObject.Value > 1
     gindex = hObject.Value-1;
-    if ~islogical(handles.NM.OOCV{oocvind}.groups)
-        groups = nk_MakeDummyVariables(handles.NM.OOCV{oocvind}.groups);
+    if ~islogical(handles.NM.OOCV{g_oocvind}.groups)
+        groups = nk_MakeDummyVariables(handles.NM.OOCV{g_oocvind}.groups);
     else
-        groups = handles.NM.OOCV{oocvind}.groups;
+        groups = handles.NM.OOCV{g_oocvind}.groups;
     end
-    if isfield(handles.NM.OOCV{oocvind},'refgroup')
-        gindex = [gindex handles.NM.OOCV{oocvind}.refgroup];
+    if isfield(handles.NM.OOCV{g_oocvind},'refgroup')
+        gindex = [gindex handles.NM.OOCV{g_oocvind}.refgroup];
     end
     handles.SubIndex = any(groups(:,gindex),2);
     switch handles.modeflag
         case 'classification'
-            if isfield(handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{gindex(1)},'PermAnal')
-                handles.PermAnal = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.Group{gindex(1)}.PermAnal.ModelPermSignificance(handles.curclass);
+            if isfield(handles.NM.analysis{handles.curranal}.OOCV{g_oocvind}.BinResults{handles.curlabel}.Group{gindex(1)},'PermAnal')
+                handles.PermAnal = handles.NM.analysis{handles.curranal}.OOCV{g_oocvind}.BinResults{handles.curlabel}.Group{gindex(1)}.PermAnal.ModelPermSignificance(handles.curclass);
             else
                 if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
             end
         case 'regression'
-            if isfield(handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{gindex(1)},'PermAnal')
-                handles.PermAnal = handles.OOCV(oocvind).data.RegrResults{handles.curlabel}.Group{gindex(1)}.PermAnal.ModelPermSignificance;
+            if isfield(handles.NM.analysis{handles.curranal}.OOCV{g_oocvind}.RegrResults{handles.curlabel}.Group{gindex(1)},'PermAnal')
+                handles.PermAnal = handles.NM.analysis{handles.curranal}.OOCV{g_oocvind}.RegrResults{handles.curlabel}.Group{gindex(1)}.PermAnal.ModelPermSignificance;
             else
                 if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
             end
@@ -1427,14 +1428,14 @@ else
     end
     switch handles.modeflag
         case 'classification'
-            if isfield(handles.OOCV(oocvind).data.BinResults{1},'PermAnal')
-                handles.PermAnal = handles.OOCV(oocvind).data.BinResults{1}.PermAnal.ModelPermSignificance(handles.curclass);
+            if isfield(handles.NM.analysis{handles.curranal}.OOCV{g_oocvind}.BinResults{1},'PermAnal')
+                handles.PermAnal = handles.NM.analysis{handles.curranal}.OOCV{g_oocvind}.BinResults{1}.PermAnal.ModelPermSignificance(handles.curclass);
             else
                 if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
             end
         case 'regression'
-            if isfield(handles.OOCV(oocvind).data.RegrResults{1},'PermAnal')
-                handles.PermAnal = handles.OOCV(oocvind).data.RegrResults{1}.PermAnal.ModelPermSignificance;
+            if isfield(handles.NM.analysis{handles.curranal}.OOCV{g_oocvind}.RegrResults{1},'PermAnal')
+                handles.PermAnal = handles.NM.analysis{handles.curranal}.OOCV{g_oocvind}.RegrResults{1}.PermAnal.ModelPermSignificance;
             else
                 if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
             end

@@ -10,7 +10,13 @@ for n = 1: numel(oocv)
    if ~isempty(oocv{n})
         handles.OOCV(cnt).num = n;
         handles.OOCV(cnt).data = oocv{n};
-        
+        if isfield(handles.NM.OOCV{n},'groups')
+            handles.OOCV(cnt).groups = handles.NM.OOCV{n}.groups;
+            handles.OOCV(cnt).grpnames = handles.NM.OOCV{n}.grpnames;
+            if isfield(handles.NM.OOCV{n},'refgroup')
+                handles.OOCV(cnt).refgroup = handles.NM.OOCV{n}.refgroup;
+            end
+        end
         % Create table data for export
         % Handle the Regression scenario differently            
         if isfield(handles,'Regr')

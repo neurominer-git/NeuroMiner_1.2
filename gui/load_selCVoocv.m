@@ -1,7 +1,7 @@
 function load_selCVoocv(handles)
 
 popupstr{1} = 'Training/CV data';
-fnd=false;
+fnd=false; 
 if isfield(handles,'OOCVinfo') && isfield(handles.OOCVinfo,'AnalVec') && ismember(handles.curranal, handles.OOCVinfo.AnalVec)
     handles.selCVoocv.Enable = 'on';
     fI = find(handles.OOCVinfo.AnalVec==handles.curranal); cnt=2;
@@ -11,7 +11,9 @@ if isfield(handles,'OOCVinfo') && isfield(handles.OOCVinfo,'AnalVec') && ismembe
             cnt=cnt+1; fnd=true;
         end
     end
-    if ~fnd,  handles.selCVoocv.Enable = 'off'; end
+    if ~fnd  
+        handles.selCVoocv.Enable = 'off'; 
+    end
 else
     handles.selCVoocv.Enable = 'off';
 end

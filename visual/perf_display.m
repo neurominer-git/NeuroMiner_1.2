@@ -59,7 +59,6 @@ set_panel_visibility(handles,'on')
 set_visibility(handles)
 load_selYAxis(handles)
 load_popupmenu1(handles)
-load_selCVoocv(handles)
 load_selModelMeasures(handles)
 load_selSubParams(handles)
 

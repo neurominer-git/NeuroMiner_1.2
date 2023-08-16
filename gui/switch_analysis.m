@@ -51,6 +51,8 @@ elseif isfield(handles,'OOCV')
     handles.selCVoocv.Value=1;
 end
 
+load_selCVoocv(handles)
+
 % Check whether selected analysis has MLI data
 mlifl='off';
 if isfield(handles,'oocvview') && handles.oocvview && oocvind
