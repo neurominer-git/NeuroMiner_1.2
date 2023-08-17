@@ -49,7 +49,7 @@ for i=1:nO
             case 'kernelOptions'
                 if isfield(param,'kernelFunc') && isfield(param,'Params')
                     for j=1:numel(param.Params)
-                        if strcmp(param.Params(j).name,'kernelFunc'),
+                        if strcmp(param.Params(j).name,'kernelFunc')
                             kernelopts = nk_matLearn_getopts_config(opt, 'get_kernel_params', char(param.Params(j).range), param);
                             if ~isfield(kernelopts,'desc'), no_mnu=true; end
                             break
@@ -58,7 +58,7 @@ for i=1:nO
                 end
         end
     end
-    if ~no_mnu, 
+    if ~no_mnu
         desc{icnt} = sprintf('%s [ %s ]', opt.desc{i}, opt_str); 
         icnt=icnt+1;
     end

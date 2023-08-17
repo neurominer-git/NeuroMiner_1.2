@@ -123,7 +123,11 @@ for i = 1:nP
             cmdstr = [  SlackParam EpsParam Tolerance CMDSTR.notolmodel CMDSTR.quiet];
             fprintf('\nTraining LIBLINEAR model with command string:%s', cmdstr);
             model = train_liblin244(label,Y,cmdstr);
-            R(:,i) = model.w; 
+            if contains(cmdstr,'-B 1')
+                R(:,i) = model.w(1:end-1); 
+            else
+                R(:,i) = model.w; 
+            end
             nonzerofeat = sum(model.w ~= 0); 
             fprintf(' ==> %g (%1.2f%%) Non-zero features.', nonzerofeat, nonzerofeat*100/model.nr_feature);
     end
