@@ -40,7 +40,7 @@ gb.fit(feat, lab)
 random_name = uuid.uuid4().hex;
 
 py_modeldir = os.path.join(rootdir,"Py_modelfiles")
-if not os.path.isdir(py_modeldir)
+if not os.path.isdir(py_modeldir):
     os.makedirs(py_modeldir)
     print(f"created folder: {py_modeldir}") 
 
