@@ -113,7 +113,7 @@ for i = 1 : nM
             pmode(i) = iVis.PERM.mode;
         end
         inp.PERM.nperms = iVis.PERM.nperms;
-        inp.PERM.flag  = iVIS.PERM.flag;
+        inp.PERM.flag  = iVis.PERM.flag;
         inp.PERM.suffix = '_VISpermmat_ID';
         permfl(i)      = true; 
         nperms(i)      = iVis.PERM.nperms;
