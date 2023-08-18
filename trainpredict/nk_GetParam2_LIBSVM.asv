@@ -12,8 +12,7 @@ function [param, model] = nk_GetParam2_LIBSVM(Y, label, ModelOnly, cmd)
          
 global SVM EVALFUNC LIBSVMTRAIN MODEFL CMDSTR GK 
 
-param = []; flw = 0; GK = struct('gkernelBool',0); oneclass = false;
-if contains(cmd,'-s 2'), oneclass = true; end
+param = []; flw = 0; GK = struct('gkernelBool',0);
 if strcmp(LIBSVMTRAIN,'svmtrain312'), flw = 1; end
 if flw
     switch SVM.kernel.kerndef 
@@ -59,6 +58,7 @@ else % Univariate case
         Y = [(1:numTrain)' , Y];
     end
     if SVM.kernel.kerndef == 8
+ 
         Y = eval(sprintf('feval(SVM.kernel.customfunc, Y, Y %s)', GK.evalStr));
         Y = [(1:numTrain)' , Y];
     end
@@ -82,25 +82,18 @@ else % Univariate case
         end  
     else
         if flw
-            if oneclass
-                idx = label == -1;
-                model = feval( LIBSVMTRAIN, W, label(idx), Y(idx,:), cmd);
-            else
-                model = feval( LIBSVMTRAIN, W, label, Y, cmd);
-            end
+            model = feval( LIBSVMTRAIN, W, label, Y, cmd);
             model = nk_BuildCalibrationModel(SVM, MODEFL, model, Y, label);
         else
-            if oneclass
-                idx = label == -1;
-                model = feval( LIBSVMTRAIN, label(idx), Y(idx,:), cmd);
-            else
-                model = feval( LIBSVMTRAIN, label, Y, cmd );
-            end
+            model = feval( LIBSVMTRAIN, label, Y, cmd );
             model = nk_BuildCalibrationModel(SVM, MODEFL, model, Y, label);
         end
     end
     if ~ModelOnly
         [param.target, param.dec_values] = nk_GetTestPerf_LIBSVM([], Y, label, model);
+%         if isfield(SVM,'CalibrateScores') && SVM.CalibrateScores
+%             param.dec_values_cal = calibrateScores(param.dec_values, param.dec_values, label);
+%         end
         if SVM.RVMflag, param.dec_values = nk_CalibrateProbabilities(param.dec_values); end
         param.val = EVALFUNC(label, param.target);
     end

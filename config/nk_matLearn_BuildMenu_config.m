@@ -9,7 +9,7 @@ for i=1:nO
         Pname = strsplit(param.Params(i).name,'.');
         switch Pname{1}
             case 'subModel'
-                if iscell(param.sublearner.algo), algo = char(param.sublearner.algo); else algo = param.sublearner.algo; end
+                if iscell(param.sublearner.algo), algo = char(param.sublearner.algo); else, algo = param.sublearner.algo; end
                 opt_str = sprintf('%s', algo);
             case {'subOptions','kernelOptions'}
                 jopt_str=[];
@@ -42,7 +42,7 @@ for i=1:nO
         switch opt.name{i}
             case 'subOptions'
                 if isfield(param,'sublearner')
-                    if iscell(param.sublearner.algo), algo = char(param.sublearner.algo); else algo = param.sublearner.algo; end
+                    if iscell(param.sublearner.algo), algo = char(param.sublearner.algo); else, algo = param.sublearner.algo; end
                     subopts = nk_matLearn_getopts_config([],'get_learner_params',algo);
                     if isempty(subopts), no_mnu=true; end
                 end

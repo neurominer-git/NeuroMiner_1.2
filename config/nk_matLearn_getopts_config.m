@@ -170,14 +170,13 @@ switch act
 
                 opt.desc = {'Define maximum number of boosting iterations', ...
                     'Select type of loss (exponential/deviance for classification, squared/absolute/huber/quantile for regression)', ...
-                    'Define learning rate (0<->1)', ...                             %'Define shrinkage factor (0<->1)', ...
+                    'Define learning rate (0<->1)', ...                            
                     'Define subsampling factor (0<->1)', ...
                     'Define maximum tree depth'};
                 % possible other parameters:
                 % min_samples_leaf,
                 % min_weight_fraction_leaf,
-                % min_impurity_decrease,
-                % criterion (to measure the quality of a split),
+                % min_impurity_decrease, %criterion (to measure the quality of a split),
                 % init,
                 % random_state,
                 % max_features,
@@ -217,7 +216,7 @@ switch act
                         opt.def  = {100, 'squared_error', 0.1, 1.0, 3};
                 end
 
-                opt.name = {'maxIters','loss','learningRate','subsamplingFactor','maxTreeDepth'}; %'shrinkageFactor'
+                opt.name = {'maxIters','loss','learningRate','subsamplingFactor','maxTreeDepth'};
 
 
             case 'ROBSVM'

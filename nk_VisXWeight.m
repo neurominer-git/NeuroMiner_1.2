@@ -180,7 +180,7 @@ for n=1:nM
                                         nmP = logical(mpp.vec * nmP);
                                         if ~isempty(PA), nmPA = mpp.vec * nmPA; end
                                 end
-                            case {'optNMF','NeNMF','NNMF','PLS','LPP', 'NPE', 'LLTSA', 'SPCA', 'PPCA', 'FA', 'FactorAnalysis', 'NCA', 'MCML', 'LMNN'}
+                            case {'optNMF','NeNMF','NNMF','PLS','LPP', 'NPE', 'LLTSA', 'SPCA', 'PPCA', 'FA', 'FactorAnalysis', 'NCA', 'MCML', 'LMNN', 'fastICA'}
                                  nmW = mpp.vec * nmW;
                                  nmP = logical(mpp.vec * nmP);
                                  if ~isempty(PA), nmPA = mpp.vec * nmPA; end
