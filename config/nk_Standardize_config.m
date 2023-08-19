@@ -90,6 +90,7 @@ if ~defaultsfl
             % Define from which data set you compute the mean and std values
             srcfl = nk_input('Compute standardization model using a subgroup of cases?',0,'yes|no',[1,0],sINDDEF);
             if srcfl
+                nk_SelectCovariateIndex(NM, NM.TrainParam.FUSION.M, 0);
                 sIND = nk_input('Define column indices in the covariate matrix that identify the subgroup(s) for model computation',0,'e',[], Inf );
             else
                 sIND = []; CALIBUSE = 2;
@@ -99,6 +100,7 @@ if ~defaultsfl
             dstfl = nk_input('Apply standardization model to a subgroup of cases?',0,'yes|no',[1,0],dINDDEF);
             if dstfl
                 if isempty(sIND), n=1; else, n = size(sIND,1); end
+                nk_SelectCovariateIndex(NM, NM.TrainParam.FUSION.M, 0);
                 if n == 1
                     dIND = nk_input('Define column index in the covariates indicating subgroups to be standardized',0,'e',[], 1);
                 else

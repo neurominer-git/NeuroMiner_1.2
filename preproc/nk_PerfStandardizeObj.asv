@@ -326,7 +326,7 @@ while (k<=maxstep)
     end
     m=mold+delta;   % computation of a new estimate
     nstep=0;
-    while all(mrobj(X,m)>=mrobj(X,mold))&&(nstep<=maxhalf)
+    while all(mrobj(X,m)>=mrobj(X,mold))&(nstep<=maxhalf)
         nstep=nstep+1;
         m=mold+delta./(2^nstep);
     end
@@ -366,7 +366,7 @@ if n>1000
     mys=zeros(nbins,1);
     ninbins=floor(n/nbins);
     for i=1:nbins
-        if (mod(n,nbins)~=0 && i==nbins)
+        if (mod(n,nbins)~=0 & i==nbins)
             mys(i)=median(sy((i-1)*ninbins+1:n));
         else
             mys(i)=median(sy((i-1)*ninbins+1:i*ninbins));
