@@ -1,4 +1,4 @@
-function [ YYY, LLL, CCC, fl ] = nk_PerfADASYN(Y, L, IN, C, noconcatfl)
+function [ YYY, LLL, CCC, fl ] = nk_PerfADASYN(Y, L, C, IN, noconcatfl)
 
 adasyn_beta                     = [];   %let ADASYN choose default
 adasyn_kDensity                 = [];   %let ADASYN choose default
@@ -11,7 +11,7 @@ if exist('IN','var') && ~isempty('IN')
     if isfield(IN,'beta') && ~isempty(IN.beta), adasyn_beta = IN.beta; end
     if isfield(IN,'kDensity') && ~isempty(IN.kDensity), adasyn_kDensity = IN.kDensity; end
     if isfield(IN,'kSMOTE') && ~isempty(IN.kSMOTE), adasyn_kSMOTE = IN.kSMOTE; end
-    if isfield(IN,'normalized') && ~isempty(IN.normalized), adasyn_normalized = IN.normalized; end
+    if isfield(IN,'standardize_data') && ~isempty(IN.standardize_data), adasyn_normalized = IN.standardize_data; end
 end
 
 if exist('C','var') && ~isempty(C)

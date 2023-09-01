@@ -96,42 +96,6 @@ end
 if isfield(SVM,'kernel'), kerntype = SVM.kernel.kernstr; else, kerntype = []; end
 
 switch modeflag
-    case 'classification'
-        if EXPERT 
-            adasyndef = {'yes','no'};
-            if ~isfield(SVM,'ADASYN')
-                SVM.ADASYN.flag = 2;
-                adasynstr = adasyndef{2}; 
-            else
-                adasynstr = adasyndef{SVM.ADASYN.flag};
-            end    
-            mnuact = [ mnuact 'Use ADASYN to adjust for unbalanced class settings [ ' adasynstr ' ]|' ];
-            mnusel = [ mnusel 7 ];
-            if SVM.ADASYN.flag == 1
-                if ~isfield(SVM.ADASYN,'beta'), SVM.ADASYN.beta = 1; end
-                betadef = SVM.ADASYN.beta; 
-                mnuact = [ mnuact sprintf('Define beta value (defines how much balancing will be applied, 0<->1) [ beta=%g ]|',betadef)];
-                mnusel = [ mnusel 8 ];
-                if ~isfield(SVM.ADASYN,'kDensity'), SVM.ADASYN.kDensity = 5; end
-                kdensdef = SVM.ADASYN.kDensity; 
-                mnuact = [ mnuact sprintf('Define k value of density algorithm (kNN looking at both classes) [ k=%g ]|',kdensdef)];
-                mnusel = [ mnusel 9 ];
-                if ~isfield(SVM.ADASYN,'kSMOTE'), SVM.ADASYN.kSMOTE = 5; end
-                ksmotedef = SVM.ADASYN.kSMOTE; 
-                mnuact = [ mnuact sprintf('Define k value of SMOTE algorithm (kNN looking only at the minority class) [ k=%g ]|',ksmotedef)];
-                mnusel = [ mnusel 10 ];
-                if ~isfield(SVM.ADASYN,'normalized'), SVM.ADASYN.normalized = false; end
-                if SVM.ADASYN.normalized, normstr = 'yes'; else, normstr = 'no'; end
-                mnuact = [ mnuact sprintf('Data is already normalized for kNN search [ %s ]|',normstr) ];
-                mnusel = [ mnusel 11 ];
-            end
-        end
-    case 'regression'
-        SVM.ADASYN.flag = 2;
-end
-
-
-switch modeflag
 
     case 'classification'
         if EXPERT
@@ -409,27 +373,6 @@ switch act
     case 6
         
         SVM.Post.Detrend = nk_input('Enable post-hoc optimization of decision threshold (using ROC analysis of C1 test data)',0,'yes|no',[1,0],1);
-        
-    case 7
-        
-        if SVM.ADASYN.flag ==1, SVM.ADASYN.flag = 2; else, SVM.ADASYN.flag = 1; end
-        
-    case 8
-        
-        SVM.ADASYN.beta = nk_input('Define beta for degree of balancing',0,'e',SVM.ADASYN.beta);
-        
-    case 9
-        
-        SVM.ADASYN.kDensity = nk_input('Define k for Density estimation in ADASYN',0,'i',SVM.ADASYN.kDensity);
-        
-    case 10
-        
-        SVM.ADASYN.kSMOTE = nk_input('Define k for SMOTE in ADASYN',0,'i',SVM.ADASYN.kSMOTE);
-        
-    case 11
-        
-        SVM.ADASYN.normalized = ~SVM.ADASYN.normalized;
-        
     
 end
 

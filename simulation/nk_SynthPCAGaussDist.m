@@ -18,10 +18,4 @@ syntheticData = syntheticDataAndLabels(:, 1:size(realData, 2)) * coeff';
 % Extract the synthetic labels
 syntheticLabels = syntheticDataAndLabels(:, size(realData, 2)+1:end);
 
-% Combine the real and synthetic data and labels
-data = [realData; syntheticData];
-labels = [realLabels; syntheticLabels];
-
-% Train the SVM using the combined data
-svm = fitcsvm(data, labels, 'KernelFunction', 'linear', 'BoxConstraint', 1);
 

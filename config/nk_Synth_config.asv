@@ -7,32 +7,56 @@ global NM
 if ~exist('mess','var'), mess = []; end
 na_str                      = '?';
 synth_flag                  = 2;
+methodnum                   = 1;
 k                           = 5;
 distanceMeasure             = 'Euclidean';
 standardize_data            = 2;
 numSyntheticObservations    = round(size(NM.label,1)*0.1);
 write2disk                  = 1;
+adasyn_beta                 = 0.5;
+adasyn_kdensity             = 5;
+adasyn_kSMOTE               = 5;
 
 % Generate synthetic data?
 if isfield(SYNTH,'flag'),                       synth_flag = SYNTH.flag; else, SYNTH.flag = synth_flag; end
+if isfield(SYNTH,'method'),                     methodnum = SYNTH.method; else, SYNTH.method = methodnum; end
 if isfield(SYNTH,'k'),                          k = SYNTH.k; else, SYNTH.k = k; end
 if isfield(SYNTH,'distanceMeasure'),            distanceMeasure = SYNTH.distanceMeasure; else, SYNTH.distanceMeasure = distanceMeasure; end
-if isfield(SYNTH,'standardize_data'),            standardize_data = SYNTH.standardize_data; else, SYNTH.standardize_data = standardize_data; end
+if isfield(SYNTH,'standardize_data'),           standardize_data = SYNTH.standardize_data; else, SYNTH.standardize_data = standardize_data; end
 if isfield(SYNTH,'numSyntheticObservations'),   numSyntheticObservations = SYNTH.numSyntheticObservations; else, SYNTH.numSyntheticObservations = numSyntheticObservations; end
 if isfield(SYNTH,'write2disk'),                 write2disk = SYNTH.write2disk; else,  SYNTH.write2disk = write2disk;  end
+if isfield(SYNTH,'beta'),                       adasyn_beta = SYNTH.beta; else, SYNTH.beta = adasyn_beta; end
+if isfield(SYNTH,'kDensity'),                   adasyn_kdensity = SYNTH.kDensity; else, SYNTH.kDensity = adasyn_kdensity; end            
+if isfield(SYNTH,'kSMOTE'),                     adasyn_kSMOTE = SYNTH.kSMOTE; else, SYNTH.kSMOTE = adasyn_kSMOTE; end
 
 mn_str = []; mn_act = [];
 
 synthstr        = {'enabled','disabled'};
+methodstr       = {'kNN-based','ADASYN','PCAGauss'};
 write2diskstr   = {'use data permanently by writing it to disk','recreate data in each model training run'};
 stdstr          = {'standardize data', 'data already standardized/standardization not needed'};
 mn_str = [mn_str sprintf('Generate synthetic data [ %s ]',synthstr{synth_flag})];       mn_act = [mn_act 1];
-if synth_flag
-    mn_str = [mn_str sprintf('|Define no. of nearest neighbors [ k=%g ]', k)];          mn_act = [mn_act 2];
-    mn_str = [mn_str sprintf('|Choose distance measure [ %s ]', distanceMeasure)];      mn_act = [mn_act 3];
-    mn_str = [mn_str sprintf('|Define whether data should be standardized before running distance analysis [ %s ]', stdstr{standardize_data})];      mn_act = [mn_act 4];
-    mn_str = [mn_str sprintf('|Define how many synthetic observations should be generated [ %g ]', numSyntheticObservations)];      mn_act = [mn_act 5];
-    mn_str = [mn_str sprintf('|Choose how to manage synthetic data [ %s ]', write2diskstr{write2disk})];      mn_act = [mn_act 6];
+
+if synth_flag == 1
+    
+    mn_str = [mn_str sprintf('|Choose method for synthetic data generation [ %s ]', methodstr{methodnum})];                                            mn_act = [mn_act 2];
+    mn_str = [mn_str sprintf('|Define whether data should be standardized before running distance analysis [ %s ]', stdstr{standardize_data})];        mn_act = [mn_act 3];
+    mn_str = [mn_str sprintf('|Choose how to manage synthetic data [ %s ]', write2diskstr{write2disk})];                                               mn_act = [mn_act 4];
+
+    switch synth_method
+        case 'kNN'
+            mn_str = [mn_str sprintf('|Define no. of nearest neighbors for interpolation [ k=%g ]', k)];                                               mn_act = [mn_act 5];
+            mn_str = [mn_str sprintf('|Choose distance measure [ %s ]', distanceMeasure)];                                                             mn_act = [mn_act 6];
+            mn_str = [mn_str sprintf('|Define how many synthetic observations you would like to be generated [ %g ]', numSyntheticObservations)];      mn_act = [mn_act 7];
+            
+        case 'ADASYN'
+            mn_str = [ mn_str sprintf('Define beta value (defines how much balancing will be applied, 0<->1) [ beta=%g ]|', adasyn_beta)];             mn_act = [mn_act 8];
+            mn_str = [ mn_str sprintf('Define k value of density algorithm (kNN looking at both classes) [ k=%g ]|',adasyn_kdensity)];                 mn_act = [mn_act 9];
+            mn_str = [ mn_str sprintf('Define k value of SMOTE algorithm (kNN looking only at the minority class) [ k=%g ]|',adasyn_kSMOTE)];          mn_act = [mn_act 10];
+        
+        case 'PCAGauss'
+            mn_str = [mn_str sprintf('|Define how many synthetic observations you would like to be generated [ %g ]', numSyntheticObservations)];      mn_act = [mn_act 7];
+    end
 end
 
 nk_PrintLogo
@@ -53,24 +77,28 @@ act = char(nk_input(mestr,0,'mq', mn_str, mn_act));
 
 switch act
     case 1
-        if SYNTH.flag == 1, SYNTH.flag = 2; else, SYNTH.flag = 1; end
-        
-    case 2
-       SYNTH.distanceMeasure = nk_input()
-
-            'Euclidean|'
-            'Manhattan|'
-            'Cosine|'
-            'Mahalanobis'}
+       if SYNTH.flag == 1, SYNTH.flag = 2; else, SYNTH.flag = 1; end
+    
     case 3
-        SYNTH.featname_mode = nk_input('Extract feature names',0,'m','Automatically (Using IDs of selected analyses)|Manually from a variable in the MATLAB workspace',[1 2], featname_mode);
-        if STACKING.featname_mode == 2
-            STACKING.featname_edit = na_str;
-        else
-            STACKING.featname_edit = 'Automatic definition';
-        end
+        if SYNTH.standardize_data == 1, SYNTH.standardize_data = 2; else, SYNTH.standardize_data = 1; end
+
     case 4
-        STACKING.featname_edit = nk_input('Define variable in MATLAB workspace containg the names of the features entering the stacker',0,'s',featname_edit);
+        if SYNTH.write2disk == 1, SYNTH.write2disk = 2; else, SYNTH.write2disk = 1; end
     case 5
-        STACKING.mode = nk_input('Extract prediction from ...',0,'m','CV1 training data (only useful for weak learners)|CV1 test data',[1 2], pred_flag);
+        SYNTH.k = nk_input('Define no. of nearest neighbors for interpolation',0,'i', k);
+    case 6
+       sel = 'Euclidean|Manhattan|Cosine|Mahalanobis';
+       defsel = strsplit(sel,'|');
+       SYNTH.distanceMeasure = char(nk_input('Choose distance measure',0,'m', sel, defsel, find(contains(defsel, distanceMeasure))));
+    case 7
+        SYNTH.numSyntheticObservations = nk_input('How many synthetic observations should be generated',0,'i', numSyntheticObservations);
+
+    case 8
+        SVM.ADASYN.beta = nk_input('Define beta for degree of balancing',0,'e',adasyn_beta);
+        
+    case 9
+        SVM.ADASYN.kDensity = nk_input('Define k for Density estimation in ADASYN',0,'i',SVM.ADASYN.kDensity);
+        
+    case 10
+        SVM.ADASYN.kSMOTE = nk_input('Define k for SMOTE in ADASYN',0,'i',SVM.ADASYN.kSMOTE);
 end

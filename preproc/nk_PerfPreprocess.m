@@ -402,9 +402,7 @@ for k=sta_iy:stp_iy % Inner permutation loop
             SrcParam.iOCV               = iOCV; % To resolve bug in nk_GenPreprocSequence.m reported by Mark Dong (29/09/2021)
             
             % Do we need to generate synthetic data?
-            % ADASYN has to be moved to SYNTH
-            adasynflag = isfield(SVM,'ADASYN') && SVM.ADASYN.flag == 1;
-            if SYNTH.flag == 1 || adasynflag
+            if SYNTH.flag == 1 
                 Covs = [];
                 if VERBOSE, fprintf('\nGenerating synthetic training data for partition CV2 [%g, %g], CV [%g, %g]', i, j, k, l); else; fprintf('\t...Synth'); end
                
@@ -437,19 +435,27 @@ for k=sta_iy:stp_iy % Inner permutation loop
                     if mult_contain
                         vTrSyn = cell(n_usY,1); LabelSyn = cell(n_usY,1); CovarsSyn = cell(n_usY,1); Synth_activated = false(1,n_usY);
                         for pu=1:n_usY
-                            if adasynflag 
-                                [ vTrSyn{pu}, LabelSyn{pu}, CovarsSyn{pu}, Synth_activated(pu) ] = nk_PerfADASYN( vTr{pu}, TrLX, SVM.ADASYN, Covs, true );
-                            else
-                                [ vTrSyn{pu}, LabelSyn{pu}, CovarsSyn{pu} ] = nk_SynthDistkNN(vTr{pu}, TrLX, Covs, SYNTH);
-                                Synth_activated(pu) = true;  
+                            switch SYNTH.method
+                                case 1
+                                    [ vTrSyn{pu}, LabelSyn{pu}, CovarsSyn{pu} ] = nk_SynthDistkNN(vTr{pu}, TrLX, Covs, SYNTH);
+                                    Synth_activated(pu) = true;  
+                                case 2
+                                    [ vTrSyn{pu}, LabelSyn{pu}, CovarsSyn{pu}, Synth_activated(pu) ] = nk_PerfADASYN( vTr{pu}, TrLX, Covs, SYNTH, true );
+                                case 3
+                                    [ vTrSyn{pu}, LabelSyn{pu}, CovarsSyn{pu} ] = nk_SynthPCAGauss(vTr{pu}, TrLX, Covs, SYNTH);
+                                    Synth_activated(pu) = true;  
                             end
                         end
                     else
-                        if adasynflag
-                            [ vTrSyn, LabelSyn, CovarsSyn, Synth_activated ] = nk_PerfADASYN( vTr, TrLX, SVM.ADASYN, Covs, true);
-                        else
-                            [ vTrSyn, LabelSyn, CovarsSyn ] = nk_SynthDistkNN(vTr, TrLX, Covs, SYNTH);
-                            Synth_activated = true;
+                        switch SYNTH.method
+                            case 1
+                                [ vTrSyn, LabelSyn, CovarsSyn ] = nk_SynthDistkNN(vTr, TrLX, Covs, SYNTH);
+                                Synth_activated = true;
+                            case 2
+                                [ vTrSyn, LabelSyn, CovarsSyn, Synth_activated ] = nk_PerfADASYN( vTr, TrLX, Covs, SYNTH, true);
+                            case 3
+                                [ vTrSyn, LabelSyn, CovarsSyn ] = nk_SynthPCAGauss(vTr, TrLX, Covs, SYNTH);
+                                Synth_activated = true;
                         end
                     end 
                     if SYNTH.write2disk

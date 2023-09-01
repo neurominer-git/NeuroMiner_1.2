@@ -37,7 +37,8 @@ end
 if sum(isnan(std_realData(:)))
     fprintf('\nImputing missing values in data');
     IN_impute.k = k;
-    IN.impute.method = 'SeqkNN'; 
+    IN_impute.method = 'SeqkNN'; 
+    IN_impute.X = std_realData;
     std_realData = nk_PerfImputeObj(std_realData, IN_impute);
 end
 

@@ -27,7 +27,7 @@ function [sY, IN, dT] = nk_PerfAdjForCovarsUsingPCAObj(Y, IN, S)
 % adjT :            Adjusted target matrix 
 % IN :              Parameter structure containing orig. and comp. params
 % =========================================================================
-% (c) Nikolaos Koutsouleris, 1/2016
+% (c) Nikolaos Koutsouleris, 7/2023
 
 % =========================== WRAPPER FUNCTION ============================ 
 if ~exist('S','var'), S=[]; end
