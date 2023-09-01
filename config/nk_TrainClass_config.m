@@ -287,7 +287,7 @@ if ~exist('act','var') || isempty(act)
 
     menustr = [ menustr 'Use different label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
     
-    menustr = [ menustr sprintf('Define synthethic data generation options [ %s ]|', STATUS.SYNTH) ]; menuact = [ menuact 4 ];
+    menustr = [ menustr sprintf('Synthethic data generation [ %s ]|', STATUS.SYNTH) ]; menuact = [ menuact 4 ];
 
     menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 6:7 ];
 

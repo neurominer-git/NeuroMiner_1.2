@@ -1,10 +1,10 @@
 function [param, model] = nk_GetParam2(Y, label, Params, ModelOnly, FeatGroups)
 % =========================================================================
-% FORMAT [param, model] = nk_GetParam2(Y, label, Params, ModelOnly)
+% FORMAT [param, model] = nk_GetParam2(Y, label, Params, ModelOnly, FeatGoups)
 % =========================================================================
 % Generic interface function to the algorithm-specific training modules
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 04/2021
+% (c) Nikolaos Koutsouleris, 09/2023
 global TRAINFUNC SVM TIME CV CVPOS
 
 % Remove cases which are completely NaN
@@ -23,18 +23,13 @@ if ~isempty(TIME) && strcmp(SVM.prog,'WBLCOX')
     label(label==-1)=0;
 end
 
-% Run ADASYN if needed
-if isfield(SVM,'ADASYN') && SVM.ADASYN.flag == 1
-    [Y, label, timevec] = nk_PerfADASYN( Y, label, SVM.ADASYN, timevec); 
-end
-
 % Check if NaNs are in matrix and throw an error to avoid non-sense results!
 sNaN = sum(~isfinite(Y(:)));
 if sNaN
     if size(Y,2)<500
         writetable(table(Y), sprintf('TrainingData_Error_CV2-%g-%g_CV1-%g-%g.xlsx', CVPOS.CV2p, CVPOS.CV2f, CVPOS.CV1p, CVPOS.CV1f ))
     end
-    error('\nFound %g non-finite values in training matrix!\nThis usually happend in intermediate fusion mode when some data modalities have cases with completely missing data.\nCheck your preprocessing settings and your data!', sNaN)
+    error('\nFound %g non-finite values in training matrix!\nThis usually happens in intermediate fusion mode when some data modalities have cases with completely missing data.\nCheck your preprocessing settings and your data!', sNaN)
 end
 
 if size(Y,1) ~= size(label,1)
