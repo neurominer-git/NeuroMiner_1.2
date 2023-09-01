@@ -327,6 +327,7 @@ if isfield(analysis,'rootdir') && exist(analysis.rootdir,'dir')
 else
     inp1.rootdir = fullfile(pwd,analysis.params.TrainParam.SVM.prog,permstr);
 end
+inp1.maindir = analysis.rootdir;
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
 
 %%%%%%%%%%%%%%%%%%%%%%% RUN VISUALIZATION ANALYSIS  %%%%%%%%%%%%%%%%%%%%%%%

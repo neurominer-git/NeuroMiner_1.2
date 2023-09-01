@@ -1,12 +1,13 @@
-% ====================ROIm=====================================================
+function [act, varind] = nk_TrainClass_config(act, varind, parentstr)
+% =========================================================================
 % FORMAT [act, varind] = nk_TrainClass_config(act, varind, parentstr)
 % =========================================================================
 % Interface for defining the parameters of the training and prediction
 % process. The function also creates default parameters if a new modality
 % has been added to the NM workspace
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2022
-function [act, varind] = nk_TrainClass_config(act, varind, parentstr)
+% (c) Nikolaos Koutsouleris, 08/2023
+
 global NM CALIBAVAIL
 
 if ~exist('act','var'), act = []; end
@@ -45,6 +46,7 @@ if ~isfield(NM,'TrainParam')
     NM.TrainParam.verbosity     = 1;
     NM.TrainParam.LABEL.flag    = 0;
     NM.TrainParam.LABEL.origlabel = NM.label;
+    NM.TrainParam.SYNTH.flag    = 2;
 elseif ~isfield(NM.TrainParam,'verbosity')
     NM.TrainParam.verbosity     = 1;
     if size(NM.label,2)>1
@@ -72,6 +74,9 @@ NM.TrainParam.ActiveModality = varind;
 % for compatibility reasons
 if ~isfield(NM.TrainParam,'STACKING') || ~NM.TrainParam.STACKING.flag
     NM.TrainParam.STACKING.flag=2;
+end
+if ~isfield(NM.TrainParam,'SYNTH') || ~NM.TrainParam.SYNTH.flag
+    NM.TrainParam.SYNTH.flag=2;
 end
 
 % Adjust varind when in stacking mode and remove any SPATIAL operations
@@ -141,10 +146,10 @@ end
 
 %% Check data entry status
 if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SAV', 'OOCV', 'META', 'STACKING', 'CALIB', 'LABEL'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'RAND', 'SYNTH', 'SAV', 'OOCV', 'META', 'STACKING', 'CALIB', 'LABEL'});
     STATUS = nk_CheckFieldStatus(NM.TrainParam.STRAT{varind},{'PREPROC','SVM','GRD','RFE','MULTI','VIS','MLI'}, [], [], STATUS);
 else
-    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI', 'CALIB', 'LABEL'});
+    STATUS = nk_CheckFieldStatus(NM,{'TrainParam','cv'},{'STACKING','RAND', 'SYNTH','PREPROC','SVM','GRD','RFE','MULTI','VIS','SAV','OOCV','MLI', 'CALIB', 'LABEL'});
 end
 switch STATUS.PREPROC
     case '...'
@@ -200,16 +205,16 @@ if ~exist('act','var') || isempty(act)
             fusstr = '[ undefined ]';
             fusemode = 0;
         end
-        fusstr = ['Define data fusion options ' fusstr '|']; menustr = [menustr fusstr]; menuact = [menuact 1];
+        fusstr = ['Define data fusion options ' fusstr '|']; menustr = [menustr fusstr]; menuact = [ menuact 1 ];
         switch fusemode
             case {2,3}
                 % Make active modality selection option available
                 descstr = [ ' (' NM.datadescriptor{varind}.desc ')'];
-                varstr = ['Set active modality for configuration [ #' num2str(varind) descstr ' ]|']; menuact = [menuact 2];
+                varstr = ['Set active modality for configuration [ #' num2str(varind) descstr ' ]|']; menuact = [ menuact 2 ];
                 if fusemode == 3, NM.TrainParam.META.flag = 1; end
                 resetstr = '';
                 if fusemode == 3
-                    resetstr = 'Reset all modality configurations to current modality setup|';  menuact = [ menuact 4];
+                    resetstr = 'Reset all modality configurations to current modality setup|';  menuact = [ menuact 5 ];
                 end
                 menustr = [menustr varstr resetstr];
         end
@@ -223,13 +228,9 @@ if ~exist('act','var') || isempty(act)
         modeflag = NM.TrainParam.LABEL.newmode;
     else
         modeflag = NM.modeflag;
-
-        %if isfield(NM.TrainParam, 'LABEL')
-        %    NM.TrainParam = rmfield(NM.TrainParam, 'LABEL');
-        %end
         NM.TrainParam.LABEL.flag = 0; 
-
     end
+
     if strcmp(modeflag,'classification')
 
         classtr = ['Classification algorithm [ ' STATUS.SVM ' ]|'];
@@ -262,7 +263,7 @@ if ~exist('act','var') || isempty(act)
         else
             multlabelselstr = sprintf('%g labels selected',size(NM.label,2));
         end
-        menustr = [ menustr 'Label selection in multi-label mode [ ' multlabelselstr ' ]|']; menuact = [ menuact 20];
+        menustr = [ menustr 'Label selection in multi-label mode [ ' multlabelselstr ' ]|']; menuact = [ menuact 21];
     end
 
     menustr = [menustr 'Cross-validation settings [ ' STATUS.cv  ' ]|']; menuact = [menuact 3];
@@ -285,32 +286,33 @@ if ~exist('act','var') || isempty(act)
     flx = flSVM && flGRD && flPREPROC;
 
     menustr = [ menustr 'Use different label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
-    %menustr = [ menustr 'Calibration data [ ' STATUS.CALIB ']|']; menuact = [menuact 1000];
+    
+    menustr = [ menustr sprintf('Define synthethic data generation options [ %s ]|', STATUS.SYNTH) ]; menuact = [ menuact 4 ];
 
-    menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 5:6 ];
+    menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 6:7 ];
 
     if flx
 
         if (any(strcmp(SVM.prog,{'MikRVM','MKLRVM','MVTRVR','MVTRVM','GLMFIT'})) && any(strcmp(SVM.kernel.kernstr,{' -t 0','lin','linear'}))) || ...
-                ( strcmp(SVM.prog,'matLRN') && ( ~isfield(NM.TrainParam.GRD.matLearn,'Params') || isempty(NM.TrainParam.GRD.matLearn.Params)) ),
+                ( strcmp(SVM.prog,'matLRN') && ( ~isfield(NM.TrainParam.GRD.matLearn,'Params') || isempty(NM.TrainParam.GRD.matLearn.Params)) )
             if flFUS
                 NM.TrainParam.STRAT{varind}.GRD.PX = []; NM.TrainParam.STRAT{varind}.GRD.n_params = 0;
             else
                 NM.TrainParam.GRD.PX = []; NM.TrainParam.GRD.n_params = 0;
             end
         else
-            menustr = [ menustr 'Learning algorithm parameters [ ' STATUS.GRD ' ]|' ]; menuact = [ menuact 7 ];
+            menustr = [ menustr 'Learning algorithm parameters [ ' STATUS.GRD ' ]|' ]; menuact = [ menuact 8 ];
         end
         % For the predictive sequence optimizer we don't need any ensemble
         % learning optimization.
         if ~strcmp(SVM.prog,'SEQOPT')
             menustr = [ menustr ...
                 'Ensemble generation strategies [ ' STATUS.RFE ' ]|'];
-            menuact = [menuact 8];
+            menuact = [menuact 9];
         end
         if multiflag
             menustr = [ menustr multistr];
-            menuact = [ menuact 9 ];
+            menuact = [ menuact 10 ];
         end
     end
 
@@ -325,9 +327,9 @@ if ~exist('act','var') || isempty(act)
         'Load training template'];
 
 
-    menuact = [ menuact 10 11 12 ];
-    if oocvflag, menuact = [ menuact 13 ]; end
-    menuact = [ menuact 16 19 14 15 ];
+    menuact = [ menuact 11 12 13 ];
+    if oocvflag, menuact = [ menuact 14 ]; end
+    menuact = [ menuact 17 20 15 16 ];
 
     nk_PrintLogo
     mestr = 'Define parameter template'; navistr = sprintf('%s\n\t>>> %s',parentstr, mestr); fprintf('\nYou are here: %s >>> ',parentstr);
@@ -355,7 +357,7 @@ switch act
             if numel(NM.TrainParam.FUSION.M) == 1
                 NM.TrainParam.FUSION.flag = false;
             end
-            if isempty(find(NM.TrainParam.FUSION.M == varind))
+            if isempty(find(NM.TrainParam.FUSION.M == varind, 1))
                 varind = NM.TrainParam.FUSION.M(1);
             end
             if NM.TrainParam.FUSION.flag == 3
@@ -371,7 +373,7 @@ switch act
         NM.TrainParam.ActiveModality = varind;
 
     case 2
-        if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag ;
+        if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag 
             M = NM.TrainParam.FUSION.M ;
         else
             M = [];
@@ -381,16 +383,20 @@ switch act
 
     case 3
         act = 1; while act>0, act = nk_CVpartition_config; end
-
+    
     case 4
+        if ~isfield(NM.TrainParam,'SYNTH'), NM.TrainParam.SYNTH.flag = 2; end
+        mess=[];act = 1; while act>0, [NM.TrainParam.SYNTH, act, mess] = nk_Synth_config(NM.TrainParam.SYNTH, mess, navistr); end
+
+    case 5
         fl = questdlg('Are you sure you want to overwrite all modality configuration with the current modality setup?',mestr,'Yes','No','No');
         if strcmp(fl,'Yes')
             STRAT = NM.TrainParam.STRAT(varind);
             NM.TrainParam.STRAT(NM.TrainParam.FUSION.M) = STRAT;
         end
 
-        % PREPROCESSING =================================================================================================================================================
-    case 5
+    % PREPROCESSING =================================================================================================================================================
+    case 6
         if ~isfield(NM,'TrainParam') || ...
                 ~isfield(NM.TrainParam,'PREPROC') || ...
                 varind > numel(NM.TrainParam.PREPROC)
@@ -409,7 +415,7 @@ switch act
         end
 
         % ML ALGORITHM SELECTION =========================================================================================================================================
-    case 6
+    case 7
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
             if ~isfield(NM.TrainParam.STRAT{varind},'SVM'), NM.TrainParam.STRAT{varind}.SVM = []; end
             act = 1; while act>0, ...
@@ -420,7 +426,7 @@ switch act
         end
 
         % ML OPTIMIZATION STRATEGIES =====================================================================================================================================
-    case 7
+    case 8
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
             if ~isfield(NM.TrainParam.STRAT{varind},'GRD'), NM.TrainParam.STRAT{varind} = nk_Grid_config(NM.TrainParam.STRAT{varind}, NM.TrainParam.STRAT{varind}.SVM, [], true); end
             act = 1; while act>0, ...
@@ -430,7 +436,7 @@ switch act
             act = 1; while act>0, [ NM.TrainParam, act ] = nk_Grid_config(NM.TrainParam, NM.TrainParam.SVM, varind, [], navistr); end
         end
         % FEATURE SELECTION ==============================================================================================x=================================================
-    case 8
+    case 9
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
             if ~isfield(NM.TrainParam.STRAT{varind},'RFE')
                 [~, NM.TrainParam.STRAT{varind}.RFE ] = ...
@@ -456,7 +462,7 @@ switch act
         end
 
         % MULTI-GROUP SETTINGS =============================================================================================================================================
-    case 9
+    case 10
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
             if ~isfield(NM.TrainParam.STRAT{varind},'MULTI'), NM.TrainParam.STRAT{varind}.MULTI = nk_Multi_config([], true); end
             act = 1; while act>0, [ NM.TrainParam.STRAT{varind}.MULTI, act ] = nk_Multi_config(NM.TrainParam.STRAT{varind}.MULTI, [], navistr); end
@@ -466,7 +472,7 @@ switch act
         end
 
         % VISUALIZATION ====================================================================================================================================================
-    case 10
+    case 11
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
             if ~isfield(NM.TrainParam,'VIS'), NM.TrainParam.STRAT{varind}.VIS = nk_Vis_config(NM.TrainParam.STRAT{varind}.VIS, NM.TrainParam.STRAT{varind}.PREPROC, 1, 1, navistr); end
             act = 1; while act>0, [ NM.TrainParam.STRAT{varind}.VIS, act] = nk_Vis_config(NM.TrainParam.STRAT{varind}.VIS, NM.TrainParam.STRAT{varind}.PREPROC, 1, [], navistr); end
@@ -476,7 +482,7 @@ switch act
         end
 
         % ML INTEPRETATION STRATEGIES =======================================================================================================================================
-    case 11
+    case 12
         if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
             if ~isfield(NM.TrainParam,'MLI'), NM.TrainParam.STRAT{varind}.MLI = nk_MLI_config(NM.TrainParam.STRAT{varind}.MLI, 1, 1, navistr); end
             act = 1; while act>0, [ NM.TrainParam.STRAT{varind}.MLI, act] = nk_MLI_config(NM.TrainParam.STRAT{varind}.MLI, 1, [], navistr); end
@@ -486,15 +492,15 @@ switch act
         end
 
         % SAVING OPTIONS ====================================================================================================================================================
-    case 12
+    case 13
         act = 1; while act>0, [ NM, act ] = nk_SavingOptions_config(NM, 0, navistr); end
 
         % OOCV OPTIONS ======================================================================================================================================================
-    case 13
+    case 14
         NM.TrainParam = nk_OOCV_config(NM.TrainParam);
 
         % EXPORT TRAINING PARAM =============================================================================================================================================
-    case 14
+    case 15
         matname = nk_input('Filename (prefix is TRAIN)',0,'s');
         matname = ['TRAIN_' matname];
         if isfield(NM,'TrainParam')
@@ -507,11 +513,11 @@ switch act
         end
 
         % IMPORT TRAINING PARAM =============================================================================================================================================
-    case 15
+    case 16
         fl = nk_input('Overwrite current settings?',0,'yes|no',[1,0],1);
         if fl
             menuvec = []; menustr =[];
-            if isfield(NM,'analysis'),
+            if isfield(NM,'analysis')
                 menustr = 'Take parameters from analysis in current NM structure|';
                 menuvec = 1;
             end
@@ -562,25 +568,25 @@ switch act
                     end
                     NM.cv = NM.analysis{analind}.params.cv;
             end
-            if ~isempty(mess)>0, h = msgbox(mess,'Loaded parameters:','none'); end
+            if ~isempty(mess)>0, msgbox(mess,'Loaded parameters:','none'); end
         end
 
         % DEFINE VERBOSITY LEVEL ============================================================================================================================================
-    case 16
+    case 17
         NM.TrainParam.verbosity = ~NM.TrainParam.verbosity;
 
-    case 17
+    case 18
         act = 1; stepind = 1; while act>0, [NM.TrainParam.META, act, stepind] = nk_Ensemble_config(NM.TrainParam.STRAT{varind}.PREPROC, varind, navistr, stepind); end
 
         % META-LEARNING (STACKING) =======================================================================================================================================
-    case 18
+    case 19
         if ~isfield(NM.TrainParam,'STACKING'), NM.TrainParam.STACKING.flag = 2; end
         mess=[];act = 1; while act>0, [NM.TrainParam.STACKING, act, mess] = nk_Stacking_config(NM.TrainParam.STACKING, s, mess, navistr); end
 
-    case 19
+    case 20
         nk_PrintWs(NM, NM.TrainParam)
 
-    case 20
+    case 21
         nk_PrintLogo
         fprintf('\n*************************************')
         fprintf('\n***     MULTI-LABEL SELECTION     ***')
@@ -603,6 +609,7 @@ switch act
                 nk_CVpartition_config(0,6);
             end
         end
+
     case 99
         nk_PrintLogo
         fprintf('\n*************************************')

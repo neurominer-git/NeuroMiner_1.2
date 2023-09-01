@@ -252,6 +252,8 @@ switch act
                                 if WRITEPARAM, if exist(savmatP,'file'), fprintf('\n Parameter file detected:\n%s\n%s\nDo not overwrite.', savnamP); end; end
                                 if flg, continue; end
                             end
+
+                            inp.maindir = analysis.rootdir;
     
                             fprintf('\n\n'); fprintf('********************** CV2 partition [%g, %g] ********************** ',ix,jx)
     

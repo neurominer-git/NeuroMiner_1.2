@@ -11,12 +11,12 @@
 % hyperparameter combination are stored. This results in a tree structure 
 % of preprocessed data and respective parameters.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2023
+% (c) Nikolaos Koutsouleris, 09/2023
 
 function [SrcParam, InputParam, TrParam] = ...
               nk_PerfPreprocessObj_core(SrcParam, InputParam, TrParam, act)
 
-global VERBOSE TEMPL SVM MODEFL 
+global VERBOSE TEMPL SVM MODEFL SYNTH 
 
 %% Prepare and check input params
 paramfl = false; tsfl = false; trfl = false; cfl = false;
@@ -78,10 +78,11 @@ else
     nL = 1;
 end
 % Do we have to manage synthetic data?
-adasynfl = false; 
-if isfield(SVM,'ADASYN') && SVM.ADASYN.flag == 1 && ...
-        any(SrcParam.adasynused), adasynfl = true; 
-    if VERBOSE, fprintf('\nADASYN-based synthetic data creation activated'); end
+synthfl= false; 
+if ~isempty(SYNTH) && SYNTH.flag == 1 && any(SrcParam.synth_activated) 
+    synthfl= true; 
+elseif isfield(SVM,'ADASYN') && SVM.ADASYN == 1 && any(SrcParam.synth_activated) 
+    synthfl= true; 
 end
 
 % done with checking and preparing, now let's do the job
@@ -102,7 +103,7 @@ ActParam = struct('trfl', trfl, ...
                   'nTs', nTs', ...
                   'nC', nC, ...
                   'i',0, ...
-                  'adasynfl', adasynfl, ...
+                  'synthfl', synthfl, ...
                   'curlabel', 1, ...
                   'label_interaction', nL>1, ...
                   'copy_ts', copy_ts);
@@ -145,7 +146,7 @@ for i=1:nact
         if nTs > 1, InputParamj.Ts  = cell(1,nTs);   end
         
         % Do we have to take Adasyn into account?
-        if adasynfl
+        if synthfl
             TrainLabelSyn = cell(nComb,nL); 
             CovarSyn = cell(nComb,nL);
         end
@@ -162,7 +163,7 @@ for i=1:nact
                 ActParam.j = j;
                 % Get training and test data from current parameter shelf
                 jj=1; if size(InputParam.Tr,1) > 1; jj = j; end
-                if adasynfl && i == 1
+                if synthfl&& i == 1
                    InputParamj.Tr = [ InputParam.Tr{jj}; InputParam.TrSyn{jj} ]; 
                 else 
                    if i==1    
@@ -245,7 +246,7 @@ for i=1:nact
                     
                     [ SrcParam, Out, TrParamij{kl,nl}, ActParam ] = feval( funcstr, SrcParam, InputParamj, TrParam, llTrParam, ActParam );
                     Tr{kl,nl} = Out.Tr;
-                    if adasynfl, TrainLabelSyn{kl,nl} = SrcParam.TrainLabelSyn{ActParam.j}; CovarSyn{kl,nl} = SrcParam.covarsSyn{ActParam.j}; end
+                    if synthfl, TrainLabelSyn{kl,nl} = SrcParam.TrainLabelSyn{ActParam.j}; CovarSyn{kl,nl} = SrcParam.covarsSyn{ActParam.j}; end
                     if isfield(Out,'Yw'), Yw{kl,nl} = Out.Yw; end
                     if isfield(Out, 'C'), C{kl,nl} = Out.C; end
                     if nTs>1
@@ -260,7 +261,7 @@ for i=1:nact
             end
         end
         InputParam.Tr = Tr; 
-        if adasynfl, SrcParam.TrainLabelSyn = TrainLabelSyn; SrcParam.covarsSyn = CovarSyn; end
+        if synthfl, SrcParam.TrainLabelSyn = TrainLabelSyn; SrcParam.covarsSyn = CovarSyn; end
         if isfield(InputParam,'Yw'), InputParam.Yw = Yw; end
         if isfield(InputParam,'C'), InputParam.C = C; end
 
@@ -279,7 +280,7 @@ for i=1:nact
 
         TrParamij = cell(nO,nL); ll = 1;
         %Do we have to use Adasyn ?
-        if adasynfl 
+        if synthfl
             % Prepare containers for synthetic label and covars expansion
             TrainLabelSyn = cell(nO,nL); 
             CovarSyn = cell(nO,nL);
@@ -309,7 +310,7 @@ for i=1:nact
                 TrParamij{kl,nl}.i_opt = O(l,:); % Save in parameter shelf
                 Tr{kl,nl} = Out.Tr; % Save in data shelf
                 % Take care of adasyn labels and covars expansion if needed.
-                if adasynfl
+                if synthfl
                     TrainLabelSyn{kl, nl} = SrcParam.TrainLabelSyn; 
                     if ~isempty(SrcParam.covars)
                         CovarSyn{kl, nl} = SrcParam.covarsSyn; 
@@ -332,14 +333,14 @@ for i=1:nact
         % Save processed training data shelves back in InputParam.Tr, which is now a cell array 
         InputParam.Tr = Tr; 
         % Adasyn: Store expanded labels and covars back in SrcParam
-        if adasynfl, SrcParam.TrainLabelSyn = TrainLabelSyn; SrcParam.covarsSyn = CovarSyn; end
+        if synthfl, SrcParam.TrainLabelSyn = TrainLabelSyn; SrcParam.covarsSyn = CovarSyn; end
         % Save CV1 and CV2 test data in shelves
         if isfield(InputParam,'Yw'), InputParam.Yw = Yw; end
         if nC > 0, InputParam.C = C; end
         if nTs > 0; InputParam.Ts = Ts; end
         TrParami = TrParamij; % Save processing parameters of curent parameters range loop
     else
-        if adasynfl && i==1
+        if synthfl&& i==1
             InputParam.Tr = [InputParam.Tr; InputParam.TrSyn];
         end
         if ~isempty(TEMPL), ActParam.Templ = TEMPL.Param(InputParam.curclass).TrainedParam{i}; end
@@ -394,7 +395,7 @@ switch MODEFL
     case 'regression'
         L = SrcParam.TrainLabel;
 end
-if actparam.adasynfl
+if actparam.synthfl
     L = [L; SrcParam.TrainLabelSyn{actparam.j}];
 end
 [SrcParam.TrL_imputed, TrParami] = nk_PerfImputeLabelObj(L, InputParam.P{i}.LABELIMPUTE); 
@@ -442,7 +443,7 @@ if VERBOSE; fprintf('\tNormalizing to group mean(s) ...'); end
 if paramfl && tsfl && isfield(TrParami,'meanY') && isfield(InputParam.P{i},'TsInd')
     tsproc = true;
 elseif trfl
-    if actparam.adasynfl && isfield(InputParam.P{i},'TrInd') && ~isempty(InputParam.P{i}.TrInd)
+    if actparam.synthfl&& isfield(InputParam.P{i},'TrInd') && ~isempty(InputParam.P{i}.TrInd)
         if iscell(SrcParam.covarsSyn)
             InputParam.P{i}.TrInd = [InputParam.P{i}.TrInd; SrcParam.covarsSyn{actparam.j}(:,InputParam.P{i}.IND)]; 
         else
@@ -502,7 +503,7 @@ if VERBOSE; fprintf('\tCorrect groups for offsets from global mean(s) ...'); end
 if paramfl && tsfl && isfield(TrParami,'meanY') && isfield(TrParami,'meanG')
     tsproc = true;
 elseif trfl
-     if actparam.adasynfl && isfield(InputParam.P{i},'sTrInd') && ~isempty(InputParam.P{i}.sTrInd)
+     if actparam.synthfl&& isfield(InputParam.P{i},'sTrInd') && ~isempty(InputParam.P{i}.sTrInd)
         if iscell(SrcParam.covarsSyn)
             InputParam.P{i}.sTrInd = [InputParam.P{i}.sTrInd; SrcParam.covarsSyn{actparam.j}(:,InputParam.P{i}.sIND)]; 
         else
@@ -594,7 +595,7 @@ if paramfl && tsfl && isfield(TrParami,'meanY') && isfield(TrParami,'stdY')
 else
     if trfl
         % Check for ADASYN
-        if actparam.adasynfl && isfield(InputParam.P{i},'sTrInd') && ~isempty(InputParam.P{i}.sTrInd)
+        if actparam.synthfl&& isfield(InputParam.P{i},'sTrInd') && ~isempty(InputParam.P{i}.sTrInd)
             if iscell(SrcParam.covarsSyn)
                 InputParam.P{i}.sTrInd = [InputParam.P{i}.sTrInd; SrcParam.covarsSyn{actparam.j}(:,InputParam.P{i}.sIND)]; 
             else
@@ -661,7 +662,7 @@ if paramfl && tsfl && isfield(InputParam.P{i},'DR') && ...
         isfield(TrParami,'mpp')
     tsproc = true;
 elseif trfl
-     if actparam.adasynfl 
+     if actparam.synthfl
         if iscell(SrcParam.TrainLabelSyn)
             DIMRED.DR.labels = [InputParam.P{i}.DR.labels(:,actparam.curlabel); SrcParam.TrainLabelSyn{actparam.j}(:,actparam.curlabel)]; 
         else
@@ -781,7 +782,7 @@ if paramfl && tsfl && isfield(TrParami,'beta')
     % Out-of-sample mode, used TsCovars and stored beta
     tsproc = true;
 elseif trfl 
-    if actparam.adasynfl 
+    if actparam.synthfl
         if iscell(SrcParam.covarsSyn)
             IN.TrCovars = [ InputParam.P{i}.TrCovars; SrcParam.covarsSyn{actparam.j}(:, IN.COVAR)]; 
         else
@@ -870,7 +871,7 @@ if ~isfield(TrParami,'W') || isempty(TrParami.W)
         RANK.curlabel = InputParam.P{i}.RANK.curlabel(:,actparam.curlabel);
         Y = InputParam.Tr;
     end
-    if actparam.adasynfl 
+    if actparam.synthfl
         % To do: synthetic data generation needs to create also
         % user-defined RANK.curlabel for artificial data. Currently only
         % synthetic target label can be created (TrainLabelSyn).

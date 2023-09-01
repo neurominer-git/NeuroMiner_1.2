@@ -49,6 +49,7 @@ inparams.P =                inp;
 inparams.analyses =         inp.analyses;
 inparams.stacking =         inp.stacking;
 inparams.rootdir =          inp.rootdir;
+inparams.maindir =          inp.maindir;
 inparams.gdmat =            inp.gdmat;
 inparams.preprocmat =       inp.preprocmat;
 if isfield(inp,'time2event')

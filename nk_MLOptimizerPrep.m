@@ -414,7 +414,7 @@ if ~isfield(inp1,'rootdir') || isempty(inp1.rootdir) || ~exist(inp1.rootdir,'dir
 else
     inp1.rootdir = fullfile(analysis.rootdir,mthstr);
 end
-
+inp1.maindir = analysis.rootdir;
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir);end
 
 % Write some info to command line

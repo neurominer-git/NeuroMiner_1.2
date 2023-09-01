@@ -33,7 +33,8 @@ global ...
     TIME ...
     CVPOS ...
     TEMPL ...
-    STACKING
+    STACKING ...
+    SYNTH
 
 paramstr = [];
 
@@ -99,6 +100,12 @@ switch act
             end
         end
 
+        try
+            SYNTH = NM.TrainParam.SYNTH;
+        catch
+            SYNTH.flag = 2;
+        end
+    
         try
             MLI = dat.TrainParam.MLI;
         catch

@@ -354,7 +354,7 @@ if inp1.oocvflag
 else
     inp1.rootdir = fullfile(analysis.rootdir,analysis.params.TrainParam.SVM.prog,'MLI');
 end
-
+inp1.maindir = analysis.rootdir;
 if ~exist(inp1.rootdir,'dir'), mkdir(inp1.rootdir); end
 nl = nk_GetLabelDim(MULTILABEL);
 inp1.MLI = MLI;
