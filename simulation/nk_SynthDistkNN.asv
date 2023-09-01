@@ -35,6 +35,7 @@ end
 
 % Check whether there are NaNs in the data and impute them
 if sum(isnan(std_realData(:)))
+    fprintf('\nImputing missing values in data');
     IN_impute.k = k;
     IN.impute.method = 'SeqkNN'; 
     std_realData = nk_PerfImputeObj(std_realData, IN_impute);
@@ -102,7 +103,7 @@ for i = 1:numSyntheticObservations
 end
 fprintf('\nDone!\n')
 % Combine the real and synthetic data and labels
-data = [realData; syntheticData];
+data = syntheticData;
 labels = [realLabels; syntheticLabels];
 if ~isempty(realCovars)
     covars = [realCovars; syntheticCovars];

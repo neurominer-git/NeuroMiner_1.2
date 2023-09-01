@@ -103,10 +103,10 @@ for i = 1:numSyntheticObservations
 end
 fprintf('\nDone!\n')
 % Combine the real and synthetic data and labels
-data = [realData; syntheticData];
-labels = [realLabels; syntheticLabels];
+data = syntheticData;
+labels = syntheticLabels;
 if ~isempty(realCovars)
-    covars = [realCovars; syntheticCovars];
+    covars = syntheticCovars;
 end
 
 function wsd = wasserstein(u_samples, v_samples, p)
