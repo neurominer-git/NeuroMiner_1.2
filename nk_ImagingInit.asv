@@ -41,15 +41,15 @@ else
         end
     end
     if DEV
-        if exist('jurootdir','var') && ~isnumeric(jurootdir) && ~exist(jurootdir,'dir')
-            tjurootdir = fileparts(which('JuSpace'));
-            if ~isempty(tjurootdir)
-                jurootdir = tjurootdir;
-                try
-                    save(imaging_init_path,'jurootdir','-append')
-                    fprintf('\nUpdated the JuSpace toolbox path according to the system settings.')
-                end
+    if exist('jurootdir','var') && ~isnumeric(jurootdir) && ~exist(jurootdir,'dir')
+        tjurootdir = fileparts(which('JuSpace'));
+        if ~isempty(tjurootdir)
+            jurootdir = tjurootdir; 
+            try
+                save(imaging_init_path,'jurootdir','-append')
+                fprintf('\nUpdated the JuSpace toolbox path according to the system settings.')
             end
         end
+    end
     end
 end

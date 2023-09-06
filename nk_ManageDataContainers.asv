@@ -151,13 +151,13 @@ switch act
         else
             groups = [];
         end
-        datacontainer.groups = nk_input('Specify logical subgroup matrix (Each column indicates one subgroup)', 0, 'e', [], [datacontainer.n_subjects_all, inf]);
+        datacontainer.groups = nk_input('Specify logical subgroup matrix (Each column indicates one subgroup)', 0, 'e', groups, [datacontainer.n_subjects_all, inf]);
         if isfield(datacontainer,'grpnames') && numel(datacontainer.grpnames) == size(datacontainer.groups,2)
             grpnames = datacontainer.grpnames;
         else
             grpnames = [];
         end
-        datacontainer.grpnames = nk_input('Provide subgroup names', 0, 'e', [], size(datacontainer.groups,2));
+        datacontainer.grpnames = nk_input('Provide subgroup names', 0, 's', [], size(datacontainer.groups,2));
         if strcmp(inp.modeflag,'classification')
             if isfield(datacontainer,'refgroup')
                 if ~datacontainer.refgroup, refgroup = 2; else, refgroup = 1; end
