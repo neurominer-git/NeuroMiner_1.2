@@ -54,6 +54,8 @@ if ~defaultsfl
                 % check whether this is compatible with the current cv
                 % structure (if one exists)
                 newgroupsN = numel(unique(newlabel));
+                if newgroupsN>2
+                    warning('Mutli-class labels are currently not supported by the alternative label functionality. You could set up a new NM structure and import the same ')
                 newgroups = unique(newlabel);
                 newgroupnames = nk_input('Groupnames (as vector, no numeric names)',0,'e',[],newgroupsN);
                     
@@ -65,13 +67,6 @@ if ~defaultsfl
                         newlabelname = 'no name defined';
                         newmode = NM.modeflag;
                     end
-                end
-                if newgroupsN>2
-                    warndlg('Mutli-class labels are currently not supported by the alternative label functionality. Enter a different label or disable alternative label.')
-                    altlabflag = 0;
-                    newlabel = 'define different label';
-                    newlabelname = 'no name defined';
-                    newmode = NM.modeflag;
                 end
 
             elseif newmodenr == 2

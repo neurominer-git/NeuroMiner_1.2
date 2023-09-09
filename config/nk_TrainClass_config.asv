@@ -599,8 +599,14 @@ switch act
         fprintf('\n*************************************')
         fprintf('\n')
         
-        for i=1:size(NM.label,2)
-            fprintf('\n- %g -  %s',i, NM.labelnames{i})
+        if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
+            for i=1:size(NM.TrainParam.LABEL.newlabel,2)
+                fprintf('\n- %g -  %s',i, NM.labelnames{i})
+            end
+        else
+            for i=1:size(NM.label,2)
+                fprintf('\n- %g -  %s',i, NM.labelnames{i})
+            end
         end
         if ~isfield(NM.TrainParam,'MULTILABEL')
             NM.TrainParam.MULTILABEL.sel = 1:size(NM.label,2);
@@ -673,7 +679,18 @@ switch act
         elseif ~LABEL.flag % if either nothing has been changed in submenu or switch from alternative label to no alt. label and learning mode switch 
             NM.TrainParam = LABEL.OrigTrainParam;
         end
-      
+        if strcmp(modeflag,'classification')
+            classtr = ['Classification algorithm [ ' STATUS.SVM ' ]|'];
+            if numel(unique(NM.label(~isnan(NM.label)))) > 2
+                multistr = ['Multi-class settings [ ' STATUS.MULTI ' ]|'];
+                multiflag = true;
+            else
+                NM.TrainParam.MULTI.flag=0;
+            end
+        else
+            classtr = ['Prediction algorithm [ ' STATUS.SVM ' ]|'];
+            multistr = ''; NM.TrainParam.MULTI.flag=0;
+        end
 
 
  %% read in calibration data

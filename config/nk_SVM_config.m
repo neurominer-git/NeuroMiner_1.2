@@ -23,7 +23,7 @@ switch progtype
         end
         act = 1; 
         while act
-            [param,act] = nk_LIBSVM_config(res, param, [], [], parentstr, modeflag); 
+            [act,param] = nk_LIBSVM_config(res, param, [], [], parentstr, modeflag); 
         end
         
     case 'SVMPRF'
