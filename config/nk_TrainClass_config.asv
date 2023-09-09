@@ -582,8 +582,20 @@ switch act
         NM.TrainParam.verbosity = ~NM.TrainParam.verbosity;
 
     case 18
-        act = 1; stepind = 1; while act>0, [NM.TrainParam.META, act, stepind] = nk_Ensemble_config(NM.TrainParam.STRAT{varind}.PREPROC, varind, navistr, stepind); end
+        % CV 09.09.2023: DELETE can fusion and stacking be activated at the same
+        % time ? No
 
+        if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
+            if ~isfield(NM.TrainParam.STRAT{varind},'SVM'), NM.TrainParam.STRAT{varind}.SVM = []; end
+            act = 1; stepind = 1; while act>0, [NM.TrainParam.META, act, stepind] = nk_Ensemble_config(NM.TrainParam.STRAT{varind}.PREPROC, varind, navistr, stepind); end
+
+        
+        else
+            if ~isfield(NM.TrainParam,'SVM'), NM.TrainParam.SVM = []; end
+            act = 1; stepind = 1; while act>0, [NM.TrainParam.META, act, stepind] = nk_Ensemble_config(NM.TrainParam.STRAT{varind}.PREPROC, varind, navistr, stepind); end
+
+        end
+        
         % META-LEARNING (STACKING) =======================================================================================================================================
     case 19
         if ~isfield(NM.TrainParam,'STACKING'), NM.TrainParam.STACKING.flag = 2; end
@@ -599,14 +611,8 @@ switch act
         fprintf('\n*************************************')
         fprintf('\n')
         
-        if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
-            for i=1:size(NM.TrainParam.LABEL.newlabel,2)
-                fprintf('\n- %g -  %s',i, NM.labelnames{i})
-            end
-        else
-            for i=1:size(NM.label,2)
-                fprintf('\n- %g -  %s',i, NM.labelnames{i})
-            end
+        for i=1:size(NM.label,2)
+            fprintf('\n- %g -  %s',i, NM.labelnames{i})
         end
         if ~isfield(NM.TrainParam,'MULTILABEL')
             NM.TrainParam.MULTILABEL.sel = 1:size(NM.label,2);
@@ -679,18 +685,7 @@ switch act
         elseif ~LABEL.flag % if either nothing has been changed in submenu or switch from alternative label to no alt. label and learning mode switch 
             NM.TrainParam = LABEL.OrigTrainParam;
         end
-        if strcmp(modeflag,'classification')
-            classtr = ['Classification algorithm [ ' STATUS.SVM ' ]|'];
-            if numel(unique(NM.label(~isnan(NM.label)))) > 2
-                multistr = ['Multi-class settings [ ' STATUS.MULTI ' ]|'];
-                multiflag = true;
-            else
-                NM.TrainParam.MULTI.flag=0;
-            end
-        else
-            classtr = ['Prediction algorithm [ ' STATUS.SVM ' ]|'];
-            multistr = ''; NM.TrainParam.MULTI.flag=0;
-        end
+      
 
 
  %% read in calibration data

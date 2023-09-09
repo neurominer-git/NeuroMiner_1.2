@@ -170,7 +170,7 @@ if ~exist('act','var') || isempty(act)
     %% Check whether there are analyses that have been completed and make stacking options available
     s = nk_GetNMStatus(NM);
     if ~isempty(s.completed_analyses) && sum(s.completed_analyses)>1 && sum(s.nmodal_analyses)>1
-        menustr = [ menustr sprintf('Define meta-learning/stacking options [ %s ]|', STATUS.STACKING) ]; menuact = [ menuact 18 ];
+        menustr = [ menustr sprintf('Define meta-learning/stacking options [ %s ]|', STATUS.STACKING) ]; menuact = [ menuact 19 ];
     else
         NM.TrainParam.STACKING.flag = 2;
     end
@@ -582,8 +582,9 @@ switch act
         NM.TrainParam.verbosity = ~NM.TrainParam.verbosity;
 
     case 18
-        act = 1; stepind = 1; while act>0, [NM.TrainParam.META, act, stepind] = nk_Ensemble_config(NM.TrainParam.STRAT{varind}.PREPROC, varind, navistr, stepind); end
 
+        act = 1; while act>0, [NM.TrainParam.META, act] = nk_Ensemble_config(NM); end
+        
         % META-LEARNING (STACKING) =======================================================================================================================================
     case 19
         if ~isfield(NM.TrainParam,'STACKING'), NM.TrainParam.STACKING.flag = 2; end

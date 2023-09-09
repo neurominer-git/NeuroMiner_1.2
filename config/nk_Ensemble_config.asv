@@ -41,6 +41,6 @@ switch act
 end
 
 NM.TrainParam.ENSEMBLE = ENSEMBLE;
-%ENSEMBLE = nk_Ensemble_config(NM);
+ENSEMBLE = nk_Ensemble_config(NM);
 
 return
