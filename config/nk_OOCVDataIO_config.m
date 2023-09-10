@@ -53,6 +53,8 @@ inp.badcoords = NM.badcoords;
 inp.analysis = NM.analysis;
 inp.oocvmode = true;
 inp.id = NM.id;
+inp.featnames = NM.featnames;
+inp.modeflag = NM.modeflag;
 if isfield(NM,'covars'), inp.covflag = true; inp.covars = NM.covars; end
 
 act = 1; while act, [act, Y, inp] = nk_ManageDataContainers(act, inp, Y, parentstr); end

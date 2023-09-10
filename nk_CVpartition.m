@@ -103,6 +103,7 @@ for h=1:nperms % Loop through perms
                         indClassCX = [indClassCX; indClass(indCx)];
                         
                     end
+                    
                 else
                     startpos = (i-1)*testsize +1; 
                     endpos = i*testsize;

@@ -186,7 +186,7 @@ for f=1:ix % Loop through CV2 permutations
         CVPOS.CV2f = d;
         
         binOOCVDh = cell(nclass,1); cntOOCVDh = cell( nclass, 1 ); inp.f = f; inp.d = d; inp.ll = ll;
-        if inp.PERM.flag
+        if inp.PERM.flag == 1
             binOOCVDh_perm = cell(nclass,1); 
             for h=1:nclass
                 binOOCVDh_perm{h} = zeros(inp.nOOCVsubj, inp.analysis.NumModels(h, ll, inp.curlabel), inp.PERM.nperms);
@@ -436,9 +436,9 @@ for f=1:ix % Loop through CV2 permutations
             else
                 EnsDat = binOOCVDh{curclass};
                 fprintf('\nAdd all base learners'' outputs to the ensemble matrix without averaging.')
-                if inp.PERM.flag
+                if inp.PERM.flag == 1 
                     for curperm=1:inp.PERM.nperms
-                        binOOCVD_perm{curclass}(:,cntOOCVDh{h}{m}(k,l,1): cntOOCVDh{h}{m}(k,l,2),curperm) = binOOCVDh_perm{curclass}(:,:,curperm);
+                        binOOCVD_perm{curclass}(:,cntOOCVDh{h}{m}(k,l,1):cntOOCVDh{h}{m}(k,l,2),curperm) = binOOCVDh_perm{curclass}(:,:,curperm);
                     end
                 end
             end

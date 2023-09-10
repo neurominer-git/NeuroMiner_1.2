@@ -170,7 +170,7 @@ if ~exist('act','var') || isempty(act)
     %% Check whether there are analyses that have been completed and make stacking options available
     s = nk_GetNMStatus(NM);
     if ~isempty(s.completed_analyses) && sum(s.completed_analyses)>1 && sum(s.nmodal_analyses)>1
-        menustr = [ menustr sprintf('Define meta-learning/stacking options [ %s ]|', STATUS.STACKING) ]; menuact = [ menuact 19 ];
+        menustr = [ menustr sprintf('Define meta-learning/stacking options [ %s ]|', STATUS.STACKING) ]; menuact = [ menuact 18 ];
     else
         NM.TrainParam.STACKING.flag = 2;
     end
@@ -582,8 +582,19 @@ switch act
         NM.TrainParam.verbosity = ~NM.TrainParam.verbosity;
 
     case 18
+        % CV 09.09.2023: DELETE can fusion and stacking be activated at the same
+        % time ? No
 
-        act = 1; while act>0, [NM.TrainParam.META, act] = nk_Ensemble_config(NM); end
+        if isfield(NM.TrainParam,'FUSION') && NM.TrainParam.FUSION.flag == 3
+            if ~isfield(NM.TrainParam.STRAT{varind},'SVM'), NM.TrainParam.STRAT{varind}.SVM = []; end
+            act = 1; stepind = 1; while act>0, [NM.TrainParam.META, act, stepind] = nk_Ensemble_config(NM.TrainParam.STRAT{varind}.PREPROC, varind, navistr, stepind); end
+
+        
+        else
+            if ~isfield(NM.TrainParam,'SVM'), NM.TrainParam.SVM = []; end
+            act = 1; stepind = 1; while act>0, [NM.TrainParam.META, act, stepind] = nk_Ensemble_config(NM.TrainParam.STRAT{varind}.PREPROC, varind, navistr, stepind); end
+
+        end
         
         % META-LEARNING (STACKING) =======================================================================================================================================
     case 19

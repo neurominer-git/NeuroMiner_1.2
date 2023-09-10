@@ -1,5 +1,4 @@
 function [act, datacontainer, inp ] = nk_ManageDataContainers(act, inp, datacontainer, parentstr)
-
 nk_PrintLogo
 if inp.oocvmode 
     containerstr = 'OOCV ';
@@ -152,13 +151,13 @@ switch act
         else
             groups = [];
         end
-        datacontainer.groups = nk_input('Specify logical subgroup matrix (Each column indicates one subgroup)', 0, 'e', groups, [inp.ncases, inf]);
+        datacontainer.groups = nk_input('Specify logical subgroup matrix (Each column indicates one subgroup)', 0, 'e', [], [datacontainer.n_subjects_all, inf]);
         if isfield(datacontainer,'grpnames') && numel(datacontainer.grpnames) == size(datacontainer.groups,2)
             grpnames = datacontainer.grpnames;
         else
             grpnames = [];
         end
-        datacontainer.grpnames = nk_input('Provide subgroup names', 0, 'e', grpnames, size(datacontainer.groups,2));
+        datacontainer.grpnames = nk_input('Provide subgroup names', 0, 'e', [], size(datacontainer.groups,2));
         if strcmp(inp.modeflag,'classification')
             if isfield(datacontainer,'refgroup')
                 if ~datacontainer.refgroup, refgroup = 2; else, refgroup = 1; end
@@ -180,7 +179,6 @@ end
 
 % _________________________________________________________________________
 function datacontainer = ReimportDatafromDisk(datacontainer)
-
 fprintf('\nRe-importing linked data container into NM: %s',datacontainer.Y);
 if iscell(datacontainer.Y) 
     for i=1:numel(datacontainer.Y)
@@ -305,7 +303,7 @@ if strcmp(IO.datasource,'matrix')
     IO.sheet = inp.na_str;
     IO.sheets = inp.na_str;
     IO.M_edit = inp.na_str;
-    IO.featnames_cv = NM.featnames{inp.currmodal};
+    IO.featnames_cv = inp.featnames{inp.currmodal};
 else
     if strcmp(IO.datasource,'spm')
         IO.datasource = 'nifti'; 
