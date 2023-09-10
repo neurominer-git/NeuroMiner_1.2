@@ -68,6 +68,7 @@ if ~defaultsfl
         end
     end
     fl = true;
+    
     if strcmp(NM.modeflag, 'classification') && isfield(NM,'groupnames') && length(NM.groupnames) > 2
         Decomps = 'not defined';
         if isfield(NM,'TrainParam') && isfield(NM.TrainParam,'RAND') && isfield(NM.TrainParam.RAND,'Decompose')

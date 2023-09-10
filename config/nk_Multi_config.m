@@ -10,7 +10,12 @@ if ~exist('defaultfl','var') || isempty(defaultfl), defaultfl = 0; end
 
 % Defaults:
 % =========
-if numel(unique(NM.label)) < 3
+if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
+    label_temp = NM.TrainParam.LABEL.newlabel; 
+else
+    label_temp = NM.label; 
+end
+if numel(unique(label_temp)) < 3
     MULTI.flag = 0;
     MULTI.train = 0;
     return; 

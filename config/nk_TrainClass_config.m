@@ -474,7 +474,7 @@ switch act
             act = 1; while act>0, [ NM.TrainParam.STRAT{varind}.MULTI, act ] = nk_Multi_config(NM.TrainParam.STRAT{varind}.MULTI, [], navistr); end
         else
             if ~isfield(NM.TrainParam,'MULTI'), NM.TrainParam.MULTI = nk_Multi_config([], true); end
-            act = 1; while act>0, [ NM.TrainParam.MULTI, act ] = nk_Multi_config(NM.TrainParam.MULTI,[], navistr); end
+            act = 1; while act>0, [ NM.TrainParam.MULTI, act] = nk_Multi_config(NM.TrainParam.MULTI,[], navistr); end
         end
 
         % VISUALIZATION ====================================================================================================================================================

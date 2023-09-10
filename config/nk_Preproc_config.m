@@ -110,8 +110,15 @@ d = nk_GetParamDescription2(NM, PREPROC, 'PreProc');
 nk_PrintLogo
 
 % Check group processing mode possibilities
-if numel(unique(NM.label(:,1))) > 2 && strcmp(modeflag,'classification') 
-    if NM.TrainParam.RAND.Decompose == 2
+if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
+    label_temp = NM.TrainParam.LABEL.newlabel; 
+else
+    label_temp = NM.label; 
+end
+if numel(unique(label_temp)) > 2 && strcmp(modeflag,'classification') 
+    if isfield(NM.TrainParam,'RAND') && ...
+                isfield(NM.TrainParam.RAND,'Decompose') && ...
+                    NM.TrainParam.RAND.Decompose == 2
         fprintf('\nOne-vs-All mode => multigroup processing activated');
         PREPROC.BINMOD = 0;
     else
@@ -160,7 +167,7 @@ if ~isempty(prestr)
     fprintf('%s ',prestr)
 end
 
-slnan = sum(isnan(NM.label));
+slnan = sum(isnan(label_temp));
 if slnan
     fprintf('\n');
     cmdstr = 'Define parameters for label propagation to unlabeled training data'; cmdmnu = 100;
@@ -314,7 +321,7 @@ switch act
         PREPROC.LABELMOD = config_labelimpute(PREPROC.LABELMOD, navistr);
         
     case 1 % Configure group processing mode
-        PREPROC = config_binmod(NM, PREPROC);
+        PREPROC = config_binmod(NM, label_temp, PREPROC);
     
     case 2 % Add Preprocessing step
         [PREPROC, EF] = config_AddReplaceModifyStep(NM, varind, PREPROC, [], 0, EF, navistr, modeflag);
@@ -546,7 +553,7 @@ else
                 case 'reducedim'
                     cmdstr = 'Apply dimensionality reduction method to data';                       cmdmnu = 8;
                 case 'labelimpute'
-                    slnan = sum(isnan(NM.label));
+                    slnan = sum(isnan(label_temp));
                     if slnan
                         cmdstr = 'Propagate labels to unlabeled training data';                     cmdmnu = 9;
                     else
@@ -670,20 +677,20 @@ CURACT.LABELMOD = LABELMOD;
 end
 % -------------------------------------------------------------------------
 %%%% GROUP PROCESSING MODE (if multi-class available) %%%%
-function CURACT = config_binmod(NM, CURACT)
+function CURACT = config_binmod(NM, label, CURACT)
 
 % Default parameter
 if isfield(CURACT,'BINMOD') && ~isempty(CURACT.BINMOD)
     switch CURACT.BINMOD, case 1, tBINMOD = 1; case 0, tBINMOD = 2; case 2, tBINMOD = 3; end
 else
-    if max(NM.label(:,1))>2 && strcmp(modeflag,'classification') 
+    if max(label(:,1))>2 && strcmp(modeflag,'classification') 
         tBINMOD = 0; % Multi-group
     else
         tBINMOD = 1; % Binary mode
     end
 end
 
-if max(NM.label(:,1))<=2 || ~strcmp(NM.modeflag,'classification')
+if max(label(:,1))<=2 || ~strcmp(NM.modeflag,'classification')
     CURACT.BINMOD = 1;
 else
     CURACT.BINMOD = nk_input('Group processing mode',0, 'm', 'binary|multi-group',[1,0], tBINMOD);
