@@ -67,14 +67,11 @@ if ~defaultsfl
                     end
                 end
 
-                if newgroupsN > 2
-                    NM.TrainParam.RAND.Decompose = ...
-                        nk_input('Multi-group decomposition method',0,'m', ...
-                        'One-vs-One|One-vs-All',[1,2],Decompn);
+               %         'One-vs-One|One-vs-All',[1,2],1);
 
                     %NM.cv = update_cvstruct_for_multiclass(NM.cv, NM.TrainParam.RAND.Decompose, newgroupsN)
 
-                end
+               % end
 
                 %                 if newgroupsN>2
                 %                     warndlg('Mutli-class labels are currently not supported by the alternative label functionality. Enter a different label or disable alternative label.')

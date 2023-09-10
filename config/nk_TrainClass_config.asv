@@ -291,7 +291,9 @@ if ~exist('act','var') || isempty(act)
 
     flx = flSVM && flGRD && flPREPROC;
     
-    if ~multiflag % in multiclass context, no alternative label functionality currently supported (due to different decomposition) 
+    if strcmp(modeflag,'classification') && multiflag % multiclass
+        menustr = [ menustr 'Use different label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
+    else 
         menustr = [ menustr 'Use different label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
     end 
     menustr = [ menustr sprintf('Synthethic data generation [ %s ]|', STATUS.SYNTH) ]; menuact = [ menuact 4 ];
