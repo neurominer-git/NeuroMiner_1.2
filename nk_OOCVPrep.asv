@@ -336,7 +336,7 @@ if analysis.params.label.altlabelflag && isfield(inp1.OO,'altlabels') && ...
     ~isempty(eval(sprintf('inp1.OO.altlabels.%s', analysis.params.label.labelname)))
     inp1.LabelCV     = analysis.params.label.label;
     inp1.labelOOCV   = eval(sprintf('inp1.OO.altlabels.%s', analysis.params.label.labelname));
-    inp1.ngroups     = numel(unique(analysis.params.label.label(~isnan(analysis.params.label.label))));
+    inp1.ngroups     
 end
 
 switch MODEFL
