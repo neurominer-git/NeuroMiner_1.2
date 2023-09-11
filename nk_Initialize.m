@@ -4,16 +4,16 @@ function nk_Initialize(action)
 % =========================================================================
 % startup script for NeuroMiner 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 04/2023
+% (c) Nikolaos Koutsouleris, 09/2023
 
 global NMinfo NM CALIBAVAIL OOCVAVAIL SPMAVAIL FSAVAIL JUAVAIL OCTAVE
 
 NMinfo.info.name    = 'NeuroMiner';
 if OCTAVE
-    NMinfo.info.ver     = sprintf('Version 1.2 (alpha) | FEANOR [OCTAVE %s]', OCTAVE_VERSION);
+    NMinfo.info.ver     = sprintf('Version 1.2 (beta) | FEANOR [OCTAVE %s]', OCTAVE_VERSION);
 else
     matver = ver('matlab');
-    NMinfo.info.ver     = sprintf('Version 1.2 (alpha) | FEANOR [%s %s]', matver.Name, matver.Release);
+    NMinfo.info.ver     = sprintf('Version 1.2 (beta) | FEANOR [%s %s]', matver.Name, matver.Release);
 end
 NMinfo.info.author  = 'Nikolaos Koutsouleris, Clara Vetter, Ariane Wiegand';
 NMinfo.info.affil   = 'Section for Precision Psychiatry';
