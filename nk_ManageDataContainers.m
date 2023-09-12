@@ -7,11 +7,13 @@ else
 end
 
 % check whether an alternative label was used in one of the locked analyses
-altlabels = [];
-if isfield(inp,'analysis')
-    for i=1:length(inp.analysis)
-        if isfield(inp.analysis{1,i}.params, 'label') && inp.analysis{1,i}.params.label.altlabelflag
-            altlabels = [altlabels, inp.analysis{1,i}.params.label.labelname];
+if datacontainer.labels_known
+    altlabels = {};
+    if isfield(inp,'analysis')
+        for i=1:length(inp.analysis)
+            if isfield(inp.analysis{1,i}.params, 'label') && inp.analysis{1,i}.params.label.altlabelflag
+                altlabels{end+1} = inp.analysis{1,i}.params.label.labelname;
+            end
         end
     end
 end
@@ -102,7 +104,7 @@ if act < 10
             mnusel = [mnusel 7];
         end
 
-        if ~isempty(altlabels)
+        if exist('altlabels', 'var') && ~isempty(altlabels)
             mnuact = [mnuact '|Add alternative label(s) to OOCV data'];
             mnusel = [mnusel 8]; 
         end
@@ -144,7 +146,7 @@ switch act
     case {8, 18}
         % if alternative labels were used in any of the locked analyses,
         % new labels have to be input for the validation data too 
-        datacontainer.label = nk_DataLabel_config(datacontainer.n_subjects_all, altlabels);
+        datacontainer.altlabels = nk_DataLabel_config(datacontainer.n_subjects_all, altlabels);
     case {9, 19}
         if isfield(datacontainer,'groups')
             groups = datacontainer.groups;

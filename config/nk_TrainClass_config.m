@@ -290,9 +290,10 @@ if ~exist('act','var') || isempty(act)
     end
 
     flx = flSVM && flGRD && flPREPROC;
-
-    menustr = [ menustr 'Use different label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
     
+    if ~multiflag % in multiclass context, no alternative label functionality currently supported (due to different decomposition) 
+        menustr = [ menustr 'Use different label [ ' STATUS.LABEL ' ]|']; menuact = [menuact 99] ;
+    end 
     menustr = [ menustr sprintf('Synthethic data generation [ %s ]|', STATUS.SYNTH) ]; menuact = [ menuact 4 ];
 
     menustr = [ menustr 'Preprocessing pipeline [ ' STATUS.PREPROC ' ]|' classtr ]; menuact = [ menuact 6:7 ];
@@ -474,7 +475,7 @@ switch act
             act = 1; while act>0, [ NM.TrainParam.STRAT{varind}.MULTI, act ] = nk_Multi_config(NM.TrainParam.STRAT{varind}.MULTI, [], navistr); end
         else
             if ~isfield(NM.TrainParam,'MULTI'), NM.TrainParam.MULTI = nk_Multi_config([], true); end
-            act = 1; while act>0, [ NM.TrainParam.MULTI, act ] = nk_Multi_config(NM.TrainParam.MULTI,[], navistr); end
+            act = 1; while act>0, [ NM.TrainParam.MULTI, act] = nk_Multi_config(NM.TrainParam.MULTI,[], navistr); end
         end
 
         % VISUALIZATION ====================================================================================================================================================

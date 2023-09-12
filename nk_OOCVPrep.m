@@ -324,11 +324,20 @@ if isfield(inp1.OO,'label') && ~isempty(inp1.OO.label)
     inp1.LabelCV     = dat.label; 
     inp1.labelOOCV   = inp1.OO.label; 
 end
+
 inp1.cases_oocv      = inp1.OO.cases;
 inp1.nOOCVsubj       = numel(inp1.OO.cases);
 inp1.id              = dat.id;
 stranalysis          = SAV.matname;
 inp1.ngroups         = numel(unique(dat.label(~isnan(dat.label))));
+
+if analysis.params.label.altlabelflag && isfield(inp1.OO,'altlabels') && ...
+    isfield(inp1.OO.altlabels, analysis.params.label.labelname) && ...
+    ~isempty(eval(sprintf('inp1.OO.altlabels.%s', analysis.params.label.labelname)))
+    inp1.LabelCV     = analysis.params.label.label;
+    inp1.labelOOCV   = eval(sprintf('inp1.OO.altlabels.%s', analysis.params.label.labelname));
+    inp1.ngroups     = numel(unique(analysis.params.label.label(~isnan(analysis.params.label.label))));
+end
 
 switch MODEFL
     case 'classification'
