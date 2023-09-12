@@ -81,7 +81,7 @@ end
 synthfl= false; 
 if ~isempty(SYNTH) && SYNTH.flag == 1 && any(SrcParam.synth_activated) 
     synthfl= true; 
-elseif isfield(SVM,'ADASYN') && SVM.ADASYN == 1 && any(SrcParam.synth_activated) 
+elseif isfield(SVM,'ADASYN') && isfield(SVM.ADASYN, 'flag') && SVM.ADASYN.flag == 1 && any(SrcParam.synth_activated) 
     synthfl= true; 
 end
 

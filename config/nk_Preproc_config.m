@@ -553,7 +553,11 @@ else
                 case 'reducedim'
                     cmdstr = 'Apply dimensionality reduction method to data';                       cmdmnu = 8;
                 case 'labelimpute'
-                    slnan = sum(isnan(label_temp));
+                    if isfield(NM.TrainParam, 'LABEL') && NM.TrainParam.LABEL.flag
+                        slnan = sum(isnan(NM.TrainParam.LABEL.newlabel));
+                    else
+                        slnan = sum(isnan(NM.label));
+                    end
                     if slnan
                         cmdstr = 'Propagate labels to unlabeled training data';                     cmdmnu = 9;
                     else
