@@ -9,7 +9,7 @@ if strcmp(fl,'no'), return; end
     
 nV = numel(NM.Y);
 nO = numel(NM.OOCV);
-if nO>1, 
+if nO>1 
      selstr = 'select';
      St = 'Independent Test Data Manager'; 
      O = nk_OOCVDataIO('title',St,'list',NM.OOCV,'mode',selstr);

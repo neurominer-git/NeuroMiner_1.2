@@ -132,7 +132,7 @@ switch act
     case {2, 12} % Read-in data
         datacontainer = InputDataModality(inp, datacontainer, navistr);
     case {3, 13} % Clear data from modality
-        datacontainer = ClearDataModality(datacontainer);
+        datacontainer = ClearDataModality(inp, datacontainer);
         if ~isfield(datacontainer,'Y'), act = 0; end
     case {4 , 14}
         datacontainer = LinkData2Disk(inp, datacontainer, 'export&link');
