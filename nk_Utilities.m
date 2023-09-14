@@ -43,7 +43,7 @@ switch act
         complvec = []; for z=1:numel(NM.analysis), if NM.analysis{z}.status, complvec = [ complvec z ]; end; end
         t_act = 1; brief = 1; analind = 1; showmodalvec = []; 
         while t_act>0, 
-            [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> UPDATE ANALYSES ROOT DIRECTORIES ', analind, [], 1, showmodalvec, brief); 
+            [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> UPDATE ANALYSES ROOT DIRECTORIES ', analind, [], 0, showmodalvec, brief); 
         end
         if ~isempty(analind), 
             analind = complvec(analind);

@@ -206,7 +206,10 @@ switch act
             while t_act>0
                 [t_act, analind, ~, showmodalvec , brief, indanal] = nk_SelectAnalysis(NM, 0, navistr, analind, [], 1, showmodalvec, brief, 7); 
             end
-            if ~isempty(analind), inp.analind = indanal(analind) ; end
+            if ~isempty(analind)
+                %inp.analind = indanal(analind) ; 
+                inp.analind = indanal; 
+            end
             nA = numel(inp.analind);
             if nA>1
                 AS = nk_GetAnalysisStatus(NM, inp.analind);
