@@ -376,7 +376,7 @@ for curclass = 1 : nclass
             Predict.binCV2Diversity_DecValues(curclass) = nk_RegAmbig(dDTs);
 
         case 'regression'
-            hrx     = nm_nanmedian(dTTs,2);
+            hrx     = nm_nanmedian(dTTs,1); %DID this change recently?
             hdx     = hrx;
             
             Predict.binCV2Performance_Targets(curclass) = EVALFUNC(dTSLabel{curclass}(:,MULTILABEL.curdim), hrx);

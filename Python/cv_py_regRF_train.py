@@ -24,6 +24,7 @@ Output:
 from sklearn.ensemble import RandomForestRegressor
 import pickle
 import uuid
+import os
 
 # criterion
 if crit == 1:
