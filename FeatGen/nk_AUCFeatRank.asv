@@ -3,16 +3,14 @@ global VERBOSE
 
 [~,nY] = size(Y);
 D = zeros(nY,1);
-if length(unique(L))==2
+if ~ismember(1,unique(L)) 
     uL = unique(L); 
     Ltemp = L; 
-    Ltemp(L == min(uL)) = -1; 
-    Ltemp(L ~= min(uL)) = 1; 
-else 
-    Ltemp = L; 
+    Ltemp(Ltemp == min(uL)) = 1; 
+    Ltemp()
 end
 for i=1:nY
-  D(i) = AUC(Ltemp,Y(:,i));  
+  D(i) = AUC(L,Y(:,i));  
 end
 if exist('AUCparam','var')
     ind = D<AUCparam;

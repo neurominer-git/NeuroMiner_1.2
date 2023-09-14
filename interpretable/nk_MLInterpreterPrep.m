@@ -208,7 +208,7 @@ switch act
             end
             if ~isempty(analind)
                 %inp.analind = indanal(analind) ; 
-                inp.analind = indanal; 
+                inp.analind = analind; 
             end
             nA = numel(inp.analind);
             if nA>1
