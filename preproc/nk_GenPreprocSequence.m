@@ -213,7 +213,7 @@ if isfield(TemplParam,'ACTPARAM')
                         InputParam.P{ac}.BETAEXT = TemplParam.ACTPARAM{ac}.BETAEXT;
                         if VERBOSE,fprintf('\n\t Beta parameter(s) computed in an OOT-sample will be used.'); end
                     else
-                        if isfield(TemplParam.ACTPARAM{ac},'SUBGROUP') && ~isempty(TemplParam.ACTPARAM{ac}.SUBGROUP)
+                        if isfield(TemplParam.ACTPARAM{ac},'SUBGROUP') && ~isempty(TemplParam.ACTPARAM{ac}.SUBGROUP) && ~isnan(TemplParam.ACTPARAM{ac}.SUBGROUP)
                             InputParam.P{ac}.SUBGROUP = TemplParam.ACTPARAM{ac}.SUBGROUP(SrcParam.TrX,:);
                             InputParam.P{ac}.SUBGROUP(SrcParam.iTrX) = []; 
                             if VERBOSE,fprintf('\n\t-> Beta parameter(s) will be computed from a specific subgroup.'); end

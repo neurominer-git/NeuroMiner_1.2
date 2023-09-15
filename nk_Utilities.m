@@ -46,7 +46,7 @@ switch act
             [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> UPDATE ANALYSES ROOT DIRECTORIES ', analind, [], 0, showmodalvec, brief); 
         end
         if ~isempty(analind) 
-            analind = complvec(analind);
+            analind = analind;
         else
             analind = complvec;
         end
