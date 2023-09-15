@@ -44,8 +44,7 @@ end
 
 if strcmp(distanceMeasure,'Mahalanobis')
     % Compute the covariance matrix of the real data (needed for the Mahalanobis distance)
-    covarianceMatrix = cov(realData, 'omitrows');
-    covHat = nearestSPD(covarianceMatrix); % matrix close to covariance matrix that is symmetric and positive definite
+    covarianceMatrix = cov(realData);
 end
 
 
@@ -77,8 +76,8 @@ for i = 1:numSyntheticObservations
         case 'Cosine'
             distances = 1 - sum((std_realData .* repmat(std_realObservation, size(realData, 1), 1)), 2) ./ (sqrt(sum(std_realData.^2, 2)) .* sqrt(sum(std_realObservation.^2)));
         case 'Mahalanobis'
-            %distances = sqrt(mahal(std_realData, std_realObservation, covarianceMatrix));
-            distances = sqrt(pdist2(std_realData, std_realObservation, 'mahalanobis', covHat));
+            distances = sqrt(mahal(std_realData, std_realObservation, covarianceMatrix));
+            distances = sqrt(pdist2(std_realData, std_realObservation, 'mah'))
         case 'Wasserstein'
             distances = wasserstein(realData, std_realObservation);
     end
