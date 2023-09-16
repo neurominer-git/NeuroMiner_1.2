@@ -126,7 +126,11 @@ for i = 1:nP
             if contains(cmdstr,'-B 1')
                 R(:,i) = model.w(1:end-1); 
             else
-                R(:,i) = model.w; 
+                if nu < 3 % binary
+                    R(:,i) = model.w;
+                else 
+                    R(:,i) = mean(model.w); % multiclass
+                end
             end
             nonzerofeat = sum(model.w ~= 0); 
             fprintf(' ==> %g (%1.2f%%) Non-zero features.', nonzerofeat, nonzerofeat*100/model.nr_feature);
