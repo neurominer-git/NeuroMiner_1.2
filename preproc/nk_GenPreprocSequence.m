@@ -515,7 +515,7 @@ if isfield(TemplParam,'ACTPARAM')
                         case 2
                             InputParam.P{ac}.REMVARCOMP.indX = TemplParam.ACTPARAM{ac}.REMVARCOMP.SUBGROUP.ind(SrcParam.TrX);
                         case 3
-                            n = numel(find(SrcParam.TrX))/100*TemplParam.ACTPARAM{ac}.REMVARCOMP.SUBGROUP.indperc;
+                            n = round(numel(find(SrcParam.TrX))/100*TemplParam.ACTPARAM{ac}.REMVARCOMP.SUBGROUP.indperc);
                             ind = true(numel(find(SrcParam.TrX)),1); randind = randperm(numel(ind),n);
                             InputParam.P{ac}.REMVARCOMP.indX = ind(randind);
                         case 4

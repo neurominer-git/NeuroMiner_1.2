@@ -37,6 +37,6 @@ function inv = chi2inv (x, n)
     end
   end
 
-  inv = gaminv (x, n / 2, 2);
+  inv = nm_gaminv (x, n / 2, 2);
 
 end

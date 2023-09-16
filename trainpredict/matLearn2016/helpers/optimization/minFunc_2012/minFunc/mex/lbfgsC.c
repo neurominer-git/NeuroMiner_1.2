@@ -10,7 +10,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     /* Variable Declarations */
     
     double *s, *y, *g, *H, *d, *ro, *alpha, *beta, *q, *r;
-    int nVars,nSteps,lhs_dims[2];
+/*     int nVars,nSteps,lhs_dims[2]; */
+    int nVars,nSteps;
+    size_t lhs_dims[2];
     double temp;
     int i,j;
     

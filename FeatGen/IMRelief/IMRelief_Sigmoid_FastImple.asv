@@ -27,15 +27,14 @@ if min(Uc)==-1
     Uc = unique(targets); 
 end
 if ~ismember(1, Uc)
-    % binary multiclass, e.g. in case of 2 vs. 3 
-    targets(targets == min(targets)) = 1; 
-    targets(targets ~= min(targets)) = 2; 
-    Uc = unique(targets); 
-else
+    
 % binary multiclass, e.g. in case of 1 vs. 3 
     targets(targets==1) = 1;
     targets(targets~=1) = 2;
     Uc = unique(targets); 
+
+
+
 end
 
 Targets = targets-1; % 0 for class 1, 1 for class 2
