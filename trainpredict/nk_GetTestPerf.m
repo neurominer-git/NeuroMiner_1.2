@@ -85,7 +85,9 @@ if ~any(ds)
              '\nCheck your learning parameters.'], ...
         CVPOS.CV2p, CVPOS.CV2f, CVPOS.CV1p,CVPOS.CV1f, height(tXtest), size(tXtest,2)); 
 end
-if sum(isnan(ds)), error('The prediction algorithm returned scores with nonfinite values! Check your learning parameters.'); end
+if sum(isnan(ds))
+    error('The prediction algorithm returned scores with nonfinite values! Check your learning parameters.'); 
+end
 %if numel(ds)>1 && numel(unique(ds))==1, error('The prediction algorithm returned all non-unique scores! Check your learning parameters.'); end
 
 % Check and add-back Nan cases

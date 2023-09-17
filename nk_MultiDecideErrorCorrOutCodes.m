@@ -59,8 +59,11 @@ switch Coding
 end
 
 % Decode (with or without weighting according to number of dichotomizers in each class)
+try
 [classes, dist, minimum] = decoding_main(X, oECOC, Decoding);
-
+catch
+    fpintf('problem')
+end
 if isempty(L), L = ones(numel(classes),1); end
 
 switch ProbComp

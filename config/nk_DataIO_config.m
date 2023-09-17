@@ -118,7 +118,9 @@ switch act
         inp.badcoords = NM.badcoords;
         inp.ncases = size(NM.cases,1);
         inp.oocvmode = false;
-        inp.id = NM.id;
+        if isfield(NM,'id')
+            inp.id = NM.id;
+        end
         inp.modeflag = NM.modeflag;
         if isfield(NM,'covars'), inp.covflag = true; inp.covars = NM.covars; end
 

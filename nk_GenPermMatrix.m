@@ -21,7 +21,7 @@ if ~exist(permfile,'file')
             end
             indpermA{h} = zeros(size(inp.labels,1), inp.PERM.nperms(1));
             indpermAh = nk_VisXPermHelper('genpermlabel', size(lb,1), inp.PERM.nperms(1));
-            for ii=1:nperms(1)
+            for ii=1:inp.PERM.nperms(1)
                 indpermA{h}(lb,ii) = lb(indpermAh(:,ii));
             end
         else

@@ -1171,10 +1171,10 @@ if ~batchflag
                 end
                 % _______________________________________________________________________________
                 % Grand mean images:
-                if isfield(nVIS,'mean')
+               if isfield(nVIS,'mean') 
 
-                    mI.GCV2_t = nk_Threshold(mI.GCV2, inp.VIS{n}.mean); % Save grand mean image
-                    sdI.GCV2_t = nk_Threshold(sdI.GCV2, inp.VIS{n}.se); % Save grand STD image
+                    mI.GCV2_t = nk_Threshold(mI.GCV2, nVIS.mean); % Save grand mean image
+                    sdI.GCV2_t = nk_Threshold(sdI.GCV2, nVIS.se); % Save grand STD image
                     ind = ( mI.GCV2_t ~= 0 & sdI.GCV2_t > 0 );
                     normI.GCV2 = zeros(size(zI.GCV2)); 
                     normI.GCV2(ind) = zI.GCV2(ind);                     % Save grand Z score image
@@ -1185,35 +1185,36 @@ if ~batchflag
                     volnam = char(volnam, [basename '_GrandSTD_thresh_' imgname suff ]);
                     volnam = char(volnam, [basename '_GrandZ_thresh_' imgname suff ]);
                     volnam = char(volnam, [basename '_GrandProb95CI_' imgname suff ]);
+                
+                    clear mI.GCV2_t sdI.GCV2_t ind normI.GCV2 zI.GCV2 indCV2MEANgrCV2SE GrandProb95CI
+
+                    % _______________________________________________________________________________
+                    % Thresholded images:
+                    if isfield(nVIS,'thresh') && ~isempty(nVIS.thresh) && nVIS.thresh
+    
+                        I.VCV2_t    = nk_Threshold(I.VCV2{h,n}, nVIS.mean);
+                        I.VCV2SE_t  = nk_Threshold(I.VCV2SE{h,n}, nVIS.se);
+                        ind         = ( I.VCV2_t ~= 0 & I.VCV2SE_t > 0 );
+                        I.VCV2rat_t = zeros(size(I.VCV2_t));
+                        I.VCV2rat_t(ind) = I.VCV2_t(ind) ./ I.VCV2SE_t(ind);
+    
+                        vols = [vols I.VCV2_t I.VCV2rat_t I.VCV2SE_t ];
+    
+                        % Save thresholded mean image
+                        threshstr = num2str(nVIS.mean.val);
+                        threshstr = regexprep(threshstr,' ','-');
+                        volnam = char(volnam, [basename '_Mean_thresh-' threshstr '_' imgname suff ]);
+    
+                        % Save thresholded CV ratio image
+                        volnam = char(volnam, [basename '_CVratio_thresh_' imgname suff ]);
+    
+                        % Save standard error image
+                        threshstr = num2str(nVIS.se.val);
+                        threshstr = regexprep(threshstr,' ','-');
+                        volnam = char(volnam, [basename '_SE_thresh-' threshstr '_' imgname suff ]);
+    
+                    end
                 end
-
-                clear mI.GCV2_t sdI.GCV2_t ind normI.GCV2 zI.GCV2 indCV2MEANgrCV2SE GrandProb95CI
-                % _______________________________________________________________________________
-                % Thresholded images:
-                if isfield(nVIS,'thresh') && ~isempty(nVIS.thresh) && nVIS.thresh
-
-                    I.VCV2_t    = nk_Threshold(I.VCV2{h,n}, inp.VIS{n}.mean);
-                    I.VCV2SE_t  = nk_Threshold(I.VCV2SE{h,n}, inp.VIS{n}.se);
-                    ind         = ( I.VCV2_t ~= 0 & I.VCV2SE_t > 0 );
-                    I.VCV2rat_t = zeros(size(I.VCV2_t));
-                    I.VCV2rat_t(ind) = I.VCV2_t(ind) ./ I.VCV2SE_t(ind);
-
-                    vols = [vols I.VCV2_t I.VCV2rat_t I.VCV2SE_t ];
-
-                    % Save thresholded mean image
-                    threshstr = num2str(inp.VIS{n}.mean.val);
-                    threshstr = regexprep(threshstr,' ','-');
-                    volnam = char(volnam, [basename '_Mean_thresh-' threshstr '_' imgname suff ]);
-
-                    % Save thresholded CV ratio image
-                    volnam = char(volnam, [basename '_CVratio_thresh_' imgname suff ]);
-
-                    % Save standard error image
-                    threshstr = num2str(inp.VIS{n}.se.val);
-                    threshstr = regexprep(threshstr,' ','-');
-                    volnam = char(volnam, [basename '_SE_thresh-' threshstr '_' imgname suff ]);
-
-                end 
                 % _______________________________________________________________________________
                 % Write-out:
                 switch datatype

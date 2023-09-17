@@ -61,11 +61,10 @@ for ii=1:PermNum % Loop through CV1 permutations
         CVL = IN.Y.mCVL{i,j}(:,MULTILABEL.curdim); TrL = IN.Y.mTrL{i,j}(:,MULTILABEL.curdim);
         CVdecsCat = zeros(nCVSubj(1), IN.nclass);
         TrdecsCat = zeros(nTrSubj(1), IN.nclass);
-        
+        Classes = [];
         for k=1:mxNFea % Loop through feature subspaces
             
             indMx = k <= nDicho;
-            Classes = [];
             
             % Construct multi-group decision matrix
             for curclass=1:IN.nclass

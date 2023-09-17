@@ -30,7 +30,7 @@ switch permmode
         else
             Lperm = L(IND);
         end
-        L = L(IND); Y=Y(IND,:);
+        L = L(IND);
         indN = isnan(L);
         uL = unique(L(~indN)); nuL = numel(uL);
         Yperm = zeros(size(Y));
