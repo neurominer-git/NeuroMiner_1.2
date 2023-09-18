@@ -7,7 +7,7 @@ else
 end
 
 % check whether an alternative label was used in one of the locked analyses
-if datacontainer.labels_known
+if inp.oocvmode && datacontainer.labels_known
     altlabels = {};
     if isfield(inp,'analysis')
         for i=1:length(inp.analysis)
