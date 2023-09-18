@@ -84,7 +84,7 @@ else % Univariate case
         if flw
             if oneclass
                 idx = label == -1;
-                model = feval( LIBSVMTRAIN, W, label(idx), Y(idx,:), cmd);
+                model = feval( LIBSVMTRAIN, W(idx), label(idx), Y(idx,:), cmd);
             else
                 model = feval( LIBSVMTRAIN, W, label, Y, cmd);
             end

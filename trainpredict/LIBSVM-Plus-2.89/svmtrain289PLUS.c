@@ -80,7 +80,7 @@ struct svm_node *x_space;
 // struct svm_performance mPerf;
 // struct svm_decvalues mDec;
 //////
-void do_cross_validation(struct svm_performance*, struct svm_decvalues*);
+ void do_cross_validation(struct svm_performance*, struct svm_decvalues*);
 
 /**
  * storeValue( ) - store the given double value in the mxStruct
