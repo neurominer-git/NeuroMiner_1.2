@@ -688,10 +688,12 @@ end
 
 for curclass = 1: nclass
 
-    if inp.targscale && LabelMode
+    if inp.targscale 
         IN.minY = inp.minLbCV; IN.maxY = inp.maxLbCV; IN.revertflag = 1;
         binOOCVD{curclass} = nk_PerfScaleObj(binOOCVD{curclass}, IN);
-        labelOOCV = nk_PerfScaleObj(labelOOCV, IN);
+        if LabelMode
+            labelOOCV = nk_PerfScaleObj(labelOOCV, IN);
+        end
     end
     if ~isempty(inp.PolyFact)
         binOOCVD{curclass} = binOOCVD{curclass} .^ (1/inp.PolyFact);
