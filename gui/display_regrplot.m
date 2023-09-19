@@ -77,14 +77,16 @@ end
 % Update current Regr structure
 handles.curRegr = regr;
 handles.curRegr.labels = label;
-handles.curRegr.tbl_cont.R2                        = handles.curRegr.R2(handles.curlabel);
-handles.curRegr.tbl_cont.r                         = handles.curRegr.r(handles.curlabel);
-handles.curRegr.tbl_cont.r_95CI_low                = handles.curRegr.r_95CI_low(handles.curlabel);
-handles.curRegr.tbl_cont.r_95CI_up                 = handles.curRegr.r_95CI_up(handles.curlabel);
-handles.curRegr.tbl_cont.t                         = handles.curRegr.t(handles.curlabel);
-handles.curRegr.tbl_cont.p                         = handles.curRegr.p(handles.curlabel);
-handles.curRegr.tbl_cont.MAE                       = handles.curRegr.MAE(handles.curlabel);
-handles.curRegr.tbl_cont.NRSMD                     = handles.curRegr.NRSMD(handles.curlabel);
+if ~isempty(label)
+    handles.curRegr.tbl_cont.R2                        = handles.curRegr.R2(handles.curlabel);
+    handles.curRegr.tbl_cont.r                         = handles.curRegr.r(handles.curlabel);
+    handles.curRegr.tbl_cont.r_95CI_low                = handles.curRegr.r_95CI_low(handles.curlabel);
+    handles.curRegr.tbl_cont.r_95CI_up                 = handles.curRegr.r_95CI_up(handles.curlabel);
+    handles.curRegr.tbl_cont.t                         = handles.curRegr.t(handles.curlabel);
+    handles.curRegr.tbl_cont.p                         = handles.curRegr.p(handles.curlabel);
+    handles.curRegr.tbl_cont.MAE                       = handles.curRegr.MAE(handles.curlabel);
+    handles.curRegr.tbl_cont.NRSMD                     = handles.curRegr.NRSMD(handles.curlabel);
+
 if ~isfield(handles.curRegr.tbl_cont,'array')
     arr                                            = cell2mat(struct2cell( handles.curRegr.tbl_cont));
 else
@@ -92,7 +94,7 @@ else
 end
 handles.curRegr.tbl_cont.rownames                  = fieldnames(handles.curRegr.tbl_cont);
 handles.curRegr.tbl_cont.array                     = arr;
-
+end
 if ~isfield(handles.Regr,'Xaxis') || isempty(handles.Regr.Xaxis)
     indnan    = ~isnan(label);
     label     = label(indnan);

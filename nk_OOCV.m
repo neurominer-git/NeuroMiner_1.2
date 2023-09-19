@@ -688,7 +688,7 @@ end
 
 for curclass = 1: nclass
 
-    if inp.targscale
+    if inp.targscale && LabelMode
         IN.minY = inp.minLbCV; IN.maxY = inp.maxLbCV; IN.revertflag = 1;
         binOOCVD{curclass} = nk_PerfScaleObj(binOOCVD{curclass}, IN);
         labelOOCV = nk_PerfScaleObj(labelOOCV, IN);
@@ -792,8 +792,11 @@ for curclass = 1: nclass
             Results.CICV2PredictedValues(indnan)=nan;
 
             Results.ErrCV2PredictedValues = Results.MeanCV2PredictedValues - labelOOCV;
-            Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , labelOOCV, 1);
-
+            if LabelMode
+                Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , labelOOCV, 1);
+            else
+                Results.Regr = nk_ComputeEnsembleProbability(Results.MeanCV2PredictedValues , [], 1);
+            end
             if inp.PERM.flag==1
                 binOOCVDhx = binOOCVD{1};
                 hdx = nm_nanmedian(binOOCVDhx,2); hdx(indnan) = nan;
