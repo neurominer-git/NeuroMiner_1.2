@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Out of Sample Cross-Validation &#8212; NeuroMiner Manual</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-1F3TPH8HH8"></script>
+    <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){ dataLayer.push(arguments); }
+                gtag('js', new Date());
+                gtag('config', 'G-1F3TPH8HH8');
+            </script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '4.8_mainmenu_OOCV_analysis';</script>
+    <link rel="canonical" href="https://neurominer-git.github.io/NeuroMiner_1.1/4.8_mainmenu_OOCV_analysis.html" />
+    <link rel="shortcut icon" href="_static/nm_logo2.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Export model parameters" href="4.15_mainmenu_export_model.html" />
+    <link rel="prev" title="ML Interpreter (MLI) results" href="4.7.02_mainmenu_display_interpretation_results.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+
+  <div class="bd-header-announcement container-fluid bd-header-announcement">
+    <div class="bd-header-announcement__content">Online Machine Learning School 2023, 25-29 Sep</div>
+  </div>
+
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/nm_logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/nm_logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    NeuroMiner
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">News</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="0.0_previous_MLSchool.html">Past Schools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0.1_MLSchool.html">Online Machine Learning School 2023 - Europe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="0.1_MLSchool_AsiaPacific.html">Online Machine Learning School 2023 - Asia-Pacific</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="1.0_introduction.html">Introduction</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="2.0_prerequisites.html">Suggested Prerequisites</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="3.0_gettingstarted.html">Installation &amp; Configuration</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="3.0.00_macos_users.html">Setting up NeuroMiner on macOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="3.0.01_python_matlab.html">How to configure Python with Matlab for NeuroMiner on the server</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">NeuroMiner interface</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="4.0_mainmenu.html">Main interface overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_mainmenu_input_data.html">Data entry in NeuroMiner</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="4.2_mainmenu_define_parameter_template.html">Define parameter template</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="4.2.00_paramtemp_data_fusion.html">Data Fusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.01_paramtemp_cv_settings.html">Cross-validation settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.02_paramtemp_preprocessing_pipeline.html">Preprocessing pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.03_paramtemp_classification_algorithm.html">Classification algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.04_paramtemp_learning_algorithm_parameters.html">Learning algorithm parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.05_paramtemp_ensemble_generation_strategies.html">Ensemble generation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.06_paramtemp_visualization_options.html">Visualization options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.07_paramtemp_interpretation_options.html">Prediction interpretation options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.08_paramtemp_model_saving_options.html">Model saving options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.09_paramtemp_define_verbosity_level.html">Define verbosity level</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.10_paramtemp_inspect_workspace.html">Inspect workspace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.11_paramtemp_save_parameter_template.html">Save parameter template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.12_paramtemp_load_training_template.html">Load training template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.13_paramtemp_multigroup.html">Multi-group analyses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.14_paramtemp_stacking.html">Stacking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.15_paramtemp_different_label.html">Use different label</a></li>
+<li class="toctree-l2"><a class="reference internal" href="4.2.16_paramtemp_synthetic_data.html">Synthetic data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_mainmenu_initialize_delete_analyses.html">Initialize analyses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_mainmenu_preprocess_features.html">Preprocess features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_mainmenu_train_supervised_classifiers.html">Train supervised classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.6_mainmenu_visualize_classifiers.html">Visualize classifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.14_mainmenu_interprete_classifiers.html">Interprete models</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="4.7_mainmenu_display_training_results.html">Result Viewer</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="4.7.01_mainmenu_display_visualization_results.html">Visualization results</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="4.7.02_mainmenu_display_interpretation_results.html">ML Interpreter (MLI) results</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Out of Sample Cross-Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.15_mainmenu_export_model.html">Export model parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.9_mainmenu_load_struct.html">Load NeuroMiner structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.10_mainmenu_save_struct.html">Save NeuroMiner structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.11_mainmenu_change_wd.html">Change working directory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.12_mainmenu_estimate_sample_size.html">Estimate sample size (simulation tool)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.13_mainmenu_utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.16_1.2_release_notes.html">NeuroMiner 1.2 (09/2023)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/neurominer-git/NeuroMiner_1.1" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/neurominer-git/NeuroMiner_1.1/issues/new?title=Issue%20on%20page%20%2F4.8_mainmenu_OOCV_analysis.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/4.8_mainmenu_OOCV_analysis.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Out of Sample Cross-Validation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neurominer-s-application-mode">NeuroMiner’s application mode</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-data-for-model-application">2 | Load data for model application</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#indicate-whether-the-target-labels-are-known">1. Indicate whether the target labels are known</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-new-data-container">2. Create a new data container</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fill-these-empty-data-containers">3. Fill these empty data containers</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#enter-the-data">4. Enter the data</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#covariates-and-additional-modalities">5. Covariates and additional modalities</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#add-subgroup-information-to-oocv-data">6. Add subgroup information to OOCV data</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-parameters-for-model-application">3 | Set up parameters for model application</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ensemble-mode">1 | Ensemble mode</a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#aggregate-all-base-learners-into-one-ensembe-mode">Aggregate ALL base learners into ONE ensembe mode</a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#compute-mean-decisions-of-cv1-partition-ensembles-before-aggregating">Compute mean decisions of CV1 partition ensembles before aggregating</a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#model-retraining-mode">2 | Model retraining mode</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#apply-classifiers-to-independent-data">4 | Apply classifiers to independent data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#open-nm-results-viewer">5 | Open NM Results Viewer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shred-input-data-in-nm-structure-external-validation">6 | Shred input data in NM structure (external validation)</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="tex2jax_ignore mathjax_ignore section" id="out-of-sample-cross-validation">
+<span id="oocv-analysis"></span><h1>Out of Sample Cross-Validation<a class="headerlink" href="#out-of-sample-cross-validation" title="Permalink to this heading">#</a></h1>
+<p>External, out-of-sample cross-validation (OOCV) is a cornerstone of machine learning and is required for strong generalizability claims. This usually involves the application of the trained models used to predict targets in the CV2 data folds to a separate dataset that has been independently collected.</p>
+<p>External validation relies on the trained models being completely separate from the OOCV data. For this reason, after completing the analysis the user must first lock analyses and start the NM application mode using the following procedure. As mentioned in the section on cross-validation, a form of external validation can be done within a machine learning analysis by selecting the leave-group-out option if the group comes from an external source (i.e., it is not from the same study or sample). However, mostly external validation is done when models from one analysis are applied to a completely different site and study. It is important to note that within a machine learning framework external validation never means that new models are created within a different sample and then the results are compared (e.g., comparison of the beta coefficients or the p-value for significance). This is usually referred to as replication and is basically never the point of machine learning because it is a field that grew around translation and practical application of models. The aim of machine learning is to create models that can be applied without modification to external samples to facilitate predictions at another site. The ultimate aim is to be able to integrate models into clinical care globally.</p>
+<p>For this critical function, the best performing models, that were applied to the test sets at the outer CV2 level, need to be applied to another, unseen (external) sample. Keep in-mind that when we refer to models in NeuroMiner then we are referring to the entire pipeline of operations that are applied to the data: from preprocessing to training. In NeuroMiner, as described in the section on <a class="reference internal" href="4.2.01_paramtemp_cv_settings.html#paramtemp-cv-settings"><span class="std std-ref">cross-validation</span></a>, the optimal models are ultimately retrained in each of the CV1 folds before being applied to the outer test folds. Thus, these are also the models which will be applied to the external validation data. For example, if there are 5 folds on the outer cycle and 5 folds on the inner cycle then 5 x 5 = 25 model pipelines will be applied to the external validation data (assuming that the single best model is chosen for each training fold).</p>
+<p>As stated in the section on <a class="reference internal" href="4.2.01_paramtemp_cv_settings.html#paramtemp-cv-settings"><span class="std std-ref">cross-validation</span></a>, in order to get a valid measure of generalizability it is critical that all operations included in the model training process are applied <em>without modification</em> to the external validation.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>It is critical that different model sets aren’t repeatedly applied to the external validation data so that the user can choose what parameters and options fit the external data best. This would completely undermine the reason for performing external validation. Luckily, in NeuroMiner features have been developed so that the user can’t easily re-run analyses with the external validation.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>NeuroMiner has two modes, <strong>discovery mode</strong> and <strong>application mode</strong>.</p>
+<ul class="simple">
+<li><p><strong>Discovery mode</strong> refers to the model training phase discussed in the previous sections.</p></li>
+<li><p><strong>Application mode</strong> refers to the model application to external validation samples.</p></li>
+</ul>
+<p>This distinction ensures that the <em>discovered</em> models are not retrained on the validation sets.</p>
+</div>
+<p>To enter application mode and apply your model to an external sample, the first step is locking your analyses. In order to do that, you must make sure all of your analyses have been computed. If there are analyses you don’t want to compute, please <a class="reference internal" href="4.3_mainmenu_initialize_delete_analyses.html#initialize-delete-analyses"><span class="std std-ref">remove them</span></a> before continuing.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This option will only show if all initialized analyses have been completed. Please make sure to train or otherwise <a class="reference internal" href="4.3_mainmenu_initialize_delete_analyses.html#initialize-delete-analyses"><span class="std std-ref">delete any untrained analysis</span></a> before entering application mode.</p>
+</div>
+<p>Once all analyses initialized in NM are completed (i.e. trained), the MAIN INTERFACE will include the additional option (“8”):</p>
+<div class="figure align-default" id="fig-nm-mainmenu-all-completed">
+<img alt="neurominer mainmenu when all analyses are completed" src="_images/NM_mainmenu_all_completed.png" />
+</div>
+<p>When selecting <strong>8 | Lock analyses and start NM application mode</strong>, you will be prompted with the question</p>
+<blockquote>
+<div><p>Do you want to finish the model discovery phase?</p>
+<p>[y]es / [n]o (Default: no)?</p>
+</div></blockquote>
+<p>To continue to application mode, type ‘y’ or ‘yes’ and press enter. A new menu will open.</p>
+<div class="section" id="neurominer-s-application-mode">
+<h2>NeuroMiner’s application mode<a class="headerlink" href="#neurominer-s-application-mode" title="Permalink to this heading">#</a></h2>
+<p>The initial menu of NeuroMiner’s application mode looks like this:</p>
+<div class="figure align-default" id="fig-nm-oocv-mainmenu">
+<img alt="neurominer application mode main menu" src="_images/NM_oocv_mainmenu.png" />
+<p class="caption"><span class="caption-number">Fig. 29 </span><span class="caption-text">NeuroMiner’s main menu in application mode</span><a class="headerlink" href="#fig-nm-oocv-mainmenu" title="Permalink to this image">#</a></p>
+</div>
+<hr class="docutils" />
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If the analyses of the NM model are trained from another location, please update the root path of all analyses to the current file path where the NM structure is saved at. To do that, please select <strong>1 | Update analyses’ root paths</strong> and follow the instructions.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="load-data-for-model-application">
+<h3>2 | Load data for model application<a class="headerlink" href="#load-data-for-model-application" title="Permalink to this heading">#</a></h3>
+<p>When you choose this option, the following dialogue box will appear:</p>
+<div class="figure align-default" id="fig-nm-oocv-gui">
+<img alt="neurominer oocv gui screenshot" src="_images/OOCV_GUI.png" />
+</div>
+<p>To enter new data,</p>
+<div class="section" id="indicate-whether-the-target-labels-are-known">
+<h4>1. Indicate whether the target labels are known<a class="headerlink" href="#indicate-whether-the-target-labels-are-known" title="Permalink to this heading">#</a></h4>
+<p>In the case of classification, are the groups the cases belong to known? If the labels are known, select the tick-box at the bottom right called “Target labels known”, otherwise leave it unchecked.</p>
+</div>
+<div class="section" id="create-a-new-data-container">
+<h4>2. Create a new data container<a class="headerlink" href="#create-a-new-data-container" title="Permalink to this heading">#</a></h4>
+<p>Click the <strong>Create New</strong> button at the bottom right. This will add a new entry to the middle blue center box (replacing the ‘NO DATA AVAILABLE’ line). This new entry should be similar to this:</p>
+<blockquote>
+<div><p>[ 1] (0 cases); data; 02-Sep-2022 08:39:04; labels known; yes</p>
+</div></blockquote>
+<p>Repeating these 2 steps, you can create as many new data containers as you want.</p>
+</div>
+<div class="section" id="fill-these-empty-data-containers">
+<h4>3. Fill these empty data containers<a class="headerlink" href="#fill-these-empty-data-containers" title="Permalink to this heading">#</a></h4>
+<p>To do so, select the container from the list in the blue center box (click on it) and then choose the button <strong>Add/Modify Data in Dataset</strong> in the upper left corner. You will be redirected to:</p>
+<div class="figure align-default" id="fig-nm-oocv-modality">
+<img alt="neurominer oocv modality screenshot" src="_images/NM_oocv_modality.png" />
+</div>
+</div>
+<div class="section" id="enter-the-data">
+<h4>4. Enter the data<a class="headerlink" href="#enter-the-data" title="Permalink to this heading">#</a></h4>
+<p>Select <strong>1 | Add/Modify OOCV data</strong>. You might recognize the now appearing menu since it contains some of the options you encountered during the <a class="reference internal" href="4.1_mainmenu_input_data.html#input-data"><span class="std std-ref">initial data entry</span></a>:</p>
+<div class="figure align-default" id="fig-nm-oocv-data-input">
+<img alt="neurominer oocv modality screenshot" src="_images/NM_oocv_data_input.png" />
+</div>
+<p>A point to note is that the <strong>type of input data has to be the same as that of
+the discovery data type used</strong>. NeuroMiner automatically detects the previous input data type (data provenance) and asks accordingly (in the case shown above, from a spreadsheet file). <a class="reference internal" href="4.1_mainmenu_input_data.html#input-data"><span class="std std-ref">Specify the data</span></a> you want to use as the validation set and IMPORT it.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Don’t move any of the discovery data files from the location on your computer once you have specified their directories to NeuroMiner (including any masks used in the processing). Otherwise, NeuroMiner will fail at this step.</p>
+</div>
+</div>
+<div class="section" id="covariates-and-additional-modalities">
+<h4>5. Covariates and additional modalities<a class="headerlink" href="#covariates-and-additional-modalities" title="Permalink to this heading">#</a></h4>
+<p>After you imported the data modality, you are redirected to the menu shown in step 3. If you entered covariates or more modalities during the discovery phase,
+NeuroMiner will at this point ask for a covariates variable and additional modalities of the validation sample. Remember that covariates always need to
+be loaded into the matlab workspace (see <a class="reference internal" href="4.1_mainmenu_input_data.html#input-data"><span class="std std-ref">data entry for the discovery sample</span></a>).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you entered several modalities during the discovery phase, you have to add the same modalities for the validation sample in the same order.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The covariates table of the validation sample needs to contain the same covariates in the same order as for the discovery data. NeuroMiner will assume that this is the case and will <strong>not</strong> ask you to define the covariate names anymore.</p>
+</div>
+<p>Once you are finished with data entry, return to the main menu of the application mode (<a class="reference internal" href="#fig-nm-oocv-mainmenu"><span class="std std-numref">Fig. 29</span></a>).</p>
+</div>
+<div class="section" id="add-subgroup-information-to-oocv-data">
+<h4>6. Add subgroup information to OOCV data<a class="headerlink" href="#add-subgroup-information-to-oocv-data" title="Permalink to this heading">#</a></h4>
+<p>This option allows you to read sugroup information about the OOCV data. By doing so you will be able to see the performance of your trained model when applied to these subgroups individually. Further, you can also specify whether one of your groups should act as a reference group. In this case performance of the model on each subgroup is compared to the performance of the model on the reference group.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The variable has to be in the form of a logical, dummy-coded matrix and should be present in your Matlab workspace, then you can simply enter the name of the variable.</p>
+<p>It has to be data-type logical, simply defining a matrix with ‘O’ and ‘1’ but <em>double</em> type will lead to an error.</p>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="set-up-parameters-for-model-application">
+<h3>3 | Set up parameters for model application<a class="headerlink" href="#set-up-parameters-for-model-application" title="Permalink to this heading">#</a></h3>
+<p>This option opens the following sub menu:</p>
+<div class="figure align-default" id="fig-nm-oocv-settings">
+<img alt="neurominer's oocv settings" src="_images/NM_oocv_settings.png" />
+</div>
+<div class="section" id="ensemble-mode">
+<h4>1 | Ensemble mode<a class="headerlink" href="#ensemble-mode" title="Permalink to this heading">#</a></h4>
+<p>This relates to how the models are applied to the external validation sample and is relevant to all machine learning analyses. In NeuroMiner, you can choose from two possible ensemble construction modes</p>
+<blockquote>
+<div><p>1 | Aggregate ALL base learners into ONE ensemble</p>
+<p>2 | Compute mean decisions of CV1 partion ensembles before aggregating</p>
+</div></blockquote>
+<div class="section" id="aggregate-all-base-learners-into-one-ensembe-mode">
+<h5>Aggregate ALL base learners into ONE ensembe mode<a class="headerlink" href="#aggregate-all-base-learners-into-one-ensembe-mode" title="Permalink to this heading">#</a></h5>
+<p>When you use a cross-validation design to train your models, all models relate
+to one of the outer, CV2, folds. In contrast, in the case of external validation, all the models will be applied to this one sample. This means that the procedure applied to the external validation sample is <strong>different</strong> from what is applied to the discovery sample.</p>
+</div>
+<div class="section" id="compute-mean-decisions-of-cv1-partition-ensembles-before-aggregating">
+<h5>Compute mean decisions of CV1 partition ensembles before aggregating<a class="headerlink" href="#compute-mean-decisions-of-cv1-partition-ensembles-before-aggregating" title="Permalink to this heading">#</a></h5>
+<p>For this reason, NeuroMiner provides the option to apply each CV1 partition
+ensemble for each CV2 fold <em>before</em> computing a mean of these decisions in
+order to follow a more similar logic to the discovery sample procedure.</p>
+</div>
+</div>
+<div class="section" id="model-retraining-mode">
+<h4>2 | Model retraining mode<a class="headerlink" href="#model-retraining-mode" title="Permalink to this heading">#</a></h4>
+<p>The next important option is the <strong>2 | Model retraining mode</strong> option. Here, you have the choice between</p>
+<blockquote>
+<div><p>1 | As defined for CV training phase</p>
+<p>2 | Use all available CV data (CV1+CV2)</p>
+</div></blockquote>
+<p>This is a critical aspect of NeuroMiner that needs to be understood from
+a machine learning perspective.</p>
+<p>As a default, NeuroMiner does not save the specific model parameters to disk because they generally consume a large amount of disk space (e.g., 50G). Instead, NeuroMiner defines the optimal parameters for the models during the preprocessing and training procedures. It then retrains the models in the discovery sample using
+these parameters before applying them to the external validation sample.</p>
+<p>For this option, NeuroMiner gives the possibility to retrain the models
+in the same way that they were trained on the discovery sample or
+to ‘Use all available CV data (CV1+CV2)’.</p>
+<p>The first option; <em>1 | As defined for CV training phase</em> is recommended if the point of the analysis is to validate the original models that will be displayed in a paper.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The gold standard though would be to save the models and use the exact models calculated in the discovery cohort for the external validation cohort, which can be done during <a class="reference internal" href="4.6_mainmenu_visualize_classifiers.html#visualize-classifiers"><span class="std std-ref">Visualization</span></a> in NeuroMiner. The reason for this is that there can be minor changes to the models when they use non-deterministic procedures (e.g., gradient descent).</p>
+</div>
+<p>After setting up the parameters, you can return to the main menu of the application mode (<a class="reference internal" href="#fig-nm-oocv-mainmenu"><span class="std std-numref">Fig. 29</span></a>). Now the menu options include <strong>4 | Apply classifiers to independent data</strong>.</p>
+</div>
+</div>
+<div class="section" id="apply-classifiers-to-independent-data">
+<h3>4 | Apply classifiers to independent data<a class="headerlink" href="#apply-classifiers-to-independent-data" title="Permalink to this heading">#</a></h3>
+<p>The submenu that opens when you select this option looks very similar to the <a class="reference internal" href="4.5_mainmenu_train_supervised_classifiers.html#mainmenu-train-supervised-classifiers"><span class="std std-ref">train models</span></a>. Choose the independent data container you want to work on and select “7 | PROCEED” once all options are set accordingly.</p>
+<p>Using the winning parameters from your discovery analyses, the models will now be retrained in the discovery data before being applied to the external validation data. You can see this happening in the matlab command window.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>In order to apply <a class="reference internal" href="4.2.14_paramtemp_stacking.html#stacking"><span class="std std-ref">stacker models</span></a> to independent data, you must first make sure that the same independent data has already been applied to all the base learner models of the stacker model. Otherwise, the stacker model cannot be applied to the independent data.</p>
+</div>
+</div>
+<div class="section" id="open-nm-results-viewer">
+<h3>5 | Open NM Results Viewer<a class="headerlink" href="#open-nm-results-viewer" title="Permalink to this heading">#</a></h3>
+<p>This option takes you to the <a class="reference internal" href="4.7_mainmenu_display_training_results.html#mainmenu-display-training-results"><span class="std std-ref"><strong>Results Viewer</strong></span></a> as in the <strong>discovery mode</strong>. If you click on the second drop-down box then there will be an option to select the external validation data for the selected analysis that you entered.</p>
+<div class="figure align-default" id="fig-nm-oocv-resultviewer">
+<img alt="Neurominer result viewer for application mode" src="_images/NM_oocv_resultviewer.png" />
+</div>
+</div>
+<div class="section" id="shred-input-data-in-nm-structure-external-validation">
+<h3>6 | Shred input data in NM structure (external validation)<a class="headerlink" href="#shred-input-data-in-nm-structure-external-validation" title="Permalink to this heading">#</a></h3>
+<p>This function replaces the modalities in the NM structure with random data and thus allows NM structures to be safely sent to external collaborators from a data privacy perspective. Make sure that you have written out optimized preprocessing and model data during model visualization, otherwise the models will not be applicable to external samples after data shredding.</p>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="4.7.02_mainmenu_display_interpretation_results.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">ML Interpreter (MLI) results</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="4.15_mainmenu_export_model.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Export model parameters</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neurominer-s-application-mode">NeuroMiner’s application mode</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#load-data-for-model-application">2 | Load data for model application</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#indicate-whether-the-target-labels-are-known">1. Indicate whether the target labels are known</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-new-data-container">2. Create a new data container</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#fill-these-empty-data-containers">3. Fill these empty data containers</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#enter-the-data">4. Enter the data</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#covariates-and-additional-modalities">5. Covariates and additional modalities</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#add-subgroup-information-to-oocv-data">6. Add subgroup information to OOCV data</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-parameters-for-model-application">3 | Set up parameters for model application</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ensemble-mode">1 | Ensemble mode</a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#aggregate-all-base-learners-into-one-ensembe-mode">Aggregate ALL base learners into ONE ensembe mode</a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#compute-mean-decisions-of-cv1-partition-ensembles-before-aggregating">Compute mean decisions of CV1 partition ensembles before aggregating</a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#model-retraining-mode">2 | Model retraining mode</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#apply-classifiers-to-independent-data">4 | Apply classifiers to independent data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#open-nm-results-viewer">5 | Open NM Results Viewer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shred-input-data-in-nm-structure-external-validation">6 | Shred input data in NM structure (external validation)</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By <a href="https://www.lmu-klinikum.de/psychiatrie-und-psychotherapie/forschung-research/working-groups/precision-psychiatry/7ef67d79b4ad4804">Section for Precision Psychiatry, Ludwig-Maximilian-University Munich</a> / <a href="https://www.psych.mpg.de/2571270/precision-psychiatry">Precision Psychiatry Group, Max Planck Institute of Psychiatry</a>
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
