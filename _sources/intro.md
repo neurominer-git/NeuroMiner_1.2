@@ -13,13 +13,13 @@ Software written by Nikolaos Koutsouleris, Clara Vetter & Ariane Wiegand
 Manual written by Dom Dwyer
 
 with contributions from
-Carlos Cabral, Shalaila Haas, Anne Ruef, Adyasha Khuntia, Elif Sarisik, Madalina Buciuman, Mark Dong, Paolo Enrico, Lisa-Maria Neuner, Clara Weyer
+Ariane Wiegand, Clara Vetter, Carlos Cabral, Shalaila Haas, Anne Ruef, Adyasha Khuntia, Elif Sarisik, Madalina Buciuman, Mark Dong, Paolo Enrico, Lisa-Maria Neuner, Clara Weyer
 
-Version release date: 12th September 2022
+Version release date: 21st September 2023
 
 ## How to cite NeuroMiner
 
-> Koutsouleris, Vetter & Wiegand (2022). Neurominer [Computer software]. Retrieved from https://github.com/neurominer-git/NeuroMiner_1.1
+> Koutsouleris, Vetter & Wiegand (2023). Neurominer [Computer software]. Retrieved from https://github.com/neurominer-git/NeuroMiner_1.2
 
 
 ## Machine learning for precision psychiatry
