@@ -10,10 +10,10 @@ global NMinfo NM CALIBAVAIL OOCVAVAIL SPMAVAIL FSAVAIL JUAVAIL OCTAVE
 
 NMinfo.info.name    = 'NeuroMiner';
 if OCTAVE
-    NMinfo.info.ver     = sprintf('Version 1.2 (beta) | FEANOR [OCTAVE %s]', OCTAVE_VERSION);
+    NMinfo.info.ver     = sprintf('Version 1.2 | FEANOR [OCTAVE %s]', OCTAVE_VERSION);
 else
     matver = ver('matlab');
-    NMinfo.info.ver     = sprintf('Version 1.2 (beta) | FEANOR [%s %s]', matver.Name, matver.Release);
+    NMinfo.info.ver     = sprintf('Version 1.2 | FEANOR [%s %s]', matver.Name, matver.Release);
 end
 NMinfo.info.author  = 'Nikolaos Koutsouleris, Clara Vetter, Ariane Wiegand';
 NMinfo.info.affil   = 'Section for Precision Psychiatry';
