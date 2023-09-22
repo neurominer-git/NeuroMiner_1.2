@@ -218,7 +218,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="4.4_mainmenu_preprocess_features.html">Preprocess features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4.5_mainmenu_train_supervised_classifiers.html">Train supervised classifiers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4.6_mainmenu_visualize_classifiers.html">Visualize classifiers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="4.14_mainmenu_interprete_classifiers.html">Interprete models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.14_mainmenu_interprete_classifiers.html">Interprete predictions</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="4.7_mainmenu_display_training_results.html">Result Viewer</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="4.7.01_mainmenu_display_visualization_results.html">Visualization results</a></li>
 
@@ -435,7 +435,6 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#select-learning-algorithm">Select learning algorithm</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Define kernel type</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimize-decision-threshold-based-on-roc-expert-mode">Optimize decision threshold based on ROC (expert mode)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-adasyn-to-adjust-for-unbalanced-class-settings-expert-mode">Use ADASYN to adjust for unbalanced class settings (expert mode)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-optimization">Sequence Optimization</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-population-the-deferral-optimization-will-be-based-on">1 | Define the population the deferral optimization will be based on</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#define-how-to-combine-sequential-predictions">2 | Define how to combine sequential predictions</a></li>
@@ -639,21 +638,6 @@ label prediction)</p></li>
 </div>
 <p>It allows optimizing the decision scores according to the Receiver Operator Function. The default setting enables the post-hoc optimization using ROC analysis of C1 test data.</p>
 </div>
-<div class="section" id="use-adasyn-to-adjust-for-unbalanced-class-settings-expert-mode">
-<h3>Use ADASYN to adjust for unbalanced class settings (expert mode)<a class="headerlink" href="#use-adasyn-to-adjust-for-unbalanced-class-settings-expert-mode" title="Permalink to this heading">#</a></h3>
-<p>If you’ve opened NM in expert mode (by calling “nm expert” instead of “nm”), you will have this option in your model setup menu. Adaptive Synthetic (ADASYN) is primarily used to tackle the ’Imbalanced Classification Problem’ prominent in Machine Learning which arises due to imbalanced class size. The key hindrance with an imbalanced dataset is that one class dominates another class resulting in a model that is highly underfitted as it is not able to classify the minority class successfully. ADASYN is an algorithm that generates synthetic data by generating more data for the class with lesser data.</p>
-<p>Enabling ADASYN mode opens up extra options:</p>
-<blockquote>
-<div><p>7 | Define beta value (defines how much balancing will be applied, 0,1) 	[k=1]</p>
-<p>8 | Define k value of density algorithm (kNN looking at both classes)		[k=5]</p>
-<p>n9 | Define k value of SMOTE algorithm (kNN looking only at the minority class) [k=5]</p>
-<p>10 | Data is already normalized for kNN search 					[no]</p>
-</div></blockquote>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>To have access to more preprocessing and model settings, you have to open NeuroMiner in expert mode. To do so, start NeroMiner by typing <strong>nm expert</strong> instead of <strong>nm</strong> in your MATLAB console.</p>
-</div>
-</div>
 <div class="section" id="sequence-optimization">
 <h3>Sequence Optimization<a class="headerlink" href="#sequence-optimization" title="Permalink to this heading">#</a></h3>
 <div class="admonition note">
@@ -801,7 +785,6 @@ label prediction)</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#select-learning-algorithm">Select learning algorithm</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Define kernel type</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimize-decision-threshold-based-on-roc-expert-mode">Optimize decision threshold based on ROC (expert mode)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-adasyn-to-adjust-for-unbalanced-class-settings-expert-mode">Use ADASYN to adjust for unbalanced class settings (expert mode)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-optimization">Sequence Optimization</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-population-the-deferral-optimization-will-be-based-on">1 | Define the population the deferral optimization will be based on</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#define-how-to-combine-sequential-predictions">2 | Define how to combine sequential predictions</a></li>

@@ -218,7 +218,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="4.4_mainmenu_preprocess_features.html">Preprocess features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4.5_mainmenu_train_supervised_classifiers.html">Train supervised classifiers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4.6_mainmenu_visualize_classifiers.html">Visualize classifiers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="4.14_mainmenu_interprete_classifiers.html">Interprete models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.14_mainmenu_interprete_classifiers.html">Interprete predictions</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="4.7_mainmenu_display_training_results.html">Result Viewer</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="4.7.01_mainmenu_display_visualization_results.html">Visualization results</a></li>
 
@@ -426,13 +426,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-new">What is new</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-notes">Release notes</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-class-support-vector-machine-classification">One-class support vector machine (classification)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#default-parameters-of-matlearn-algorithms">Default parameters of matLearn algorithms</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-functions">Python functions</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classification-with-mcrvm-and-polynomial-kernel">Classification with MCRVM and polynomial kernel</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-notes">Release notes</a></li>
 </ul>
             </nav>
         </div>
@@ -473,27 +467,24 @@ document.write(`
 </div>
 <div class="section" id="release-notes">
 <h2>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this heading">#</a></h2>
-<div class="section" id="one-class-support-vector-machine-classification">
-<h3>One-class support vector machine (classification)<a class="headerlink" href="#one-class-support-vector-machine-classification" title="Permalink to this heading">#</a></h3>
-<p>To correctly use the one-class SVM (within the <a class="reference external" href="https://www.csie.ntu.edu.tw/~cjlin/libsvm/">LIBSVM package</a>), the reference group needs to be labeled as -1 or 2. One class classification is currently still in development, thus, errors might arise. Please send an email to the developers should you encounter some bugs.</p>
-</div>
-<div class="section" id="default-parameters-of-matlearn-algorithms">
-<h3>Default parameters of matLearn algorithms<a class="headerlink" href="#default-parameters-of-matlearn-algorithms" title="Permalink to this heading">#</a></h3>
-<p>Some of the algoirthms from the matLearn package currently come with no default parameters set. Make sure to choose these before initializing and running a model to avoid issues and errors. You can set the parameters when navigating to the <strong>Learning algorithm parameters</strong> (<a class="reference internal" href="4.2.04_paramtemp_learning_algorithm_parameters.html#learning-algorithm-parameters"><span class="std std-ref">more information</span></a>) option from the <strong>Parameter Template</strong> menu. To get an overview of the parameters and what values they can take, have a look at the <a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Software/matLearn.html">matLearn documentation</a>.</p>
-<p><strong>Algorithms that are missing/ have currently wrong default parameters</strong></p>
 <ul class="simple">
+<li><p>One-class support vector machine (classification): To correctly use the one-class SVM (within the <a class="reference external" href="https://www.csie.ntu.edu.tw/~cjlin/libsvm/">LIBSVM package</a>), the reference group needs to be labeled as -1 or 2. One class classification is currently still in development, thus, errors might arise. Please send an email to the developers should you encounter some bugs.</p></li>
+<li><p>Default parameters of matLearn algorithms: Some of the algoirthms from the matLearn package currently come with no default parameters set. Make sure to choose these before initializing and running a model to avoid issues and errors. You can set the parameters when navigating to the <strong>Learning algorithm parameters</strong> (<a class="reference internal" href="4.2.04_paramtemp_learning_algorithm_parameters.html#learning-algorithm-parameters"><span class="std std-ref">more information</span></a>) option from the <strong>Parameter Template</strong> menu. To get an overview of the parameters and what values they can take, have a look at the <a class="reference external" href="https://www.cs.ubc.ca/~schmidtm/Software/matLearn.html">matLearn documentation</a>.</p>
+<ul>
+<li><p>Algorithms that are missing/ have currently wrong default parameters**</p>
+<ul>
 <li><p>Local regression</p></li>
 <li><p><a class="reference external" href="https://dl.acm.org/doi/abs/10.1016/j.compbiolchem.2019.03.017">IMRelief</a> needs different default parameters</p></li>
 </ul>
-</div>
-<div class="section" id="python-functions">
-<h3>Python functions<a class="headerlink" href="#python-functions" title="Permalink to this heading">#</a></h3>
-<p>Some of the learnign algorithms and preprocessing steps call Python functions. In order to use these, please follow the steps on <a class="reference internal" href="3.0.01_python_matlab.html#python-matlab"><span class="std std-ref">how to configure Python in Matlab</span></a> before.</p>
-</div>
-<div class="section" id="classification-with-mcrvm-and-polynomial-kernel">
-<h3>Classification with MCRVM and polynomial kernel<a class="headerlink" href="#classification-with-mcrvm-and-polynomial-kernel" title="Permalink to this heading">#</a></h3>
-<p>The polynomial kernel currently does not work for the MCRVM algorithm. This is a known issue and we are working on resolving it.</p>
-</div>
+</li>
+</ul>
+</li>
+<li><p>Python functions
+Some of the learnign algorithms and preprocessing steps call Python functions. In order to use these, please follow the steps on <a class="reference internal" href="3.0.01_python_matlab.html#python-matlab"><span class="std std-ref">how to configure Python in Matlab</span></a> before.</p></li>
+<li><p>Classification with MCRVM and polynomial kernel
+The polynomial kernel currently does not work for the MCRVM algorithm. This is a known issue and we are working on resolving it.</p></li>
+<li><p>Alternative label for multiclass problems is not yet implemented.</p></li>
+</ul>
 </div>
 </div>
 
@@ -565,13 +556,7 @@ document.write(`
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-new">What is new</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-notes">Release notes</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-class-support-vector-machine-classification">One-class support vector machine (classification)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#default-parameters-of-matlearn-algorithms">Default parameters of matLearn algorithms</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-functions">Python functions</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classification-with-mcrvm-and-polynomial-kernel">Classification with MCRVM and polynomial kernel</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-notes">Release notes</a></li>
 </ul>
   </nav></div>
 
