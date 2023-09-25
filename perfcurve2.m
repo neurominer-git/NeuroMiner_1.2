@@ -362,8 +362,8 @@ if docv
 end
 
 % Convert class labels to a cat array
-labels = nominal(labels);
-trueNames = getlabels(labels);
+labels = categorical(labels);
+trueNames = categories(labels);
 if length(trueNames) < 2
     error(message('stats:perfcurve:NotEnoughClasses'));
 end
@@ -635,7 +635,7 @@ end
 
 function [W,negClassNames] = membership(sLabels,sWeights,posClass,negClass,trueNames)
 % Find the positive class. Must have exactly one.
-posClass = cellstr(nominal(posClass));
+posClass = cellstr(categorical(posClass));
 if length(posClass)>1
     error(message('stats:perfcurve:TooManyPositiveClasses'));
 end
@@ -645,12 +645,12 @@ end
 
 % Check negative class labels
 if strcmpi(negClass,'all')
-    negClass = nominal(trueNames);
+    negClass = categorical(trueNames);
     [~,posClassLoc] = ismember(posClass,cellstr(negClass));
     negClass(posClassLoc) = [];
-    negClass = nominal(negClass);
+    negClass = categorical(negClass);
 else
-    negClass = nominal(negClass);
+    negClass = categorical(negClass);
     tf = ismember(cellstr(negClass),trueNames);
     if any(~tf)
         error(message('stats:perfcurve:NegativeClassNotFound'));
@@ -663,7 +663,7 @@ end
 nNeg = length(negClass);
 
 % Names of selected negative classes
-negClassNames = getlabels(negClass);
+negClassNames = unique(negClass);
 
 % Check for duplicate entries
 if nNeg~=length(negClassNames)
