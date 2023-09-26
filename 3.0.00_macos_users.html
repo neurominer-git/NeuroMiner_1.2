@@ -441,14 +441,19 @@ document.write(`
 see <a class="reference external" href="https://nl.mathworks.com/help/matlab/call-mex-file-functions.html">MATLAB documentation</a></p>
 </div></blockquote>
 <p>To circumvent having to verifying each MEX-file manually, run the following in the terminal:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">xattr</span> <span class="o">-</span><span class="n">r</span> <span class="o">-</span><span class="n">d</span> <span class="n">com</span><span class="o">.</span><span class="n">apple</span><span class="o">.</span><span class="n">quarantine</span> <span class="n">PATH_TO_NEUROMINER</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">xattr</span> <span class="o">-</span><span class="n">r</span> <span class="o">-</span><span class="n">d</span> <span class="n">com</span><span class="o">.</span><span class="n">apple</span><span class="o">.</span><span class="n">quarantine</span> <span class="n">PATH</span><span class="o">/</span><span class="n">TO</span><span class="o">/</span><span class="n">NEUROMINER</span>
 </pre></div>
 </div>
 <p>and then</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">find</span> <span class="n">PATH_TO_NEUROMINER</span> <span class="o">-</span><span class="n">name</span> \<span class="o">*.</span><span class="n">mexmaci64</span> <span class="o">-</span><span class="n">exec</span> <span class="n">spctl</span> <span class="o">--</span><span class="n">add</span> <span class="p">{}</span> \<span class="p">;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">find</span> <span class="n">PATH</span><span class="o">/</span><span class="n">TO</span><span class="o">/</span><span class="n">NEUROMINER</span> <span class="o">-</span><span class="n">name</span> \<span class="o">*.</span><span class="n">mexmaci64</span> <span class="o">-</span><span class="n">exec</span> <span class="n">spctl</span> <span class="o">--</span><span class="n">add</span> <span class="p">{}</span> \<span class="p">;</span>
 </pre></div>
 </div>
-<p>You will then be asked to enter your admin password (what you use to log into your account on your macOS computer).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>replace PATH/TO/NEUROMINER with the full path to the NeuroMiner installation. For example:</p>
+<p>/Users/claravetter/local/Code/NeuroMiner/NeuroMiner_1.2</p>
+</div>
+<p>If you’ve saved the NeuroMiner folder somewhere on /Users/NAME/…, you will then be asked to enter your admin password (what you use to log into your account on your macOS computer).</p>
 <p>For more information on what these commands do, see <a class="reference external" href="https://osxdaily.com/2015/07/15/add-remove-gatekeeper-app-command-line-mac-os-x/">this link</a>.</p>
 </div>
 
