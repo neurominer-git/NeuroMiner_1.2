@@ -730,7 +730,7 @@ else
     y = v.CVRatio; 
 end
 vlineval = [-2 2];
-miny = nanmin(y); maxy = nanmax(y);
+miny = min(y); maxy = max(y);
 
 function [y, miny, maxy, vlineval] = CVRatio_CV2(v, curclass, multiflag)
 
@@ -744,7 +744,7 @@ else
     y = v.CVRatio_CV2;
 end
 vlineval = [-2 2];
-miny = nanmin(y); maxy = nanmax(y);
+miny = min(y); maxy = max(y);
 
 function [y, miny, maxy, vlineval] = FeatProb(v, curclass, multiflag)
 
@@ -758,7 +758,7 @@ else
     y = v.FeatProb;
 end
 vlineval = 0.5;
-miny = 0; maxy = nanmax(y);
+miny = 0; maxy = max(y);
 
 function [y, miny, maxy, vlineval] = Prob_CV2(v, curclass, multiflag)
 
@@ -799,7 +799,7 @@ else
     y = v.SignBased_CV2_z;
 end
 vlineval= [-2 2];
-miny = nanmin(y(:)); maxy = nanmax(y(:));
+miny = min(y(:)); maxy = max(y(:));
 
 function [y, miny, maxy, vlineval] = SignBased_CV2_p_uncorr(v, curclass, multiflag)
 
@@ -812,7 +812,7 @@ if iscell(v.SignBased_CV2_p_uncorr)
 else
     y = v.SignBased_CV2_p_uncorr;
 end 
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, miny, maxy, vlineval] = SignBased_CV2_p_fdr(v, curclass, multiflag)
@@ -826,7 +826,7 @@ if iscell(v.SignBased_CV2_p_fdr)
 else
     y = v.SignBased_CV2_p_fdr;
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, miny, maxy, vlineval] = Spearman_CV2(v, curclass, multiflag)
@@ -840,7 +840,7 @@ if iscell(v.Spearman_CV2)
 else
     y = v.Spearman_CV2;
 end
-miny = nanmin(y(:)); maxy = nanmax(y(:));
+miny = min(y(:)); maxy = max(y(:));
 vlineval= [];
 
 function [y, miny, maxy, vlineval] = Pearson_CV2(v, curclass, multiflag)
@@ -854,7 +854,7 @@ if iscell(v.Pearson_CV2)
 else
     y = v.Pearson_CV2;
 end
-miny = nanmin(y(:)); maxy = nanmax(y(:));
+miny = min(y(:)); maxy = max(y(:));
 vlineval= [];
 
 function [y, se, miny, maxy, vlineval] = Spearman_CV2_p_uncorr(v, curclass, multiflag)
@@ -877,7 +877,7 @@ else
         se = sqrt(v.Spearman_CV2_p_uncorr_STD);
     end
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, se, miny, maxy, vlineval] = Pearson_CV2_p_uncorr(v, curclass, multiflag)
@@ -900,7 +900,7 @@ else
         se = sqrt(v.Pearson_CV2_p_uncorr_STD);
     end
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, miny, maxy, vlineval] = Spearman_CV2_p_fdr(v, curclass, multiflag)
@@ -913,7 +913,7 @@ if iscell(v.Spearman_CV2_p_fdr)
 else
     y = v.Spearman_CV2_p_fdr;
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, miny, maxy, vlineval] = Pearson_CV2_p_fdr(v, curclass, multiflag)
@@ -926,7 +926,7 @@ if iscell(v.Pearson_CV2_p_fdr)
 else
     y = v.Pearson_CV2_p_fdr;
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, miny, maxy, vlineval] = PermZ_CV2(v, curclass, multiflag)
@@ -939,7 +939,7 @@ if iscell(v.PermZ_CV2)
 else
     y = v.PermZ_CV2;
 end
-miny = nanmin(y(:)); maxy = nanmax(y(:));
+miny = min(y(:)); maxy = max(y(:));
 vlineval = [];
 
 function [y, miny, maxy, vlineval] = PermProb_CV2(v, curclass, multiflag)
@@ -952,7 +952,7 @@ if iscell(v.PermProb_CV2)
 else
     y = v.PermProb_CV2;
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, miny, maxy, vlineval] = PermProb_CV2_FDR(v, curclass, multiflag)
@@ -965,7 +965,7 @@ if iscell(v.PermProb_CV2_FDR)
 else
     y = v.PermProb_CV2_FDR;
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, miny, maxy, vlineval] = Analytical_p(v, curclass, multiflag)
@@ -978,7 +978,7 @@ if iscell(v.Analytical_p)
 else
     y = v.Analytical_p;
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, miny, maxy, vlineval] = Analyitcal_p_fdr(v, curclass, multiflag)
@@ -991,7 +991,7 @@ if iscell(v.Analyitcal_p_fdr)
 else
     y = v.Analyitcal_p_fdr;
 end
-miny = 0; maxy = nanmax(y(:));
+miny = 0; maxy = max(y(:));
 vlineval = -log10(0.05);
 
 function [y, se, miny, maxy, vlineval] = MEAN(v, curclass, multiflag)
@@ -1005,7 +1005,7 @@ if iscell(v.MEAN)
 else
     y = v.MEAN; se = v.SE; 
 end
-miny = nanmin(y(:)); maxy = nanmax(y(:));
+miny = min(y(:)); maxy = max(y(:));
 vlineval = [];
 
 function [y, se, miny, maxy, vlineval] = MEAN_CV2(v, curclass, multiflag)
@@ -1019,5 +1019,5 @@ if iscell(v.MEAN_CV2)
 else
     y = v.MEAN_CV2; se = v.SE_CV2; 
 end
-miny = nanmin(y(:)); maxy = nanmax(y(:));
+miny = min(y(:)); maxy = max(y(:));
 vlineval = [];

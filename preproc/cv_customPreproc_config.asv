@@ -2,7 +2,6 @@ function [CUSTOMPREPROC, PX, act ] = cv_customPreproc_config(CUSTOMPREPROC, PX, 
 
 funcFile = '';
 funcParams = [];
-Pa
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
@@ -46,20 +45,21 @@ if ~defaultsfl
             if ParamsDef == 1
                 funcParams = nk_input('Define number of parameters',0, 'i');
                 CUSTOMPREPROC.nParam = funcParams;
+                values = {};
                 for i = 1:funcParams
                     paramName = nk_input(sprintf('Parameter %d name:',i),0,'s');
-
+                    Values = nk_input('Parameter %d values:',0,'e');
                     eval(sprintf("%sValues = nk_input('Parameter %d values:',0,'e');", paramName, i));
                     %eval(sprintf("PX = nk_AddParam(%sValues, paramName, 1,[] );" , paramName));
                     %eval(sprintf("CUSTOMPREPROC.%s = %sValues;", paramName, paramName));
-
+                    values{i} = aValues; 
                 end
                 paramCombos = allcomb([1 2],[3 4],[5 6]);
                 combosIdx = 1:size(paramCombos,1);
                 PX = nk_AddParam(combosIdx, paramName,1,[]);
                 CUSTOMPREPROC.ParamCombos = paramCombos;
             else 
-
+               CUSTOMPREPROC.nParam = [];
 
 
             end
