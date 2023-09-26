@@ -2,6 +2,7 @@ function [CUSTOMPREPROC, PX, act ] = cv_customPreproc_config(CUSTOMPREPROC, PX, 
 
 funcFile = '';
 funcParams = [];
+Pa
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
@@ -58,7 +59,7 @@ if ~defaultsfl
                 PX = nk_AddParam(combosIdx, paramName,1,[]);
                 CUSTOMPREPROC.ParamCombos = paramCombos;
             else 
-               CUSTOMPREPROC.nParam = [];
+
 
 
             end

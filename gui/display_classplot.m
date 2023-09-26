@@ -182,7 +182,7 @@ else
     maxX = max(handles.BinClass{h}.Xaxis);
 end
 XLIMS = [minX-r maxX+r];
-yr = range(predh)*0.05;
+yr = nk_Range(predh)*0.05;
 YLIMS = [min(predh)-yr max(predh)+yr]; 
 xlim(handles.axes1, XLIMS);
 ylim(handles.axes1, YLIMS);
