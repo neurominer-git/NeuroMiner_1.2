@@ -1,2 +1,2 @@
 function str = timestampstr
-str = char(datetime(datestr(now),'Format','ddMMyyyy_HHmmss'));
+str = char(datetime('now','Format','ddMMyyyy_HHmmss'));
