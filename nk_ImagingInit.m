@@ -9,10 +9,10 @@ if ~exist(imaging_init_path,'file') || delete_existing
     fsrootdir = uigetdir(neurominerpath,'Specify Freesurfer MATLAB directory');
     if DEV
         jurootdir = uigetdir(neurominerpath,'Specify JuSpace directory');
-        save(imaging_init_path,'spmrootdir','fsrootdir','jurootdir');
     else
         jurootdir = [];
     end
+    save(imaging_init_path,'spmrootdir','fsrootdir','jurootdir');
 else
     P = load(imaging_init_path); 
     spmrootdir=P.spmrootdir;

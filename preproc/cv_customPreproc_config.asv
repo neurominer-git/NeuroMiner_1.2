@@ -48,13 +48,13 @@ if ~defaultsfl
                 values = {};
                 for i = 1:funcParams
                     paramName = nk_input(sprintf('Parameter %d name:',i),0,'s');
-                    eval(sprintf("curValues = nk_input('Parameter %d values:',0,'e');",i)); 
-                    %eval(sprintf("%sValues = nk_input('Parameter %d values:',0,'e');", paramName, i));
+                    Values = nk_input('Parameter %d values:',0,'e');
+                    eval(sprintf("%sValues = nk_input('Parameter %d values:',0,'e');", paramName, i));
                     %eval(sprintf("PX = nk_AddParam(%sValues, paramName, 1,[] );" , paramName));
                     %eval(sprintf("CUSTOMPREPROC.%s = %sValues;", paramName, paramName));
-                    values{i} = curValues; 
+                    values{i} = aValues; 
                 end
-                paramCombos = allcomb(values);
+                paramCombos = allcomb([1 2],[3 4],[5 6]);
                 combosIdx = 1:size(paramCombos,1);
                 PX = nk_AddParam(combosIdx, paramName,1,[]);
                 CUSTOMPREPROC.ParamCombos = paramCombos;
