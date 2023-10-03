@@ -1,6 +1,6 @@
 function [ Res, IN ] = nk_SimulateML2(IN, axes, batchflag)
 % =========================================================================
-% FORMAT function [ R, P ] = nk_SimulateML(IN)
+% FORMAT function [ R, P ] = nk_SimulateML2(IN)
 % =========================================================================
 % This function is part of the NeuroMiner machine learning library.
 % It allows the user to determine the expected prognostic performance of a
@@ -202,8 +202,9 @@ Res.Params = P;
 uid = datestr(datetime('now'), 'yyyymmdd_HHMMSS');
 resfilename = sprintf("Simulation_results_ID%s.mat", uid); % TO DO: more informative filename
 
-save(sprintf('%s/%s',resdir,resfilename), Res);
+save(sprintf('%s/%s',resdir, resfilename), 'Res');
 
+% ___________________________________________________________________________________________________________________
 function [Rmean, R95CI] = compute_perf(nf, mr, nc, er, auc_max, auc_min, nb, bp, ncm, nfm, algorithm, RAND, varargin)
 global SVM fromData xNM xCV
 
