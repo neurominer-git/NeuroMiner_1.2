@@ -56,7 +56,7 @@ if ~defaultsfl
                 newgroupsN = numel(unique(newlabel));
                 newgroups = unique(newlabel);
                 newgroupnames = nk_input('Groupnames (as vector, no numeric names)',0,'e',[],newgroupsN);
-
+                
                 if isfield(NM, 'cv')
                     cv_ok = check_CV_class(NM.cv, NM.cases, newlabel, newgroups);
                     if ~cv_ok

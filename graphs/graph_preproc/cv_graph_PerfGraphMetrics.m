@@ -104,6 +104,9 @@ for i = 1:size(Y,1)
         eval(funclist{j});        
     end
     eval(sprintf('%s];', metvec_str));
+    if ~isreal(metrics_vector)
+        metrics_vector = real(metrics_vector);
+    end
     metricsY(i,:) = metrics_vector;
 end
 Y = metricsY;

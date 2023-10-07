@@ -371,8 +371,9 @@ for i = 1:size(cvadj.class,1)
                 newclass{i,j}{l}.TrainInd = cvadj.class{i,j}{l}.TrainInd; 
                 newclass{i,j}{l}.TestInd = cvadj.class{i,j}{l}.TestInd; 
                 label_wrapper = @(ind) inp.label.label(ind);
-                newclass{i,j}{l}.TrainLabel = cellfun(label_wrapper, newclass{i,j}{l}.TrainInd, 'UniformOutput', false);
-                newclass{i,j}{l}.TestLabel = cellfun(label_wrapper, newclass{i,j}{l}.TestInd, 'UniformOutput', false);
+                label_wrapper2 = @(ind) newclass{i,j}{l}.label(ind);
+                newclass{i,j}{l}.TrainLabel = cellfun(label_wrapper2, newclass{i,j}{l}.TrainInd, 'UniformOutput', false);
+                newclass{i,j}{l}.TestLabel = cellfun(label_wrapper2, newclass{i,j}{l}.TestInd, 'UniformOutput', false);
             end
 %             class_wrapper2 = @(class) GenClass2(class, cvadj.class{i,j}, [], inp.TrainParam.LABEL.newlabel);
 %             newclass{i,j} = cellfun(class_wrapper2, newclass, 'UniformOutput', false);
