@@ -2,8 +2,8 @@ function [DEVMAP, PX] = nk_Devmap_config(DEVMAP, PX, NM, defaultsfl, parentstr)
 
 if ~exist('defaultsfl','var') || isempty(defaultsfl),  defaultsfl = 0; end;
 algostr     = 'pls';
-covdesc     = 'NM target label';
-covmat      = NM.label;
+covdesc     = 'undefined';
+covmat      = [];
 loo         = false;
 glabel      = [];
 ncomp       = 1;
@@ -27,12 +27,17 @@ if ~defaultsfl
         grpstr = sprintf('no');
     end
     
-    if size(covmat,2)>1
-        covsizestr = sprintf('Matrix ''%s'' (%g x %g)', covdesc, size(covmat,1), size(covmat,2));
-        componentstr = []; mnuact = 1:3;
+    if isempty(covmat)
+        covsizestr = 'undefined';
+        componentstr = []; mnuact=1:3;
     else
-        covsizestr = sprintf('Vector ''%s'' (%g x 1)', covdesc, size(covmat,1));
-        componentstr = []; mnuact = 1:3;
+        if size(covmat,2)>1
+            covsizestr = sprintf('Matrix ''%s'' (%g x %g)', covdesc, size(covmat,1), size(covmat,2));
+            componentstr = []; mnuact = 1:3;
+        else
+            covsizestr = sprintf('Vector ''%s'' (%g x 1)', covdesc, size(covmat,1));
+            componentstr = []; mnuact = 1:3;
+        end
     end
     if strcmp(algostr,'spls')
         if ~exist('cu','var'), yyy = 'undefined'; cudef = 1; else, yyy = nk_ConcatParamstr(cu); cudef = cu; end 
@@ -65,7 +70,7 @@ if ~defaultsfl
             flg = nk_input('Weight feature using only one specific subgroup?',0,'yes|no',[1,0],0);
             if flg, glabel = nk_input('Define logical vector to identify subgroup',0,'e',[],[numel(NM.label),1]); else, glabel=[]; end
         case 3
-            covmat = nk_input(sprintf('Define covariate matrix for %s',algostr),0,'e',[],[numel(NM.label),Inf]); 
+            covmat = nk_input(sprintf('Define covariate matrix for %s (Do not use the target labels!!!)',algostr),0,'e',[],[numel(NM.label),Inf]); 
             covdesc = nk_input('Give a short description for the covariate matrix/vector',0,'s');
             ncomp = size(covmat,2);
         case 4

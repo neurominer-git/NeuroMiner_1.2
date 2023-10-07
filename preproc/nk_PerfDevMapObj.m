@@ -2,36 +2,37 @@ function [sY, IN, Yrecon] = nk_PerfDevMapObj(Y, IN)
 
 switch IN.DEVMAP.algostr
     case {'pls','spls'}
-        devfun = 'PerfPLSObj'; params = IN.DEVMAP;
+        devfun = @PerfPLSObj; params = IN.DEVMAP;
 end
 
 if isfield(params,'mpp') % Apply model to data
     if iscell(Y) 
         sY = cell(1,numel(Y)); Yrecon = sY;
-        for i=1:numel(Y), 
+        for i=1:numel(Y)
             % Define active indices depending on training or testing situation
             if isfield(IN,'TsInd'), iX = params.covmat(IN.TsInd{i},:); else, iX = params.covmat; end
-            [sY{i}, ~, Yrecon{i}] = feval ( devfun, iX, Y{i}, params ); 
+            [sY{i}, ~, Yrecon{i}] = devfun( iX, Y{i}, params ); 
         end
     else
         if isfield(IN,'TsInd'), X = params.covmat(IN.TsInd,:); else, X = params.covmat; end
-        [sY , ~, Yrecon ] = feval( devfun, X, Y, params ); 
+        [sY , ~, Yrecon ] = devfun( X, Y, params ); 
     end
+
 else % Train model using data
-    if isfield(IN,'TrInd'), 
+    if isfield(IN,'TrInd')
         X = params.covmat(IN.TrInd,:); 
         if isfield( params,'glabel' ) && ~isempty(params.glabel) 
             X = X(params.glabel(IN.TrInd),:); 
             Y = Y(params.glabel(IN.TrInd),:); 
         end
-    else, 
+    else 
         X = params.covmat; 
         if isfield( params,'glabel' ) && ~isempty(params.glabel)
-            X = X(params.glabel,:); 
+            X = X(params.glabels,:); 
             Y = Y(params.glabel,:); 
         end
     end
-    [ sY, params, Yrecon ] = feval( devfun, X, Y, params); 
+    [ sY, params, Yrecon ] = devfun( X, Y, params ); 
 end
 
 switch IN.DEVMAP.algostr
@@ -39,6 +40,7 @@ switch IN.DEVMAP.algostr
         IN.DEVMAP = params;
 end
 
+% _________________________________________________________________________
 function [sY, IN, Yrecon] = PerfPLSObj(X,Y,IN)
 
 if ~isfield(IN,'mpp') 

@@ -966,7 +966,7 @@ if VERBOSE,fprintf('\tExtract variance components ...'); end
 if paramfl && tsfl 
     % Out-of-sample mode, used stored weights 
     tsproc = true;
-elseif trfl, 
+elseif trfl
    % Training mode, learn beta and optionally apply it to
     % out-of-sample data
     [ InputParam.Tr, TrParami ] = nk_PerfAdjForCovarsUsingPCAObj(InputParam.Tr, InputParam.P{i}.REMVARCOMP, InputParam.Tr);
@@ -999,7 +999,7 @@ if VERBOSE,fprintf('\tDeviation-based feature weighting ...'); end
 if paramfl && tsfl 
     % Out-of-sample mode, used stored weights 
     tsproc = true;
-elseif trfl, 
+elseif trfl 
    % Training mode, learn beta and optionally apply it to
     % out-of-sample data
     [ InputParam.Tr, TrParami ] = nk_PerfDevMapObj(InputParam.Tr, InputParam.P{i});

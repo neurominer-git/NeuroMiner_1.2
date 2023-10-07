@@ -568,6 +568,7 @@ if isfield(TemplParam,'ACTPARAM')
                     InputParam.P{ac}.DEVMAP.Params = PX.Params;
                     InputParam.P{ac}.DEVMAP.Params_desc = PX.Params_desc;
                 end
+                
             case 'graphSparsity'
                 if VERBOSE, fprintf('\n* APPLY SPARSITY THRESHOLD TO CONNECTIVITY MATRICES'); end
                 InputParam.P{ac} =  TemplParam.ACTPARAM{ac};

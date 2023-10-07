@@ -1,7 +1,7 @@
 function [sY, sX, sYX, IN] = nk_PLS(Y, X, IN)
 % Computes PLS model from experimental predictors X and predictands Y
 % _________________________________________________________________________
-% (c) Nikolaos Koutsouleris, 10/2023
+% (c) Nikolaos Koutsouleris, 08/2023
 if ~isfield(IN,'trained'),IN.trained=0;end
 if ~isfield(IN,'algostr'),IN.algostr='pls';end
 
@@ -15,7 +15,7 @@ end
 if ~IN.trained % No LV projection parameters found => compute mpp
     
     % Step 1
-    % Mean centering / standardization of predictands (Y) and predictor
+    % Mean centering / standardization of dependant (Y) and predictor
     % matrix (Xd) depending on the deviation mapping methodology
     switch IN.algostr
         case 'pls'
@@ -65,13 +65,21 @@ if ~IN.trained % No LV projection parameters found => compute mpp
                 IN.mpp.C = IN.mpp.C - (IN.mpp.C * IN.mpp.v(:,i)') * IN.mpp.v(:,i)';
             end
     end
+    % Compute U scores by applying U transform to the mean-centered
+    % training data
+    sY = mY*IN.mpp.u;
+    % Now compute V scores by applying the learned V transform to
+    % the mean-centered X training matrix.
+    sX = mXd*IN.mpp.v;
+    sYX = mXd * (IN.mpp.u * IN.mpp.v')' + IN.mpp.mY.meanY;
     IN.trained = true;
 else
-    % Mean-center the Y (predictand) matrix using the parameters learned in the training
+    % Mean-center the Y (dependent) matrix using the parameters learned in the training
     % data
     mY = nk_PerfStandardizeObj(Y,IN.mpp.mY);
     % Compute U scores by applying U transform to the mean-centered test
     % data
+    sY = mY*IN.mpp.u; sX = []; sYX = [];
     if ~isempty(Xd)
         % Mean-center the X (predictor) matrix using the parameters learned in the training
         % data
@@ -94,16 +102,9 @@ else
                  end
             end
         end
+        % Now compute V scores by applying the learned V transform to
+        % the mean-centered X matrix.
+        sX = mXd*IN.mpp.v;
+        sYX = mXd * (IN.mpp.u * IN.mpp.v')' + IN.mpp.mY.meanY;
     end
 end
-
-% Final step
-
-% Compute U scores by applying U transform to the mean-centered
-% predictand matrix (Y)
-sY = mY*IN.mpp.u;
-% Now compute V scores by applying the learned V transform to
-% the mean-centered predictor matrix (X).
-sX = mXd*IN.mpp.v;
-% Compute UV scores for the predictor data
-sYX = mXd * (IN.mpp.u * IN.mpp.v')' + IN.mpp.mY.meanY;
