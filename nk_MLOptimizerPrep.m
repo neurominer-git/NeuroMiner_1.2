@@ -330,7 +330,7 @@ if ~isempty(analysis)
 
                     tNM.label = tNM.analysis{inp.analind(i)}.params.label.label; 
                     tNM.modeflag = tNM.analysis{inp.analind(i)}.params.label.modeflag;  
-                    altlabel = true;
+                    %altlabel = true;
                 end
                 tNM.analysis{inp.analind(i)} = MLOptimizerPrep(tNM, tNM.analysis{inp.analind(i)}, inp);
                 nk_SetupGlobalVariables(tNM.analysis{inp.analind(i)}.params, 'clear', 0)
