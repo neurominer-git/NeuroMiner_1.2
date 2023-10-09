@@ -940,7 +940,10 @@ This option allows the user to either upweight or downweight the features based 
 <hr class="docutils" />
 <div class="section" id="measure-deviation-from-normative-data">
 <h2>Measure deviation from normative data<a class="headerlink" href="#measure-deviation-from-normative-data" title="Permalink to this heading">#</a></h2>
-<p>This function calculates a PLS and then determines how much the data deviates from the model that is produced. The hypothesis here is that the PLS model will represent a normative variation between the primary features (e.g., the brain) and the second feature matrix (e.g., the labels or another variable set). By calculating the deviation from this model, it is hypothesized that normative deviation will be modeled and then included in further processing steps.</p>
+<p>This function calculates a partial least squares (PLS) model and then determines how much the data deviates from the model that is produced. The hypothesis here is that the PLS model represents a normative variation between the primary features (i.e., your (processed by previous preprocessing steps in your pipeline) features which were entered into NM, e.g., brain data) and the second feature matrix which you can load into NM when setting up this step (e.g., covariates, like age and/or sex).</p>
+<p><strong>How does it work?</strong>
+PLS first extracts a set of latent factors that explain as much of the covariance as possible between the primary features and the covariate matrix. Next, a regression predicts values of the primary features using the decomposition of the covariates.</p>
+<p>Finally, the normative deviation is computed (primary features - predicted primary feautures) and replaces the primary features in further processing steps.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The outcome label should <strong>not</strong> be entered in the covariate matrix since the information will otherwise be introduced into the processed feature data and, therefore, inflate performance.</p>
