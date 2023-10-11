@@ -150,7 +150,7 @@ switch IN.method
                 indi_Yi = indi_Yi(ind_c(idx_c));
                 indnan_Xi = indnan_Xi(ind_r);
                 Xj = tX(indnan_Xi, indi_Yi);
-                indNomi = indNom(ind_c(idx_c));
+                
                 %end
 
                 % Compute distance metric
@@ -163,6 +163,7 @@ switch IN.method
                     case 'hybrid'
                         % Identify nominal features using predefined
                         % variable. Compute distances in nominal features
+                        indNomi = indNom(ind_c(idx_c));
                         indZ1 = indi_Yi & indNomi;
                         indZ2 = indi_Yi & ~indNomi;
                         D1 =  pdist2(tX(indnan_Xi, indZ1), tY(i,indZ1),IN.hybrid.method1);
