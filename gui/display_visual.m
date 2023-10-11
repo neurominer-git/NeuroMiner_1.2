@@ -118,10 +118,10 @@ switch meas{measind}
             
     case 'CV-ratio of feature weights [Overall Mean]'
         [y, miny, maxy, vlineval] = CVRatio(v, curclass, multiflag);
-
+        if miny>0, miny=0; end
     case 'CV-ratio of feature weights [Grand Mean]'
         [y, miny, maxy, vlineval] = CVRatio_CV2(v, curclass, multiflag);
-
+        if miny>0, miny=0; end
     case 'Feature selection probability [Overall Mean]'
         [y, miny, maxy, vlineval] = FeatProb(v, curclass, multiflag);
 
@@ -129,17 +129,17 @@ switch meas{measind}
         [y, miny, maxy, vlineval] = Prob_CV2(v, curclass, multiflag);
 
     case 'Sign-based consistency'
-       [y, miny, maxy, vlineval] = SignBased_CV2(v, curclass, multiflag);
-
+        [y, miny, maxy, vlineval] = SignBased_CV2(v, curclass, multiflag);
+        if miny>0, miny=0; end
     case 'Sign-based consistency (Z score)'
         [y, miny, maxy, vlineval] = SignBased_CV2_z(v, curclass, multiflag);
-        
+        if miny>0, miny=0; end
     case 'Sign-based consistency -log10(P value)'
         [y, miny, maxy, vlineval] = SignBased_CV2_p_uncorr(v, curclass, multiflag);
-
+        if miny>0, miny=0; end
     case 'Sign-based consistency -log10(P value, FDR)'
         [y, miny, maxy, vlineval] = SignBased_CV2_p_fdr(v, curclass, multiflag);
-
+        if miny>0, miny=0; end
     case 'Spearman correlation [Grand Mean]'
         [y, miny, maxy, vlineval] = Spearman_CV2(v, curclass, multiflag);
 

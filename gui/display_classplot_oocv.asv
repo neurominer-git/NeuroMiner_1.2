@@ -202,7 +202,7 @@ else
 end
 
 % Define textbox info data 
-pss = cell(1,numel(P_oocv_h));psslen=0;
+pss = cell(1,numel(N));psslen=0;
 for i=1:numel(pss)
     expgroupi = 'not labeled';
     if labels_known

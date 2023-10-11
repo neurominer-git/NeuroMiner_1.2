@@ -24,9 +24,9 @@ function [tY, Pnt, paramfl, tYocv] = nk_PerfPreprocess(Y, inp, labels, ...
 % paramfl   = modified script execution parameters
 % tYocv     = the preprocessed independent test data
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2023
+% (c) Nikolaos Koutsouleris, 10/2023
 
-global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL SVM MULTILABEL CALIB SYNTH SAV
+global PREPROC MODEFL MULTI CV xCV RAND VERBOSE TEMPL MULTILABEL CALIB SYNTH SAV
 
 % Initialize runtime variables
 i       = inp.f; % Curration permutation
