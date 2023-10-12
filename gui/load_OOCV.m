@@ -43,7 +43,10 @@ for n = 1: numel(oocv)
             else
                 try
                     Cont = handles.OOCV(cnt).data.BinResults{l};
+                    handles.OOCV(cnt).flag = true;
                 catch
+                    handles.OOCV(cnt).flag = false;
+                    cnt=cnt+1;
                     continue
                 end
             end
