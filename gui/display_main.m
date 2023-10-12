@@ -43,8 +43,13 @@ switch h_list{h_val}
             
             if strcmp(handles.selCVoocv.Enable,'on') && handles.selCVoocv.Value>1
                 handles.oocvview = true;
-                handles = display_classplot_oocv(h_class, handles);
                 [~,oocvind] = get_oocvind(handles);
+                if isfield(handles.OOCV(oocvind).data.BinResults{handles.curlabel},'PermAnal')
+                    handles.PermAnal = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.PermAnal.ModelPermSignificance(h_class);
+                else
+                    if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
+                end
+                handles = display_classplot_oocv(h_class, handles);
                 load_selCase(handles,handles.OOCVinfo.Analyses{handles.curranal}.cases{oocvind});
                 if isfield(handles.OOCV(oocvind).data,'BinResults') && isfield(handles.OOCV(oocvind).data.BinResults{h_class},'Group')
                     Groups = handles.OOCV(oocvind).data.BinResults{h_class}.Group;
@@ -59,11 +64,6 @@ switch h_list{h_val}
                 else
                     handles.selSubGroupOOCV.Value = 1;
                     handles.selSubGroupOOCV.Visible = 'off';
-                end
-                if isfield(handles.OOCV(oocvind).data.BinResults{handles.curlabel},'PermAnal')
-                    handles.PermAnal = handles.OOCV(oocvind).data.BinResults{handles.curlabel}.PermAnal.ModelPermSignificance(h_class);
-                else
-                    if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
                 end
             else
                 handles.oocvview = false;
