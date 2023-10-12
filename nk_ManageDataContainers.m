@@ -281,7 +281,7 @@ IO.oocvflag = true;
 IO.labels_known = datacontainer.labels_known;
 IO.badcoords = inp.badcoords{inp.currmodal}; 
 IO.brainmask = inp.brainmask{inp.currmodal}; 
-IO.Ydims = inp.Ydims(inp.currmodal);
+IO.Ydims     = inp.Ydims(inp.currmodal);
 
 if IO.labels_known
     IO.n_subjects = IO.n_subjects/0;

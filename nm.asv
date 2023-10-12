@@ -317,8 +317,7 @@ try
             if ~isempty(TrCV_Data_containers)
                 NewRootDir = nk_DirSelector('Update paths to discovery data containers'' root paths');
                 for i=1:numel(TrCV_containers)
-                    [~, nam, ext] = spm_fileparts(NM.Y{TrCV_containers(i)});
-                    NM.Y{TrCV_containers(i)} = fullfile(NewRootDir,[nam ext]);
+                    [pth, nam, ext] = spm_fileparts()
                 end
             end
             nk_input('Press enter to return to the main menu',0,'sq');

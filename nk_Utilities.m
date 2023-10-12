@@ -45,11 +45,7 @@ switch act
         while t_act>0 
             [t_act, analind, ~, showmodalvec , brief] = nk_SelectAnalysis(NM, 0, 'MAIN INTERFACE >> UPDATE ANALYSES ROOT DIRECTORIES ', analind, [], 0, showmodalvec, brief); 
         end
-        if ~isempty(analind) 
-            analind = analind;
-        else
-            analind = complvec;
-        end
+        if isempty(analind), analind = complvec; end
         newdir = nk_DirSelector('Update analyses'' root paths');
         NM = nk_UpdateRootPaths(NM, analind, newdir);
     case 10
