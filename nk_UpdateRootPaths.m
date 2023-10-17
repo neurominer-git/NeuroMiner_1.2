@@ -15,13 +15,17 @@ end
 
 nA = numel(AnalVec);
 failed = []; succeeded = []; cntf=1;cnts=1;
+
 for j=1:nA
-     try
+
+    try
          analind = AnalVec(j);
+
          if exist(NewRootDir,'dir')
-            [~,analdir] = fileparts(NM.analysis{analind}.rootdir);
+            [~,analdir] = spm_fileparts(NM.analysis{analind}.rootdir);
             NewAnalDir = fullfile(NewRootDir,analdir);
-            % Adjust root directories
+            
+            % Adjust root directories of current analysis
             NM.analysis{analind}.parentdir = NewRootDir;
             NM.analysis{analind}.rootdir = NewAnalDir;
             NM.analysis{analind}.logfile = fullfile(NewAnalDir,['NM_Analysis' NM.analysis{analind}.id '.log']);

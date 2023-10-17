@@ -68,7 +68,7 @@ else
 end
 
 % Get back data and data descriptors according to data fusion mode
-[OUT.X, OUT.labels] = nk_CompatY2(dat, tF, oocvind, FUSION);
+[OUT.X, OUT.labels] = nk_CompatY(dat, tF, oocvind, FUSION, stk_flag);
 
 % Overwrite standard label with alternative label, if needed
 if isfield(analysis.params,'label') && analysis.params.label.altlabelflag==1

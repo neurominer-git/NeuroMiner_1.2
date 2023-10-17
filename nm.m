@@ -313,6 +313,14 @@ try
         case 'inspect'
             
             nk_SelectVariateIndex(NM,1,[],0);
+            TrCV_containers = find(any(cellfun(@ischar, NM.Y)));
+            if ~isempty(TrCV_Data_containers)
+                NewRootDir = nk_DirSelector('Update paths to discovery data containers'' root paths');
+                for i=1:numel(TrCV_containers)
+                    [~, nam, ext] = spm_fileparts(NM.Y{TrCV_containers(i)});
+                    NM.Y{TrCV_containers(i)} = fullfile(NewRootDir,[nam ext]);
+                end
+            end
             nk_input('Press enter to return to the main menu',0,'sq');
             
         case 'config'
@@ -382,7 +390,12 @@ try
             scrambleflag = nk_input('Are you sure you want to shred all input features?',0,'yes|no',[1,0],2);
             if scrambleflag
                 for i=1:numel(NM.Y)
-                    [m,n] = size(NM.Y{i}); NM.Y{i} = rand(m,n);
+                    if ischar(NM.Y{i})
+                        m = numel(NM.cases); n = NM.datadescriptor{i}.input_settings.Ydims;
+                    else
+                        [m,n] = size(NM.Y{i}); 
+                    end
+                    NM.Y{i} = rand(m,n);
                 end
                 NM.defs.data_scrambled = 1;
                 savemat(NM);

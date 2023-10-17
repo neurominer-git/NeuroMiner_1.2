@@ -52,6 +52,12 @@ if iscell(dat.Y)
             fprintf('\n[ %3g ]',i);fprintf(' %s', dat.datadescriptor{i}.desc);
             if nvar < 10
                 fprintf('\n');
+                if ischar(dat.Y{i})
+                    fprintf('\t\t* Data location: on disk %s', dat.Y{i})
+                    if exist(dat.Y{i},'file'), fprintf(': file found.'), else, fprintf(': file not found.'); end
+                else
+                    fprintf('\t\t* Data location: NM workspace\n')
+                end
                 switch dat.datadescriptor{i}.input_settings.datasource
                     case {'matrix','networks'}
                         switch dat.datadescriptor{i}.input_settings.groupmode

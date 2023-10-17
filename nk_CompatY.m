@@ -1,6 +1,6 @@
-function [X, L] = nk_CompatY2(NM, varind, oocvind, FUSION)
+function [X, L] = nk_CompatY(NM, varind, oocvind, FUSION, stacking_flag)
 % =========================================================================
-% FORMAT [X, L] = nk_CompatY2(NM, varind, oocvind)
+% FORMAT [X, L] = nk_CompatY(NM, varind, oocvind)
 % =========================================================================
 % This function extracts the feature space from the NM structure, which is 
 % needed for preprocessing, training and visualization. The extraction is 
@@ -36,7 +36,7 @@ function [X, L] = nk_CompatY2(NM, varind, oocvind, FUSION)
 % X.threshval       : Threshold (if modality is neuroimaging data)
 % X.threshop        : Threshold operation (if modality is neuroimaging data)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris 08/2022
+% (c) Nikolaos Koutsouleris 10/2023
 
 if ~exist('varind','var'), varind=1; end; nM = numel(varind);
 if ~exist('oocvind','var')
@@ -61,10 +61,12 @@ end
 
 L = NM.label;
 
-% Load linked files if needed
-NM = nk_LoadLinkedData(NM, varind);
-if ~isempty(oocvind) 
-   NM.OOCV{oocvind} = nk_LoadLinkedData(NM.OOCV{oocvind}, varind);
+% Load linked files if needed (e.g. when stacking is not activated)
+if ~stacking_flag
+    NM = nk_LoadLinkedData(NM, varind);
+    if ~isempty(oocvind) 
+       NM.OOCV{oocvind} = nk_LoadLinkedData(NM.OOCV{oocvind}, varind);
+    end
 end
 
 switch FUSION.flag
