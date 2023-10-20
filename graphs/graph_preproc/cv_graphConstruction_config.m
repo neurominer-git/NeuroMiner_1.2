@@ -10,7 +10,7 @@ SimilarityMeasure = 'Mutual information';
 if ~exist('defaultsfl','var') || isempty(defaultsfl); defaultsfl = false; end
 
 if ~defaultsfl
-    if isempty(GRAPHCONSTRUCTION), [GRAPHCONSTRUCTION, PX] = graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, true); end
+    if isempty(GRAPHCONSTRUCTION), [GRAPHCONSTRUCTION, PX] = cv_graphConstruction_config(GRAPHCONSTRUCTION, PX, brainmask, parentstr, true); end
     if isfield(GRAPHCONSTRUCTION,'method'), ConstructionMethod = GRAPHCONSTRUCTION.method; end
     if isfield(GRAPHCONSTRUCTION,'parcellation'), ParcellationAtlas = GRAPHCONSTRUCTION.parcellation; end
     %if isfield(GRAPHCONSTRUCTION, 'variableTypes'), VariableTypesVec = GRAPHCONSTRUCTION.variableTypes; end

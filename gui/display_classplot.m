@@ -355,6 +355,7 @@ switch GraphType
         handlevec = [b,x1,x2,handles.classplot];
         legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'},{errest}];
     otherwise
+        
         handlevec = [b,x1,x2];
         legendvec = [handles.BinClass{h}.groupnames(:)',{'misclassified'}, {'misclassified'}];
 end

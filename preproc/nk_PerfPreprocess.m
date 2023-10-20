@@ -57,7 +57,7 @@ if isfield(inp, 'C') && inp.C{1,1}.calibflag
     Cocv = inp.C{1,1}.Y;
     CALIB = inp.C{1,1};
 else
-    CALIB.flag = false;
+    CALIB.calibflag = false;
 end
 
 % Set binary/regression or multi-group processing mode
