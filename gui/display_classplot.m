@@ -274,7 +274,7 @@ idx1 = id1 & ~err; idx2 = id2 & ~err; b(1) = 0; b(2)= 0;
 if sum(idx1)
     if ~AltAx && ~handles.tglSort.Value
         fIdx1 = find(id1);
-        v = [ [ lxL(fIdx1(1)) offy ]; [ lxL(fIdx1(1)) YLIMS(2) ]; [ lxL(fIdx1(end))+r YLIMS(2) ]; [ lxL(fIdx1(end))+r offy ] ];             
+        v = [ [ lxL(fIdx1(1))-1 offy ]; [ lxL(fIdx1(1))-1 YLIMS(2) ]; [ lxL(fIdx1(end))+r YLIMS(2) ]; [ lxL(fIdx1(end))+r offy ] ];             
         patch('Faces',[1 2 3 4], 'Vertices', v, 'FaceColor', CLR1, 'EdgeColor', 'none', 'FaceAlpha', 0.15)
     end
     b(1) = plot(lxL(idx1),predh(idx1), handles.colpt,...

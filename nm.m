@@ -58,7 +58,7 @@ function nm(varargin)
 % User can choose to use NM in expert mode by invoking nm with the 'expert'
 % option.
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 07/2023
+% (c) Nikolaos Koutsouleris, 10/2023
 global EXPERT DEV OCTAVE NM
 
 nosplash  = false; EXPERT = false; OCTAVE = false; DEV = false; 

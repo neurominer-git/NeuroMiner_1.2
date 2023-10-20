@@ -1,8 +1,7 @@
 function D = nk_FScoreFeatRankMdIqr(Y, L, N)
 
 % Y     :       Data
-% L     :       Target Labels
-% L2    :       Nuisance Labels (optional)
+% L     :       Target Labelss
 
 ix = unique(L);
 
@@ -16,7 +15,7 @@ if numel(ix) == 2
     
     % Standard Deviations of Positive / Negative Labels
     sP = iqr(YP); sM = iqr(YM);
-    %vec = (size(Y,2):-1:1)'/size(Y,2);
+
     if exist('N','var') && ~isempty(N)
         
         ND = zeros(size(Y,2),size(N,2));
@@ -30,6 +29,7 @@ if numel(ix) == 2
             ND(:,i) = tND';   
         end
     end
+
     % Compute Fscore and optionally weight down nuisance voxels
     D = (mP-mM).^2 ./ (sP + sM); D = D'; 
     

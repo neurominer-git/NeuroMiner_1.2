@@ -7,7 +7,7 @@ function visdata = nk_VisModels(inp, id, GridAct, batchflag)
 % the predictive patterns of the models and optionally computed model 
 % significance using a permutation-based approach
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 03/2020
+% (c) Nikolaos Koutsouleris, 10/2023
 
 global SVM RAND SAV RFE MODEFL CV VERBOSE FUSION MULTILABEL EVALFUNC CVPOS OCTAVE 
 
@@ -181,7 +181,7 @@ for f=1:ix % Loop through CV2 permutations
         fprintf('\n---------------------------------------------------------------------------------------------')
         if ~GridAct(f,d) 
             ll=ll+1;
-            fprintf('\nSkipping CV2 [%g,%g] (user-defined).',f,d)
+            fprintf('\nSkipping CV2 partition [%g,%g] (user-defined).',f,d)
             continue 
         end
         
@@ -201,7 +201,7 @@ for f=1:ix % Loop through CV2 permutations
                 if exist(oVISpath,'file') && ~ovrwrt && ~batchflag
                     
                     [~, onam] = fileparts(oVISpath);
-                    fprintf('\nVISdatamat found for CV2 [%g,%g]:',f,d)
+                    fprintf('\nVISdatamat found for CV2 partition [%g,%g]:',f,d)
                     fprintf('\nLoading: %s',onam)
                     [I, I1, filefound] = nk_VisXHelper('accum', nM, nclass, decompfl, permfl, ix, jx, I, inp, ll, nperms, oVISpath);
                     WriteCV2Data(inp, nM, FUSION, SAV, operm, ofold, I1);
@@ -222,7 +222,7 @@ for f=1:ix % Loop through CV2 permutations
                     % in batch mode we do not compute statistics across the
                     % CV2 partitions
                     [~, onam] = fileparts(oVISpath);
-                    fprintf('\nVISdatamat found for CV2 [%g,%g]:\n%s',f,d,onam)
+                    fprintf('\nVISdatamat found for CV2 partition [%g,%g]:\n%s',f,d,onam)
                     fprintf('\nBatch mode detected. Continue.')
                     ll=ll+1;
                     continue
@@ -286,7 +286,7 @@ for f=1:ix % Loop through CV2 permutations
                 if ~fndMD, MD = cell(nclass,1); end
                 
                 % ---------------------------------------------------------
-                if ~VERBOSE,fprintf('\n\nComputing visualizations for CV2 [ %g, %g ] ',f,d), end
+                if ~VERBOSE,fprintf('\n\nComputing visualizations for CV2 partition [ %g, %g ] ',f,d), end
                 
                 %% Initialize containers for analysis
                 if permfl 
@@ -450,8 +450,8 @@ for f=1:ix % Loop through CV2 permutations
                                 if ~islogical(Fkl),F = Fkl ~= 0; else F = Fkl; end
 
                                 if VERBOSE
-                                    fprintf('\n');fprintf(['Constructing predictive pattern(s) in CV2 [ %2g ,%2g ], ' ...
-                                    'CV1 [ %2g ,%2g, Predictor #%g/%g ]: %g model(s), %s ML params [ %s ]. '], f, d, k, l, h, nclass, ul, algostr, P_str); 
+                                    fprintf('\n');fprintf(['Constructing predictive pattern(s) in CV2 partition [ %2g ,%2g ], ' ...
+                                    'CV1 partition [ %2g ,%2g, Predictor #%g/%g ]: %g model(s), %s ML params [ %s ]. '], f, d, k, l, h, nclass, ul, algostr, P_str); 
                                 else
                                     fprintf('\n');fprintf('Visualizing: CV2 [ %2g, %2g ], CV1 [ %2g, %2g, P: #%g/%g ]: %g model(s) ',f, d, k, l, h, nclass, ul) ;
                                 end
@@ -662,17 +662,13 @@ for f=1:ix % Loop through CV2 permutations
                                             % Compute permuted model test performance
                                             [perf_perm, I1.TS_perm{h}(:,il(h),perms), I1.DS_perm{h}(:,il(h),perms)] = nk_GetTestPerf(modelTs, modelTsL, Find, MDs, modelTr);
 
-                                            % Compare against original model performance
+                                            % Compare permuted against original model performance
                                             if feval(compfun, perf_perm, perf_orig)
                                                 fprintf('.'); 
                                                 Px_perm(perms) = Px_perm(perms) + 1;
                                             end
                                             % Compute permuted weight map in input space
-                                            try
-                                                TXperms= nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
-                                            catch
-                                                fprintf('problem');
-                                            end
+                                            TXperms= nk_VisXWeight(inp, MDs, Ymodel_perm, L_perm, varind, ParamX, Find, Vind, decompfl, memoryprob, [], Fadd);
                                             for n=1:nM 
                                                 Tx_perm{n}(:,perms) = TXperms{n}; 
                                             end
@@ -691,7 +687,7 @@ for f=1:ix % Loop through CV2 permutations
                                             Fpind = any(Tx_perm{n},2)'; 
                                             
                                             % Now compute the P value vector:
-                                            Pvals = sum( abs(Tx_perm{n}) > abs(Tx{n}),2 ) / nperms(1);
+                                            Pvals = sum( abs(Tx_perm{n}) >= abs(Tx{n}),2 ) / nperms(1);
                                             Pvals = Pvals(Fpind);
 
                                             % ... and the Z score vector:

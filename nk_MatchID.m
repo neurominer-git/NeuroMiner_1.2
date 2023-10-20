@@ -18,7 +18,7 @@
 % cases_m       : matched IDs
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, 06/2012
+% (c) Nikolaos Koutsouleris, 10/2023
 
 function [M, cases_m, Sind, Dind] = nk_MatchID(Sid, S, Did, D, act, infind, verbose)
 

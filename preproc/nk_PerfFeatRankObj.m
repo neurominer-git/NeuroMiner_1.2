@@ -164,7 +164,7 @@ switch IN.algostr
         end
         IN.X = [ones(size(L,1),1) L]; 
         IN = nk_PerfANOVAObjNew(Y,IN);
-        IN.W = -log10(IN.p);
+        IN.W = IN.F;
     
     case 'pls'
         if strcmp(IN.PLS.algostr,'spls')
@@ -200,7 +200,8 @@ if size(IN.W,1) < size(IN.W,2); IN.W = IN.W'; end
 
 % Scale from realmin to 1
 IN.W = nk_PerfScaleObj(IN.W);
-IN.W(IN.W==0)=realmin;
+IN.W(IN.W==0 | isnan(IN.W))=realmin;
+IN.W(isinf(IN.W))=1;
 
 % If downweighting has been selected invert the weight vector
 if IN.weightmethod == 2, IN.W = 1-IN.W; end

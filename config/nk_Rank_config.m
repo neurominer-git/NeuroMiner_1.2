@@ -231,6 +231,8 @@ if ~defaultsfl
                         PX = nk_AddParam(RANK.FEAST.NumFeat, 'NumFeat', 1, PX); 
                     case 'relief'
                         RANK.Relief.k = nk_input('Define number(s) of nearest neigbours for RELIEF',0,'i',10,1); PX = nk_AddParam(RANK.Relief.k, 'K', 1, PX); 
+                    case 'fscore'
+                        RANK.FScoreType = char(nk_input('Define Fscore computation method',0,'m','mean(std)|median(IQR)',{'mean','median'})); 
                     case 'pls'
                         if ~isfield(RANK,'PLS'), [~, RANK.PLS ] = nk_PLS_config(NM, [], [], true); end
                     case 'extern' 

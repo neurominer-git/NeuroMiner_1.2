@@ -69,6 +69,7 @@ switch h_list{h_val}
                 end
             else
                 handles.oocvview = false;
+                if isfield(handles,'PermAnal'), handles = rmfield(handles,'PermAnal'); end
                 handles = display_classplot(h_class, handles);
                 load_selCase(handles,handles.BinClass{h_class}.cases)
                 handles.selSubGroupOOCV.Value = 1;

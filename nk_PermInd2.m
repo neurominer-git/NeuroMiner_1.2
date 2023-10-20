@@ -62,7 +62,14 @@ for i=1:mL % Loop through classes
                    fprintf('\nReplicated permutation indices detected. Skip current permutation.')
                    trycnt = trycnt + 1;
                    if trycnt == trylim
-                       error('Try limit reached. Permutation of class membership data failed.')
+                       if cfl
+                           error(sprintf(['\nTry limit reached. Permutation of class membership data failed!', ...
+                                          '\n\tConstrain index = %g', ...
+                                          '\n\tNo. of observations in current class and constrain index = %g\n'], ...
+                                          uConstraint(h), numel(rindcl)));
+                       else
+                           error('Try limit reached. Permutation of class membership data failed.')
+                       end
                    end
                end
            else

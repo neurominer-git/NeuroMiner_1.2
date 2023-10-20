@@ -35,7 +35,7 @@ algostr         = GetMLType(SVM);
 binOOCVD        = cell(nclass,1);
 ll              = 1; 
 totLearn        = 0;
-
+ha              = [];
 if ~exist('GridAct','var') || isempty(GridAct), GridAct = nk_CVGridSelector(ix,jx); end
 if ~exist('batchflag','var') || isempty(batchflag), batchflag = false; end
 
@@ -610,7 +610,7 @@ for f=1:ix % Loop through CV2 permutations
                 end
                 hu.Name = sprintf('NM Application Viewer: %s => %s [OOCV #%g]',inp.analysis_id, inp.desc_oocv, inp.oocvind);
                 set(0,'CurrentFigure',hu); if ll==1, clf ; end
-                if ll==1; ha = tight_subplot(2,nsubgroups,0.03,[.1 .05],[.1 .05]); end
+                if ll==1 || isempty(ha); ha = tight_subplot(2,nsubgroups,0.03,[.1 .05],[.1 .05]); end
                 lg = cell(nsubgroups,nclass); hc = zeros(nsubgroups, nclass); lh = lg; hd = hc;
                 for curgroup=1:nsubgroups
                     hold(ha(curgroup),'on');hold (ha(curgroup+nsubgroups),'on');

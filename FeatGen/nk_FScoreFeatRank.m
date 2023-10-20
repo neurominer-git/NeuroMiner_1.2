@@ -2,7 +2,7 @@ function D = nk_FScoreFeatRank(Y, L, N)
 
 % Y     :       Data
 % L     :       Target Labels
-% L2    :       Nuisance Labels (optional)
+% N    :       Nuisance Labels (optional)
 
 ix = unique(L);
 
