@@ -101,7 +101,7 @@ if ~isempty(analysis)
     % Configure loading of pre-existing parameters and models
     if inp.saveparam == 2 && inp.lfl == 1
         LOAD_opts        = {'yes', 'no'}; 
-        if ~DATASCRAM
+        if DATASCRAM
             LoadStr = sprintf('Use saved pre-processing params and models [ %s ]|', LOAD_opts{inp.loadparam});              LoadAct = 7;
         end
         if inp.loadparam == 1

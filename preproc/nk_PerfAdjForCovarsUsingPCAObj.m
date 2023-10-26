@@ -208,7 +208,8 @@ switch IN.recon
         if VERBOSE, fprintf('\nReconstructing target matrix based on selected components.'); end
         
         if strcmp(IN.DR.RedMode, 'fastICA')
-            [tT, IN.mpp] = cv_PerfICA(dT(:,IN.ind0), IN.mpp, 'inverse_transform');
+            dT(:,~IN.ind0) = 0;
+            [tT, IN.mpp] = cv_PerfICA(dT, IN.mpp, 'inverse_transform');
             adjT = zeros(size(dT,1),numel(IN.indNonRem)); adjT(:,IN.indNonRem) = tT;
         else
             tT = bsxfun(@plus, IN.mpp.vec(:,IN.ind0)* dT(:,IN.ind0)' , IN.mpp.sampleMean')';
