@@ -314,7 +314,7 @@ try
             
             nk_SelectVariateIndex(NM,1,[],0);
             TrCV_containers = find(any(cellfun(@ischar, NM.Y)));
-            if ~isempty(TrCV_Data_containers)
+            if ~isempty(TrCV_containers)
                 NewRootDir = nk_DirSelector('Update paths to discovery data containers'' root paths');
                 for i=1:numel(TrCV_containers)
                     [~, nam, ext] = spm_fileparts(NM.Y{TrCV_containers(i)});
