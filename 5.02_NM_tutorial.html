@@ -429,7 +429,7 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training">Training</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualisation">Visualisation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">Visualization</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation">Interpretation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#external-validation">External validation</a></li>
 </ul>
@@ -452,7 +452,7 @@ document.write(`
 <h2>Data entry<a class="headerlink" href="#data-entry" title="Permalink to this heading">#</a></h2>
 <p>Neurominer supports the entry of various data types, here we will import matrix data from a text file using simulated brain parcellation data. We have included the example data in the NeuroMiner installation, you will find it in the sub-directory NeuroMiner_1.2/example_data_simulated/</p>
 <p>We will start by loading the covars.mat file into Matlab. This needs to be done before starting NeuroMiner. See <a class="reference internal" href="4.1_mainmenu_input_data.html#input-data"><span class="std std-ref">here</span></a> for more information. One way to load the data is by executing</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;load((PATH/TO/NeuroMiner_1.2/example_data_simulated/covars.mat))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">load</span><span class="p">((</span><span class="n">PATH</span><span class="o">/</span><span class="n">TO</span><span class="o">/</span><span class="n">NeuroMiner_1</span><span class="mf">.2</span><span class="o">/</span><span class="n">example_data_simulated</span><span class="o">/</span><span class="n">covars</span><span class="o">.</span><span class="n">mat</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Now, you should see two variables in the workspace ‘covars’ and ‘covarsNames’. We will need them later. Then, open NeuroMiner by typing:</p>
@@ -480,126 +480,70 @@ document.write(`
 <div class="section" id="cross-validation-setup">
 <h3>1. Cross-validation setup<a class="headerlink" href="#cross-validation-setup" title="Permalink to this heading">#</a></h3>
 <p>Let’s now <span class="xref myst">define the cross-validation (CV) settings</span> (option 1).</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>1 (Cross-validation settings)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Cross</span><span class="o">-</span><span class="n">validation</span> <span class="n">settings</span><span class="p">)</span> 
+</pre></div>
+</div>
 <p>As you may know, CV is implemented to assess generalizability and optimize parameters. Neurominer uses repeated, nested-cross validation as a default (pooled cross-validation, i.e. randomly creating the CV folds) but other frameworks are implemented as well. For now, we will just accept that as the default, alongside the default number of inner and outer permutations (1) and folds (10), so choose:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>7 (Build Cross-Validation structure).</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>Q or 9 (to go back to the previous menu)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">7</span> <span class="p">(</span><span class="n">Build</span> <span class="n">Cross</span><span class="o">-</span><span class="n">Validation</span> <span class="n">structure</span><span class="p">)</span><span class="o">.</span> 
+
+<span class="o">&gt;&gt;</span> <span class="n">Q</span> <span class="ow">or</span> <span class="mi">9</span> <span class="p">(</span><span class="n">to</span> <span class="n">go</span> <span class="n">back</span> <span class="n">to</span> <span class="n">the</span> <span class="n">previous</span> <span class="n">menu</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Now you are taken back to the Define parameter template menu. You can see that the ??? behind the cv settings have disappeared.</p>
 </div>
 <div class="section" id="preprocessing-piueline-setup">
 <h3>2. Preprocessing piüeline setup<a class="headerlink" href="#preprocessing-piueline-setup" title="Permalink to this heading">#</a></h3>
 <p>Preprocessing is essential in machine learning, and within NeuroMiner it describes any steps that need to be applied to the data before training can be run. These steps comprise scaling  the data, dimensionality reduction, filtering, etc (see the <a class="reference internal" href="4.2.02_paramtemp_preprocessing_pipeline.html#preprocessing-pipeline"><span class="std std-ref">preprocessing section in the manual</span></a>).
 To move to the preprocessing menu, type:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>2 (Preprocessing pipeline)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">2</span> <span class="p">(</span><span class="n">Preprocessing</span> <span class="n">pipeline</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>The pipeline that is saved in the Parameter Template is outlined at the top of the screen under “CV-PREPROCESSING PIPELINE”. Step 1 and step 2 outline the default preprocessing settings.
 If you want to add a preprocessing step, go to</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>1 (Add preprocessing step)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Add</span> <span class="n">preprocessing</span> <span class="n">step</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>As you can see, there are many options. In your own time, you can play with these preprocessing options and see how they influence the accuracy of your predictions.
 But in this example, we just want to use the two default options, so navigate back to the <em>Define parameter template</em> menu.</p>
 </div>
 <div class="section" id="learning-algorithm-setup">
 <h3>3. Learning algorithm setup<a class="headerlink" href="#learning-algorithm-setup" title="Permalink to this heading">#</a></h3>
 <p>You will subsequently see  <a class="reference internal" href="4.2.03_paramtemp_classification_algorithm.html#paramtemp-classification-algorithm"><span class="std std-ref">various options</span></a> pertaining to choosing the learning algorithm for training, its parameters as well as the performance criterions for the models to be generated.</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>3 (Classification algorithm)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="p">(</span><span class="n">Classification</span> <span class="n">algorithm</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>If you wanted to select another learning algorithm except the default Support Vector Machine (SVM), you would choose:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>2 (Select learning algorithm)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">2</span> <span class="p">(</span><span class="n">Select</span> <span class="n">learning</span> <span class="n">algorithm</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>For now, we will leave these options as default as well. Navigate back to the <em>Define parameter template</em> menu.</p>
 <p>As you can see, the model saving options are still undefined. Go to:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>10 (Model saving options)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">10</span> <span class="p">(</span><span class="n">Model</span> <span class="n">saving</span> <span class="n">options</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Then, press Enter to accept default suggestions and to return to the menu.</p>
 <p>To save the parameter template settings into an analysis which we can then train, we need to <a class="reference internal" href="4.3_mainmenu_initialize_delete_analyses.html#initialize-delete-analyses"><span class="std std-ref">intialize</span></a> it first, i.e., tell NM that we are happy with the settings defined in the parameter template section. To do so, exit the parameter template menu and select the following steps:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>3 (Initialize analysis)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>1 (Define analysis identifier)</p>
-</div></blockquote>
-</div></blockquote>
-<p>CV10x10_defaults</p>
-<blockquote>
-<div><blockquote>
-<div><p>2 (Provide analysis description)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>My first NeuroMiner analysis!</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
-<p>[Press Enter key to go to a new line]</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>. [The dot symbol tells NeuroMiner that you have finished]</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>3 (Specify parent directory of the analysis) [Specify the directory using the pop-up window.]</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt; 3 (Initialize analysis)
+
+&gt;&gt; 1 (Define analysis identifier) 
+
+&gt;&gt; CV10x10_defaults
+
+&gt;&gt; 2 (Provide analysis description)
+
+&gt;&gt; My first NeuroMiner analysis!
+
+[Press Enter key to go to a new line]
+
+&gt;&gt; . [The dot symbol tells NeuroMiner that you have finished]
+
+&gt;&gt; 3 (Specify parent directory of the analysis) [Specify the directory using the pop-up window.]
+</pre></div>
+</div>
 <p>If you have filled all the required information, you will now see option 4 PROCEED. Choose it.</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>4 (PROCEED)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">4</span> <span class="p">(</span><span class="n">PROCEED</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>By doing so NM initializes the analysis and saves all the settings that we have joust defined, including the specific cv structure, the preprocessing steps, and learning algorithm. If you would now go back to the parameter template menu and change any of these, this would not affect the already initialized analysis. Additionally, NM has created a directory on your disk which will later be filled with the result files. You can verify that your analysis folder was created in the directory that you just specified. The folder name contains an ID number and the analysis identifier in its name.</p>
 <p>For now, save your NM structure again, just as you did after data entry.</p>
 </div>
@@ -608,60 +552,40 @@ But in this example, we just want to use the two default options, so navigate ba
 <h2>Training<a class="headerlink" href="#training" title="Permalink to this heading">#</a></h2>
 <p>Now that your settings are initialized, you can preprocess and train your data and model. We will trail the model directly without [running only the preprocessing first] (this can be useful, though, to reduce computational costs, e.g., if you are working with very high dimensional data, such as neuroimaging, or you just want to compare the performance of different learning algorithms but using the exact same preprocessing pipeline).</p>
 <p>In the “MAIN INTERFACE” menu, opt for the following:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>5 (Train supervised classifiers)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>3 (Select CV2 partitions to operate on)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>1 (Select all CV2 positions)
-[Press enter key to return to the previous menu]</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><p>4 (PROCEED)</p>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">5</span> <span class="p">(</span><span class="n">Train</span> <span class="n">supervised</span> <span class="n">classifiers</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="p">(</span><span class="n">Select</span> <span class="n">CV2</span> <span class="n">partitions</span> <span class="n">to</span> <span class="n">operate</span> <span class="n">on</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Select</span> <span class="nb">all</span> <span class="n">CV2</span> <span class="n">positions</span><span class="p">)</span>
+<span class="p">[</span><span class="n">Press</span> <span class="n">enter</span> <span class="n">key</span> <span class="n">to</span> <span class="k">return</span> <span class="n">to</span> <span class="n">the</span> <span class="n">previous</span> <span class="n">menu</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">4</span> <span class="p">(</span><span class="n">PROCEED</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Once you click on proceed, you will see a pop-up window, the NM Optimization viewer, which displays the performance of your model during the training process in real-time. Since we did not change the default setting of “accuracy” being the <a class="reference internal" href="4.2.03_paramtemp_classification_algorithm.html#paramtemp-classification-algorithm"><span class="std std-ref">performance metric to be optimized</span></a>, this graph displays the main accuracy of training, CV1 and CV2 folds.</p>
 <div class="admonition-note-for-macos-users admonition">
 <p class="admonition-title">Note for macOS users.</p>
 <p>If you are using NeuroMiner for the first time you might encounter an error here caused by additional security settings. Please see <a class="reference internal" href="3.0.00_macos_users.html#macos-users"><span class="std std-ref">our manual</span></a> on how to proceed in that case.</p>
 </div>
 <p>Once the training is finished, you will see the training menu in the Matlab command window again. To view your results, from the main interface, choose</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>8 (View Result Viewer)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">8</span> <span class="p">(</span><span class="n">View</span> <span class="n">Result</span> <span class="n">Viewer</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>The different plots are described <a class="reference internal" href="4.7_mainmenu_display_training_results.html#mainmenu-display-training-results"><span class="std std-ref">in the section</span></a>.</p>
 </div>
-<div class="section" id="visualisation">
-<h2>Visualisation<a class="headerlink" href="#visualisation" title="Permalink to this heading">#</a></h2>
+<div class="section" id="visualization">
+<h2>Visualization<a class="headerlink" href="#visualization" title="Permalink to this heading">#</a></h2>
 <p>After training the analysis, we have the option to <a class="reference internal" href="4.6_mainmenu_visualize_classifiers.html#visualize-classifiers"><span class="std std-ref">visualize the model</span></a> in order to get more insights into which of our input features (that is before preprocessing) contributed to our model’s predictions.</p>
 <p>Go to the main interface, then:</p>
-<blockquote>
-<div><blockquote>
-<div><p>6 (Visualize Classifiers)</p>
-</div></blockquote>
-<blockquote>
-<div><p>7 (PROCEED)</p>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">6</span> <span class="p">(</span><span class="n">Visualize</span> <span class="n">Classifiers</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">7</span> <span class="p">(</span><span class="n">PROCEED</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>With this, the analysis is complete. To visualize the results, go back to the main interface and press:</p>
-<blockquote>
-<div><blockquote>
-<div><p>8 (Open NM Results Viewer (cross-validation results))</p>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">8</span> <span class="p">(</span><span class="n">Open</span> <span class="n">NM</span> <span class="n">Results</span> <span class="n">Viewer</span> <span class="p">(</span><span class="n">cross</span><span class="o">-</span><span class="n">validation</span> <span class="n">results</span><span class="p">))</span>
+</pre></div>
+</div>
 <p>The different plots are explained in more detail <a class="reference internal" href="4.7.01_mainmenu_display_visualization_results.html#visualization-results"><span class="std std-ref">here</span></a>.</p>
 <p>At this point, save your NM structure again.</p>
 </div>
@@ -674,71 +598,37 @@ But in this example, we just want to use the two default options, so navigate ba
 <p>Another important concept is <a class="reference internal" href="4.8_mainmenu_OOCV_analysis.html#oocv-analysis"><span class="std std-ref">external validation</span></a>, i.e. generalizability of our model to external data.</p>
 <p>Since the validation of a model should serve as a test of generalizability and not as a tool to optimize model performance, NM strictly divides the training and the external validation phase. Once you enter into the external validation phase, you will not be able to go back to the training phase. This measure is meant for your own protection so that our claims of generalizability are not undermined!</p>
 <p>To go over to the external validation, lock the NeuroMiner structure containing your trained analyses:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>9 (Lock analyses and start NM application mode)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>y[es]
-[the available options in the menu should now change]</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">9</span> <span class="p">(</span><span class="n">Lock</span> <span class="n">analyses</span> <span class="ow">and</span> <span class="n">start</span> <span class="n">NM</span> <span class="n">application</span> <span class="n">mode</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">y</span><span class="p">[</span><span class="n">es</span><span class="p">]</span>
+<span class="p">[</span><span class="n">the</span> <span class="n">available</span> <span class="n">options</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">menu</span> <span class="n">should</span> <span class="n">now</span> <span class="n">change</span><span class="p">]</span>
+</pre></div>
+</div>
 <p>At this point, quickly exit NM to prepare the external validation data in the example_simulated_data folder and load the “validation_data_covars.mat” variable into the MATLAB workspace (NM has to be exited before). Note, in this simple example analysis, we are not actually using the covariates for preprocessing, so you could omit this step, but should you later implement, e.g., a site correction method like combat in your processing pipeline, it is essential to avoid running into errors later on. Then, start NeuroMiner again.</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>nm</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>2 (Load data for model application)</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">nm</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">2</span> <span class="p">(</span><span class="n">Load</span> <span class="n">data</span> <span class="k">for</span> <span class="n">model</span> <span class="n">application</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>In the newly opened pop-up window, you can create external validation data containers (by clicking on “Create New…”). You will need to specify whether, in this validation set, the labels are known or not. If you have labels, you can compute external validation performance metrics, if not, you will only get the prediction scores. For now, tick the box “Target labels known”, then click on “Create New’’. This creates a field in the middle blue center box that looks like this:
 [ 1 ] (0 cases); date: DATE; labels known: yes</p>
 <p>Now that we have created an empty container for our validation data, we need to fill it. To do so, press “add/modify data in dataset” which takes you to the entry menu of NeuroMiner, which is similar to the initial data entry before training. NM gives you an overview of the modalities that you had entered for the training data on top of the menu and whether you already loaded validation data for these. In our example, it is only Modality 1. To load the data,</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>1 (Add/Modify OOCV data)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>1 (Define data provenance)
-[choose COBRE_hammers_ROI.xlsx through the pop-up window]</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>2 (Define name of sheet in spreadsheet file)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>1 [to choose the first sheet]</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>6 (IMPORT matrix)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>5 (Add covariate data in OOCV data)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><p>Covars</p>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Add</span><span class="o">/</span><span class="n">Modify</span> <span class="n">OOCV</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Define</span> <span class="n">data</span> <span class="n">provenance</span><span class="p">)</span>
+<span class="p">[</span><span class="n">choose</span> <span class="n">COBRE_hammers_ROI</span><span class="o">.</span><span class="n">xlsx</span> <span class="n">through</span> <span class="n">the</span> <span class="n">pop</span><span class="o">-</span><span class="n">up</span> <span class="n">window</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">2</span> <span class="p">(</span><span class="n">Define</span> <span class="n">name</span> <span class="n">of</span> <span class="n">sheet</span> <span class="ow">in</span> <span class="n">spreadsheet</span> <span class="n">file</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">[</span><span class="n">to</span> <span class="n">choose</span> <span class="n">the</span> <span class="n">first</span> <span class="n">sheet</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">6</span> <span class="p">(</span><span class="n">IMPORT</span> <span class="n">matrix</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">5</span> <span class="p">(</span><span class="n">Add</span> <span class="n">covariate</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">OOCV</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">Covars</span>
+</pre></div>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Because the original data was entered from a textfile, NeuroMiner requires a textfile for the external validation data as well. Also, NeuroMiner will expect the same variable names for the cases, groups, and the features, otherwise it will give an error.</p>
@@ -749,42 +639,25 @@ But in this example, we just want to use the two default options, so navigate ba
 <p>The same goes for the covariates, you don’t need to load them here, but if the model you later validate on this data makes use of them during a preprocessing step, it will cause an error.</p>
 </div>
 <p>Return to the main interface and:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>3 (Set up parameters for model application), to see the menu below:</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">3</span> <span class="p">(</span><span class="n">Set</span> <span class="n">up</span> <span class="n">parameters</span> <span class="k">for</span> <span class="n">model</span> <span class="n">application</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>TO DO: do these options actually change anything???</p>
 <p>If you want the application of your external model to have a similar logic to the original model training, select:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>1 (Ensemble mode)</p>
-</div></blockquote>
-</div></blockquote>
-<blockquote>
-<div><blockquote>
-<div><p>2 (Compute mean decisions of CV1 partition ensembles before aggregating).</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">1</span> <span class="p">(</span><span class="n">Ensemble</span> <span class="n">mode</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="mi">2</span> <span class="p">(</span><span class="n">Compute</span> <span class="n">mean</span> <span class="n">decisions</span> <span class="n">of</span> <span class="n">CV1</span> <span class="n">partition</span> <span class="n">ensembles</span> <span class="n">before</span> <span class="n">aggregating</span><span class="p">)</span><span class="o">.</span> 
+</pre></div>
+</div>
 <p>Then, to accept the default in option 2 (Model retraining mode), exit to the main interface, and:</p>
-<blockquote>
-<div><blockquote>
-<div><p>4 (Apply classifiers to independent data)</p>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">4</span> <span class="p">(</span><span class="n">Apply</span> <span class="n">classifiers</span> <span class="n">to</span> <span class="n">independent</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>By selecting this, using the winning parameters from your discovery analyses, the models will now be retrained in the discovery data before being applied to the external validation data.</p>
 <p>Once done, you can view the results in the NM result viewer:</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>6 (Open Result Viewer (cross-validation &amp; independent test results))</p>
-</div></blockquote>
-</div></blockquote>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="mi">6</span> <span class="p">(</span><span class="n">Open</span> <span class="n">Result</span> <span class="n">Viewer</span> <span class="p">(</span><span class="n">cross</span><span class="o">-</span><span class="n">validation</span> <span class="o">&amp;</span> <span class="n">independent</span> <span class="n">test</span> <span class="n">results</span><span class="p">))</span>
+</pre></div>
+</div>
 <p>You will then be taken to the <a class="reference internal" href="4.6_mainmenu_visualize_classifiers.html#visualize-classifiers"><span class="std std-ref">Results Display</span></a> as before. After selecting the analysis you chose for the model application, you can click on the second drop-down box which shows an option to select the external validation data that you entered, as opposed to the default “Training/CV data”.</p>
 </div>
 </div>
@@ -846,7 +719,7 @@ But in this example, we just want to use the two default options, so navigate ba
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#training">Training</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualisation">Visualisation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">Visualization</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation">Interpretation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#external-validation">External validation</a></li>
 </ul>
