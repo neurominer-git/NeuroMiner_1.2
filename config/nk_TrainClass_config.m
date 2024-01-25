@@ -649,7 +649,7 @@ switch act
             NM.modeflag                 = LABEL.newmode;
             
             % Create default NM parameters space
-            nk_CVpartition_config(true);
+            %nk_CVpartition_config(true);
             NM.TrainParam.STACKING.flag = 2;
             NM.TrainParam.FUSION.flag   = 0;
             NM.TrainParam.FUSION.M      = 1;
