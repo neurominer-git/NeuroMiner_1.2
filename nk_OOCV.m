@@ -5,7 +5,7 @@ function [Results, FileNames, RootPath] = nk_OOCV(inp)
 % Independent test data prediction module
 % 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% (c) Nikolaos Koutsouleris, last modified 08/2023
+% (c) Nikolaos Koutsouleris, last modified 11/2023
 
 global SVM RFE MULTI MODEFL CV EVALFUNC OOCV SCALE SAV CVPOS RAND
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%% INITIALIZATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,6 +59,8 @@ switch TrainWithCV2Ts
 end
 
 % Check and transform labels if needed
+% Also if we are in multilabel mode this function return the current label
+% in inp.label
 inp = nk_ApplyLabelTransform( SCALE, MODEFL, inp );
 
 % Check whether oocv labels are available and process them accordingly.
@@ -95,12 +97,16 @@ else
             Results.PermAnal.ModelPermPerf = cell(nclass,1);
             Results.PermAnal.ModelObsPerf(curclass) = zeros(nclass,1);
             Results.PermAnal.ModelPermPerfCrit{curclass} = cell(nclass,1);
-            Results.PermAnal.ModelPermSignificance(curclass) = zeros(nclass,1);    
+            Results.PermAnal.ModelPermSignificance(curclass) = zeros(nclass,1); 
+            compfun = str2func(nk_ReturnEvalOperator(SVM.GridParam));
         end
     else
         Results.CV2Performance_PredictedValues_History = nan(1, nCV2 );
         Results.CV2Performance_PredictedValues = nan(1, nCV2 );
         labelDicho{1} = ones(size(inp.labelOOCV));
+        if inp.PERM.flag==1
+             compfun = str2func(nk_ReturnEvalOperator(SVM.GridParam));
+        end
     end
 end
 
@@ -167,7 +173,7 @@ paramfl = struct('use_exist',inp.loadparam, ...
 %Pre-smooth data, if needed, to save computational time
 inp.ll=inp.GridAct';inp.ll=find(inp.ll(:));
 inp = nk_PerfInitSpatial(analysis, inp, paramfl);
-
+cntOOCVDh = zeros( ix*jx, nclass, 2);
 % =========================================================================
 for f=1:ix % Loop through CV2 permutations
 
@@ -185,7 +191,7 @@ for f=1:ix % Loop through CV2 permutations
         CVPOS.CV2p = f;
         CVPOS.CV2f = d;
         
-        binOOCVDh = cell(nclass,1); cntOOCVDh = cell( nclass, 1 ); inp.f = f; inp.d = d; inp.ll = ll;
+        binOOCVDh = cell(nclass,1); inp.f = f; inp.d = d; inp.ll = ll;
         if inp.PERM.flag == 1
             binOOCVDh_perm = cell(nclass,1); 
             for h=1:nclass
@@ -247,13 +253,11 @@ for f=1:ix % Loop through CV2 permutations
                         [Ps, Pspos, nP, Pdesc] = nk_GetModelParams2(analysis, multiflag, ll, h, inp.curlabel);
 
                         if ~fndMD , MD{h} = cell(nP,1); end
-                        cntOOCVDh{h} = cell(1,nP);
                         cntModels = 1;
 
                         % Loop through parameter combinations
                         for m = 1 : nP
 
-                            cntOOCVDh{h,f,d}{m} = zeros(iy,jy,2);
                             cPs = Ps(m,:); sPs = nk_PrepMLParams(Ps, Pdesc, m);
                             P_str = nk_DefineMLParamStr(cPs, analysis.Model.ParamDesc, h);
 
@@ -380,7 +384,7 @@ for f=1:ix % Loop through CV2 permutations
                                             % labels
                                             for curperm = 1:inp.PERM.nperms
                                                 fprintf('.')
-                                                modelTrL_perm = nk_VisXPermY(Ymodel, inp.labels, TrInd, 1, indperm, [], curperm);
+                                                modelTrL_perm = nk_VisXPermY(Ymodel, inp.label, TrInd, 1, indperm, [], curperm);
                                                 [ ~, MD_perm ] = nk_GetParam2(Ymodel, modelTrL_perm , sPs, 1);
                                                 [ ~, ~, uD_perm( :, u, curperm) ] = nk_GetTestPerf(OCV, labelOOCV, F(:,u), MD_perm, Ymodel, 1);
                                                 if detrendfl
@@ -393,8 +397,6 @@ for f=1:ix % Loop through CV2 permutations
                                     fprintf('. Done');
                                     
                                     %% Step 3: Concatenate binary classifiers / predictors into [k,l,h] array
-                                    cntOOCVDh{h}{m}(k,l,1) = size(binOOCVDh{h},2)+1;
-                                    cntOOCVDh{h}{m}(k,l,2) = size(binOOCVDh{h},2)+size(uD,2);
                                     binOOCVDh{h} = [binOOCVDh{h} uD];
                                     if inp.PERM.flag == 1
                                        binOOCVDh_perm{h}(:,cntModels:cntModels+size(uD,2)-1,:) = uD_perm;
@@ -402,6 +404,17 @@ for f=1:ix % Loop through CV2 permutations
                                     cntModels = cntModels + size(uD,2);
                                 end
                             end
+                        end
+                        % Bug fix for wrong indexing causing nk_OOCV to
+                        % crash in permutation mode when concatenating
+                        % all predictions instead of concatenating the
+                        % CV1 mean predictions.
+                        if ll==1
+                            cntOOCVDh(ll, h, 1) = 1;
+                            cntOOCVDh(ll, h, 2) = cntModels-1;
+                        else
+                            cntOOCVDh(ll, h, 1) = cntOOCVDh(ll-1, h, 2) + 1;
+                            cntOOCVDh(ll, h, 2) = cntOOCVDh(ll, h, 1) + cntModels-2;
                         end
                     end
                     fprintf('\nSaving %s', oOOCVpath); 
@@ -424,9 +437,11 @@ for f=1:ix % Loop through CV2 permutations
                     fprintf('\n%s',vnam);
                     load(vpth)
                 end 
+
         end
         
         for curclass=1:nclass
+            [~, ~, nP, ~] = nk_GetModelParams2(analysis, multiflag, ll, curclass, inp.curlabel);
             if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel
                 fprintf('\nCompute mean of base learners'' outputs of current CV2 partition and add them to the ensemble matrix.')
                 EnsDat = nm_nanmedian(binOOCVDh{curclass},2);
@@ -441,7 +456,8 @@ for f=1:ix % Loop through CV2 permutations
                 if inp.PERM.flag == 1 
                     for m=1:nP
                         for curperm=1:inp.PERM.nperms
-                            binOOCVD_perm{curclass}(:,cntOOCVDh{curclass}{m}(k,l,1):cntOOCVDh{curclass}{m}(k,l,2),curperm) = binOOCVDh_perm{curclass}(:,:,curperm);
+                            binOOCVD_perm{curclass}(:,cntOOCVDh(ll, curclass, 1):cntOOCVDh(ll, h, 2),curperm) = ...
+                                binOOCVDh_perm{curclass}(:,:,curperm);
                         end
                     end
                 end
@@ -486,7 +502,6 @@ for f=1:ix % Loop through CV2 permutations
 
             % Compute multi-group labels (& performance, if labels are
             % available)
-            
             [Results.MultiCV2Performance, Results.MultiCV2Predictions] = ...
                 nk_MultiEnsPerf(multiOOCV, sign(multiOOCV), labelOOCV, multiClass, ngroups);
             if LabelMode
@@ -574,9 +589,19 @@ for f=1:ix % Loop through CV2 permutations
                         end
                     end
                 end
-            else
-                hdx_ll = nm_nanmedian(binOOCVDh{1},2); hdx_ll(indnan) = nan;
-                hdx = nm_nanmedian(binOOCVD{1},2); hdx(indnan) = nan;
+            else % regression case
+                if size(binOOCVDh{1},2)>1
+                    hdx_ll = nm_nanmedian(binOOCVDh{1},2); 
+                else
+                    hdx_ll = binOOCVDh{1}; 
+                end
+                if size(binOOCVD{1},2)>1
+                    hdx = nm_nanmedian(binOOCVD{1},2); 
+                else
+                    hdx = binOOCVD{1}; 
+                end
+                hdx_ll(indnan) = nan;
+                hdx(indnan) = nan;
                 if ll==1 || batchflag, Results.RegrLabels = labelOOCV; Results.RegrLabels(indnan) = nan; end
                 Results.CV2Performance_PredictedValues(ll) = EVALFUNC(Results.RegrLabels, hdx_ll);
                 Results.CV2Performance_PredictedValues_History(ll) = EVALFUNC(Results.RegrLabels, hdx);
@@ -736,7 +761,7 @@ for curclass = 1: nclass
                 end
                 Results.PermAnal.ModelObsPerf(curclass) = EVALFUNC(labelDicho{curclass}(indDicho{curclass}), hdx);
                 Results.PermAnal.ModelPermPerf{curclass} = PermPredPerf;
-                Results.PermAnal.ModelPermPerfCrit{curclass} = PermPredPerf >= Results.PermAnal.ModelObsPerf(curclass);
+                Results.PermAnal.ModelPermPerfCrit{curclass} = compfun(PermPredPerf, Results.PermAnal.ModelObsPerf(curclass));
                 Results.PermAnal.ModelPermSignificance(curclass) = sum(Results.PermAnal.ModelPermPerfCrit{curclass})/inp.PERM.nperms;    
             end
 
@@ -776,7 +801,7 @@ for curclass = 1: nclass
                         end
                         Results.Group{g}.PermAnal.ModelObsPerf(curclass) = EVALFUNC(Results.Group{g}.ObservedValues{curclass}, hdx);
                         Results.Group{g}.PermAnal.ModelPermPerf{curclass} = PermPredPerf;
-                        Results.Group{g}.PermAnal.ModelPermPerfCrit{curclass} = PermPredPerf >= Results.Group{g}.PermAnal.ModelObsPerf(curclass);
+                        Results.Group{g}.PermAnal.ModelPermPerfCrit{curclass} = compfun(PermPredPerf, Results.Group{g}.PermAnal.ModelObsPerf(curclass));
                         Results.Group{g}.PermAnal.ModelPermSignificance(curclass) = sum(Results.Group{g}.PermAnal.ModelPermPerfCrit{curclass})/inp.PERM.nperms;  
                     end
                 end
@@ -809,7 +834,7 @@ for curclass = 1: nclass
                 end
                 Results.PermAnal.ModelObsPerf = EVALFUNC(labelOOCV, hdx);
                 Results.PermAnal.ModelPermPerf = PermPredPerf;
-                Results.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.PermAnal.ModelObsPerf;
+                Results.PermAnal.ModelPermPerfCrit = compfun(PermPredPerf, Results.PermAnal.ModelObsPerf);
                 Results.PermAnal.ModelPermSignificance = sum(Results.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;    
             end
 
@@ -849,7 +874,7 @@ for curclass = 1: nclass
                             end
                             Results.Group{g}.PermAnal.ModelObsPerf = EVALFUNC(Results.Group{g}.ObservedValues, hdx);
                             Results.Group{g}.PermAnal.ModelPermPerf = PermPredPerf;
-                            Results.Group{g}.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.Group{g}.PermAnal.ModelObsPerf;
+                            Results.Group{g}.PermAnal.ModelPermPerfCrit = compfun(PermPredPerf, Results.Group{g}.PermAnal.ModelObsPerf);
                             Results.Group{g}.PermAnal.ModelPermSignificance = sum(Results.Group{g}.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;  
                         end
                     else
@@ -883,7 +908,7 @@ if MULTI.flag && multiflag
         end
         Results.MultiClass.PermAnal.ModelObsPerf = Results.MultiClass.performance.BAC_Mean;
         Results.MultiClass.PermAnal.ModelPermPerf = PermPredPerf;
-        Results.MultiClass.PermAnal.ModelPermPerfCrit = PermPredPerf >= Results.MultiClass.PermAnal.ModelObsPerf;
+        Results.MultiClass.PermAnal.ModelPermPerfCrit = compfun(PermPredPerf, Results.MultiClass.PermAnal.ModelObsPerf);
         Results.MultiClass.PermAnal.ModelPermSignificance = sum(Results.MultiClass.PermAnal.ModelPermPerfCrit)/inp.PERM.nperms;  
     end
 end
