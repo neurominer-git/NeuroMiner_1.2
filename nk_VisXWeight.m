@@ -284,7 +284,7 @@ for n=1:nM
                     end
                     if ~isempty(PA), mPA{m} = nmPA; end
                 end
-                if templfl, mWF{m} = nmWF; end
+                %if templfl, mWF{m} = nmWF; end
             end
         else
             mW{n} = nmW;
