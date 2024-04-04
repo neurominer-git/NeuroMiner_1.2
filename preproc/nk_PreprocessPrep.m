@@ -130,6 +130,7 @@ switch act
 
             NM.runtime.curanal = analdim(i);
             tdir = pwd; if isfield(analysis,'rootdir') && exist(analysis.rootdir,'dir'), tdir = analysis.rootdir; end
+            if ~exist(analysis.rootdir,'dir'), mkdir(analysis.rootdir);end
             % Define modality-independent parameters of current analysis as global variables
             
             if ~isempty(STACKING) && STACKING.flag ==1
