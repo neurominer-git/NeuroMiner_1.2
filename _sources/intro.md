@@ -6,7 +6,7 @@ name: fig:nm_hero_right
 alt: neurominer logo
 ---
 ```
-## Manual for NeuroMiner Version 1.1
+## Manual for NeuroMiner Version 1.2
 
 Software written by Nikolaos Koutsouleris, Clara Vetter & Ariane Wiegand
 
