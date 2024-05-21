@@ -120,7 +120,7 @@ for i=1:nMD
         % if not, compute the destination-group specific mean 
         if VERBOSE, fprintf('\nNeither saved group mean or source group exists for destination group %g. Use destination group to compute means',MD(i)); end
         meanGi = nm_nanmean(Y(IN.dIND == MD(i),:));
-        if all(indGS == 0) % CV: does this make sense? (4.4.2024)
+        if all(indGS == 0) 
             IN.meanY = nm_nanmean(Y(indGD,:)); 
         end
     end

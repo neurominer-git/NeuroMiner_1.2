@@ -183,7 +183,7 @@ for i=1:nP % Loop through hyperparameter combinations
             origRAND, ...
             IN.verbose, IN.Modalities, IN.DataLabel, IN.NRanalysis, IN.add2orig, IN.NReps, IN.SitesIdx, IN.condIdx); % varargin
     else
-        [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), P(i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose, [], [], [], [], IN.reps);
+        [R(i), R95CI(:,i)] = compute_perf(P(i,1), P(i,2), P(i,3), P(i,4), open (i,5), P(i,6), P(i,7), P(i,8), P(i,9), P(1,10), IN.algorithm, IN.RAND, IN.verbose, [], [], [], [], IN.reps);
     end
     % Update the simulation plot
     if exist("ax")

@@ -172,7 +172,9 @@ paramfl = struct('use_exist',inp.loadparam, ...
 
 %Pre-smooth data, if needed, to save computational time
 inp.ll=inp.GridAct';inp.ll=find(inp.ll(:));
-inp = nk_PerfInitSpatial(analysis, inp, paramfl);
+if ~inp.analmode
+    inp = nk_PerfInitSpatial(analysis, inp, paramfl);
+end
 cntOOCVDh = zeros( ix*jx, nclass, 2);
 % =========================================================================
 for f=1:ix % Loop through CV2 permutations
