@@ -136,7 +136,7 @@ if inp.PERM.flag==1
         if ~RFE.CV2Class.EnsembleStrategy.AggregationLevel
             binOOCVD_perm{h} = nan(inp.nOOCVsubj, sum(inp.analysis.NumModels(h,:, inp.curlabel)>0), inp.PERM.nperms);
         else
-            binOOCVD_perm{h} = nan(inp.nOOCVsubj, sum(inp.analysis.NumModels(h, :, inp.curlabel)), inp.PERM.nperms);
+            binOOCVD_perm{h} = nan(inp.nOOCVsubj, sum(inp.analysis.NumModels(h, :, inp.curlabel)), inp.PERM.nperms); % this can cause oom issues if many observations, models and permutaitons
         end
     end
 end
