@@ -429,6 +429,9 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-preprocessing-step">Add preprocessing step</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#enable-spatial-operations-using-spatial-op-wizard">Enable spatial operations using Spatial OP Wizard</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regress-out-nuisance-covariates">Regress out nuisance covariates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-correlations-options">Partial Correlations options</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#combat-options">ComBat options</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disparate-impact-remover-options">Disparate Impact Remover options</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#apply-dimensionality-reduction-method-to-data">Apply dimensionality reduction method to data</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-subspaces">Extracting Subspaces</a></li>
 </ul>
@@ -523,22 +526,22 @@ document.write(`
 <img alt="neurominer residualization Options" src="_images/NM_preproc_residualization.png" />
 </div>
 <p><strong>1 | Select method</strong></p>
-<p>The first option gives you two possible methods to regress out the covariates: Partial Correlations and ComBat. Partial correlations method computes the coefficients that generate the chosen covariate effects in the data with a general linear model. In addition to the partial correlations method, ComBat also scales the variance estimators. It allows to separate the label (e.g., disease) effects and the covariate effects in the data to some degree. For more detailed information about the ComBat method please check <a class="reference external" href="https://academic.oup.com/biostatistics/article/8/1/118/252073">Johnson et al.,
-2007</a>. Currently, Combat can only be used to correct for batch effects (e.g. site, sex). It requires a numeric vector encoding batch effects to be modeled out. In contrast, partial correlations should be used with a dummy-coded matrix if the user wants to correct for batch effects using this method.</p>
+<p>The first option gives you three possible methods to regress out the covariates: Partial Correlations, ComBat and Disparate Impact Remover (DIR). The partial correlations method computes the coefficients that generate the chosen covariate effects in the data with a general linear model. In addition to the partial correlations method, ComBat also scales the variance estimators. It allows to separate the label (e.g., disease) effects and the covariate effects in the data to some degree. For more detailed information about the ComBat method please check <a class="reference external" href="https://academic.oup.com/biostatistics/article/8/1/118/252073">Johnson et al.,
+2007</a>. Currently, Combat can only be used to correct for batch effects (e.g. site, sex). It requires a numeric vector encoding batch effects to be modeled out. In contrast, partial correlations should be used with a dummy-coded matrix if the user wants to correct for batch effects using this method. Finally, DIR is a method that allows users to transform the features of the dataset so that predictions are fair and do not disproportionately disadvantage any particular group (e.g., race, gender or age groups). Briefly, the algorithm calculates the distribution of values for each selected feature for two or more subject groups (e.g., males and females), calculates the median/mean distribution for all subjects, and applies a percentage of correction (known as repair level, or alpha) to each group towards that median/mean distribution. For a more detailed explanation of the DIR method, please visit the original publication <a class="reference external" href="https://doi.org/10.48550/arXiv.1412.3756">Feldman et al., 2014</a>.</p>
+<p>Depending on the selected method, the following configuration options will change. Below there is a description of the options for each method.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Please be aware that ComBat does not provide you with an external validation mode if new sites appear in the test data. For this case, there is a function in NeuroMiner called nk_MultiCentIntensNorm2.m. This function binarizes the interacting covariate and finds the bin with the largest overlap (N) between sites. In this subgroup it computes partial correlation coefficients or offsets and applies those to the entire group to correct for group effects.</p>
 </div>
-<p><strong>2 | Select covariates from NM covariates matrix</strong></p>
-<p>Selecting the second option will allow you to choose the covariates that you want to control the data with. You select the covariate(s) by entering in either a single numeral (e.g., 1) or many (e.g., 1:2) relating to the covariates that have been previously entered. Once these are selected, the user will be returned to the partial correlations setup menu.</p>
-<p><strong>3 | include intercept</strong></p>
-<p>The choice of whether to include an intercept
-is based on your research question and relate to intercept inclusion in
-any other use of regression.</p>
-<p><strong>4 | attenuate or increase covariate effects</strong></p>
-<p>Allows the user to
-either attenuate or increase the effects of the covariate on the data
-using regression.</p>
+</div>
+<div class="section" id="partial-correlations-options">
+<h2>Partial Correlations options<a class="headerlink" href="#partial-correlations-options" title="Permalink to this heading">#</a></h2>
+<p><strong>2 | Select covariates from NM covariate matrix</strong></p>
+<p>Selecting the second option will allow you to choose the covariates that you want to control the data with. You select the covariate(s) by entering in either a single numeral (e.g., 1) or many (e.g., 1:2) relating to the covariates that have been previously entered. Once these are selected, the user will be returned to the partial correlations setup menu. Currently, the DIR method only allows for categorical covariates.</p>
+<p><strong>3 | Use intercept in partial correlation analysis</strong></p>
+<p>The choice of whether to include an intercept is based on your research question and relate to intercept inclusion in any other use of regression.</p>
+<p><strong>4 | Attenuate or increase covariate effects</strong></p>
+<p>Allows the user to either attenuate or increase the effects of the covariate on the data using regression.</p>
 <p><strong>5 | use externally-computed beta coefficients</strong></p>
 <p>Allows the user to
 enter beta coefficients from a regression that has been previously
@@ -551,6 +554,32 @@ changed during previous preprocessing steps.</p>
 2015</a> and <a class="reference external" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0022193">Dukart et al.,
 2016</a>). This function is useful when the user does not want to remove variance that may interact with the target of interest. For example, brain volume in schizophrenia interacts with age, therefore, the relationship between age and brain volume can be modeled in the control participants only and then these beta coefficients can be used in the schizophrenia sample to remove the effects of age without removing the effects of illness.</p>
 <p>When this option is selected, you will see that another option <strong>7 | Provide index to training cases for computing betas</strong> is added to the menu. Select it to define a logical vector consisting of TRUE and FALSE corresponding to the participants in the study; e.g., [0 0 0 0 1 1 1 1]. A FALSE value (i.e., a zero) indicates that they will not be used in the calculation of the betas. A TRUE value (i.e., a 1) indicates that they will be used in the calculation of the betas. Logical vectors can be created from normal double vectors by simply typing ”logical(yourvector)” on the command line (“0”s and “1”s will automatically treated as logical values as well).</p>
+</div>
+<div class="section" id="combat-options">
+<h2>ComBat options<a class="headerlink" href="#combat-options" title="Permalink to this heading">#</a></h2>
+<p><strong>2 | Select covariates from NM covariate matrix</strong></p>
+<p>Selecting the second option will allow you to choose the covariates that you want to control the data with. You select the covariate(s) by entering in either a single numeral (e.g., 1) or many (e.g., 1:2) relating to the covariates that have been previously entered. Once these are selected, the user will be returned to the partial correlations setup menu. Currently, the DIR method only allows for categorical covariates.</p>
+<p><strong>3 | Retain variance effects during correction</strong></p>
+<p>This option allows to retain the variance effects from a selected covariate of interest, while correcting from batch effects from the covariate selected in the option 2. If this option is set to “yes”, a new option will appear: <strong>4 | Define retainment covariates (ComBat method)</strong> which allows the user to select the retainment covariate in a analogous fashion to the removed covariate in option 2. Additionally, another option will also be added: <strong>5 | Include NM label in variance retainment</strong>. This option allows to include the label (e.g., control vs. schizophrenia) as a retainment covariate. This means that the ComBat algorithm will retain the variance from the different label groups.</p>
+<p><strong>6 | Define subgroup of training cases</strong></p>
+<p>Option 5 allows the user to define a subgroup of training cases for the ComBat correction, which are then applied to the data (as discussed in the supplementary material of <a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/25935725">Koutsouleris et al.,
+2015</a> and <a class="reference external" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0022193">Dukart et al.,
+2016</a>). This function is useful when the user does not want to remove variance that may interact with the target of interest. For example, brain volume in schizophrenia interacts with age, therefore, the relationship between age and brain volume can be modeled in the control participants only and then the same ComBat correction can be used in the schizophrenia sample to remove the effects of age without removing the effects of illness.</p>
+<p>When this option is selected, you will see that another option <strong>7 | Provide index to training cases</strong> is added to the menu. Select it to define a logical vector consisting of TRUE and FALSE corresponding to the participants in the study; e.g., [0 0 0 0 1 1 1 1]. A FALSE value (i.e., a zero) indicates that they will not be used in the ComBat calculation. A TRUE value (i.e., a 1) indicates that they will be used in the calculation. Logical vectors can be created from normal double vectors by simply typing ”logical(yourvector)” on the command line (“0”s and “1”s will automatically treated as logical values as well).</p>
+</div>
+<div class="section" id="disparate-impact-remover-options">
+<h2>Disparate Impact Remover options<a class="headerlink" href="#disparate-impact-remover-options" title="Permalink to this heading">#</a></h2>
+<p><strong>2 | Select covariates from NM covariate matrix</strong></p>
+<p>Selecting the second option will allow you to choose the covariates that you want to control the data with. You select the covariate(s) by entering in either a single numeral (e.g., 1) or many (e.g., 1:2) relating to the covariates that have been previously entered. Once these are selected, the user will be returned to the partial correlations setup menu. Currently, the DIR method only allows for categorical covariates.</p>
+<p><strong>3 | Type of distribution</strong></p>
+<p>Measure used to calculate the “ideal” feature distribution used for correction. If the mean is selected, then the ideal distribution is calculated by calculating the mean of frequency of each bin among all the distributions from the covariate groups. If the median is selected, the same process is applied, but using the median.</p>
+<p><strong>4 | Strength of correction</strong></p>
+<p>This option determines the repair level. A value of 0 will apply no correction (the feature distribution will remain the same), while a strength of correction of 1 will totally correct the distributions to the mean/median distribution among the covariate groups.</p>
+<p><strong>5 | Define subgroup of training cases</strong></p>
+<p>Option 5 allows the user to define a subgroup of training cases for computing the DIR distributions, which are then applied to the data (as discussed in the supplementary material of <a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/25935725">Koutsouleris et al.,
+2015</a> and <a class="reference external" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0022193">Dukart et al.,
+2016</a>). This function is useful when the user does not want to remove variance that may interact with the target of interest.</p>
+<p>When this option is selected, you will see that another option <strong>6 | Provide index to training cases</strong> is added to the menu. Select it to define a logical vector consisting of TRUE and FALSE corresponding to the participants in the study; e.g., [0 0 0 0 1 1 1 1]. A FALSE value (i.e., a zero) indicates that they will not be used in the calculation of the distributions. A TRUE value (i.e., a 1) indicates that they will be used in the calculation. Logical vectors can be created from normal double vectors by simply typing ”logical(yourvector)” on the command line (“0”s and “1”s will automatically treated as logical values as well).</p>
 <hr class="docutils" />
 </div>
 <div class="section" id="apply-dimensionality-reduction-method-to-data">
@@ -1029,6 +1058,9 @@ PLS first extracts a set of latent factors that explain as much of the covarianc
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-preprocessing-step">Add preprocessing step</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#enable-spatial-operations-using-spatial-op-wizard">Enable spatial operations using Spatial OP Wizard</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regress-out-nuisance-covariates">Regress out nuisance covariates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-correlations-options">Partial Correlations options</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#combat-options">ComBat options</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disparate-impact-remover-options">Disparate Impact Remover options</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#apply-dimensionality-reduction-method-to-data">Apply dimensionality reduction method to data</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-subspaces">Extracting Subspaces</a></li>
 </ul>
