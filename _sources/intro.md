@@ -6,7 +6,19 @@ name: fig:nm_hero_right
 alt: neurominer logo
 ---
 ```
+
+
+:::{note}
+A NEW VERSION OF NEUROMINER IS NOW AVAILABLE - CHECK OUT THE NEW MANUAL TOO: https://neurominer-git.github.io/NeuroMiner_1.3/intro.html 
+
+This manual will not be maintained. 
+:::
+
+
+
 ## Manual for NeuroMiner Version 1.2
+
+
 
 Software written by Nikolaos Koutsouleris, Clara Vetter & Ariane Wiegand
 
