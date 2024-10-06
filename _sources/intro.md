@@ -22,10 +22,7 @@ This manual will not be maintained.
 
 Software written by Nikolaos Koutsouleris, Clara Vetter & Ariane Wiegand
 
-Manual written by Dom Dwyer
 
-with contributions from
-Ariane Wiegand, Clara Vetter, Carlos Cabral, Shalaila Haas, Anne Ruef, Adyasha Khuntia, Elif Sarisik, Madalina Buciuman, Mark Dong, Paolo Enrico, Lisa-Maria Neuner, Clara Weyer
 
 Version release date: 21st September 2023
 
